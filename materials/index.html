@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Материалы — IT College Hub</title>
+  <link rel="stylesheet" href="../static/css/styles.css" />
+  <script defer src="../static/js/data.js"></script>
+  <script defer src="../static/js/storage.js"></script>
+  <script defer src="../static/js/components.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="logo">IT College Hub</a>
+    <nav class="nav">
+      <a class="nav-link" href="../specialties/index.html">Специальности</a>
+    </nav>
+  </div>
+</header>
+<main class="container section">
+  <div id="wrap"></div>
+</main>
+<script>
+  function getParam(name){ return new URLSearchParams(location.search).get(name); }
+  document.addEventListener('DOMContentLoaded', () => {
+    const topicId = getParam('topic');
+    const all = Store.allMaterials();
+    const list = all[topicId] || [];
+
+    const mount = document.getElementById('wrap');
+
+    if (!list.length) {
+      mount.appendChild(UI.el('div', { class: 'card' }, [
+        UI.el('h2', {}, 'Материалы не найдены'),
+        UI.el('p', { class: 'meta' }, 'Попробуйте выбрать другую тему или спросите преподавателя.'),
+      ]));
+      return;
+    }
+
+    list.forEach(m => {
+      mount.appendChild(UI.el('div', { class: 'card' }, [
+        UI.el('span', { class: 'badge' }, m.kind === 'theory' ? 'Теория' : m.kind === 'practice' ? 'Практика' : 'Прочее'),
+        UI.el('h3', {}, m.title),
+        UI.el('p', {}, m.content)
+      ]));
+    })
+  });
+</script>
+</body>
+</html>

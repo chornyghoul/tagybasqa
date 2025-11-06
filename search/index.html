@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Поиск по темам — IT College Hub</title>
+  <link rel="stylesheet" href="../static/css/styles.css" />
+  <script defer src="../static/js/data.js"></script>
+  <script defer src="../static/js/storage.js"></script>
+  <script defer src="../static/js/components.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="logo">IT College Hub</a>
+    <nav class="nav">
+      <a class="nav-link" href="../specialties/index.html">Специальности</a>
+    </nav>
+  </div>
+</header>
+<main class="container section">
+  <h1>Поиск по темам</h1>
+  <div id="search"></div>
+</main>
+<script>
+  function getParam(name){ return new URLSearchParams(location.search).get(name); }
+  document.addEventListener('DOMContentLoaded', () => {
+    const preset = { q: getParam('q') || '', level: getParam('level') || '', kind: getParam('kind') || '' };
+    const currentSpecialty = getParam('specialty') || '';
+
+    const mount = document.getElementById('search');
+
+    // Поисковая строка + фильтры
+    const { wrap, input, level, kind } = UI.searchInput({ withFilters: true, preset, onInput: render });
+
+    // Автодополнение
+    const suggest = UI.el('div', { class: 'card' });
+    input.addEventListener('input', () => {
+      const q = input.value.toLowerCase();
+      suggest.innerHTML = '';
+      if (!q) return;
+      const items = AppData.searchIndex
+        .filter(x => !currentSpecialty || x.key === currentSpecialty)
+        .filter(x => x.label.toLowerCase().includes(q) || (x.tags||[]).some(t => t.toLowerCase().includes(q)))
+        .slice(0, 5);
+      items.forEach(s => {
+        const a = UI.el('a', { class: 'nav-link', href: s.type === 'specialty' ? `../specialties/view.html?key=${s.key}` : `../materials/index.html?topic=${s.id}` }, s.label);
+        suggest.appendChild(a);
+      });
+    });
+
+    const results = UI.el('div', { class: 'grid' });
+
+    mount.appendChild(wrap);
+    mount.appendChild(UI.el('div', { class: 'notice' }, 'Поиск локальный. Для продакшена подключите Algolia или ElasticSearch.'));
+    mount.appendChild(suggest);
+    mount.appendChild(results);
+
+    function render(state) {
+      const q = (state.q || '').toLowerCase();
+      results.innerHTML = '';
+      const pools = [];
+      Object.entries(AppData.topics).forEach(([key, list]) => {
+        if (currentSpecialty && key !== currentSpecialty) return;
+        list.forEach(t => {
+          if (state.level && t.level !== state.level) return;
+          if (state.kind && t.type !== state.kind) return;
+          if (q && !t.title.toLowerCase().includes(q) && !(t.tags||[]).some(tag => tag.toLowerCase().includes(q))) return;
+          results.appendChild(UI.topicItem(t));
+        })
+      });
+    }
+
+    render(preset);
+  });
+</script>
+</body>
+</html>

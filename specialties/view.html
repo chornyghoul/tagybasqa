@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Специальность — IT College Hub</title>
+  <link rel="stylesheet" href="../static/css/styles.css" />
+  <script defer src="../static/js/data.js"></script>
+  <script defer src="../static/js/storage.js"></script>
+  <script defer src="../static/js/components.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="logo">IT College Hub</a>
+    <nav class="nav">
+      <a class="nav-link" href="../search/index.html">Поиск</a>
+    </nav>
+  </div>
+</header>
+<main class="container section">
+  <div id="wrap"></div>
+</main>
+<script>
+  function getParam(name){ return new URLSearchParams(location.search).get(name); }
+  document.addEventListener('DOMContentLoaded', () => {
+    const key = getParam('key');
+    const sp = AppData.specialties.find(s => s.key === key);
+    const wrap = document.getElementById('wrap');
+    if (!sp) { wrap.textContent = 'Специальность не найдена'; return; }
+
+    wrap.appendChild(UI.el('div', { class: 'card', style: `background:${sp.color}` }, [
+      UI.el('div', { class: 'meta' }, sp.code),
+      UI.el('h1', {}, sp.title),
+      UI.el('p', {}, sp.desc),
+      UI.el('div', { class: 'actions' }, [
+        UI.el('a', { class: 'btn btn-secondary', href: `../search/index.html?specialty=${sp.key}` }, 'Поиск по темам')
+      ])
+    ]));
+
+    // Поиск и список тем
+    const preset = { q: new URLSearchParams(location.search).get('q') || '' };
+    const { wrap: searchWrap } = UI.searchInput({ placeholder: 'Найти тему...', withFilters: true, preset, onInput: filterRender });
+    wrap.appendChild(searchWrap);
+
+    const list = UI.el('div', { class: 'grid' });
+    wrap.appendChild(list);
+
+    function filterRender(state) {
+      const q = (state.q || '').toLowerCase();
+      const level = state.level || '';
+      const kind = state.kind || '';
+      list.innerHTML = '';
+      const topics = AppData.topics[key] || [];
+      topics
+        .filter(t => !q || t.title.toLowerCase().includes(q) || (t.tags||[]).some(tag => tag.toLowerCase().includes(q)))
+        .filter(t => !level || t.level === level)
+        .filter(t => !kind || t.type === kind)
+        .forEach(t => list.appendChild(UI.topicItem(t)));
+    }
+
+    filterRender(preset);
+  });
+</script>
+</body>
+</html>
