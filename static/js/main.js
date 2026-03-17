@@ -1,358 +1,157 @@
-// Инициализация базы данных пользователей в localStorage
-function initUserDatabase() {
-    if (!localStorage.getItem('users')) {
-        // Создаем тестовых пользователей
-        const testUsers = [
-            {
-                id: '1',
-                name: 'Иван Студентов',
-                email: 'admin@qwer.ru         ',
-                password: 'admin',
-                role: 'student'
-            }
-        ];
-        localStorage.setItem('users', JSON.stringify(testUsers));
+// main.js — ФИНАЛЬНАЯ РАБОЧАЯ ВЕРСИЯ (2025)
+
+let currentUser = null;  // ← глобальная переменная (можно оставить, но мы будем читать из localStorage)
+
+const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
+
+// ГЛАВНАЯ ФУНКЦИЯ — всегда читает из localStorage
+function updateAuthUI() {
+  console.log('→ updateAuthUI() вызвана');
+
+  // ВСЕГДА читаем свежие данные из localStorage
+  const stored = localStorage.getItem('currentUser');  // ← только этот ключ!
+  const user = stored ? JSON.parse(stored) : null;
+
+  console.log('Пользователь из localStorage:', user);
+
+  const authBlock = document.getElementById('authButtons');
+  if (!authBlock) {
+    console.warn('Блок #authButtons не найден!');
+    return;
+  }
+
+  const signupBtn  = authBlock.querySelector('.hero-header__signup');
+  const profileBtn = authBlock.querySelector('.hero-header__profile');
+  const menuBtn    = authBlock.querySelector('.hero-header__menu-btn');
+
+  if (user) {
+    console.log('АВТОРИЗОВАН:', user.name || user.email);
+
+    document.body.classList.remove('guest');
+    document.body.classList.add('authenticated');
+
+    if (signupBtn)  signupBtn.style.display = 'none';
+    if (profileBtn) profileBtn.style.display = isMobile() ? 'none' : 'flex';
+    if (menuBtn) {
+      menuBtn.style.display = isMobile() ? 'flex' : 'none';
+      menuBtn.onclick = toggleMenu;
     }
-}
 
-// Получение всех пользователей из базы данных
-function getUsers() {
-    return JSON.parse(localStorage.getItem('users')) || [];
-}
+    if (isMobile()) createMobileMenu(user);  // передаём user
 
-// Сохранение пользователя в базу данных
-function saveUser(user) {
-    const users = getUsers();
-    users.push(user);
-    localStorage.setItem('users', JSON.stringify(users));
-}
+  } else {
+    console.log('ГОСТЬ — показываем кнопку регистрации');
 
-// Поиск пользователя по email
-function findUserByEmail(email) {
-    const users = getUsers();
-    return users.find(user => user.email === email);
-}
+    document.body.classList.remove('authenticated');
+    document.body.classList.add('guest');
 
-// Проверка, существует ли пользователь с таким email
-function isUserExists(email) {
-    return findUserByEmail(email) !== undefined;
-}
-
-// Валидация формы регистрации
-function validateRegistrationForm(formData) {
-    const errors = {};
-    
-    // Проверка ФИО
-    if (!formData.name.trim()) {
-        errors.name = 'ФИО обязательно для заполнения';
-    } else if (formData.name.trim().length < 2) {
-        errors.name = 'ФИО должно содержать минимум 2 символа';
+    if (signupBtn) {
+      signupBtn.style.display = 'flex';
+      console.log('Кнопка "Регистрация" — ВИДИМА');
     }
-    
-    // Проверка email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-        errors.email = 'Email обязателен для заполнения';
-    } else if (!emailRegex.test(formData.email)) {
-        errors.email = 'Введите корректный email';
-    } else if (isUserExists(formData.email)) {
-        errors.email = 'Пользователь с таким email уже существует';
+    if (profileBtn) profileBtn.style.display = 'none';
+    if (menuBtn)    menuBtn.style.display = 'none';
+
+    // Очищаем мобильное меню
+    const menu = document.getElementById('mobileMenu');
+    if (menu) {
+      menu.innerHTML = '';
+      menu.classList.remove('open');
+      document.body.classList.remove('menu-open');
+      document.body.style.overflow = '';
     }
-    
-    // Проверка пароля
-    if (!formData.password) {
-        errors.password = 'Пароль обязателен для заполнения';
-    } else if (formData.password.length < 6) {
-        errors.password = 'Пароль должен содержать минимум 6 символов';
-    }
-    
-    // Проверка подтверждения пароля
-    if (!formData.confirmPassword) {
-        errors.confirmPassword = 'Подтверждение пароля обязательно';
-    } else if (formData.password !== formData.confirmPassword) {
-        errors.confirmPassword = 'Пароли не совпадают';
-    }
-    
-    return errors;
+  }
 }
 
-// Валидация формы входа
-function validateLoginForm(formData) {
-    const errors = {};
-    
-    // Проверка email
-    if (!formData.email.trim()) {
-        errors.email = 'Email обязателен для заполнения';
-    } else if (!isUserExists(formData.email)) {
-        errors.email = 'Пользователь с таким email не найден';
-    }
-    
-    // Проверка пароля
-    if (!formData.password) {
-        errors.password = 'Пароль обязателен для заполнения';
-    } else {
-        const user = findUserByEmail(formData.email);
-        if (user && user.password !== formData.password) {
-            errors.password = 'Неверный пароль';
-        }
-    }
-    
-    return errors;
+// Создание мобильного меню — принимаем user как параметр
+function createMobileMenu(user) {
+  if (!user || !isMobile()) return;
+
+  const menu = document.getElementById('mobileMenu');
+  const content = menu?.querySelector('.mobile-menu__content');
+  if (!content) return;
+
+  content.innerHTML = `
+    <div class="mobile-menu__handle"></div>
+    <div class="mobile-menu__inner">
+      <div class="mobile-menu__header">
+        <span class="mobile-menu__greeting">Привет, ${user.name || 'Друг'}!</span>
+        <button class="mobile-menu__close" aria-label="Закрыть"><i class="fa fa-times"></i></button>
+      </div>
+      <nav class="mobile-menu__nav">
+        <ul class="mobile-menu__list">
+          <li><a href="index.html"><i class="fa fa-home"></i> Главная</a></li>
+          <li><a href="./specialties.html"><i class="fa fa-book"></i> Спецальности</a></li>
+          <li><a href="games/index.html"><i class="fa fa-gamepad"></i> Игры</a></li>
+          <li><a href="tests/index.html"><i class="fa fa-question-circle"></i> Тесты</a></li>
+          <li><a href="presentations/index.html"><i class="fa fa-slideshare"></i> Презентации</a></li>
+          <div class="mobile-menu__divider"></div>
+          <li><a href="./profile.html"><i class="fa fa-user"></i> Профиль</a></li>
+          <li><a href="./dashboard.html"><i class="fa fa-tachometer-alt"></i> Кабинет</a></li>
+          <li><a href="./settings.html"><i class="fa fa-cog"></i> Настройки</a></li>
+          <div class="mobile-menu__divider"></div>
+          <li><a href="#" onclick="logout(event)" style="color:#ff4444">
+            <i class="fa fa-sign-out-alt"></i> Выйти
+          </a></li>
+        </ul>
+      </nav>
+    </div>
+  `;
+
+  content.querySelector('.mobile-menu__close').onclick = toggleMenu;
+  menu.querySelector('.mobile-menu__overlay')?.addEventListener('click', toggleMenu);
 }
 
-// Отображение ошибок в форме
-function displayFormErrors(formId, errors) {
-    // Скрыть все сообщения об ошибках
-    const errorElements = formId === 'loginForm' 
-        ? document.querySelectorAll('#loginForm .error-message')
-        : document.querySelectorAll('#regForm .error-message');
-    
-    errorElements.forEach(el => {
-        el.style.display = 'none';
-    });
-    
-    // Показать ошибки
-    Object.keys(errors).forEach(field => {
-        let errorElement;
-        if (formId === 'loginForm') {
-            // Для формы логина используем другие ID
-            errorElement = document.getElementById(`login${field.charAt(0).toUpperCase() + field.slice(1)}Error`);
-        } else {
-            // Для формы регистрации обычные ID
-            errorElement = document.getElementById(`${field}Error`);
-        }
-        
-        if (errorElement) {
-            errorElement.textContent = errors[field];
-            errorElement.style.display = 'block';
-        }
-    });
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const icon = document.querySelector('.hero-header__menu-btn i');
+  const isOpen = menu.classList.toggle('open');
+
+  icon?.classList.toggle('fa-bars', !isOpen);
+  icon?.classList.toggle('fa-times', isOpen);
+  document.body.classList.toggle('menu-open', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
 }
 
+// ВЫХОД — ИСПРАВЛЕНО НА 100%
+function logout(e) {
+  e.preventDefault();
 
-// Открытие модального окна
-function openModal(modalId) {
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.remove('open');
-    });
-    document.getElementById(modalId).classList.add('open');
+  if (!confirm('Выйти из аккаунта?')) {
+    console.log('Выход отменён');
+    return;
+  }
+
+  console.log('Удаляем currentUser из localStorage...');
+  localStorage.removeItem('currentUser');  // ← только этот ключ!
+
+  console.log('localStorage.currentUser после удаления:', localStorage.getItem('currentUser')); // → null
+
+  updateAuthUI();  // ← теперь точно увидит, что пользователя нет
+
+  const menu = document.getElementById('mobileMenu');
+  if (menu?.classList.contains('open')) {
+    console.log('Меню закрыто');
+    toggleMenu();
+  }
+
+  console.log('УСПЕШНЫЙ ВЫХОД');
 }
 
-// Закрытие модального окна
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('open');
-}
+// Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Страница загружена — проверяем авторизацию');
+  updateAuthUI();
 
-// Обновление интерфейса в зависимости от состояния авторизации
-function updateUI() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    
-    if (currentUser) {
-        // Пользователь авторизован
-        document.querySelectorAll('[data-guest="true"]').forEach(el => {
-            el.style.display = 'none';
-        });
-        document.querySelectorAll('[data-auth="true"]').forEach(el => {
-            el.style.display = 'flex';
-        });
-        document.getElementById('userContent').style.display = 'flex';
-        
-        // Обновление информации о пользователе
-        document.getElementById('userName').textContent = currentUser.name;
-        document.getElementById('userRole').textContent = currentUser.role === 'student' ? 'Студент' : 'Преподаватель';
-        document.getElementById('userRole').className = `user-role ${currentUser.role}`;
-        document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-    } else {
-        // Пользователь не авторизован
-        document.querySelectorAll('[data-guest="true"]').forEach(el => {
-            el.style.display = 'flex';
-        });
-        document.querySelectorAll('[data-auth="true"]').forEach(el => {
-            el.style.display = 'none';
-        });
-        document.getElementById('userContent').style.display = 'none';
-    }
-}
+  window.addEventListener('resize', () => {
+    clearTimeout(window.resizeTimer);
+    window.resizeTimer = setTimeout(updateAuthUI, 150);
+  });
 
-// Выход из системы
-function logout() {
-    localStorage.removeItem('currentUser');
-    updateUI();
-    showNotification('Вы успешно вышли из системы');
-}
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    // Инициализация базы данных
-    initUserDatabase();
-    
-    // Обновление интерфейса
-    updateUI();
-    
-    // Обработчики для кнопок открытия модальных окон
-    document.getElementById('openRegister').addEventListener('click', function(e) {
-        e.preventDefault();
-        openModal('registerModal');
-    });
-    
-    document.getElementById('openLoginBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        openModal('loginModal');
-    });
-    
-    document.getElementById('openLogin').addEventListener('click', function(e) {
-        e.preventDefault();
-        closeModal('registerModal');
-        openModal('loginModal');
-    });
-    
-    document.getElementById('openRegisterFromLogin').addEventListener('click', function(e) {
-        e.preventDefault();
-        closeModal('loginModal');
-        openModal('registerModal');
-    });
-    
-    // Обработчики для кнопок закрытия модальных окон
-    document.querySelectorAll('.modal-close, .modal-overlay').forEach(element => {
-        element.addEventListener('click', function() {
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.classList.remove('open');
-            });
-        });
-    });
-    
-    // Обработчик формы регистрации
-    document.getElementById('regForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            name: this.name.value,
-            email: this.email.value,
-            password: this.password.value,
-            confirmPassword: this.confirmPassword.value,
-            role: this.role.value
-        };
-        
-        const errors = validateRegistrationForm(formData);
-        
-        if (Object.keys(errors).length === 0) {
-            // Сохранение пользователя
-            const user = {
-                id: Date.now().toString(),
-                name: formData.name,
-                email: formData.email,
-                password: formData.password,
-                role: formData.role
-            };
-            
-            saveUser(user);
-            
-            // Закрытие модального окна и очистка формы
-            closeModal('registerModal');
-            this.reset();
-            
-            // Показать уведомление об успешной регистрации
-        } else {
-            displayFormErrors('regForm', errors);
-        }
-    });
-    
-    // Обработчик формы входа
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            email: this.email.value,
-            password: this.password.value
-        };
-        
-        const errors = validateLoginForm(formData);
-        
-        if (Object.keys(errors).length === 0) {
-            // Авторизация пользователя
-            const user = findUserByEmail(formData.email);
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            
-            // Закрытие модального окна и очистка формы
-            closeModal('loginModal');
-            this.reset();
-            
-            // Обновление интерфейса
-            updateUI();
-            
-            // Показать уведомление об успешном входе
-            showNotification(`Добро пожаловать, ${user.name}!`);
-        } else {
-            displayFormErrors('loginForm', errors);
-        }
-    });
-    
-    // Обработчик кнопки выхода
-    document.getElementById('logoutBtn').addEventListener('click', logout);
-    
-    // Обработчик для кнопки "Кабинет"
-    document.querySelector('.hero-header__cabinet').addEventListener('click', function(e) {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser) {
-            e.preventDefault();
-            showNotification('Пожалуйста, войдите в систему', 'error');
-        }
-    });
-    
-    // Обработчик для кнопки "Забыли пароль"
-    document.getElementById('forgotPassword').addEventListener('click', function(e) {
-        e.preventDefault();
-        showNotification('Функция восстановления пароля временно недоступна', 'error');
-    });
-    
-    // Закрытие модальных окон по ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.classList.remove('open');
-            });
-        }
-    });
+  window.addEventListener('focus', () => setTimeout(updateAuthUI, 100));
+  window.addEventListener('storage', updateAuthUI);
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const specialtyBtns = document.querySelectorAll('.specialty-btn');
-    const specialtyCards = document.querySelectorAll('.specialty-card');
-    const specialtiesStack = document.querySelector('.specialties-stack');
-
-    // Изначально активна первая карточка
-    specialtyCards[0].classList.add('active');
-
-    function activateButton(btn) {
-        specialtyBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    function showAllCards() {
-        specialtiesStack.classList.add('show-all');
-        specialtyCards.forEach(card => card.classList.remove('active'));
-    }
-
-    function showSingleCard(targetId) {
-        specialtiesStack.classList.remove('show-all');
-        specialtyCards.forEach(card => {
-            card.classList.remove('active');
-            if (card.getAttribute('data-id') === targetId) {
-                card.classList.add('active');
-            }
-        });
-    }
-
-    specialtyBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            activateButton(this);
-
-            if (targetId === 'all') {
-                showAllCards();
-            } else {
-                showSingleCard(targetId);
-            }
-        });
-    });
-});
+// Глобальные функции
+window.logout = logout;
+window.toggleMenu = toggleMenu;

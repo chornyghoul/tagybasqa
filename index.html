@@ -1,332 +1,175 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Learnplay — Игры, Тесты, Презентации</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <title>LearnPlay — Учи программирование весело!</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/styles.css">
-
 </head>
+
 <body>
-  <header class="site-header hero-header">  
-    <div class="header-inner">
-      <nav class="hero-header__nav">
-        <a href="index.html" class="logo">LearnPlay</a>
-        <a class="hero-header__link active" href="index.html">Главная</a>
-        <a class="hero-header__link" href="specialties/index.html">Спецальности</a>
-        <a class="hero-header__link" href="games/index.html">Игры</a>
-        <a class="hero-header__link" href="tests/index.html">Тесты</a>
-        <a class="hero-header__link" href="presentations/index.html">Презентации</a>
-      </nav>
 
-        <div class="hero-header__actions">
-          <a class="hero-header__signup" href="#" id="openRegister" data-guest="true">
-            <span class="hero-header__icon">✺</span>
-            <span>Регистрация</span>
-          </a>
-          <a id="openLoginBtn" class="a-primary" data-guest="true">Войти</a>
-          <button id="logoutBtn" class="hero-header__logout" data-auth="true" style="display:none"><p>Logout</p></button>
-          <a class="hero-header__cabinet" href="profile/index.html" data-auth="true"><i class="fa fa-user"  ></i></a>
-          
+  <header class="site-header hero-header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="logotype">
+          <img src="/static/img/Gemini_Generated_Image_rj36awrj36awrj36__1_-removebg-preview.png" alt="">
         </div>
-    </div>
+        <nav class="hero-header__nav">
+          <a class="hero-header__link active" href="#">Главная</a>
+          <a class="hero-header__link" href="./specialties.html">Преподаватели</a>
+          <a class="hero-header__link" href="games/index.html">Курсы</a>
+          <a class="hero-header__link" href="../learnplay/index.html">Квизы</a>
+          <a class="hero-header__link" href="presentations/index.html">ИИ ассистент</a>
+        </nav>
 
-    <!-- ПРОМО-БЛОК -->
-    <div class="container container-promo">
-      <section class="promo">
-        <div class="promo__inner">
-          <!-- ТЕКСТ СЛЕВА -->
-          <div class="promo__content">
-            <h1 class="promo__title">
-              Игры, тесты и<br>презентации для<br>увлекательного обучения
-            </h1>
-            <p class="promo__subtitle">
-              Платформа для студентов и учителей с интерактивными материалами по всем предметам.
-            </p>
-            <a class="promo__btn" href="topics/index.html">Начать учиться</a>
-          </div>
-
-          <!-- КАРТЫ СПРАВА -->
-          <div class="promo__grid">
-            <div class="promo__card stats">
-              <h4>10 000+</h4>
-              <p>Активных студентов</p>
-            </div>
-            <div class="promo__card stats">
-              <h4>500+</h4>
-              <p>Материалов</p>
-            </div>
-            <div class="promo__card stats">
-              <h4>100+</h4>
-              <p>Уроков в неделю</p>
-            </div>
-          </div>
+        <div class="hero-header__action" id="authButtons">
+          <button class="register-btn">Регистрация</button>
         </div>
-      </section>
+      </div>
     </div>
   </header>
 
   <main>
-    <!-- === SERVICES SECTION === -->
-<section class="services-section section">
-  <div class="next-container">
-    <!-- Контейнер и аним-блок теперь в одной строке -->
-    <div class="services-content-wrapper">
-      <div class="container">
-        <div class="services-header">
-          <h2>Наши <span class="gradient-text">Инструменты</span></h2>
-        </div>
+    <div class="slides-wrapper">
+      <section class="slide first-content">
+        <asite class="left-asite">
+          <div class="information-block-1">
+            <button class="download-btn">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <g id="Interface / Download">
+                    <path id="Vector" d="M6 21H18M12 3V17M12 17L17 12M12 17L7 12" stroke="#ffffff" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"></path>
+                  </g>
+                </g>
+              </svg>
+              Download App
+            </button>
 
-        <div class="services-bg-words">
-          <div>Презентации</div>
-          <div><span class="gradient-text">Тесты</span></div>
-          <div>Игры</div>
-          <div>Уроки</div>
-        </div>
+            <p class="p">Artificial Intelligence (AI) is software that learns patterns from huge amounts of data and
+              then uses those patterns to do tasks that normally need human intelligence — like understanding language,
+              making decisions, recognizing images, writing text, planning steps, or solving problems. </p>
 
-        <div class="services-grid">
-          <div class="service-card">
-            <h3>Презентации</h3>
-            <ul>
-              <li><span>•</span> Готовые шаблоны</li>
-              <li><span>•</span> Интерактивные слайды</li>
-            </ul>
+            <br>
+            <button class="check-opportunities">
+              Check opportunities
+              <span class="arrow-circle">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
+                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                  <g id="SVGRepo_iconCarrier">
+                    <path d="M7 17L17 7M17 7H8M17 7V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round"></path>
+                  </g>
+                </svg>
+            </button>
           </div>
-          <div class="service-card">
-            <h3>Тесты</h3>
-            <ul>
-              <li><span>•</span> Викторины и опросы</li>
-              <li><span>•</span> Автоматическая проверка</li>
-              <li><span>•</span> Статистика ответов</li>
-            </ul>
-          </div>
-          <div class="service-card">
-            <h3>Игры</h3>
-            <ul>
-              <li><span>•</span> Kahoot-подобные квизы</li>
-              <li><span>•</span> Обучающие мини-игры</li>
-            </ul>
-          </div>
-          <div class="service-card">
-            <h3>Уроки</h3>
-            <ul>
-              <li><span>•</span> Видео-уроки</li>
-              <li><span>•</span> Задания и ДЗ</li>
-              <li><span>•</span> Прогресс учеников</li>
-              <li><span>•</span> Чат и форум</li>
-              <li><span>•</span> Экспорт в PDF</li>
-            </ul>
-          </div>
-        </div>
+        </asite>
 
-        <div class="testimonial-card">
-          <i class="fas fa-quote-left quote-icon"></i>
-          <blockquote>
-            "В разработке делаю чтобы все было удобно и понятно как и для преподавателей и в основном для СТУДЕНТОВ"
-          </blockquote>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar">
-              <img src="/static/img/Almatinskij-gosudarstvennyj-politehnicheskij-kolledzh-AGPK.png" alt="">
-            </div>
-            <div>
-              <strong>Miras Abilkassym</strong><br>
-              <small>Разработчик</small>
-            </div>
+        <h1 class="first-content-h1 fade-in-up">ARTIFICIAL INTELLIGENCE ASSISTENT</h1>
+        <img src="./static/img/image (15).png" class="project-mascot" alt="AI Assistant Mascot">
+
+        <aside class="right-asite">
+          <img src="/static/img/M026T0394 M003T1448 C Carousel  Mockup 20Apr25.png" alt="" class="mockupmyapp">
+          </div>
+        </aside>
+      </section>
+      <section class="slide second-content">
+        <div class="left-asite">
+          <div class="information-block-1">
           </div>
         </div>
-
-        <div class="partners-grid">
-          <div class="partner-logo">Almaty</div>
-          <div class="partner-logo">Politechnic</div>
-          <div class="partner-logo">College</div>
-          <div class="partner-logo">П22-4Б</div>
-          <div class="partner-logo">IT</div>
+        <img src="./static/img/image (18).png" class="project-mascot" alt="AI Assistant Mascot">
+        <div class="right-asite">
+          <div class="main-btn fade-in-up">
+          </div>
         </div>
-      </div>
-
-      <!-- Анимационный блок справа -->
-      <div class="anim-block">
-        <!-- Здесь может быть анимация, canvas, Lottie и т.д. -->
-      </div>
+      </section>
     </div>
-  </div>
-</section>
+  </main>
 
+  <script>
+    let currentSlide = 0;
+    const slidesWrapper = document.querySelector('.slides-wrapper');
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
 
+    // ────────────────────────────────────────────────
+    function updateSlideClasses() {
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active', 'prev', 'next');
 
-<section class="expertise-section-bw">
-  <div class="expertise-container" >
-    <div class="expertise-grid-bw">
-      <div class="expertise-card-bw">
-        <h3>
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-          Top-notch Experts
-        </h3>
-        <div class="avatars">
-          <div class="avatar"></div>
-          <div class="avatar"></div>
-          <span>Founders of Hubfolio</span>
-        </div>
-      </div>
+        if (index === currentSlide) {
+          slide.classList.add('active');
+        } else if (index === currentSlide - 1) {
+          slide.classList.add('prev');
+        } else if (index === currentSlide + 1) {
+          slide.classList.add('next');
+        }
+      });
+    }
 
-      <div class="expertise-card-bw">
-        <h3>
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          Dedicated Support 24/7
-        </h3>
-      </div>
+    // ────────────────────────────────────────────────
+    function updateHeaderColor() {
+      const headerLinks = document.querySelectorAll('.hero-header__link');
 
-      <div class="expertise-card-bw">
-        <h3>
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-          </svg>
-          Flexible Pricing
-        </h3>
-      </div>
-    </div>
+      if (currentSlide === 0) {
+        // первый слайд — дефолтный цвет (из CSS)
+        headerLinks.forEach(link => {
+          link.style.color = '';
+          link.classList.remove('colored-nav');
+        });
+      } else {
+        // все остальные слайды — фиолетовый
+        headerLinks.forEach(link => {
+          link.style.color = '#6367FF';
+          link.classList.add('colored-nav');
+        });
+      }
+    }
 
-    <!-- Highlight -->
-    <div class="highlight-block-bw">
-      <p class="highlight-text">
-        We help business elevate their value through custom software development, product design, QA and consulting services.
-      </p>
-      <a href="#" class="highlight-btn">
-        <span>More About Us</span>
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-          <polyline points="12 5 19 12 12 19"></polyline>
-        </svg>
-      </a>
-    </div>
+    // ────────────────────────────────────────────────
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
 
-    <!-- Stats -->
-    <div class="stats-grid-bw">
-      <div class="stat-card-bw">
-        <div class="stat-value">4.8/5</div>
-        <div class="stat-label">Goodfirms</div>
-      </div>
-      <div class="stat-card-bw">
-        <div class="stat-value">Top 50</div>
-        <div class="stat-label">Global Companies on Clutch</div>
-      </div>
-      <div class="stat-card-bw">
-        <div class="stat-value">95%</div>
-        <div class="stat-label">Job Success Upwork</div>
-      </div>
-      <div class="stat-card-bw">
-        <div class="stat-value">Top 20</div>
-        <div class="stat-label">Global Team on Behance</div>
-      </div>
-    </div>
+      if (slidesWrapper.style.transition !== '') {
+        return;
+      }
 
-  </div>
+      let slideChanged = false;
 
-</section>
+      if (e.deltaY > 40 && currentSlide < totalSlides - 1) {
+        currentSlide++;
+        slideChanged = true;
+      }
+      else if (e.deltaY < -40 && currentSlide > 0) {
+        currentSlide--;
+        slideChanged = true;
+      }
 
+      if (slideChanged) {
+        slidesWrapper.style.transform = `translateY(-${currentSlide * 100}vh)`;
+        updateSlideClasses();
 
+        // Меняем цвет шапки ПОСЛЕ завершения анимации
+        setTimeout(() => {
+          updateHeaderColor();
+        }, 200);   // ← самое важное: подбери под свою анимацию (обычно 400–700 мс)
+      }
+    }, { passive: false });
 
+    // ────────────────────────────────────────────────
+    // Инициализация при загрузке страницы
+    updateSlideClasses();
+    updateHeaderColor();   
+  </script>
 
-</main>
-  <!-- Модальное окно регистрации -->
-  <section class="user-section">
-  <div class="user-info" id="userContent" style="display:none">
-    <div class="user-avatar">
-      <span id="userAvatar">U</span>
-    </div>
-    <div class="user-details">
-      <div class="user-name" id="userName">Пользователь</div>
-      <div class="user-role student" id="userRole">Студент</div>
-    </div>
-  </div>
-</section>
-
-<!-- Модальное окно регистрации -->
-<section id="registerModal" class="modal">
-  <div class="modal-overlay"></div>
-  <div class="modal-content card">
-    <button class="modal-close" aria-label="Закрыть">×</button>
-    <h1>Регистрация</h1>
-    <form id="regForm" class="form">
-      <div class="form-row">
-        <label>ФИО</label>
-        <input required class="input" name="name" placeholder="Иванов Иван" />
-        <div class="error-message" id="nameError"></div>
-      </div>
-      <div class="form-row">
-        <label>Email</label>
-        <input required type="email" class="input" name="email" placeholder="you@example.com" />
-        <div class="error-message" id="emailError"></div>
-      </div>
-      <div class="form-row">
-        <label>Пароль</label>
-        <input required type="password" class="input" name="password" placeholder="••••••••" />
-        <div class="error-message" id="passwordError"></div>
-      </div>
-      <div class="form-row">
-        <label>Подтверждение пароля</label>
-        <input required type="password" class="input" name="confirmPassword" placeholder="••••••••" />
-        <div class="error-message" id="confirmPasswordError"></div>
-      </div>
-      <div class="form-row">
-        <label>Роль</label>
-        <select required name="role" class="input">
-          <option value="student">Студент</option>
-          <option value="teacher">Преподаватель</option>
-        </select>
-      </div>
-      <div class="form-actions">
-        <button class="btn btn-primary" type="submit">Создать аккаунт</button>
-        <a class="btn" href="#" id="openLogin">У меня есть аккаунт</a>
-      </div>
-    </form>
-  </div>
-</section>
-
-<!-- Модальное окно входа -->
-<section class="modal" id="loginModal">
-  <div class="modal-overlay"></div>
-  <div class="modal-content card">
-    <button class="modal-close" aria-label="Закрыть">×</button>
-    <h1>Вход в систему</h1>
-    <form id="loginForm" class="form">
-      <div class="form-row">
-        <label>Email</label>
-        <input required type="email" class="input" name="email" placeholder="you@example.com" />
-        <div class="error-message" id="loginEmailError"></div>
-      </div>
-      
-      <div class="form-row">
-        <label>Пароль</label>
-        <input required type="password" class="input" name="password" placeholder="••••••••" />
-        <div class="error-message" id="loginPasswordError"></div>
-      </div>
-      
-      <div class="forgot-password">
-        <a href="#" id="forgotPassword">Забыли пароль?</a>
-      </div>
-
-      
-      <div class="form-actions">
-        <button class="btn btn-primary" type="submit">Войти</button>
-        <a class="btn" href="#" id="openRegisterFromLogin">Создать аккаунт</a>
-      </div>
-    </form>
-  </div>
-</section>
-  <!-- Твои скрипты -->
-  <script defer src="static/js/data.js"></script>
-  <script defer src="static/js/storage.js"></script>
-  <script defer src="static/js/components.js"></script>
-  <script defer src="static/js/main.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Курс • LearnPlay</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#F8F5FF;--card:#FFFFFF;--border:#C6A5F9;--border-light:#C6A5F944;
+      --text:#0D0425;--muted:#5E5CE7;--primary:#C6A5F9;--primary-dark:#5E5CE7;
+      --success:#27ae60;--danger:#e74c3c;--warning:#f39c12;
+      --shadow:rgba(397,165,249,.2);
+    }
+    [data-theme="dark"]{
+      --bg:#0D0425;--card:#161B22;--border:#5E5CE7;--border-light:#5E5CE744;
+      --text:#F0F6FC;--muted:#8B949E;--primary:#C6A5F9;--primary-dark:#8B8FFF;
+      --shadow:rgba(0,0,0,.4);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:all .4s; min-height:100vh}
+
+    /* Переключатель темы */
+    .theme-toggle{
+      position:fixed;top:20px;right:20px;width:56px;height:56px;background:var(--card);
+      border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;
+      justify-content:center;cursor:pointer;z-index:999;box-shadow:0 8px 25px var(--shadow);
+      transition:all .4s;overflow:hidden;
+    }
+    .theme-toggle:hover{transform:scale(1.1)}
+    .theme-toggle-container{--size:28px;display:flex;justify-content:center;align-items:center;position:relative;user-select:none}
+    .theme-toggle-container input{position:absolute;opacity:0;width:0;height:0}
+    .moon,.sun{position:absolute;animation:keyframes-fill .5s ease-out forwards}
+    .sun{display:none}
+    [data-theme="dark"] .moon{display:none}
+    [data-theme="dark"] .sun{display:block}
+    @keyframes keyframes-fill{0%{transform:rotate(-360deg) scale(0);opacity:0}75%{transform:rotate(25deg)}100%{opacity:1}}
+
+    .container{max-width:1450px;margin:0 auto;padding:30px;display:grid;grid-template-columns:380px 1fr;gap:30px}
+    @media (max-width:1024px){.container{grid-template-columns:1fr;display:block}}
+
+    .sidebar,.progress-box,.course-header{
+      background:var(--card);border-radius:20px;padding:28px;
+      box-shadow:0 8px 32px var(--shadow);margin-bottom:25px
+    }
+    .sidebar-header{
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:white;text-align:center;padding:24px;border-radius:16px 16px 0 0;
+      margin:-28px -28px 20px -28px
+    }
+    .problem-list a{
+      display:flex;justify-content:space-between;align-items:center;padding:16px 20px;
+      border-bottom:1px solid var(--border-light);transition:all .3s;position:relative;font-weight:500;
+      text-decoration:none;color:var(--text);
+    }
+    .problem-list a:hover{background:var(--border-light)}
+    .problem-list a.solved .title::before{content:"Success ";color:var(--success)}
+    .problem-list a.active{background:var(--primary);color:white;font-weight:700}
+    .problem-list a.active::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:white}
+    .difficulty{padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;text-transform:uppercase}
+    .easy{background:#d4edda;color:#155724}.medium{background:#fff3cd;color:#856404}.hard{background:#f8d7da;color:#721c24}
+
+    .editor-container{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 8px 32px var(--shadow);margin-bottom:25px}
+    .editor-header{padding:14px 20px;background:var(--primary);color:white;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+    #editor{height:320px;font-family:'Fira Code',monospace;font-size:15px;border:none;outline:none;padding:20px;background:#0d042508;color:var(--text)}
+    .controls{padding:16px 20px;background:var(--bg);display:flex;gap:12px;border-top:1px solid var(--border-light)}
+    .btn{padding:10px 24px;border:none;border-radius:12px;font-weight:600;cursor:pointer;transition:all .3s}
+    .btn-run{background:#3498db;color:white}.btn-run:hover{background:#2980b9}
+    .btn-submit{background:var(--success);color:white}.btn-submit:hover{background:#219653}
+    .btn-submit:disabled{background:#95dea4;cursor:not-allowed}
+    #output{padding:16px;background:#000;color:#0f0;font-family:'Fira Code',monospace;font-size:14px;min-height:100px;border-radius:8px;margin-top:12px}
+    .result{margin-top:16px;padding:16px;border-radius:12px;font-weight:600}
+    .result.success{background:#d4edda;color:#155724}
+    .result.error{background:#f8d7da;color:#721c24}
+
+    .not-found{text-align:center;padding:80px;font-size:1.5rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+  <!-- Переключатель темы -->
+  <label class="theme-toggle" id="themeToggle">
+    <div class="theme-toggle-container">
+      <input type="checkbox" id="themeCheckbox">
+      <svg viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="moon">
+        <path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"></path>
+      </svg>
+      <svg viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="sun">
+        <path d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2. Eighth c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z"></path>
+      </svg>
+    </div>
+  </label>
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3 id="courseTitle">Загрузка...</h3>
+        <div id="solvedCount">Решено 0 из 0 задач</div>
+      </div>
+      <div class="problem-list" id="problemList"></div>
+    </aside>
+
+    <main>
+      <div class="course-header">
+        <h1 id="mainTitle" style="font-size:2.4rem;background:linear-gradient(90deg,var(--primary),var(--primary-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+          Курс загружается...
+        </h1>
+        <p style="color:var(--muted);margin:16px 0">Пиши код — проверяй — получай Success</p>
+      </div>
+
+      <div class="progress-box">
+        <div style="font-weight:700;margin-bottom:12px">Ваш прогресс</div>
+        <div style="height:16px;background:var(--border-light);border-radius:12px;overflow:hidden">
+          <div id="progressFill" style="height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--primary-dark));transition:width .6s"></div>
+        </div>
+        <div id="progressText" style="margin-top:8px;color:var(--primary-dark);font-weight:600">0 из 0 задач • 0%</div>
+      </div>
+
+      <div id="taskContainer">
+        <div class="not-found">Выберите курс или задачу из списка слева</div>
+      </div>
+    </main>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+<script>
+  let pyodide;
+  async function loadPyodide() {
+    pyodide = await loadPyodide();
+    console.log("Pyodide загружен!");
+  }
+  loadPyodide();
+
+  // === ДАННЫЕ КУРСОВ ===
+  const coursesData = {
+    101: {
+      title: "Python с нуля до Junior+",
+      tasks: [
+        {id:1,title:"Hello World",diff:"easy",tests:[["print('Hello, LearnPlay!')","Hello, LearnPlay!"]]},
+        {id:2,title:"Сумма двух чисел",diff:"easy",tests:[["a=5\nb=7\nprint(a+b)","12"]]},
+        {id:3,title:"Чётное или нечётное",diff:"easy",tests:[["n=4\nprint('YES' if n%2==0 else 'NO')","YES"],["n=7\nprint('YES' if n%2==0 else 'NO')","NO"]]},
+        {id:4,title:"Факториал",diff:"medium",tests:[["def f(n):return 1 if n<=1 else n*f(n-1)\nprint(f(5))","120"]]},
+        {id:5,title:"Список квадратов",diff:"medium",tests:[["print([x*x for x in range(1,6)])","[1, 4, 9, 16, 25]"]]},
+        {id:6,title:"Палиндром",diff:"medium",tests:[["s='радар'\nprint('YES' if s==s[::-1] else 'NO')","YES"]]},
+        {id:7,title:"Класс Person",diff:"hard",tests:[["class Person:\n    def __init__(self,name):\n        self.name=name\n    def greet(self):\n        print(f'Привет, я {self.name}')\np=Person('Алекс')\np.greet()","Привет, я Алекс"]]},
+      ]
+    },
+    102: {
+      title: "JavaScript & TypeScript 2025",
+      tasks: [
+        {id:1,title:"Hello JS",diff:"easy",tests:[["console.log('Hello, LearnPlay!')","Hello, LearnPlay!"]]},
+        {id:2,title:"Сумма массива",diff:"easy",tests:[["let a=[1,2,3,4]; console.log(a.reduce((x,y)=>x+y,0))","10"]]},
+        {id:3,title:"Палиндром",diff:"medium",tests:[["function isPalindrome(s){return s===s.split('').reverse().join('')}\nconsole.log(isPalindrome('радар'))","true"]]},
+      ]
+    },
+    // Добавь другие курсы при желании
+  };
+
+  // Получаем ID из URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const courseId = parseInt(urlParams.get('id')) || 101;
+
+  const course = coursesData[courseId];
+  const STORAGE_KEY = `course-${courseId}-progress`;
+  let solved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  let tasks = course?.tasks || [];
+
+  if (!course) {
+    document.getElementById('taskContainer').innerHTML = `
+      <div class="not-found">
+        Курс не найден<br><br>
+        <a href="./specialties.html" style="color:var(--primary)">← Вернуться к списку курсов</a>
+      </div>`;
+    document.title = "Курс не найден | LearnPlay";
+  } else {
+    document.title = `${course.title} • LearnPlay`;
+    document.getElementById('courseTitle').textContent = course.title;
+    document.getElementById('mainTitle').textContent = course.title;
+  }
+
+  // === Тема ===
+  const checkbox = document.getElementById('themeCheckbox');
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.setAttribute('data-theme', 'dark');
+    checkbox.checked = true;
+  }
+  checkbox.addEventListener('change', () => {
+    if (checkbox.checked) {
+      document.body.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+
+  function renderList() {
+    const list = document.getElementById('problemList');
+    list.innerHTML = tasks.map(t => `
+      <a href="#task${t.id}" class="problem-item ${solved[t.id]?'solved':''} ${location.hash===`#task${t.id}`?'active':''}">
+        <span class="title">${t.id}. ${t.title}</span>
+        <span class="difficulty ${t.diff}">${t.diff === 'easy' ? 'Easy' : t.diff === 'medium' ? 'Medium' : 'Hard'}</span>
+      </a>
+    `).join('');
+  }
+
+  function updateProgress() {
+    const done = Object.keys(solved).length;
+    const percent = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+    document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('progressText').textContent = `${done} из ${tasks.length} задач • ${percent}%`;
+    document.getElementById('solvedCount').textContent = `Решено ${done} из ${tasks.length} задач`;
+  }
+
+  function renderTask() {
+    const hash = location.hash || '#task1';
+    const id = parseInt(hash.replace('#task',''));
+    const task = tasks.find(t => t.id === id) || tasks[0];
+
+    if (!task) {
+      document.getElementById('taskContainer').innerHTML = `<div class="not-found">Задача не найдена</div>`;
+      return;
+    }
+
+    document.getElementById('taskContainer').innerHTML = `
+      <div style="background:var(--card);border-radius:20px;padding:32px;box-shadow:0 8px 32px var(--shadow)">
+        <h2 style="font-size:2rem;font-weight:800;margin-bottom:12px">${task.id}. ${task.title}</h2>
+        <div style="display:flex;gap:16px;color:var(--muted);margin-bottom:20px">
+          <span class="difficulty ${task.diff}">${task.diff === 'easy' ? 'Easy' : task.diff === 'medium' ? 'Medium' : 'Hard'}</span>
+          <span>Решено: ${solved[task.id] ? 'Success' : 'Ещё нет'}</span>
+        </div>
+
+        <div style="background:var(--bg);padding:24px;border-left:6px solid var(--primary);border-radius:12px;margin-bottom:24px">
+          <h3 style="margin-bottom:16px">Условие</h3>
+          <p>Напиши программу, которая решает эту задачу.</p>
+          <p>Вывод должен точно совпадать с ожидаемым.</p>
+        </div>
+
+        <div class="editor-container">
+          <div class="editor-header">
+            <span>main.py</span>
+            <span>Python 3.11</span>
+          </div>
+          <textarea id="editor">${solved[task.id] ? '# Задача решена Success\n' : '# Напиши свой код здесь\n'}</textarea>
+          <div class="controls">
+            <button class="btn btn-run" id="runBtn">Запустить</button>
+            <button class="btn btn-submit" id="submitBtn" ${solved[task.id]?'disabled':''}>
+              ${solved[task.id] ? 'Success Решено' : 'Отправить решение'}
+            </button>
+          </div>
+        </div>
+
+        <div id="output"></div>
+        <div id="result"></div>
+      </div>
+    `;
+
+    document.getElementById('runBtn')?.addEventListener('click', async () => {
+      if (!pyodide) return alert('Pyodide ещё загружается...');
+      const code = document.getElementById('editor').value;
+      let output = '';
+      try {
+        pyodide.setStdout({batched: str => { output += str + '\n'; }});
+        pyodide.setStderr({batched: str => { output += 'Ошибка: ' + str + '\n'; }});
+        await pyodide.runPythonAsync(code);
+        document.getElementById('output').textContent = output || 'Нет вывода';
+      } catch (err) {
+        document.getElementById('output').textContent = 'Ошибка выполнения:\n' + err.message;
+      }
+    });
+
+    document.getElementById('submitBtn')?.addEventListener('click', async () => {
+      if (!pyodide) return;
+      const code = document.getElementById('editor').value;
+      let allPassed = true;
+
+      for (const [inputCode, expected] of task.tests) {
+        let output = '';
+        try {
+          pyodide.setStdout({batched: str => { output += str; }});
+          await pyodide.runPythonAsync(inputCode + '\n' + code);
+          if (output.trim() !== expected.trim()) {
+            allPassed = false;
+            break;
+          }
+        } catch (e) {
+          allPassed = false;
+          break;
+        }
+      }
+
+      const resultEl = document.getElementById('result');
+      if (allPassed) {
+        solved[task.id] = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(solved));
+        resultEl.className = 'result success';
+        resultEl.textContent = 'Success Правильно! Задача решена!';
+        updateProgress();
+        renderList();
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').textContent = 'Success Решено';
+      } else {
+        resultEl.className = 'result error';
+        resultEl.textContent = 'Неправильно. Попробуй ещё раз!';
+      }
+    });
+  }
+
+  window.addEventListener('hashchange', () => { renderList(); renderTask(); });
+
+  if (course) {
+    renderList();
+    renderTask();
+    updateProgress();
+  }
+</script>
+</body>
+</html>
