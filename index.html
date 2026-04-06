@@ -1,175 +1,600 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LearnPlay — Учи программирование весело!</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tagybasqa — Платформа</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/styles.css">
 </head>
 
+<canvas id="particle-field" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.75;"></canvas>
 <body>
 
-  <header class="site-header hero-header">
-    <div class="container">
-      <div class="header-inner">
-        <div class="logotype">
-          <img src="/static/img/Gemini_Generated_Image_rj36awrj36awrj36__1_-removebg-preview.png" alt="">
-        </div>
-        <nav class="hero-header__nav">
-          <a class="hero-header__link active" href="#">Главная</a>
-          <a class="hero-header__link" href="./specialties.html">Преподаватели</a>
-          <a class="hero-header__link" href="games/index.html">Курсы</a>
-          <a class="hero-header__link" href="../learnplay/index.html">Квизы</a>
-          <a class="hero-header__link" href="presentations/index.html">ИИ ассистент</a>
-        </nav>
+  <!-- PRELOADER -->
+  <div id="global-preloader">
+    <div class="preloader-wordmark">Образовательная платформа</div>
+    <div class="preloader-logo">TB</div>
+    <div class="preloader-line"></div>
+  </div>
 
-        <div class="hero-header__action" id="authButtons">
-          <button class="register-btn">Регистрация</button>
+  <div class="app-container">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar-left">
+      <a class="sidebar-logo" href="./index.html">
+        <div class="logo-mark">Tagybasqa</div>
+        <div class="logo-sub">Platform / 2026</div>
+      </a>
+
+      <div class="nav-links">
+        <button class="nav-item tab-btn active" data-target="view-menu">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          Главная
+        </button>
+        <button class="nav-item tab-btn" data-target="view-profile">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          Профиль
+        </button>
+        <button class="nav-item tab-btn" data-target="view-search">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          Поиск
+        </button>
+        <button class="nav-item tab-btn" data-target="view-courses">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .65.73.45.75.45C2.4 20.45 4.05 20 5.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.65 0 .5-.6.5-.65V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>
+          Курсы
+        </button>
+      </div>
+
+      <div class="nav-sep"></div>
+
+      <button class="nav-item logout" id="logoutBtn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        Выйти
+      </button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- VIEW: ГЛАВНАЯ -->
+      <div id="view-menu" class="view-section active">
+        <div class="tabs-container">
+          <div class="tab menu-tab active" data-menu-target="menu-recommended">Для вас</div>
+          <div class="tab menu-tab" data-menu-target="menu-feed">Лента</div>
+          <div class="tab menu-tab" data-menu-target="menu-subscriptions">Квизы</div>
+        </div>
+
+        <div id="menu-recommended" class="inner-view active">
+          <div style="padding: 28px;">
+            <p class="section-heading">Рекомендованные курсы</p>
+            <div class="courses-grid">
+              <div class="course-card" onclick="window.location.href='./course.html'">
+                <span class="course-num">01 / Новинка</span>
+                <span class="course-emoji-wrap">🌐</span>
+                <span class="course-badge">HTML & CSS</span>
+                <div class="course-title">Web-разработка: HTML & CSS</div>
+                <div class="course-desc">Освойте верстку сайтов с нуля. Flexbox, Grid, анимации и современные подходы к UI.</div>
+                <div class="course-meta">
+                  <span>12 ч.</span>
+                  <span>★ 4.9</span>
+                  <span>1.2k студентов</span>
+                </div>
+                <div class="course-footer">
+                  <div class="course-author">
+                    <div class="author-avatar" style="background:#e11d48;">И</div>
+                    <span class="author-name">Иван И.</span>
+                  </div>
+                  <button class="course-btn" onclick="event.stopPropagation(); window.location.href='./course.html'">Начать →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="menu-feed" class="inner-view">
+          <div class="create-post-container">
+            <div class="create-post-top">
+              <div class="create-post-avatar" id="userPostAvatar"></div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                <textarea class="create-post-input" id="postInput" maxlength="280" rows="2"
+                  placeholder="Что нового? Поделитесь знаниями..."></textarea>
+                <div id="imagePreviewContainer">
+                  <img id="imagePreview" alt="preview">
+                  <button id="removeImageBtn">✕</button>
+                </div>
+                <div id="pollContainer">
+                  <input type="text" class="poll-option-input" placeholder="Вариант 1">
+                  <input type="text" class="poll-option-input" placeholder="Вариант 2">
+                  <button id="removePollBtn">Отменить опрос</button>
+                </div>
+              </div>
+            </div>
+            <div class="create-post-bottom">
+              <div class="create-post-actions">
+                <button class="action-icon" id="btnAttach" title="Прикрепить фото">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </button>
+                <input type="file" id="fileInput" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none">
+                <button class="action-icon" id="btnPoll" title="Создать опрос">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                    <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+              <span id="charCount" class="char-display">280</span>
+              <button class="publish-btn" disabled>Опубликовать</button>
+            </div>
+          </div>
+          <div class="empty-state" style="margin: 24px;">Лента пока пуста — будьте первым, кто поделится чем-то интересным!</div>
+        </div>
+
+        <div id="menu-subscriptions" class="inner-view">
+          <div style="padding: 28px 28px 0;">
+            <p class="section-heading">Мои подписки</p>
+          </div>
+          <div class="empty-state" style="margin: 0 28px;">Подпишитесь на авторов или курсы, чтобы видеть их здесь.</div>
         </div>
       </div>
-    </div>
-  </header>
 
-  <main>
-    <div class="slides-wrapper">
-      <section class="slide first-content">
-        <asite class="left-asite">
-          <div class="information-block-1">
-            <button class="download-btn">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                <g id="SVGRepo_iconCarrier">
-                  <g id="Interface / Download">
-                    <path id="Vector" d="M6 21H18M12 3V17M12 17L17 12M12 17L7 12" stroke="#ffffff" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round"></path>
-                  </g>
-                </g>
-              </svg>
-              Download App
-            </button>
-
-            <p class="p">Artificial Intelligence (AI) is software that learns patterns from huge amounts of data and
-              then uses those patterns to do tasks that normally need human intelligence — like understanding language,
-              making decisions, recognizing images, writing text, planning steps, or solving problems. </p>
-
-            <br>
-            <button class="check-opportunities">
-              Check opportunities
-              <span class="arrow-circle">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                  <g id="SVGRepo_iconCarrier">
-                    <path d="M7 17L17 7M17 7H8M17 7V16" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                      stroke-linejoin="round"></path>
-                  </g>
-                </svg>
+      <!-- VIEW: ПРОФИЛЬ -->
+      <div id="view-profile" class="view-section">
+        <div class="profile-header">
+          <div class="profile-banner">
+            <button class="banner-edit-icon" title="Изменить баннер">
+              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
             </button>
           </div>
-        </asite>
-
-        <h1 class="first-content-h1 fade-in-up">ARTIFICIAL INTELLIGENCE ASSISTENT</h1>
-        <img src="./static/img/image (15).png" class="project-mascot" alt="AI Assistant Mascot">
-
-        <aside class="right-asite">
-          <img src="/static/img/M026T0394 M003T1448 C Carousel  Mockup 20Apr25.png" alt="" class="mockupmyapp">
-          </div>
-        </aside>
-      </section>
-      <section class="slide second-content">
-        <div class="left-asite">
-          <div class="information-block-1">
+          <div class="header-content">
+            <div class="avatar-container">
+              <div class="main-avatar"></div>
+            </div>
+            <div class="action-buttons">
+              <button class="edit-profile-btn">Редактировать профиль</button>
+            </div>
+            <div class="user-info-text">
+              <div class="user-name-row"><h1>Загрузка...</h1></div>
+              <span class="handle">@username</span>
+              <div class="stats-row">
+                <span><strong>0</strong> подписчиков</span>
+                <span><strong>0</strong> подписок</span>
+              </div>
+              <div class="reg-date">
+                <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+                Присоединился в 2026 г.
+              </div>
+            </div>
           </div>
         </div>
-        <img src="./static/img/image (18).png" class="project-mascot" alt="AI Assistant Mascot">
-        <div class="right-asite">
-          <div class="main-btn fade-in-up">
+
+        <div class="tabs-container" style="margin-top: 0;">
+          <div class="tab profile-tab active" data-profile-target="profile-courses">Мои курсы</div>
+          <div class="tab profile-tab" data-profile-target="profile-achievements">Достижения</div>
+          <div class="tab profile-tab" data-profile-target="profile-progress">Прогресс</div>
+        </div>
+
+        <div id="profile-courses" class="inner-view active" style="padding: 28px;">
+          <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="section-heading" style="margin:0;">Мои курсы</h2>
+            <button id="createCourseBtn" class="save-btn" style="background:var(--text); color:var(--bg); padding:10px 20px;">
+              + Создать новый курс
+            </button>
+          </div>
+
+          <div id="myCoursesContainer">
+            <!-- Курсы будут подгружаться сюда динамически -->
+            <div class="empty-state" id="noCoursesMessage">
+              У вас пока нет созданных курсов.<br>Создайте первый курс прямо сейчас!
+            </div>
           </div>
         </div>
-      </section>
+
+        <div id="profile-achievements" class="inner-view" style="padding: 28px;">
+          <p class="section-heading">Достижения</p>
+          <div class="achievements-grid">
+            <div class="achievement-card"><div class="ach-icon">🔥</div><div class="ach-name">Начало пути</div><div class="ach-desc">Первый урок пройден</div></div>
+            <div class="achievement-card"><div class="ach-icon">⚡</div><div class="ach-name">Быстрый старт</div><div class="ach-desc">3 урока за один день</div></div>
+            <div class="achievement-card locked"><div class="ach-icon">🏆</div><div class="ach-name">Мастер</div><div class="ach-desc">Первый курс завершён</div></div>
+            <div class="achievement-card locked"><div class="ach-icon">💎</div><div class="ach-name">Эксперт</div><div class="ach-desc">5 курсов завершено</div></div>
+            <div class="achievement-card locked"><div class="ach-icon">🌟</div><div class="ach-name">Автор</div><div class="ach-desc">Первый курс создан</div></div>
+            <div class="achievement-card locked"><div class="ach-icon">🤝</div><div class="ach-name">Наставник</div><div class="ach-desc">100 подписчиков</div></div>
+          </div>
+        </div>
+
+        <div id="profile-progress" class="inner-view" style="padding: 28px;">
+          <p class="section-heading">Прогресс обучения</p>
+          <div class="empty-state">Начните курс, чтобы отслеживать прогресс здесь.</div>
+        </div>
+      </div>
+
+      <!-- VIEW: ПОИСК -->
+      <div id="view-search" class="view-section">
+        <div style="padding: 28px;">
+          <p class="section-heading">Поиск</p>
+          <div class="search-input-container">
+            <svg width="16" height="16" fill="var(--text3)" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input type="text" placeholder="Искать курсы, авторов, темы...">
+          </div>
+          <div id="searchResults" class="search-results">
+            <div class="empty-state" style="margin-top: 24px;">Введите запрос для поиска</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: ВСЕ КУРСЫ -->
+      <div id="view-courses" class="view-section">
+        <div class="tabs-container">
+          <div class="tab active">Все курсы</div>
+          <div class="tab">Программирование</div>
+          <div class="tab">Дизайн</div>
+        </div>
+        <div style="padding: 28px;">
+          <div class="courses-grid" id="publicCoursesContainer">
+            <div class="empty-state">Загрузка курсов...</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="right-sidebar">
+      <div class="sidebar-widget">
+        <div class="widget-title">Кого читать</div>
+        <div class="suggested-user">
+          <div class="su-ava">🦁</div>
+          <div class="su-info">
+            <div class="su-name">User1</div>
+            <div class="su-handle">@example · Python</div>
+          </div>
+          <button class="follow-btn">Следить</button>
+        </div>
+        <div class="suggested-user">
+          <div class="su-ava">🐺</div>
+          <div class="su-info">
+            <div class="su-name">user2</div>
+            <div class="su-handle">@example</div>
+          </div>
+          <button class="follow-btn">Следить</button>
+        </div>
+        <div class="suggested-user">
+          <div class="su-ava">🦊</div>
+          <div class="su-info">
+            <div class="su-name">user3</div>
+            <div class="su-handle">@example · Fullstack</div>
+          </div>
+          <button class="follow-btn">Следить</button>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <a href="#">Вакансии</a>
+        <a href="#">Статус серверов</a>
+        <a href="#">Условия использования</a>
+        <a href="#">Конфиденциальность</a>
+        <span>© 2026 ООО «Tagybasqa»</span>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- MODAL: НАСТРОЙКИ ПРОФИЛЯ -->
+  <div id="editProfileModal" class="modal-overlay">
+    <div class="settings-modal-content">
+
+      <aside class="settings-sidebar">
+        <h2 class="settings-title">Настройки</h2>
+        <nav class="settings-nav">
+          <button class="settings-tab active" data-settings-target="settings-account">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Аккаунт
+          </button>
+          <button class="settings-tab" data-settings-target="settings-appearance">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z"/></svg>
+            Оформление
+          </button>
+          <button class="settings-tab" data-settings-target="settings-security">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            Безопасность
+          </button>
+          <button class="settings-tab" data-settings-target="settings-notifications">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            Уведомления
+          </button>
+        </nav>
+      </aside>
+
+      <main class="settings-main">
+        <div id="settings-account" class="settings-panel active">
+          <h3 class="panel-header">Аккаунт</h3>
+          <div class="settings-field-col">
+            <div class="field-info" style="margin-bottom: 14px;">
+              <label>Аватар профиля</label>
+              <span>URL изображения или эмодзи (например: 🐼)</span>
+            </div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <div class="clan-avatar" id="editAvatarPreview">😶</div>
+              <input type="text" id="avatarUrlInput" class="settings-input" placeholder="https://... или 🐼" style="flex:1;">
+            </div>
+          </div>
+          <div class="settings-field-row">
+            <div class="field-info">
+              <label>Имя</label>
+              <span>Отображаемое имя на платформе</span>
+            </div>
+            <div class="field-control">
+              <input type="text" id="editNameInput" maxlength="50" class="settings-input" placeholder="Ваше имя">
+            </div>
+          </div>
+          <div class="settings-field-row">
+            <div class="field-info">
+              <label>Username</label>
+              <span>Уникальный идентификатор</span>
+            </div>
+            <div class="field-control">
+              <input type="text" id="editHandleInput" maxlength="20" class="settings-input" placeholder="username">
+            </div>
+          </div>
+        </div>
+
+        <div id="settings-appearance" class="settings-panel">
+          <h3 class="panel-header">Оформление</h3>
+          <div class="empty-state">Настройки темы и оформления скоро появятся.</div>
+        </div>
+
+        <div id="settings-security" class="settings-panel">
+          <h3 class="panel-header">Безопасность</h3>
+          <div style="margin-top: 24px; border: 1px solid var(--red); padding: 20px;">
+            <h4 style="color: var(--red); margin-bottom: 10px; font-size: 14px; font-weight: 600;">Опасная зона</h4>
+            <p style="color: var(--text3); font-size: 12px; font-family: var(--mono); margin-bottom: 16px;">Это действие необратимо. Все данные будут удалены.</p>
+            <button id="deleteAccountBtn"
+              style="background: transparent; border: 1px solid var(--red); color: var(--red); padding: 8px 20px; cursor: pointer; font-family: var(--font); font-size: 13px; font-weight: 600; width: 100%; transition: all 0.15s;"
+              onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background='transparent'">
+              Удалить мой аккаунт навсегда
+            </button>
+          </div>
+        </div>
+
+        <div id="settings-notifications" class="settings-panel">
+          <h3 class="panel-header">Уведомления</h3>
+          <div class="empty-state">Настройки уведомлений появятся в следующем обновлении.</div>
+        </div>
+
+        <div class="settings-footer">
+          <button id="cancelProfileBtn" class="settings-cancel-btn">Отмена</button>
+          <button id="saveProfileBtn" class="settings-save-btn">Сохранить</button>
+        </div>
+      </main>
     </div>
-  </main>
+  </div>
 
   <script>
-    let currentSlide = 0;
-    const slidesWrapper = document.querySelector('.slides-wrapper');
-    const slides = document.querySelectorAll('.slide');
-    const totalSlides = slides.length;
+    // Preloader
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('global-preloader').classList.add('hidden');
+      }, 700);
+    });
 
-    // ────────────────────────────────────────────────
-    function updateSlideClasses() {
-      slides.forEach((slide, index) => {
-        slide.classList.remove('active', 'prev', 'next');
-
-        if (index === currentSlide) {
-          slide.classList.add('active');
-        } else if (index === currentSlide - 1) {
-          slide.classList.add('prev');
-        } else if (index === currentSlide + 1) {
-          slide.classList.add('next');
-        }
+    // Tab navigation
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(btn.dataset.target)?.classList.add('active');
       });
-    }
+    });
 
-    // ────────────────────────────────────────────────
-    function updateHeaderColor() {
-      const headerLinks = document.querySelectorAll('.hero-header__link');
+    // Inner tabs - menu
+    document.querySelectorAll('.menu-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('#view-menu .inner-view').forEach(v => v.classList.remove('active'));
+        document.getElementById(tab.dataset.menuTarget)?.classList.add('active');
+      });
+    });
 
-      if (currentSlide === 0) {
-        // первый слайд — дефолтный цвет (из CSS)
-        headerLinks.forEach(link => {
-          link.style.color = '';
-          link.classList.remove('colored-nav');
-        });
-      } else {
-        // все остальные слайды — фиолетовый
-        headerLinks.forEach(link => {
-          link.style.color = '#6367FF';
-          link.classList.add('colored-nav');
-        });
-      }
-    }
+    // Inner tabs - profile
+    document.querySelectorAll('.profile-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('#view-profile .inner-view').forEach(v => v.classList.remove('active'));
+        document.getElementById(tab.dataset.profileTarget)?.classList.add('active');
+      });
+    });
 
-    // ────────────────────────────────────────────────
-    window.addEventListener('wheel', (e) => {
-      e.preventDefault();
+    // Settings tabs
+    document.querySelectorAll('.settings-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(tab.dataset.settingsTarget)?.classList.add('active');
+      });
+    });
 
-      if (slidesWrapper.style.transition !== '') {
-        return;
-      }
+    // Courses view tabs
+    document.querySelectorAll('#view-courses .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#view-courses .tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
 
-      let slideChanged = false;
+    // Edit profile modal
+    document.querySelector('.edit-profile-btn')?.addEventListener('click', () => {
+      document.getElementById('editProfileModal').classList.add('active');
+    });
+    document.getElementById('cancelProfileBtn')?.addEventListener('click', () => {
+      document.getElementById('editProfileModal').classList.remove('active');
+    });
+    document.getElementById('editProfileModal')?.addEventListener('click', e => {
+      if (e.target === document.getElementById('editProfileModal'))
+        document.getElementById('editProfileModal').classList.remove('active');
+    });
 
-      if (e.deltaY > 40 && currentSlide < totalSlides - 1) {
-        currentSlide++;
-        slideChanged = true;
-      }
-      else if (e.deltaY < -40 && currentSlide > 0) {
-        currentSlide--;
-        slideChanged = true;
-      }
+    // Char counter
+    const postInput = document.getElementById('postInput');
+    const charCount = document.getElementById('charCount');
+    const publishBtn = document.querySelector('.publish-btn');
+    postInput?.addEventListener('input', () => {
+      const remaining = 280 - postInput.value.length;
+      charCount.textContent = remaining;
+      publishBtn.disabled = postInput.value.trim().length === 0;
+      charCount.style.color = remaining < 20 ? 'var(--red)' : 'var(--text3)';
+    });
 
-      if (slideChanged) {
-        slidesWrapper.style.transform = `translateY(-${currentSlide * 100}vh)`;
-        updateSlideClasses();
-
-        // Меняем цвет шапки ПОСЛЕ завершения анимации
-        setTimeout(() => {
-          updateHeaderColor();
-        }, 200);   // ← самое важное: подбери под свою анимацию (обычно 400–700 мс)
-      }
-    }, { passive: false });
-
-    // ────────────────────────────────────────────────
-    // Инициализация при загрузке страницы
-    updateSlideClasses();
-    updateHeaderColor();   
+    // Create course
+    document.getElementById('createCourseBtn')?.addEventListener('click', () => {
+      window.location.href = './create-course.html';
+    });
   </script>
 
-</body>
+  <script src="./static/js/main.js" type="module"></script>
+  <script>
+// Particle Background для Tagybasqa
+const canvas = document.getElementById("particle-field");
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+if (canvas && !prefersReducedMotion) {
+    const ctx = canvas.getContext("2d");
+    let width = 0, height = 0;
+    let particles = [];
+    const mouse = { x: 0, y: 0 };
+
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random();
+            this.y = Math.random();
+            this.vx = (Math.random() - 0.5) * 0.0008;
+            this.vy = (Math.random() - 0.5) * 0.0008;
+            this.radius = Math.random() * 1.8 + 0.6;
+            this.alpha = Math.random() * 0.6 + 0.4;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0 || this.x > 1) this.vx *= -1;
+            if (this.y < 0 || this.y > 1) this.vy *= -1;
+        }
+    }
+
+    function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function createParticles(count) {
+        particles = Array.from({ length: count }, () => new Particle());
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        const ax = [], ay = []; // для оптимизации
+
+        particles.forEach((p, i) => {
+            p.update();
+
+            const px = p.x * width;
+            const py = p.y * height;
+            ax[i] = px;
+            ay[i] = py;
+
+            // Точка
+            ctx.beginPath();
+            ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`; // мягкий голубой
+            ctx.arc(px, py, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Лёгкое свечение
+            ctx.beginPath();
+            ctx.fillStyle = `rgba(120, 200, 255, ${p.alpha * 0.25})`;
+            ctx.arc(px, py, p.radius * 2.2, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // Линии между частицами
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = ax[i] - ax[j];
+                const dy = ay[i] - ay[j];
+                const dist = Math.hypot(dx, dy);
+
+                if (dist < 160) {
+                    const opacity = 0.09 * (1 - dist / 160);
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(140, 190, 255, ${opacity})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.moveTo(ax[i], ay[i]);
+                    ctx.lineTo(ax[j], ay[j]);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Линии к курсору (нежное взаимодействие)
+        const mx = mouse.x;
+        const my = mouse.y;
+        particles.forEach((_, i) => {
+            const dx = ax[i] - mx;
+            const dy = ay[i] - my;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < 220) {
+                const opacity = 0.06 * (1 - dist / 220);
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(180, 220, 255, ${opacity})`;
+                ctx.lineWidth = 0.7;
+                ctx.moveTo(ax[i], ay[i]);
+                ctx.lineTo(mx, my);
+                ctx.stroke();
+            }
+        });
+
+        requestAnimationFrame(draw);
+    }
+
+    // Инициализация
+    window.addEventListener("resize", () => {
+        resize();
+    });
+
+    window.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+
+    // Запуск
+    resize();
+    createParticles(50);        // количество частиц (можно менять от 50 до 90)
+    draw();
+
+    // Дополнительно: плавное появление canvas
+    setTimeout(() => {
+        canvas.style.transition = "opacity 5s ease";
+        canvas.style.opacity = "0.5";
+    }, 800);
+}
+</script>
+</body>
 </html>

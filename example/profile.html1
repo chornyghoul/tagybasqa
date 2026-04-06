@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ТБ - Платформа</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+  <div id="global-preloader" class="global-preloader">
+    <div class="spinner-large"></div>
+  </div>
+
+  <div class="app-container">
+
+    <aside class="sidebar-left">
+      <div class="nav-links">
+        <button class="nav-item tab-btn active" data-target="view-menu">Главная</button>
+        <button class="nav-item tab-btn" data-target="view-profile">Профиль</button>
+        <button class="nav-item tab-btn" data-target="view-search">Поиск</button>
+      </div>
+      <button class="nav-item logout" id="logoutBtn">Выйти</button>
+    </aside>
+
+    <main class="main-content">
+
+      <div id="view-menu" class="view-section active">
+
+        <div class="tabs-container">
+          <div class="tab menu-tab active" data-menu-target="menu-recommended">Для вас</div>
+          <div class="tab menu-tab" data-menu-target="menu-feed">Лента студентов</div>
+          <div class="tab menu-tab" data-menu-target="menu-subscriptions">Подписки</div>
+        </div>
+
+        <div id="menu-recommended" class="inner-view active">
+          <h2 style="font-weight: 800; font-size: 20px; margin-bottom: 20px;">Рекомендованные курсы</h2>
+          <div class="courses-grid">
+
+            <div class="course-card" style="cursor: pointer;" onclick="window.location.href='./course.html'">
+              <div class="course-img">
+                <span class="course-badge">Новинка</span>
+                <div class="course-emoji">🌐</div> 
+              </div>
+              <div class="course-info">
+                <div class="course-meta">
+                  <span>⏱ 12 часов</span>
+                  <span>⭐ 4.9</span>
+                </div>
+                <h3>Web-разработка: HTML & CSS</h3>
+                <p>Освойте верстку сайтов с нуля. Работа с семантикой, Flexbox и CSS Grid для создания современных интерфейсов.</p>
+                <div class="course-footer">
+                  <div class="course-author">
+                    <div class="author-avatar" style="background: #e11d48;">И</div>
+                    <span class="author-name">Иван И.</span>
+                  </div>
+                  <button class="course-btn" onclick="event.stopPropagation(); window.location.href='./course.html'">Начать</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div id="menu-feed" class="inner-view">
+
+          <div class="create-post-container">
+            <div class="create-post-top">
+              <div class="create-post-avatar" id="userPostAvatar"></div>
+              <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 10px;">
+                <input type="text" placeholder="Что нового?" class="create-post-input" id="postInput" maxlength="280">
+
+                <div id="imagePreviewContainer" style="display: none; position: relative; width: max-content;">
+                  <img id="imagePreview"
+                    style="max-height: 200px; border-radius: 12px; border: 1px solid var(--border-color);" src=""
+                    alt="preview">
+                  <button id="removeImageBtn"
+                    style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;">✕</button>
+                </div>
+
+                <div id="pollContainer"
+                  style="display: none; flex-direction: column; gap: 8px; border: 1px solid var(--border-color); padding: 12px; border-radius: 12px;">
+                  <input type="text" class="poll-option-input" placeholder="Вариант 1"
+                    style="background: transparent; border: 1px solid var(--border-color); color: white; padding: 8px; border-radius: 8px;">
+                  <input type="text" class="poll-option-input" placeholder="Вариант 2"
+                    style="background: transparent; border: 1px solid var(--border-color); color: white; padding: 8px; border-radius: 8px;">
+                  <button id="removePollBtn"
+                    style="background: transparent; border: none; color: #ff4b4b; cursor: pointer; text-align: left; font-size: 13px; margin-top: 4px;">Отменить
+                    опрос</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="create-post-bottom">
+              <div class="create-post-actions">
+                <button class="action-icon" id="btnAttach">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                </button>
+                <input type="file" id="fileInput" accept="image/png, image/jpeg, image/gif" style="display: none;">
+
+                <button class="action-icon" id="btnPoll">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <span id="charCount" style="font-size: 12px; color: #888; margin-right: 10px;">280</span>
+              <button class="publish-btn">Опубликовать</button>
+            </div>
+          </div>
+
+          <div class="empty-state">Здесь будут отображаться новости, вопросы и обсуждения студентов.</div>
+        </div>
+
+        <div id="menu-subscriptions" class="inner-view">
+          <h2 style="font-weight: 800; font-size: 20px; margin-bottom: 20px;">Мои подписки</h2>
+          <div class="empty-state">Вы пока не подписаны ни на один курс или автора.</div>
+        </div>
+
+      </div>
+
+      <div id="view-profile" class="view-section">
+        <div class="profile-header">
+          <div class="profile-banner">
+            <button class="banner-edit-icon">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="header-content">
+            <div class="avatar-container">
+              <div class="main-avatar">
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button class="edit-profile-btn">Редактировать</button>
+            </div>
+
+            <div class="user-info-text">
+              <div class="user-name-row">
+                <h1>Name</h1>
+              </div>
+              <span class="handle">@username</span>
+
+              <div class="stats-row">
+                <span><strong>0</strong> подписчиков</span>
+                <span><strong>0</strong> подписок</span>
+              </div>
+              <div class="reg-date">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+                </svg>
+                Регистрация: март 2026 г.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs-container" style="margin-top: 20px;">
+          <div class="tab profile-tab active" data-profile-target="profile-courses">Мои курсы</div>
+          <div class="tab profile-tab" data-profile-target="profile-achievements">Достижения</div>
+        </div>
+
+        <div id="profile-courses" class="inner-view active">
+          <div id="createCourseAction" style=" margin-bottom: 20px;">
+            <button id="createCourseBtn" class="save-btn" style="background: #1d9bf0; color: white;">+ Создать новый
+              курс</button>
+          </div>
+          <div class="empty-state">У вас пока нет активных курсов.</div>
+        </div>
+
+        <div id="profile-achievements" class="inner-view">
+          <div class="empty-state">Здесь будут отображаться ваши награды и сертификаты.</div>
+        </div>
+
+      </div>
+
+      <div id="view-search" class="view-section">
+        <h2 style="font-weight: 800; font-size: 24px;">Поиск</h2>
+        <div class="search-input-container">
+          <svg width="20" height="20" fill="var(--text-muted)" viewBox="0 0 24 24">
+            <path
+              d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+          </svg>
+          <input type="text" placeholder="Искать курсы, пользователей или статьи...">
+        </div>
+        <div class="empty-state" style="margin-top: 20px;">Введите запрос для начала поиска</div>
+      </div>
+
+    </main>
+
+    <aside class="right-sidebar">
+      <div class="footer-links">
+        <a href="#">Вакансии</a>
+        <a href="#">Статус серверов</a>
+        <a href="#">Условия использования</a>
+        <a href="#">Конфиденциальность</a>
+        <a href="#">Политика Cookies</a>
+        <span style="margin-top: 12px;">© 2026 ООО «Tagybasqa»</span>
+      </div>
+    </aside>
+
+  </div>
+
+
+
+
+
+
+
+  <div id="editProfileModal" class="modal-overlay">
+    <div class="settings-modal-content">
+
+      <aside class="settings-sidebar">
+        <h2 class="settings-title">Настройки</h2>
+        <nav class="settings-nav">
+          <button class="settings-tab active" data-settings-target="settings-account">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>
+            Аккаунт
+          </button>
+          <button class="settings-tab" data-settings-target="settings-appearance">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z" />
+            </svg>
+            Оформление
+          </button>
+          <button class="settings-tab" data-settings-target="settings-security">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+            </svg>
+            Безопасность
+          </button>
+          <button class="settings-tab" data-settings-target="settings-privacy">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
+            </svg>
+            Приватность
+          </button>
+          <button class="settings-tab" data-settings-target="settings-notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
+            </svg>
+            Уведомления
+          </button>
+        </nav>
+      </aside>
+
+      <main class="settings-main">
+
+        <div id="settings-account" class="settings-panel active">
+          <h3 class="panel-header">Аккаунт</h3>
+
+          <div class="settings-field-col">
+            <div class="field-info" style="margin-bottom: 12px;">
+              <label>Аватарка профиля (URL или Эмодзи)</label>
+              <span>Вставьте прямую ссылку на картинку из интернета или просто любой эмодзи.</span>
+            </div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <div class="clan-avatar" id="editAvatarPreview"
+                style="min-width: 60px; height: 60px; font-size: 30px; border: 1px solid #444; flex-shrink: 0;">😭</div>
+              <div class="field-control" style="flex-grow: 1; width: auto;">
+                <input type="text" id="avatarUrlInput" class="settings-input"
+                  placeholder="Например: https://site.com/image.jpg или 🐼" style="width: 100%;">
+              </div>
+            </div>
+          </div>
+          <div class="settings-field-row">
+            <div class="field-info">
+              <label>Имя</label>
+              <span>Ваше отображаемое имя</span>
+            </div>
+            <div class="field-control">
+              <input type="text" id="editNameInput" maxlength="50" class="settings-input">
+            </div>
+          </div>
+
+          <div class="settings-field-row">
+            <div class="field-info">
+              <label>Username</label>
+              <span>Ваш уникальный идентификатор (только латиница, цифры и _)</span>
+            </div>
+            <div class="field-control">
+              <input type="text" id="editHandleInput" maxlength="15" class="settings-input">
+            </div>
+          </div>
+
+        </div>
+
+        <div id="settings-appearance" class="settings-panel">
+          <h3 class="panel-header">Оформление</h3>
+          <div class="empty-state">Настройки оформления находятся в разработке.</div>
+        </div>
+        <div id="settings-security" class="settings-panel">
+          <h3 class="panel-header">Безопасность</h3>
+          <div style="margin-top: 20px; border: 1px solid #ff4b4b; padding: 15px; border-radius: 8px;">
+            <h4 style="color: #ff4b4b; margin-bottom: 10px;">Опасная зона</h4>
+            <button id="deleteAccountBtn"
+              style="background: transparent; border: 1px solid #ff4b4b; color: #ff4b4b; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%;">
+              Удалить мой аккаунт навсегда
+            </button>
+          </div>
+        </div>
+        <div id="settings-privacy" class="settings-panel">
+          <h3 class="panel-header">Приватность</h3>
+          <div class="empty-state">Настройки приватности находятся в разработке.</div>
+        </div>
+        <div id="settings-notifications" class="settings-panel">
+          <h3 class="panel-header">Уведомления</h3>
+          <div class="empty-state">Настройки уведомлений находятся в разработке.</div>
+        </div>
+
+        <div class="settings-footer">
+          <button id="cancelProfileBtn" class="settings-cancel-btn">Отмена</button>
+          <button id="saveProfileBtn" class="settings-save-btn">Сохранить</button>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('createCourseBtn').addEventListener('click', function () {
+      window.location.href = './course-creator.html';
+    });
+  </script>
+  <script src="/static/js/main.js" type="module"></script>
+</body>
+
+</html>
