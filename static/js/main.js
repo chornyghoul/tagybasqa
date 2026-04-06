@@ -33,9 +33,6 @@ const storage = getStorage(app);
 // ─────────────────────────────────────────
 // АВТОРИЗАЦИЯ
 // ─────────────────────────────────────────
-// ─────────────────────────────────────────
-// АВТОРИЗАЦИЯ
-// ─────────────────────────────────────────
 onAuthStateChanged(auth, async (user) => {
     const path = window.location.pathname;
     const isAuthPage = path.includes('auth.html');
@@ -58,7 +55,8 @@ onAuthStateChanged(auth, async (user) => {
         
         if (isIndexPage) {
             loadUserCourses(user);
-            loadAllPublicCourses(); // <--- ДОБАВИТЬ ЭТУ СТРОКУ СЮДА
+            loadAllPublicCourses(); 
+            loadUserProgress(user); // Загружаем прогресс пользователя (Мои подписки)
         }
 
     } else {
@@ -260,30 +258,110 @@ function updateVerifiedBadge(userData) {
 }
 
 // ─────────────────────────────────────────
-// МОИ КУРСЫ
+// ПРОГРЕСС ОБУЧЕНИЯ (ПРОЙДЕННЫЕ КУРСЫ)
 // ─────────────────────────────────────────
-async function loadUserCourses(user) {
-    const container = document.getElementById('profile-courses');
+async function loadUserProgress(user) {
+    const container = document.getElementById('enrolledCoursesContainer');
     if (!container) return;
 
-    const createBtnHtml = `
-        <div style="margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;">
-            <h2 class="section-heading" style="margin:0;">Мои курсы</h2>
-            <button onclick="window.location.href='./create-course.html'"
-                    class="save-btn" style="background:var(--text);color:var(--bg);padding:10px 20px;">
-                + Создать новый курс
-            </button>
-        </div>`;
+    try {
+        const userSnap = await getDoc(doc(db, "users", user.uid));
+        if (!userSnap.exists()) {
+            container.innerHTML = '<div class="empty-state">Данные пользователя не найдены.</div>';
+            return;
+        }
+
+        const userData = userSnap.data();
+        const courseProgress = userData.courseProgress || {};
+        const enrolledCourseIds = Object.keys(courseProgress);
+
+        if (enrolledCourseIds.length === 0) {
+            container.innerHTML = '<div class="empty-state">Вы пока не начали ни одного курса.<br>Перейдите во вкладку "Курсы" и выберите что-нибудь интересное!</div>';
+            return;
+        }
+
+        container.innerHTML = ''; // Очищаем статус "Загрузка..."
+        
+        for (const courseId of enrolledCourseIds) {
+            const courseSnap = await getDoc(doc(db, "courses", courseId));
+            
+            if (courseSnap.exists()) {
+                const courseData = courseSnap.data();
+                
+                // Считаем общее количество уроков в курсе
+                let totalLessons = 0;
+                if (courseData.modules) {
+                    courseData.modules.forEach(mod => {
+                        if (mod.lessons) totalLessons += mod.lessons.length;
+                    });
+                }
+
+                // Количество пройденных уроков из базы пользователя
+                const completedLessons = courseProgress[courseId].length || 0;
+                
+                // Высчитываем процент
+                let percent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+                if (percent > 100) percent = 100;
+
+                renderProgressCard(courseId, courseData, completedLessons, totalLessons, percent, container);
+            }
+        }
+    } catch (error) {
+        console.error("Ошибка при загрузке прогресса:", error);
+        container.innerHTML = '<div class="empty-state">Не удалось загрузить данные прогресса.</div>';
+    }
+}
+
+function renderProgressCard(courseId, courseData, completed, total, percent, container) {
+    const isCompleted = percent === 100;
+    
+    let iconHtml = '';
+    if (isCompleted) {
+        iconHtml = '🏆';
+    } else if (courseData.emoji) {
+        iconHtml = courseData.emoji;
+    } else if (courseData.cover && courseData.cover.startsWith('http')) {
+        iconHtml = `<img src="${courseData.cover}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r);">`;
+    } else {
+        iconHtml = '📚';
+    }
+
+    const title = courseData.title || 'Курс без названия';
+    
+    const html = `
+        <a href="./course.html?id=${courseId}" class="progress-card">
+           <div class="pc-top">
+             <div class="pc-icon" style="overflow:hidden;">${iconHtml}</div>
+             <div class="pc-info">
+               <div class="pc-title">${escHtml(title)}</div>
+               <div class="pc-meta">${completed} / ${total} уроков пройдено</div>
+             </div>
+             <div class="pc-percent" style="color: ${isCompleted ? 'var(--gold)' : 'var(--blue)'}">${percent}%</div>
+           </div>
+           <div class="pc-bar-bg">
+             <div class="pc-bar-fill" style="width: ${percent}%; background: ${isCompleted ? 'var(--gold)' : 'var(--blue)'};"></div>
+           </div>
+        </a>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+// ─────────────────────────────────────────
+// МОИ СОЗДАННЫЕ КУРСЫ
+// ─────────────────────────────────────────
+async function loadUserCourses(user) {
+    const container = document.getElementById('myCoursesContainer');
+    if (!container) return;
 
     try {
         const snap = await getDocs(query(collection(db, "courses"), where("uid", "==", user.uid)));
 
         if (snap.empty) {
-            container.innerHTML = createBtnHtml + '<div class="empty-state">У вас пока нет созданных курсов.<br>Создайте первый курс!</div>';
+            container.innerHTML = '<div class="empty-state">У вас пока нет созданных курсов.<br>Создайте первый курс!</div>';
             return;
         }
 
-        let html = createBtnHtml + '<div class="courses-grid">';
+        let html = '<div class="courses-grid">';
         snap.forEach((d, i) => {
             const c = d.data();
             const id = d.id;
@@ -331,12 +409,10 @@ async function loadUserCourses(user) {
         container.innerHTML = html + '</div>';
     } catch (err) {
         console.error(err);
-        container.innerHTML = createBtnHtml + '<div class="empty-state">Ошибка загрузки курсов</div>';
+        container.innerHTML = '<div class="empty-state">Ошибка загрузки курсов</div>';
     }
 }
-// ─────────────────────────────────────────
-// ВСЕ ОТКРЫТЫЕ КУРСЫ (ВКЛАДКА "КУРСЫ")
-// ─────────────────────────────────────────
+
 // ─────────────────────────────────────────
 // ВСЕ ОТКРЫТЫЕ КУРСЫ (ВКЛАДКА "КУРСЫ")
 // ─────────────────────────────────────────
@@ -345,7 +421,6 @@ async function loadAllPublicCourses() {
     if (!container) return;
 
     try {
-        // Запрашиваем из базы все курсы, где статус равен "Открытый"
         const publicCoursesQuery = query(
             collection(db, "courses"), 
             where("status", "==", "Открытый")
@@ -358,11 +433,9 @@ async function loadAllPublicCourses() {
             return;
         }
 
-        // 1. Собираем уникальные ID авторов (uid) со всех загруженных курсов
         const uidSet = new Set();
         snap.forEach(d => uidSet.add(d.data().uid));
 
-        // 2. Загружаем актуальные профили авторов из коллекции users
         const userCache = {};
         await Promise.all([...uidSet].map(async uid => {
             if (!uid) return;
@@ -384,12 +457,10 @@ async function loadAllPublicCourses() {
             const id = docSnap.id;
             const num = String(index).padStart(2, '0');
             
-            // 3. Достаем актуальные данные автора (имя и аватар)
             const author = userCache[c.uid] || {};
             const authorName = author.name || c.userName || 'Автор';
             const authorAvatar = author.avatar || '';
             
-            // Определяем обложку курса
             let coverHtml = '';
             if (c.cover && c.cover.startsWith('http')) {
                 coverHtml = `<img src="${c.cover}" style="width:100%;height:100%;object-fit:cover;">`;
@@ -397,7 +468,6 @@ async function loadAllPublicCourses() {
                 coverHtml = c.cover || '📚';
             }
 
-            // Формируем аватарку автора (эмодзи, картинка или первая буква имени)
             let avatarHtml = '';
             if (authorAvatar) {
                 if ([...authorAvatar].length <= 2) {
@@ -409,7 +479,6 @@ async function loadAllPublicCourses() {
                 avatarHtml = `<div class="author-avatar" style="background:var(--accent-dim); color:var(--text); display:flex; align-items:center; justify-content:center;">${authorName[0].toUpperCase()}</div>`;
             }
 
-            // Формируем HTML карточки в стиле платформы
             html += `
             <div class="course-card" onclick="window.location.href='./course.html?id=${id}'">
               <span class="course-num">${num} / ${escHtml(c.category || 'Общее')}</span>
@@ -440,17 +509,13 @@ async function loadAllPublicCourses() {
 }
 
 window.editCourse = id => { window.location.href = `./create-course.html?edit=${id}`; };
-// Глобальная функция удаления курса
 window.deleteCourse = async (courseId) => {
     if (!confirm('Вы уверены, что хотите удалить этот курс? Все данные (модули, уроки) будут стерты навсегда.')) {
         return;
     }
-
     try {
         await deleteDoc(doc(db, "courses", courseId));
         showToast('Курс успешно удален');
-
-        // Перезагружаем список курсов для текущего пользователя
         const currentUser = auth.currentUser;
         if (currentUser) {
             loadUserCourses(currentUser);
@@ -593,7 +658,6 @@ function setupFeed(user) {
         const changes = snap.docChanges();
         const onlyMods = changes.length > 0 && changes.every(c => c.type === 'modified');
 
-        // Точечное обновление лайков и опросов без полного перерендера
         if (!isInitialLoad && onlyMods) {
             changes.forEach(change => {
                 const data = change.doc.data();
@@ -615,7 +679,6 @@ function setupFeed(user) {
         if (emptyState) emptyState.style.display = snap.empty ? 'block' : 'none';
         if (snap.empty) return;
 
-        // Батч-загрузка авторов
         const uidSet = new Set();
         snap.forEach(d => uidSet.add(d.data().uid));
         const userCache = {};
@@ -664,10 +727,8 @@ function setupFeed(user) {
         });
     });
 
-    // Event delegation
     if (!feedContainer.dataset.listenerAttached) {
         feedContainer.addEventListener('click', async e => {
-            // Лайк
             const likeBtn = e.target.closest('.like-post-btn');
             if (likeBtn) {
                 const pid = likeBtn.dataset.id;
@@ -685,14 +746,12 @@ function setupFeed(user) {
                 } catch (err) { console.error(err); }
             }
 
-            // Удалить пост
             const delBtn = e.target.closest('.delete-post-btn');
             if (delBtn && confirm('Удалить пост?')) {
                 try { await deleteDoc(doc(db, "posts", delBtn.dataset.id)); }
                 catch { alert('Ошибка удаления'); }
             }
 
-            // Голосование
             const pollBtn = e.target.closest('.poll-option-btn:not([disabled])');
             if (pollBtn) {
                 const postId = pollBtn.dataset.postId;
