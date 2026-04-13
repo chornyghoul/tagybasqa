@@ -13,9 +13,6 @@ import {
     getStorage, ref, uploadBytes, getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
-// ─────────────────────────────────────────
-// КОНФИГУРАЦИЯ
-// ─────────────────────────────────────────
 const firebaseConfig = {
     apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
     authDomain: "pystart-dd2db.firebaseapp.com",
@@ -41,7 +38,6 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         if (isAuthPage) { window.location.href = './index.html'; return; }
 
-        // Logout
         document.getElementById('logoutBtn')?.addEventListener('click', () => {
             if (confirm('Выйти из аккаунта?')) {
                 signOut(auth).then(() => { window.location.href = './auth.html'; });
@@ -52,11 +48,12 @@ onAuthStateChanged(auth, async (user) => {
         setupFeed(user);
         setupSearch(user);
         setupSuggestedUsers(user);
-        
+
         if (isIndexPage) {
+            loadPlatformStats();          // УЛУЧШЕНИЕ 6: статистика платформы
             loadUserCourses(user);
-            loadAllPublicCourses(); 
-            loadUserProgress(user); // Загружаем прогресс пользователя (Мои подписки)
+            loadAllPublicCourses();
+            loadUserProgress(user);
         }
 
     } else {
@@ -64,6 +61,48 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('global-preloader')?.classList.add('hidden');
     }
 });
+
+// ─────────────────────────────────────────
+// УЛУЧШЕНИЕ 6: СТАТИСТИКА ПЛАТФОРМЫ
+// ─────────────────────────────────────────
+async function loadPlatformStats() {
+    const container = document.getElementById('platformStats');
+    if (!container) return;
+
+    try {
+        const [coursesSnap, usersSnap, quizzesSnap] = await Promise.all([
+            getDocs(query(collection(db, "courses"), where("status", "==", "Открытый"))),
+            getDocs(query(collection(db, "users"), limit(200))),
+            getDocs(query(collection(db, "quizzes"), where("visibility", "==", "public")))
+        ]);
+
+        const coursesCount = coursesSnap.size;
+        const usersCount = usersSnap.size;
+        const quizzesCount = quizzesSnap.size;
+
+        container.innerHTML = `
+            <div class="stats-strip">
+                <div class="stat-chip">
+                    <span class="stat-chip-num">${usersCount}</span>
+                    <span class="stat-chip-label">Студентов</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="stat-chip-num">${coursesCount}</span>
+                    <span class="stat-chip-label">Курсов</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="stat-chip-num">${quizzesCount}</span>
+                    <span class="stat-chip-label">Квизов</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="stat-chip-num" style="color:var(--green);">онлайн</span>
+                    <span class="stat-chip-label">Статус</span>
+                </div>
+            </div>`;
+    } catch (e) {
+        console.error("Ошибка загрузки статистики:", e);
+    }
+}
 
 // ─────────────────────────────────────────
 // ПРОФИЛЬ
@@ -92,7 +131,6 @@ function loadUserProfile(user) {
         }
     };
 
-    // Мгновенный кэш
     try {
         const cached = JSON.parse(localStorage.getItem('lastKnownProfile'));
         if (cached) {
@@ -155,7 +193,6 @@ function loadUserProfile(user) {
         document.getElementById('global-preloader')?.classList.add('hidden');
     });
 
-    // Редактирование профиля
     const editModal = document.getElementById('editProfileModal');
     const cancelBtn = document.getElementById('cancelProfileBtn');
     const saveBtn = document.getElementById('saveProfileBtn');
@@ -174,7 +211,6 @@ function loadUserProfile(user) {
 
     cancelBtn?.addEventListener('click', () => editModal?.classList.remove('active'));
     window.addEventListener('click', e => { if (e.target === editModal) editModal.classList.remove('active'); });
-
     avatarInp?.addEventListener('input', e => renderAvatarPreview(e.target.value.trim(), avatarPreview));
 
     saveBtn?.addEventListener('click', async () => {
@@ -206,7 +242,6 @@ function loadUserProfile(user) {
         }
     });
 
-    // Удаление аккаунта
     document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => {
         if (!confirm('Удалить аккаунт навсегда? Это действие необратимо.')) return;
         const btn = document.getElementById('deleteAccountBtn');
@@ -258,7 +293,7 @@ function updateVerifiedBadge(userData) {
 }
 
 // ─────────────────────────────────────────
-// ПРОГРЕСС ОБУЧЕНИЯ (ПРОЙДЕННЫЕ КУРСЫ)
+// УЛУЧШЕНИЕ 3: СТРИК + ПРОГРЕСС ОБУЧЕНИЯ
 // ─────────────────────────────────────────
 async function loadUserProgress(user) {
     const container = document.getElementById('enrolledCoursesContainer');
@@ -267,7 +302,9 @@ async function loadUserProgress(user) {
     try {
         const userSnap = await getDoc(doc(db, "users", user.uid));
         if (!userSnap.exists()) {
-            container.innerHTML = '<div class="empty-state">Данные пользователя не найдены.</div>';
+            renderEmptyState(container, '📚', 'Вы ещё не начали ни одного курса', 'Перейти к курсам', () => {
+                document.querySelector('.tab-btn[data-target="view-courses"]')?.click();
+            });
             return;
         }
 
@@ -275,34 +312,30 @@ async function loadUserProgress(user) {
         const courseProgress = userData.courseProgress || {};
         const enrolledCourseIds = Object.keys(courseProgress);
 
+        renderStreakWidget(courseProgress, userData);
+
         if (enrolledCourseIds.length === 0) {
-            container.innerHTML = '<div class="empty-state">Вы пока не начали ни одного курса.<br>Перейдите во вкладку "Курсы" и выберите что-нибудь интересное!</div>';
+            renderEmptyState(container, '📚', 'Вы ещё не начали ни одного курса', 'Перейти к курсам', () => {
+                document.querySelector('.tab-btn[data-target="view-courses"]')?.click();
+            });
             return;
         }
 
-        container.innerHTML = ''; // Очищаем статус "Загрузка..."
-        
+        container.innerHTML = '';
+
         for (const courseId of enrolledCourseIds) {
             const courseSnap = await getDoc(doc(db, "courses", courseId));
-            
             if (courseSnap.exists()) {
                 const courseData = courseSnap.data();
-                
-                // Считаем общее количество уроков в курсе
                 let totalLessons = 0;
                 if (courseData.modules) {
                     courseData.modules.forEach(mod => {
                         if (mod.lessons) totalLessons += mod.lessons.length;
                     });
                 }
-
-                // Количество пройденных уроков из базы пользователя
                 const completedLessons = courseProgress[courseId].length || 0;
-                
-                // Высчитываем процент
                 let percent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
                 if (percent > 100) percent = 100;
-
                 renderProgressCard(courseId, courseData, completedLessons, totalLessons, percent, container);
             }
         }
@@ -312,42 +345,166 @@ async function loadUserProgress(user) {
     }
 }
 
+function renderStreakWidget(courseProgress, userData) {
+    const streakContainer = document.getElementById('streakWidget');
+    if (!streakContainer) return;
+
+    const streak = userData.streak || 0;
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0]; // "2026-04-13"
+
+    // Массив дат, в которые пользователь заходил (или выполнял активность)
+    // Это главный массив, который нужно заполнять при заходе пользователя
+    const visitedDates = courseProgress?.visitedDates || userData?.visitedDates || [];
+
+    const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    
+    // Находим индекс сегодняшнего дня (Понедельник = 0)
+    const todayIdx = (today.getDay() + 6) % 7;
+
+    // Генерируем даты всей недели (с понедельника)
+    const weekDates = [];
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - todayIdx);
+
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(startOfWeek);
+        d.setDate(startOfWeek.getDate() + i);
+        weekDates.push(d.toISOString().split('T')[0]);
+    }
+
+    // Создаём HTML дней
+    const daysHTML = days.map((dayName, i) => {
+        const dateStr = weekDates[i];
+        const isVisited = visitedDates.includes(dateStr);   // ← главный момент
+        const isToday = dateStr === todayStr;
+
+        let className = 'streak-day';
+        if (isVisited) className += ' done';
+        if (isToday) className += ' today';
+
+        return `
+            <div class="${className}">
+                <div class="streak-day-dot"></div>
+                <div class="streak-day-name">${dayName}</div>
+            </div>
+        `;
+    }).join('');
+
+    streakContainer.innerHTML = `
+        <div class="streak-widget">
+            <div class="streak-left">
+                <div class="streak-fire">🔥</div>
+                <div>
+                    <div class="streak-num">${streak}</div>
+                    <div class="streak-text">дней подряд</div>
+                </div>
+            </div>
+            <div class="streak-days-col">
+                <div class="streak-label-top">Эта неделя</div>
+                <div class="streak-days-row">
+                    ${daysHTML}
+                </div>
+            </div>
+        </div>
+    `;
+}
 function renderProgressCard(courseId, courseData, completed, total, percent, container) {
     const isCompleted = percent === 100;
-    
+
     let iconHtml = '';
-    if (isCompleted) {
-        iconHtml = '🏆';
+    if (courseData.cover && courseData.cover.startsWith('http')) {
+        iconHtml = `<img src="${courseData.cover}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;" alt="">`;
     } else if (courseData.emoji) {
-        iconHtml = courseData.emoji;
-    } else if (courseData.cover && courseData.cover.startsWith('http')) {
-        iconHtml = `<img src="${courseData.cover}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r);">`;
+        iconHtml = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:42px;">${courseData.emoji}</div>`;
     } else {
-        iconHtml = '📚';
+        const initial = (courseData.title || 'К').charAt(0).toUpperCase();
+        iconHtml = `<div style="width:100%;height:100%;background:var(--accent-dim);color:var(--text);font-size:42px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:16px;">${initial}</div>`;
     }
 
     const title = courseData.title || 'Курс без названия';
-    
-    const html = `
-        <a href="./course.html?id=${courseId}" class="progress-card">
-           <div class="pc-top">
-             <div class="pc-icon" style="overflow:hidden;">${iconHtml}</div>
-             <div class="pc-info">
-               <div class="pc-title">${escHtml(title)}</div>
-               <div class="pc-meta">${completed} / ${total} уроков пройдено</div>
-             </div>
-             <div class="pc-percent" style="color: ${isCompleted ? 'var(--gold)' : 'var(--blue)'}">${percent}%</div>
-           </div>
-           <div class="pc-bar-bg">
-             <div class="pc-bar-fill" style="width: ${percent}%; background: ${isCompleted ? 'var(--gold)' : 'var(--blue)'};"></div>
-           </div>
+    const color = isCompleted ? 'var(--gold)' : 'var(--text)';
+    const hasCertificate = !!courseData.certificate;
+
+    container.insertAdjacentHTML('beforeend', `
+        <a href="./course.html?id=${courseId}" 
+           class="progress-card course-card-modern"
+           style="text-decoration:none;color:inherit;">
+            
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;flex-direction:column;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;cursor:pointer;min-height:260px;">
+                
+                <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;">
+                    <div class="pc-icon" style="width:72px;height:72px;flex-shrink:0;border-radius:16px;overflow:hidden;background:var(--bg2);box-shadow:0 4px 16px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;">
+                        ${iconHtml}
+                    </div>
+                    
+                    <div style="flex:1;min-width:0;">
+                        <div class="course-title-modern" style="font-size:18px;font-weight:700;line-height:1.3;margin-bottom:6px;color:var(--text);">
+                            ${escHtml(title)}
+                        </div>
+                        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.05em;margin-bottom:16px;">
+                            ${completed} / ${total} уроков пройдено
+                        </div>
+                        
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div style="flex:1;height:8px;background:var(--bg3);border-radius:9999px;position:relative;overflow:hidden;">
+                                <div class="pc-bar-fill" 
+                                     style="height:100%;width:${percent}%;background:${color};transition:width .4s cubic-bezier(0.34,1.56,0.64,1);">
+                                </div>
+                            </div>
+                            <div class="pc-percent" 
+                                 style="font-family:var(--mono);font-size:17px;font-weight:700;color:${color};white-space:nowrap;min-width:48px;text-align:right;">
+                                ${percent}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                ${isCompleted ? `
+                <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                    <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;">
+                        <div style="width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 3px var(--gold)"></div>
+                        Курс завершен
+                    </div>
+                    ${hasCertificate ? `
+                    <button onclick="event.stopImmediatePropagation(); event.preventDefault(); downloadCertificate('${courseId}');"
+                            style="background: var(--green);color:white;border:none;padding:9px 20px;border-radius:9999px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:all .2s ease;">
+                        Скачать сертификат
+                    </button>` : ''}
+                </div>` : ''}
+            </div>
         </a>
-    `;
-    container.insertAdjacentHTML('beforeend', html);
+    `);
 }
 
+window.downloadCertificate = async function (courseId) {
+    const user = auth.currentUser;
+    if (!user) return alert('Сначала войдите в аккаунт');
+
+    try {
+        const courseSnap = await getDoc(doc(db, "courses", courseId));
+        const course = courseSnap.data();
+
+        if (!course.certificate) {
+            return alert('Для этого курса сертификат ещё не настроен');
+        }
+
+        const link = document.createElement('a');
+        link.href = course.certificate;
+        link.download = `Сертификат_${course.title || 'Курс'}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showToast('✅ Сертификат скачивается...');
+    } catch (err) {
+        console.error(err);
+        alert('Не удалось скачать сертификат');
+    }
+};
+
 // ─────────────────────────────────────────
-// МОИ СОЗДАННЫЕ КУРСЫ
+// УЛУЧШЕНИЕ 1: МОИ КУРСЫ С ПРОГРЕСС-БАРОМ
 // ─────────────────────────────────────────
 async function loadUserCourses(user) {
     const container = document.getElementById('myCoursesContainer');
@@ -357,54 +514,71 @@ async function loadUserCourses(user) {
         const snap = await getDocs(query(collection(db, "courses"), where("uid", "==", user.uid)));
 
         if (snap.empty) {
-            container.innerHTML = '<div class="empty-state">У вас пока нет созданных курсов.<br>Создайте первый курс!</div>';
+            renderEmptyState(container, '✏️', 'Вы ещё не создали ни одного курса', 'Создать первый курс', () => {
+                window.location.href = './create-course.html';
+            });
             return;
         }
 
         let html = '<div class="courses-grid">';
-        snap.forEach((d, i) => {
+
+        // Используем for...of, чтобы дождаться ответа от функции рейтинга
+        for (const d of snap.docs) {
             const c = d.data();
             const id = d.id;
             const isDraft = c.status === 'Черновик';
+
+            const studentsCount = c.studentsCount || 0;
+            const modules = c.modules?.length || 0;
+
+            // Получаем реальный рейтинг из БД
+            let ratingText = await getCourseAverageRating(db, id);
+            ratingText = ratingText.replace('★ ', ''); // Оставляем только число для этого блока
+
             html += `
-                    <div class="course-card modern" onclick="window.viewCourse('${id}')">
-                        <div class="card-header">
-                            <span class="course-category">${escHtml(c.category || 'Общее')}</span>
-                            <div class="card-actions-top">
-                                <span class="status-dot ${isDraft ? 'draft' : 'published'}" title="${isDraft ? 'Черновик' : 'Опубликован'}"></span>
-                                <button onclick="event.stopImmediatePropagation(); window.deleteCourse('${id}')" 
-                                        class="delete-course-btn" title="Удалить курс">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="card-body">
-                            <div class="course-icon-main">${c.emoji || '📚'}</div>
-                            <h3 class="course-title-modern">${escHtml(c.title || 'Без названия')}</h3>
-                            <p class="course-description-modern">${escHtml((c.tagline || c.description || '').substring(0, 70))}...</p>
-                        </div>
-
-                        <div class="card-stats">
-                            <div class="stat-item">
-                                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                <span>${c.rating || '0.0'}</span>
-                            </div>
-                            <div class="stat-item">
-                                <span>${c.modules?.length || 0} модулей</span>
-                            </div>
-                        </div>
-
-                        <div class="card-footer-modern">
-                            <button onclick="event.stopImmediatePropagation(); window.editCourse('${id}')" class="btn-secondary-modern">
-                                Настроить
-                            </button>
-                            <button onclick="event.stopImmediatePropagation(); window.viewCourse('${id}')" class="btn-primary-modern">
-                                Открыть →
+                <div class="course-card modern" onclick="window.viewCourse('${id}')">
+                    <div class="card-header">
+                        <span class="course-category">${escHtml(c.category || 'Общее')}</span>
+                        <div class="card-actions-top">
+                            <span class="status-dot ${isDraft ? 'draft' : 'published'}" title="${isDraft ? 'Черновик' : 'Опубликован'}"></span>
+                            <button onclick="event.stopImmediatePropagation(); window.deleteCourse('${id}')"
+                                    class="delete-course-btn" title="Удалить курс">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
                             </button>
                         </div>
-                    </div>`;
-        });
+                    </div>
+
+                    <div class="card-body">
+                        <div class="course-icon-main" style="overflow:hidden;">
+    ${c.cover && c.cover.startsWith('http') ? `<img src="${c.cover}" style="width:100%;height:100%;object-fit:cover;display:block;">` : (c.emoji || '<div style="width:100%;height:100%;background:var(--bg3);"></div>')}
+</div>
+                        <h3 class="course-title-modern">${escHtml(c.title || 'Без названия')}</h3>
+                        <p class="course-description-modern">${escHtml((c.tagline || c.description || '').substring(0, 70))}...</p>
+                    </div>
+
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <span>${ratingText}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>${modules} модулей</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>${studentsCount} студентов</span>
+                        </div>
+                    </div>
+
+                    <div class="card-footer-modern">
+                        <button onclick="event.stopImmediatePropagation(); window.editCourse('${id}')" class="btn-secondary-modern">
+                            Настроить
+                        </button>
+                        <button onclick="event.stopImmediatePropagation(); window.viewCourse('${id}')" class="btn-primary-modern">
+                            Открыть →
+                        </button>
+                    </div>
+                </div>`;
+        }
 
         container.innerHTML = html + '</div>';
     } catch (err) {
@@ -414,22 +588,29 @@ async function loadUserCourses(user) {
 }
 
 // ─────────────────────────────────────────
-// ВСЕ ОТКРЫТЫЕ КУРСЫ (ВКЛАДКА "КУРСЫ")
+// ВСЕ ОТКРЫТЫЕ КУРСЫ С ПРОГРЕСС-БАРОМ И РЕЙТИНГОМ
 // ─────────────────────────────────────────
 async function loadAllPublicCourses() {
     const container = document.getElementById('publicCoursesContainer');
     if (!container) return;
 
+    let courseProgress = {};
+    const user = auth.currentUser;
+    if (user) {
+        try {
+            const userSnap = await getDoc(doc(db, "users", user.uid));
+            if (userSnap.exists()) courseProgress = userSnap.data().courseProgress || {};
+        } catch (e) { }
+    }
+
     try {
-        const publicCoursesQuery = query(
-            collection(db, "courses"), 
-            where("status", "==", "Открытый")
-        );
-        
+        const publicCoursesQuery = query(collection(db, "courses"), where("status", "==", "Открытый"));
         const snap = await getDocs(publicCoursesQuery);
 
         if (snap.empty) {
-            container.innerHTML = '<div class="empty-state">Пока нет доступных курсов. Станьте первым автором!</div>';
+            renderEmptyState(container, '🎓', 'Пока нет доступных курсов', 'Создать курс', () => {
+                window.location.href = './create-course.html';
+            });
             return;
         }
 
@@ -441,43 +622,61 @@ async function loadAllPublicCourses() {
             if (!uid) return;
             try {
                 const ud = await getDoc(doc(db, "users", uid));
-                if (ud.exists()) {
-                    userCache[uid] = ud.data();
-                }
-            } catch (e) {
-                console.error("Ошибка загрузки пользователя", e);
-            }
+                if (ud.exists()) userCache[uid] = ud.data();
+            } catch (e) { }
         }));
 
         let html = '';
         let index = 1;
-        
-        snap.forEach(docSnap => {
+
+        // Перебираем курсы через for...of для асинхронного подсчета рейтинга
+        for (const docSnap of snap.docs) {
             const c = docSnap.data();
             const id = docSnap.id;
             const num = String(index).padStart(2, '0');
-            
+
             const author = userCache[c.uid] || {};
             const authorName = author.name || c.userName || 'Автор';
             const authorAvatar = author.avatar || '';
-            
+
+            const userLessons = courseProgress[id] ? courseProgress[id].length : 0;
+            let totalLessons = 0;
+            if (c.modules) c.modules.forEach(m => { if (m.lessons) totalLessons += m.lessons.length; });
+            const percent = totalLessons > 0 ? Math.round((userLessons / totalLessons) * 100) : 0;
+            const isStarted = userLessons > 0;
+            const isCompleted = percent === 100;
+
+            // Вычисляем реальный рейтинг курса из БД
+            let displayRating = c.rating || 0;
+            if (!displayRating || displayRating === 0) {
+                displayRating = await getCourseAverageRating(db, id); // пересчёт
+            } else {
+                displayRating = `★ ${displayRating}`;
+            }
+
             let coverHtml = '';
             if (c.cover && c.cover.startsWith('http')) {
                 coverHtml = `<img src="${c.cover}" style="width:100%;height:100%;object-fit:cover;">`;
+            } else if (c.cover || c.emoji) {
+                coverHtml = c.cover || c.emoji;
             } else {
-                coverHtml = c.cover || '📚';
+                coverHtml = '<div style="width:100%;height:100%;background:var(--bg3);"></div>';
             }
 
             let avatarHtml = '';
             if (authorAvatar) {
                 if ([...authorAvatar].length <= 2) {
-                    avatarHtml = `<div class="author-avatar" style="background:var(--accent-dim); color:var(--text); font-size:14px; display:flex; align-items:center; justify-content:center;">${authorAvatar}</div>`;
+                    avatarHtml = `<div class="author-avatar" style="background:var(--accent-dim);color:var(--text);font-size:14px;display:flex;align-items:center;justify-content:center;">${authorAvatar}</div>`;
                 } else {
                     avatarHtml = `<div class="author-avatar" style="background:url('${authorAvatar}') center/cover;"></div>`;
                 }
             } else {
-                avatarHtml = `<div class="author-avatar" style="background:var(--accent-dim); color:var(--text); display:flex; align-items:center; justify-content:center;">${authorName[0].toUpperCase()}</div>`;
+                avatarHtml = `<div class="author-avatar" style="background:var(--accent-dim);color:var(--text);display:flex;align-items:center;justify-content:center;">${authorName[0].toUpperCase()}</div>`;
             }
+
+            let btnText = 'Начать →';
+            if (isCompleted) btnText = '✓ Завершён';
+            else if (isStarted) btnText = `Продолжить (${percent}%)`;
 
             html += `
             <div class="course-card" onclick="window.location.href='./course.html?id=${id}'">
@@ -486,20 +685,25 @@ async function loadAllPublicCourses() {
               <span class="course-badge">${escHtml(c.level || 'Для всех')}</span>
               <div class="course-title">${escHtml(c.title || 'Без названия')}</div>
               <div class="course-desc">${escHtml((c.tagline || c.description || '').substring(0, 70))}...</div>
+              ${isStarted ? `
+              <div class="course-progress-wrap">
+                <div class="course-progress-bar" style="width:${percent}%;background:${isCompleted ? 'var(--gold)' : 'var(--text)'};"></div>
+              </div>
+              <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px;">${isCompleted ? '✓ Завершён' : `${percent}% пройдено`}</div>` : ''}
               <div class="course-meta">
                 <span>${escHtml(c.duration || '-')}</span>
-                <span>★ 0.0</span>
+                <span style="color: var(--gold); font-weight: 500;">★ ${c.rating || '0.0'}</span>
               </div>
               <div class="course-footer">
                 <div class="course-author">
                   ${avatarHtml}
                   <span class="author-name">${escHtml(authorName)}</span>
                 </div>
-                <button class="course-btn">Начать →</button>
+                <button class="course-btn" style="${isCompleted ? 'color:var(--gold);border-color:#16a34a;' : ''}">${btnText}</button>
               </div>
             </div>`;
             index++;
-        });
+        }
 
         container.innerHTML = html;
     } catch (err) {
@@ -510,16 +714,12 @@ async function loadAllPublicCourses() {
 
 window.editCourse = id => { window.location.href = `./create-course.html?edit=${id}`; };
 window.deleteCourse = async (courseId) => {
-    if (!confirm('Вы уверены, что хотите удалить этот курс? Все данные (модули, уроки) будут стерты навсегда.')) {
-        return;
-    }
+    if (!confirm('Вы уверены, что хотите удалить этот курс? Все данные будут стерты навсегда.')) return;
     try {
         await deleteDoc(doc(db, "courses", courseId));
         showToast('Курс успешно удален');
         const currentUser = auth.currentUser;
-        if (currentUser) {
-            loadUserCourses(currentUser);
-        }
+        if (currentUser) loadUserCourses(currentUser);
     } catch (err) {
         console.error("Ошибка при удалении курса:", err);
         alert('Не удалось удалить курс: ' + err.message);
@@ -560,7 +760,6 @@ function setupFeed(user) {
     };
     postInput.oninput = checkState;
 
-    // Фото
     document.getElementById('btnAttach')?.addEventListener('click', () => fileInput?.click());
     fileInput?.addEventListener('change', e => {
         const file = e.target.files[0];
@@ -579,7 +778,6 @@ function setupFeed(user) {
         checkState();
     });
 
-    // Опрос
     document.getElementById('btnPoll')?.addEventListener('click', () => {
         if (!pollContainer) return;
         isPollActive = true;
@@ -597,7 +795,6 @@ function setupFeed(user) {
         checkState();
     });
 
-    // Публикация
     publishBtn.addEventListener('click', async () => {
         publishBtn.disabled = true;
         const orig = publishBtn.textContent;
@@ -650,7 +847,6 @@ function setupFeed(user) {
         checkState();
     });
 
-    // Рендер ленты
     let isInitialLoad = true;
     const feedQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(30));
 
@@ -676,8 +872,18 @@ function setupFeed(user) {
         isInitialLoad = false;
         feedContainer.querySelectorAll('.post-item').forEach(el => el.remove());
         const emptyState = feedContainer.querySelector('.empty-state');
-        if (emptyState) emptyState.style.display = snap.empty ? 'block' : 'none';
-        if (snap.empty) return;
+
+        if (snap.empty) {
+            if (emptyState) {
+                emptyState.innerHTML = `
+                    <div class="empty-icon"><svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>comment-1</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-100.000000, -255.000000)" fill="#000000"> <path d="M116,281 C114.832,281 113.704,280.864 112.62,280.633 L107.912,283.463 L107.975,278.824 C104.366,276.654 102,273.066 102,269 C102,262.373 108.268,257 116,257 C123.732,257 130,262.373 130,269 C130,275.628 123.732,281 116,281 L116,281 Z M116,255 C107.164,255 100,261.269 100,269 C100,273.419 102.345,277.354 106,279.919 L106,287 L113.009,282.747 C113.979,282.907 114.977,283 116,283 C124.836,283 132,276.732 132,269 C132,261.269 124.836,255 116,255 L116,255 Z" id="comment-1" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>   </div>
+                    <div class="empty-title">Лента пока пуста</div>
+                    <div class="empty-sub">Будьте первым, кто поделится чем-то интересным!</div>`;
+                emptyState.style.display = 'flex';
+            }
+            return;
+        }
+        if (emptyState) emptyState.style.display = 'none';
 
         const uidSet = new Set();
         snap.forEach(d => uidSet.add(d.data().uid));
@@ -842,16 +1048,15 @@ async function runSearch(q, container) {
         const lq = q.toLowerCase();
         const results = [];
 
-        // Поиск курсов
         const coursesSnap = await getDocs(query(collection(db, "courses"), limit(20)));
         coursesSnap.forEach(d => {
             const data = d.data();
             if (data.title?.toLowerCase().includes(lq) || data.category?.toLowerCase().includes(lq)) {
-                results.push({ type: 'course', id: d.id, icon: data.emoji || '📚', title: data.title, sub: data.tagline || data.category || 'Курс' });
+                const icon = (data.cover && data.cover.startsWith('http')) ? data.cover : (data.emoji || '');
+                results.push({ type: 'course', id: d.id, icon: icon, title: data.title, sub: data.tagline || data.category || 'Курс' });
             }
         });
 
-        // Поиск пользователей
         const usersSnap = await getDocs(query(collection(db, "users"), limit(20)));
         usersSnap.forEach(d => {
             const data = d.data();
@@ -867,7 +1072,7 @@ async function runSearch(q, container) {
 
         container.innerHTML = results.map(r => `
             <a class="search-result-item" href="${r.type === 'course' ? `./course.html?id=${r.id}` : '#'}">
-                <div class="sr-icon">${[...String(r.icon)].length <= 2 ? r.icon : `<img src="${r.icon}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`}</div>
+                <div class="sr-icon">${r.icon ? ([...String(r.icon)].length <= 2 ? r.icon : `<img src="${r.icon}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`) : '<div style="width:100%;height:100%;background:var(--bg3);border-radius:50%;"></div>'}</div>
                 <div class="sr-info">
                     <h4>${escHtml(r.title || '')}</h4>
                     <p>${escHtml(r.sub)}</p>
@@ -937,17 +1142,62 @@ document.addEventListener('DOMContentLoaded', () => {
     wire('#view-menu .menu-tab', '#view-menu .inner-view', 'savedMenuTab', 'menuTarget');
     wire('#view-profile .profile-tab', '#view-profile .inner-view', 'savedProfileTab', 'profileTarget');
     wire('.settings-tab', '.settings-panel', null, 'settingsTarget');
-    wire('#view-courses .tabs-container .tab', null, null, 'target');
+
+    setupCourseFilters();
 });
 
 // ─────────────────────────────────────────
-// ИНЛАЙН-СТИЛИ ДЛЯ ПОСТОВ И ОПРОСОВ
+// УЛУЧШЕНИЕ 2: PILL-ФИЛЬТРЫ ДЛЯ КУРСОВ
+// ─────────────────────────────────────────
+function setupCourseFilters() {
+    const pillContainer = document.getElementById('courseFilterPills');
+    if (!pillContainer) return;
+
+    pillContainer.addEventListener('click', e => {
+        const pill = e.target.closest('.filter-pill');
+        if (!pill) return;
+
+        pillContainer.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+
+        const filter = pill.dataset.filter;
+        const cards = document.querySelectorAll('#publicCoursesContainer .course-card');
+
+        cards.forEach(card => {
+            if (filter === 'all') {
+                card.style.display = '';
+            } else {
+                const category = card.querySelector('.course-num')?.textContent || '';
+                card.style.display = category.toLowerCase().includes(filter.toLowerCase()) ? '' : 'none';
+            }
+        });
+    });
+}
+
+// ─────────────────────────────────────────
+// УЛУЧШЕНИЕ 5: УНИВЕРСАЛЬНЫЙ EMPTY STATE
+// ─────────────────────────────────────────
+function renderEmptyState(container, icon, text, btnText, btnAction) {
+    container.innerHTML = `
+        <div class="empty-state-rich">
+            <div class="empty-icon">${icon}</div>
+            <div class="empty-title">${text}</div>
+            ${btnText ? `<button class="empty-action-btn">${btnText} →</button>` : ''}
+        </div>`;
+    if (btnAction) {
+        container.querySelector('.empty-action-btn')?.addEventListener('click', btnAction);
+    }
+}
+
+// ─────────────────────────────────────────
+// ИНЛАЙН-СТИЛИ
 // ─────────────────────────────────────────
 function injectStyles() {
     if (document.getElementById('tbq-injected-styles')) return;
     const s = document.createElement('style');
     s.id = 'tbq-injected-styles';
     s.textContent = `
+    /* ПОСТЫ */
     .post-item {
         display: flex; gap: 12px;
         padding: 18px 24px;
@@ -983,7 +1233,7 @@ function injectStyles() {
     .delete-post-btn { color: var(--text3); font-size: 11px; padding: 4px 6px; }
     .delete-post-btn:hover { color: var(--red); }
 
-    /* Опрос */
+    /* ОПРОСЫ */
     .poll-block { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
     .poll-option-btn {
         position: relative; overflow: hidden;
@@ -1003,10 +1253,164 @@ function injectStyles() {
     .poll-option-pct { font-family: var(--mono); font-size: 11px; color: var(--text3); position: relative; z-index: 1; }
     .poll-footer { font-family: var(--mono); font-size: 10px; color: var(--text3); text-align: right; margin-top: 2px; }
 
-    /* Follow */
+    /* УЛУЧШЕНИЕ 1: Прогресс в карточке курса */
+    .course-progress-wrap {
+        height: 2px; background: var(--border);
+        margin-bottom: 6px; overflow: hidden;
+    }
+    .course-progress-bar {
+        height: 100%; transition: width .5s ease;
+    }
+
+    /* УЛУЧШЕНИЕ 3: СТРИК */
+        .streak-widget {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        border-radius: 12px; /* опционально, для красоты */
+    }
+
+    .streak-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .streak-fire {
+        font-size: 32px;
+    }
+
+    .streak-num {
+        font-size: 32px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .streak-text {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+    .streak-days-col {
+        flex: 1;
+    }
+
+    .streak-label-top {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text3);
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .streak-days-row {
+        display: flex;
+        gap: 8px;
+        justify-content: space-between; /* или space-around */
+    }
+
+    .streak-day {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .streak-day-dot {
+        width: 22px;
+        height: 22px;
+        border: 2px solid var(--border2);
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .streak-day.done .streak-day-dot {
+        background: #22c55e;        /* зелёный для выполненных */
+        border-color: #22c55e;
+    }
+
+    .streak-day.today .streak-day-dot {
+        border-color: var(--text);
+        background: transparent;
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.1); /* подсветка сегодня */
+    }
+
+    .streak-day-name {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--text3);
+    }
+
+    /* УЛУЧШЕНИЕ 5: ПУСТЫЕ СОСТОЯНИЯ */
+    .empty-state-rich {
+        display: flex; flex-direction: column; align-items: center;
+        padding: 48px 24px; text-align: center;
+        border: 1px dashed var(--border); margin: 8px auto;
+        width: 90%; box-sizing: border-box;
+    }
+    .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: .7; }
+    .empty-title { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 16px; line-height: 1.6; }
+    .empty-sub { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 16px; }
+    .empty-action-btn {
+        background: var(--text); color: var(--bg);
+        border: none; padding: 8px 20px;
+        font-family: var(--font); font-size: 12px; font-weight: 700;
+        cursor: pointer; transition: opacity .15s; letter-spacing: .03em;
+    }
+    .empty-action-btn:hover { opacity: .8; }
+
+    /* УЛУЧШЕНИЕ 6: СТАТИСТИКА */
+    .stats-strip {
+        display: flex; gap: 1px; margin-bottom: 28px;
+        background: var(--border);
+        border: 1px solid var(--border);
+    }
+    .stat-chip {
+        flex: 1; background: var(--bg);
+        padding: 16px 12px; text-align: center;
+    }
+    .stat-chip-num {
+        display: block; font-size: 20px; font-weight: 900;
+        line-height: 1; margin-bottom: 4px;
+    }
+    .stat-chip-label {
+        display: block; font-family: var(--mono);
+        font-size: 9px; color: var(--text3);
+        text-transform: uppercase; letter-spacing: .1em;
+    }
+
+    /* УЛУЧШЕНИЕ 2: PILL ФИЛЬТРЫ */
+    .filter-pills {
+        display: flex; gap: 8px; flex-wrap: wrap;
+        padding: 16px 28px; border-bottom: 1px solid var(--border);
+    }
+    .filter-pill {
+        background: transparent; border: 1px solid var(--border2);
+        color: var(--text3); padding: 5px 14px;
+        font-family: var(--font); font-size: 12px; font-weight: 500;
+        cursor: pointer; border-radius: 99px; transition: all .15s;
+        letter-spacing: .02em;
+    }
+    .filter-pill:hover { border-color: var(--border3); color: var(--text2); }
+    .filter-pill.active {
+        background: var(--text); color: var(--bg);
+        border-color: var(--text);
+    }
+
+    /* FOLLOW */
     .follow-btn.following { border-color: var(--border3); color: var(--text); }
 
-    /* Toast */
+    /* TOAST */
     #tbq-toast {
         position: fixed; bottom: 80px; left: 50%;
         transform: translateX(-50%) translateY(20px);
@@ -1024,6 +1428,25 @@ function injectStyles() {
         40%,80%  { transform: translateX(6px); }
     }
     .shake { animation: shake .3s ease; }
+
+    /* ФИКС РАЗМЕРА ОБЛОЖЕК И ВЫРАВНИВАНИЕ КАРТОЧЕК */
+    .course-emoji-wrap,
+    .course-icon-main {
+        display: block; width: 100%; height: 180px;
+        background: var(--bg3); overflow: hidden;
+        flex-shrink: 0; border-radius: var(--r); margin-bottom: 12px;
+    }
+    .course-emoji-wrap img,
+    .course-icon-main img {
+        width: 100%; height: 100%;
+        object-fit: cover; display: block;
+    }
+    .course-card {
+        display: flex; flex-direction: column; height: 100%;
+    }
+    .course-footer {
+        margin-top: auto; padding-top: 16px;
+    }
     `;
     document.head.appendChild(s);
 }
@@ -1082,4 +1505,30 @@ function shake(el) {
     el.classList.remove('shake');
     void el.offsetWidth;
     el.classList.add('shake');
+}
+
+// ─────────────────────────────────────────
+// СИСТЕМА РЕЙТИНГА КУРСОВ (НОВОЕ)
+// ─────────────────────────────────────────
+async function getCourseAverageRating(db, courseId) {
+    try {
+        const q = query(collection(db, "courseReviews"), where("courseId", "==", courseId));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            return "★ Нет оценок";
+        }
+
+        let totalScore = 0;
+        snapshot.forEach(docSnap => {
+            totalScore += docSnap.data().rating;
+        });
+
+        const average = (totalScore / snapshot.size).toFixed(1);
+        return `★ ${average}`;
+
+    } catch (error) {
+        console.error("Ошибка при получении рейтинга курса:", error);
+        return "★ —";
+    }
 }

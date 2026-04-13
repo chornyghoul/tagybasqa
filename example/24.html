@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Курс — Tagybasqa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg2: #f8f8f8;
+      --bg3: #f1f1f1;
+      --border: rgba(0, 0, 0, 0.06);
+      --border2: rgba(0, 0, 0, 0.10);
+      --border3: rgba(0, 0, 0, 0.18);
+      --text: #1a1a1a;
+      --text2: #555555;
+      --text3: #888888;
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.08);
+      --green: #22c55e;
+      --green-bg: rgba(34, 197, 94, 0.08);
+      --blue: #3b82f6;
+      --blue-bg: rgba(59, 130, 246, 0.08);
+      --gold: #f59e0b;
+      --r: 3px;
+      --r2: 5px;
+      --font: 'Onest', sans-serif;
+      --mono: 'DM Mono', monospace;
+    }
+
+    /* ... (весь твой существующий CSS остаётся без изменений до конца стилей) ... */
+    /* Я оставил только важные дополнения */
+
+    .star-icon {
+      transition: all 0.2s;
+    }
+
+    .star-icon:hover {
+      transform: scale(1.15);
+    }
+
+    .reason-options button {
+      padding: 8px 14px;
+      font-size: 13px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .reason-options button.active {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: var(--green);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+    <aside class="sidebar-l">
+      <div class="logo-container">
+        <a href="./index.html" class="logo">Tagybasqa<span class="logo-sub">Platform / 2026</span></a>
+      </div>
+      <button class="nav-item" onclick="window.location.href='./index.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M19 12H5"></path>
+          <path d="M12 19l-7-7 7-7"></path>
+        </svg>
+        К списку курсов
+      </button>
+      <div class="curriculum-container" id="sidebarCurriculum"></div>
+    </aside>
+
+    <main class="main">
+      <div class="lesson-content-wrapper" id="lessonContent">
+        <div class="loading-state">Загрузка курса...</div>
+      </div>
+    </main>
+
+    <aside class="sidebar-r">
+      <div class="profile-card">
+        <div class="profile-ava" id="userAvatarUi"></div>
+        <div class="profile-info">
+          <h4 id="userNameUi">Студент</h4>
+          <span id="userHandleUi">@студент</span>
+        </div>
+      </div>
+
+      <div class="widget-title">Ваш прогресс</div>
+      <div class="progress-widget">
+        <div class="progress-val" id="progressPercentUi">0%</div>
+        <div class="progress-lbl">Пройдено материала</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressBarUi" style="width: 0%;"></div>
+        </div>
+        <div class="stats-row">
+          Завершено <span id="completedLessonsUi">0 / 0</span>
+        </div>
+      </div>
+
+      <!-- БЛОК ОЦЕНКИ -->
+      <div class="widget-title">Оцените курс</div>
+      <div class="progress-widget" id="ratingWidget" style="padding: 24px 20px;">
+        <div class="stars-container" style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+          <svg class="star-icon" data-value="1" width="28" height="28" fill="none" stroke="var(--text3)" stroke-width="2" style="cursor:pointer;"></svg>
+          <svg class="star-icon" data-value="2" width="28" height="28" fill="none" stroke="var(--text3)" stroke-width="2" style="cursor:pointer;"></svg>
+          <svg class="star-icon" data-value="3" width="28" height="28" fill="none" stroke="var(--text3)" stroke-width="2" style="cursor:pointer;"></svg>
+          <svg class="star-icon" data-value="4" width="28" height="28" fill="none" stroke="var(--text3)" stroke-width="2" style="cursor:pointer;"></svg>
+          <svg class="star-icon" data-value="5" width="28" height="28" fill="none" stroke="var(--text3)" stroke-width="2" style="cursor:pointer;"></svg>
+        </div>
+
+        <div id="ratingStatus" style="font-family: var(--mono); font-size: 11px; color: var(--text3); text-align: center; margin-bottom: 16px;">
+          Нажмите на звёзды, чтобы оценить курс
+        </div>
+
+        <div id="reasonContainer" style="display: none; margin-bottom: 20px;">
+          <div style="font-size: 13px; color: var(--text2); margin-bottom: 8px;">Почему такая оценка?</div>
+          <div class="reason-options" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;"></div>
+          <textarea id="customReason" placeholder="Или напишите свой комментарий..." 
+            style="width: 100%; height: 80px; padding: 12px; border: 1px solid var(--border2); border-radius: var(--r); font-family: var(--font); font-size: 14px; resize: vertical;"></textarea>
+        </div>
+
+        <button id="submitRatingBtn" class="check-btn disabled" style="width: 100%;" onclick="window.submitCourseRating()">
+          Отправить оценку
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="xp-popup" id="xpPopup">+10 XP</div>
+  <canvas id="confettiCanvas"></canvas>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+      authDomain: "pystart-dd2db.firebaseapp.com",
+      projectId: "pystart-dd2db",
+      storageBucket: "pystart-dd2db.firebasestorage.app",
+      messagingSenderId: "9188811255",
+      appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = urlParams.get('id');
+
+    let currentCourseData = null;
+    let FLAT_LESSONS = [];
+    let currentLessonIdx = null;
+    let currentStepIdx = 0;
+    let answered = false;
+    let selectedAnswer = null;
+    let lessonSteps = [];
+    let isSavingProgress = false;
+
+    let userStats = { courseProgress: {}, xp: 0, lessons: 0 };
+    let currentUserProfile = {};
+    let userRating = 0;
+    let selectedReason = '';
+
+    const reasonsByRating = {
+      1: ["Слишком сложно", "Неинтересно", "Много ошибок", "Не то, что ожидал"],
+      2: ["Слишком просто", "Мало материала", "Не понравился стиль", "Были баги"],
+      3: ["Средне", "Есть недочёты", "Нормально, но можно лучше", "Не хватило практики"],
+      4: ["Хорошо", "Интересный материал", "Полезно", "Почти всё понравилось"],
+      5: ["Отлично!", "Очень полезный курс", "Лучший курс по теме", "Рекомендую всем"]
+    };
+
+    // SVG иконки
+    const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    const SVG_PLAY = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+    const SVG_LOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+    const SVG_DOT = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"></circle></svg>`;
+    const SVG_MODULES = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+    const SVG_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+    const SVG_USER = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+    const SVG_THEORY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`;
+    const SVG_QUIZ = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`;
+    const SVG_TROPHY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>`;
+    const SVG_CROSS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+    function getRatingColor(rating) {
+      if (rating <= 2) return 'var(--red)';
+      if (rating === 3) return 'var(--gold)';
+      return 'var(--green)';
+    }
+
+    function highlightStars(count) {
+      document.querySelectorAll('.star-icon').forEach(star => {
+        const val = parseInt(star.dataset.value);
+        if (val <= count) {
+          star.setAttribute('fill', getRatingColor(count));
+          star.setAttribute('stroke', getRatingColor(count));
+        } else {
+          star.setAttribute('fill', 'none');
+          star.setAttribute('stroke', 'var(--text3)');
+        }
+      });
+    }
+
+    function renderReasonOptions() {
+      const container = document.querySelector('.reason-options');
+      container.innerHTML = '';
+      const options = reasonsByRating[userRating] || [];
+
+      options.forEach(reason => {
+        const btn = document.createElement('button');
+        btn.textContent = reason;
+        btn.onclick = () => {
+          selectedReason = reason;
+          document.querySelectorAll('.reason-options button').forEach(b => {
+            b.classList.toggle('active', b.textContent === reason);
+          });
+          checkSubmitButton();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function checkSubmitButton() {
+      const submitBtn = document.getElementById('submitRatingBtn');
+      const hasReason = selectedReason || document.getElementById('customReason').value.trim() !== '';
+      if (userRating > 0 && hasReason) {
+        submitBtn.classList.remove('disabled');
+        submitBtn.disabled = false;
+      } else {
+        submitBtn.classList.add('disabled');
+        submitBtn.disabled = true;
+      }
+    }
+
+    function setupRatingSystem() {
+      const stars = document.querySelectorAll('.star-icon');
+      const statusEl = document.getElementById('ratingStatus');
+      const reasonContainer = document.getElementById('reasonContainer');
+
+      loadUserRating();   // ← теперь одна чистая версия
+
+      stars.forEach(star => {
+        star.addEventListener('mouseover', () => highlightStars(parseInt(star.dataset.value)));
+        star.addEventListener('mouseout', () => highlightStars(userRating));
+
+        star.addEventListener('click', () => {
+          if (!auth.currentUser) {
+            alert("Войдите в аккаунт, чтобы оставить оценку");
+            return;
+          }
+          userRating = parseInt(star.dataset.value);
+          highlightStars(userRating);
+          selectedReason = '';
+
+          reasonContainer.style.display = 'block';
+          renderReasonOptions();
+
+          statusEl.textContent = `Вы поставили ${userRating} из 5`;
+          statusEl.style.color = getRatingColor(userRating);
+
+          document.getElementById('submitRatingBtn').classList.add('disabled');
+          document.getElementById('submitRatingBtn').disabled = true;
+        });
+      });
+
+      document.getElementById('customReason').addEventListener('input', checkSubmitButton);
+    }
+
+    async function submitCourseRating() {
+      if (!userRating || !auth.currentUser) return;
+
+      const customReason = document.getElementById('customReason').value.trim();
+      const finalReason = selectedReason || customReason || "Без комментария";
+
+      const submitBtn = document.getElementById('submitRatingBtn');
+      submitBtn.textContent = "Сохранение...";
+      submitBtn.disabled = true;
+
+      try {
+        await saveRatingToDb(userRating, finalReason);
+
+        const status = document.getElementById('ratingStatus');
+        status.textContent = "Спасибо! Ваша оценка сохранена ✓";
+        status.style.color = "var(--green)";
+
+        document.querySelectorAll('.star-icon').forEach(s => s.style.pointerEvents = 'none');
+        document.getElementById('reasonContainer').style.opacity = '0.6';
+        submitBtn.style.display = 'none';
+
+      } catch (e) {
+        alert("Ошибка при сохранении оценки");
+        console.error(e);
+      }
+    }
+
+    async function saveRatingToDb(rating, reason = "") {
+      if (!auth.currentUser || !courseId) return;
+      const uid = auth.currentUser.uid;
+
+      await setDoc(doc(db, "courseReviews", `${courseId}_${uid}`), {
+        courseId,
+        userId: uid,
+        rating,
+        reason,
+        timestamp: new Date()
+      });
+
+      // Пересчёт среднего рейтинга курса
+      const q = query(collection(db, "courseReviews"), where("courseId", "==", courseId));
+      const snapshot = await getDocs(q);
+      let total = 0;
+      snapshot.forEach(d => total += d.data().rating);
+      const average = snapshot.size > 0 ? (total / snapshot.size).toFixed(1) : "0.0";
+
+      await updateDoc(doc(db, "courses", courseId), { rating: average });
+    }
+
+    async function loadUserRating() {
+      if (!auth.currentUser || !courseId) return;
+      const uid = auth.currentUser.uid;
+
+      try {
+        const ratingDoc = await getDoc(doc(db, "courseReviews", `${courseId}_${uid}`));
+        if (ratingDoc.exists()) {
+          const data = ratingDoc.data();
+          userRating = data.rating;
+
+          highlightStars(userRating);
+
+          const status = document.getElementById('ratingStatus');
+          status.textContent = `Ваша оценка: ${userRating}/5`;
+          status.style.color = "var(--text2)";
+
+          document.getElementById('reasonContainer').style.display = 'none';
+          document.getElementById('submitRatingBtn').style.display = 'none';
+        }
+      } catch (e) {
+        console.error("Ошибка загрузки рейтинга:", e);
+      }
+    }
+
+    // ====================== ОСНОВНОЙ КОД КУРСА ======================
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!courseId) {
+        document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Курс не найден.</div>';
+        return;
+      }
+
+      if (user) {
+        const userSnap = await getDoc(doc(db, "users", user.uid));
+        if (userSnap.exists()) {
+          currentUserProfile = userSnap.data();
+          userStats.courseProgress = currentUserProfile.courseProgress || {};
+          userStats.xp = currentUserProfile.xp || 0;
+          userStats.lessons = currentUserProfile.lessons || 0;
+        }
+        setupRatingSystem();
+      }
+
+      updateRightSidebarUi();
+      await fetchCourseData();
+    });
+
+    // ... (весь остальной код: fetchCourseData, renderSidebarCurriculum, openLesson и т.д. — оставь как было в твоём последнем файле)
+
+    // Я оставил только ключевые функции ниже, чтобы не дублировать весь код:
+
+    async function fetchCourseData() {
+      try {
+        const docSnap = await getDoc(doc(db, "courses", courseId));
+        if (docSnap.exists()) {
+          currentCourseData = docSnap.data();
+          let authorName = currentCourseData.userName || "Автор";
+          if (currentCourseData.uid) {
+            const authorDoc = await getDoc(doc(db, "users", currentCourseData.uid));
+            if (authorDoc.exists() && authorDoc.data().name) authorName = authorDoc.data().name;
+          }
+          currentCourseData.actualAuthorName = authorName;
+
+          renderSidebarCurriculum();
+          renderCourseIntro();
+        } else {
+          document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Курс не найден.</div>';
+        }
+      } catch (error) {
+        document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Ошибка загрузки.</div>';
+      }
+    }
+    function renderSidebarCurriculum() {
+      const c = currentCourseData;
+      let html = '';
+
+      if (!c.modules || c.modules.length === 0) {
+        document.getElementById('sidebarCurriculum').innerHTML = '<div style="color:var(--text3); font-size:12px; padding: 0 12px;">Уроки еще не добавлены.</div>';
+        return;
+      }
+
+      FLAT_LESSONS = [];
+      let globalLessonIndex = 0;
+
+      c.modules.forEach((mod, modIdx) => {
+        html += `
+            <div class="sb-module">
+              <div class="sb-module-title">Модуль ${modIdx + 1}: ${escHtml(mod.title || 'Без названия')}</div>
+          `;
+
+        if (mod.lessons && mod.lessons.length > 0) {
+          mod.lessons.forEach((lesson, lIdx) => {
+            FLAT_LESSONS.push(lesson);
+
+            const isLastInModule = (lIdx === mod.lessons.length - 1);
+            const isTestOnly = (lesson.quiz && lesson.quiz.length > 0 && !lesson.content);
+            const isModuleTest = lesson.isModuleTest || (isLastInModule && isTestOnly);
+            lesson._isModuleTest = isModuleTest;
+
+            if (isModuleTest) {
+              html += `
+                  <div class="sb-lesson sb-module-test locked" data-lesson-id="${globalLessonIndex}" onclick="window.openLesson(${globalLessonIndex})">
+                    <div class="sb-lesson-icon" id="sb-icon-${globalLessonIndex}">${SVG_LOCK}</div>
+                    <div class="sb-lesson-text">${escHtml(lesson.title || 'Итоговый тест модуля')}</div>
+                  </div>
+                `;
+            } else {
+              html += `
+                  <div class="sb-lesson locked" data-lesson-id="${globalLessonIndex}" onclick="window.openLesson(${globalLessonIndex})">
+                    <div class="sb-lesson-icon" id="sb-icon-${globalLessonIndex}">${SVG_LOCK}</div>
+                    <div class="sb-lesson-text">${globalLessonIndex + 1}. ${escHtml(lesson.title || 'Урок')}</div>
+                  </div>
+                `;
+            }
+            globalLessonIndex++;
+          });
+        }
+        html += `</div>`;
+      });
+
+      document.getElementById('sidebarCurriculum').innerHTML = html;
+      updateSidebarLessonsState();
+      updateRightSidebarUi();
+    }
+    function updateSidebarLessonsState() {
+      let completedInThisCourse = userStats.courseProgress[courseId] || [];
+      const nextLessonId = completedInThisCourse.length;
+
+      document.querySelectorAll('.sb-lesson[data-lesson-id]').forEach(node => {
+        const lessonId = parseInt(node.getAttribute('data-lesson-id'));
+        const statusIcon = node.querySelector('.sb-lesson-icon');
+        const lesson = FLAT_LESSONS[lessonId];
+
+        node.classList.remove('done', 'active-node', 'locked', 'active-reading');
+
+        if (completedInThisCourse.includes(lessonId)) {
+          node.classList.add('done');
+          statusIcon.innerHTML = SVG_CHECK;
+        } else if (lessonId === nextLessonId) {
+          node.classList.add('active-node');
+          statusIcon.innerHTML = lesson._isModuleTest ? SVG_TROPHY : SVG_PLAY;
+        } else {
+          node.classList.add('locked');
+          statusIcon.innerHTML = SVG_LOCK;
+        }
+
+        if (lessonId === currentLessonIdx) {
+          node.classList.add('active-reading');
+          if (!completedInThisCourse.includes(lessonId)) {
+            statusIcon.innerHTML = lesson._isModuleTest ? SVG_TROPHY : SVG_DOT;
+          }
+        }
+      });
+    }
+
+    function renderCourseIntro() {
+      const c = currentCourseData;
+      let completedInThisCourse = userStats.courseProgress[courseId] || [];
+      let nextLessonId = completedInThisCourse.length;
+
+      let btnText = nextLessonId === 0 ? "Начать курс" : "Продолжить обучение";
+      let startIdx = nextLessonId < FLAT_LESSONS.length ? nextLessonId : 0;
+
+      const html = `
+          <div class="course-intro">
+            <div class="course-badge">${escHtml(c.level || 'Для всех')}</div>
+            <div class="course-title">${escHtml(c.title || 'Без названия')}</div>
+            <div class="course-sub">${escHtml(c.tagline || c.description || 'Выберите урок в меню слева, чтобы начать.')}</div>
+            
+            <button class="check-btn ready" onclick="window.openLesson(${startIdx})">${btnText}</button>
+
+            <div class="course-stats">
+              <div class="course-stats-item">${SVG_MODULES} Модулей: <span>${c.modules ? c.modules.length : 0}</span></div>
+              <div class="course-stats-item">${SVG_CLOCK} Длительность: <span>${c.duration || '-'}</span></div>
+              <div class="course-stats-item">${SVG_USER} Автор: <span>${escHtml(c.actualAuthorName)}</span></div>
+            </div>
+          </div>
+        `;
+      document.getElementById('lessonContent').innerHTML = html;
+      currentLessonIdx = null;
+      updateSidebarLessonsState();
+    }
+
+    window.openLesson = function (idx) {
+      if (FLAT_LESSONS.length === 0) return;
+      if (idx >= FLAT_LESSONS.length) return;
+
+      let completedInThisCourse = userStats.courseProgress[courseId] || [];
+      if (!completedInThisCourse.includes(idx) && idx !== completedInThisCourse.length) {
+        return;
+      }
+
+      currentLessonIdx = idx;
+      currentStepIdx = 0;
+      answered = false;
+      selectedAnswer = null;
+
+      const lesson = FLAT_LESSONS[idx];
+      lessonSteps = [];
+
+      if (lesson.content || lesson.text) {
+        lessonSteps.push({ type: 'theory', title: lesson.title || 'Теория', content: lesson.content || lesson.text });
+      }
+
+      const tests = lesson.quiz || lesson.steps || [];
+      if (Array.isArray(tests)) {
+        tests.forEach(t => {
+          lessonSteps.push({ type: 'mcq', q: t.question || t.q, options: t.options || [], answer: t.answer !== undefined ? parseInt(t.answer) : 0, explain: t.explain || '' });
+        });
+      }
+
+      if (lessonSteps.length === 0) {
+        lessonSteps = [{ type: "theory", title: "Пустой урок", content: "Материал находится в разработке." }];
+      }
+
+      updateSidebarLessonsState();
+      renderLessonStep();
+    };
+
+    function renderLessonStep() {
+      const step = lessonSteps[currentStepIdx];
+      const progress = ((currentStepIdx) / lessonSteps.length) * 100;
+      answered = false; selectedAnswer = null;
+
+      const lesson = FLAT_LESSONS[currentLessonIdx];
+      const isModuleTest = lesson._isModuleTest;
+
+      let bodyHtml = '';
+
+      if (step.type === 'theory') {
+        bodyHtml = `
+            <div class="step-counter">
+              ${SVG_THEORY} <span>Чтение · Раздел ${currentStepIdx + 1} из ${lessonSteps.length}</span>
+              <div class="step-progress-wrap"><div class="step-progress-fill" style="width:${progress}%"></div></div>
+            </div>
+            <div class="lesson-q">${escHtml(step.title)}</div>
+            <div class="theory-content">${(step.content || '').replace(/\n/g, '<br>')}</div>
+            <button class="check-btn ready" onclick="window.nextStep()">Понятно, продолжить</button>`;
+      } else {
+        const testHeader = isModuleTest ? "Итоговый тест модуля" : "Проверка знаний";
+        const icon = isModuleTest ? SVG_TROPHY : SVG_QUIZ;
+        bodyHtml = `
+            <div class="step-counter">
+              <span style="color: ${isModuleTest ? 'var(--gold)' : 'inherit'}; display:flex; align-items:center; gap:6px;">${icon}</span>
+              <span style="color: ${isModuleTest ? 'var(--gold)' : 'inherit'};">${testHeader} · Вопрос ${currentStepIdx + 1} из ${lessonSteps.length}</span>
+              <div class="step-progress-wrap"><div class="step-progress-fill" style="width:${progress}%; background: ${isModuleTest ? 'var(--gold)' : 'var(--blue)'};"></div></div>
+            </div>
+            <div class="lesson-q">${escHtml(step.q || 'Выберите правильный ответ')}</div>
+            <div class="answers-grid">
+              ${(step.options || []).map((o, i) => `<button class="answer-btn" onclick="window.selectMCQ(${i})">${escHtml(o)}</button>`).join('')}
+            </div>
+            <div class="feedback-bar" id="feedbackBar"><div class="fb-icon" id="fbIcon"></div><div class="fb-text" id="fbText"></div></div>
+            <button class="check-btn disabled" id="checkBtn" onclick="window.checkAnswer()">Проверить ответ</button>`;
+      }
+
+      document.getElementById('lessonContent').innerHTML = bodyHtml;
+      document.querySelector('.main').scrollTop = 0;
+    }
+
+    window.selectMCQ = function (idx) {
+      if (answered) return;
+      document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.answer-btn')[idx].classList.add('selected');
+      selectedAnswer = idx;
+
+      const btn = document.getElementById('checkBtn');
+      btn.className = 'check-btn ready';
+      btn.disabled = false;
+    };
+
+    window.checkAnswer = function () {
+      if (answered || selectedAnswer === null) return;
+
+      const step = lessonSteps[currentStepIdx];
+      const correct = selectedAnswer === parseInt(step.answer || 0);
+
+      const bar = document.getElementById('feedbackBar');
+      const icon = document.getElementById('fbIcon');
+      const text = document.getElementById('fbText');
+      const btn = document.getElementById('checkBtn');
+      const answerButtons = document.querySelectorAll('.answer-btn');
+
+      btn.disabled = true;
+
+      if (correct) {
+        answered = true;
+        bar.className = 'feedback-bar show-correct'; icon.innerHTML = SVG_CHECK;
+        text.className = 'fb-text correct-text'; text.innerHTML = `<h4>Верно!</h4><p>${step.explain || 'Отличная работа.'}</p>`;
+
+        answerButtons.forEach(b => b.disabled = true);
+        answerButtons[selectedAnswer].classList.add('correct');
+
+        btn.className = 'check-btn next';
+        btn.textContent = 'Далее';
+        btn.disabled = false;
+        btn.onclick = () => window.nextStep();
+      } else {
+        bar.className = 'feedback-bar show-wrong'; icon.innerHTML = SVG_CROSS;
+        text.className = 'fb-text wrong-text'; text.innerHTML = `<h4>Неверно</h4><p>${step.explain || 'Попробуйте другой вариант.'}</p>`;
+
+        answerButtons[selectedAnswer].classList.add('wrong');
+        setTimeout(() => {
+          answerButtons[selectedAnswer].classList.remove('wrong', 'selected');
+          btn.className = 'check-btn disabled';
+          btn.disabled = false;
+        }, 1000);
+
+        selectedAnswer = null;
+      }
+    };
+
+    window.nextStep = function () {
+      currentStepIdx++;
+      if (currentStepIdx >= lessonSteps.length) { showCompletion(); return; }
+      renderLessonStep();
+    };
+
+    async function showCompletion() {
+      if (isSavingProgress) return;
+      isSavingProgress = true;
+
+      try {
+        const lesson = FLAT_LESSONS[currentLessonIdx];
+        const isLastLessonInCourse = currentLessonIdx === FLAT_LESSONS.length - 1;
+        const isModuleTest = lesson._isModuleTest;
+
+        if (!userStats.courseProgress[courseId]) userStats.courseProgress[courseId] = [];
+        if (!userStats.courseProgress[courseId].includes(currentLessonIdx)) {
+          userStats.courseProgress[courseId].push(currentLessonIdx);
+          userStats.xp += isModuleTest ? 50 : 15;
+          userStats.lessons += 1;
+        }
+
+        await saveStatsToDb();
+        updateSidebarLessonsState();
+
+        let nextBtnHtml = isLastLessonInCourse
+          ? `<button class="check-btn ready" onclick="window.location.href='./index.html'">Завершить курс</button>`
+          : `<button class="check-btn ready" onclick="window.openLesson(${currentLessonIdx + 1})">Следующий урок</button>`;
+
+        document.getElementById('lessonContent').innerHTML = `
+              <div class="completion show">
+                <div class="comp-icon">${SVG_TROPHY}</div>
+                <div class="comp-title">${isModuleTest ? 'Тест модуля сдан!' : 'Урок пройден!'}</div>
+                <div class="comp-sub">Вы успешно завершили материал "${escHtml(lesson.title || 'Урок')}".</div>
+                ${nextBtnHtml}
+              </div>`;
+
+        window.launchConfetti();
+        showXP(isModuleTest ? "+50 XP" : "+15 XP");
+
+      } finally {
+        isSavingProgress = false;
+      }
+    }
+
+    // --- UI HELPER ФУНКЦИИ ---
+    function updateRightSidebarUi() {
+      const name = currentUserProfile.name || auth.currentUser?.email?.split('@')[0] || "Студент";
+      document.getElementById('userNameUi').textContent = name;
+      document.getElementById('userHandleUi').textContent = currentUserProfile.handle || "@студент";
+
+      const avaEl = document.getElementById('userAvatarUi');
+      const avatar = currentUserProfile.avatar;
+      if (avatar) {
+        if ([...avatar].length <= 2) { avaEl.textContent = avatar; avaEl.style.backgroundImage = 'none'; }
+        else { avaEl.style.backgroundImage = `url('${avatar}')`; avaEl.textContent = ''; }
+      } else {
+        avaEl.textContent = name[0].toUpperCase();
+      }
+
+      if (FLAT_LESSONS.length === 0) return;
+
+      let completedInThisCourse = userStats.courseProgress[courseId] || [];
+      let totalCompleted = completedInThisCourse.length;
+      let totalLessons = FLAT_LESSONS.length;
+      let percent = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
+
+      document.getElementById('progressPercentUi').textContent = `${percent}%`;
+      document.getElementById('progressBarUi').style.width = `${percent}%`;
+      document.getElementById('completedLessonsUi').textContent = `${totalCompleted} / ${totalLessons}`;
+    }
+
+    async function saveStatsToDb() {
+      if (!auth.currentUser) return;
+      try {
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
+          courseProgress: userStats.courseProgress,
+          xp: userStats.xp,
+          lessons: userStats.lessons
+        }, { merge: true });
+        updateRightSidebarUi();
+      } catch (e) {
+        console.error("Ошибка сохранения прогресса:", e);
+      }
+    }
+
+    function showXP(msg) {
+      const popup = document.getElementById('xpPopup');
+      popup.textContent = msg; popup.className = 'xp-popup burst';
+      setTimeout(() => popup.className = 'xp-popup', 1500);
+    }
+
+    window.launchConfetti = function () {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+      const pieces = [];
+      const colors = ['#f5f5f0', '#3b82f6', '#4ade80', '#fbbf24'];
+      for (let i = 0; i < 50; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width, y: -20, r: Math.random() * 4 + 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 5, vy: Math.random() * 3 + 2, rot: Math.random() * 360, vr: (Math.random() - 0.5) * 5
+        });
+      }
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180); ctx.fillStyle = p.color;
+          ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+          ctx.restore();
+          p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.1;
+        });
+        if (++frame < 120) requestAnimationFrame(draw); else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      draw();
+    };
+    function escHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+  </script>
+</body>
+
+</html>

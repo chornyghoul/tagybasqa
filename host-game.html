@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление игрой — Tagybasqa</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Onest:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a; --bg2: #111111; --bg3: #181818;
+            --border: rgba(255,255,255,.07); --border2: rgba(255,255,255,.12);
+            --text: #f5f5f0; --text2: #888880; --text3: #444440;
+            --accent: #f5f5f0; --green: #4ade80; --red: #ef4444;
+            --font: 'Onest', sans-serif; --mono: 'DM Mono', monospace;
+        }
+
+        body {
+            margin: 0; padding: 0; background: var(--bg); color: var(--text);
+            font-family: var(--font); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; min-height: 100vh;
+        }
+
+        .host-container {
+            width: 100%; max-width: 800px; background: var(--bg2);
+            border: 1px solid var(--border); border-radius: 12px;
+            padding: 40px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .quiz-title { font-size: 24px; color: var(--text2); margin-bottom: 20px; }
+        
+        .pin-box {
+            background: var(--bg); border: 2px dashed var(--border2);
+            padding: 30px; border-radius: 12px; margin-bottom: 40px;
+        }
+        .pin-label { font-family: var(--mono); color: var(--text3); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
+        .pin-number { font-size: 72px; font-weight: 900; letter-spacing: 8px; color: var(--text); line-height: 1; margin-top: 10px; }
+
+        .players-section { margin-bottom: 40px; }
+        .players-count { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .players-grid {
+            display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; min-height: 50px;
+        }
+        .player-pill {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
+            padding: 10px 20px; border-radius: 99px; font-weight: 600; font-size: 14px;
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .action-btn {
+            background: var(--text); color: var(--bg); border: none;
+            padding: 16px 48px; font-family: var(--font); font-size: 18px; font-weight: 800;
+            border-radius: 8px; cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+        }
+        .action-btn:hover { opacity: 0.9; }
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .end-btn {
+            background: transparent; color: var(--red); border: 1px solid var(--red);
+            padding: 10px 24px; font-size: 14px; font-weight: 600; border-radius: 8px;
+            cursor: pointer; margin-top: 40px; transition: all 0.2s;
+        }
+        .end-btn:hover { background: rgba(239, 68, 68, 0.1); }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="host-container">
+        <div id="screen-lobby" class="screen active">
+            <div class="quiz-title" id="quizTitleDisplay">Загрузка квиза...</div>
+            
+            <div class="pin-box">
+                <div class="pin-label">ПИН-код для подключения</div>
+                <div class="pin-number" id="pinDisplay">------</div>
+            </div>
+
+            <div class="players-section">
+                <div class="players-count">Игроков: <span id="playersCount">0</span></div>
+                <div class="players-grid" id="playersList">
+                    </div>
+            </div>
+
+            <button class="action-btn" id="startBtn" disabled>Начать игру</button>
+            <br>
+            <button class="end-btn" id="cancelBtn">Отменить сессию</button>
+        </div>
+
+        <div id="screen-playing" class="screen">
+            <div class="quiz-title">Игра идет! 🔥</div>
+            <p style="color: var(--text2); margin-bottom: 30px;">Игроки сейчас отвечают на своих устройствах.</p>
+            
+            <button class="action-btn" style="background: var(--bg3); color: var(--text); border: 1px solid var(--border2);">Следующий вопрос →</button>
+            <br>
+            <button class="end-btn" id="endGameBtn">Завершить игру</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+            authDomain: "pystart-dd2db.firebaseapp.com",
+            projectId: "pystart-dd2db",
+            storageBucket: "pystart-dd2db.firebasestorage.app",
+            messagingSenderId: "9188811255",
+            appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Получаем ID сессии из URL (?session=...)
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+
+        if (!sessionId) {
+            alert("Сессия не найдена. Возвращаемся на главную.");
+            window.location.href = './index.html';
+        }
+
+        const sessionRef = doc(db, "sessions", sessionId);
+        let currentSessionData = null;
+
+        // Слушаем изменения в сессии в реальном времени
+        const unsubscribe = onSnapshot(sessionRef, (docSnap) => {
+            if (!docSnap.exists()) {
+                alert("Сессия была закрыта или удалена.");
+                window.location.href = './index.html';
+                return;
+            }
+
+            const data = docSnap.data();
+            currentSessionData = data;
+
+            // Обновляем UI Лобби
+            if (data.status === 'waiting') {
+                document.getElementById('quizTitleDisplay').textContent = data.quizTitle || "Квиз";
+                document.getElementById('pinDisplay').textContent = data.pin || "000000";
+
+                // Парсим объект players, который вы задали в index.html (players: {})
+                const playersObj = data.players || {};
+                const playerNames = Object.values(playersObj); // Предполагаем, что значения это имена
+                
+                document.getElementById('playersCount').textContent = playerNames.length;
+                
+                const playersListEl = document.getElementById('playersList');
+                playersListEl.innerHTML = '';
+                
+                if (playerNames.length > 0) {
+                    playerNames.forEach(name => {
+                        const div = document.createElement('div');
+                        div.className = 'player-pill';
+                        div.textContent = name; // В будущем здесь можно доставать name из объекта игрока
+                        playersListEl.appendChild(div);
+                    });
+                    document.getElementById('startBtn').disabled = false;
+                } else {
+                    playersListEl.innerHTML = '<div style="color: var(--text3); font-family: var(--mono); font-size: 12px;">Пока никого нет...</div>';
+                    document.getElementById('startBtn').disabled = true;
+                }
+            } 
+            // Если статус сменился на 'playing', меняем экран
+            else if (data.status === 'playing') {
+                document.getElementById('screen-lobby').classList.remove('active');
+                document.getElementById('screen-playing').classList.add('active');
+            }
+        });
+
+        // Кнопка: Начать игру
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            try {
+                // Меняем статус на 'playing' и ставим первый вопрос
+                await updateDoc(sessionRef, {
+                    status: 'playing',
+                    currentQuestion: 0
+                });
+            } catch (error) {
+                console.error(error);
+                alert("Ошибка запуска игры.");
+            }
+        });
+
+        // Кнопка: Отменить сессию (из лобби)
+        document.getElementById('cancelBtn').addEventListener('click', async () => {
+            if(confirm("Отменить эту игру? Все подключенные игроки будут отключены.")) {
+                try {
+                    await deleteDoc(sessionRef); // onSnapshot выкинет всех на главную
+                } catch (error) { console.error(error); }
+            }
+        });
+
+        // Кнопка: Завершить игру (во время игры)
+        document.getElementById('endGameBtn').addEventListener('click', async () => {
+            if(confirm("Точно завершить игру?")) {
+                try {
+                    // Можно либо удалить сессию, либо поставить status: 'finished'
+                    await updateDoc(sessionRef, { status: 'finished' });
+                    window.location.href = './index.html';
+                } catch (error) { console.error(error); }
+            }
+        });
+
+        // Очистка при закрытии вкладки
+        window.addEventListener('beforeunload', () => {
+            if (currentSessionData && currentSessionData.status === 'waiting') {
+                // Опционально: автоматически удалять сессию, если хост закрыл вкладку в лобби
+                // deleteDoc(sessionRef); 
+            }
+        });
+
+    </script>
+</body>
+</html>

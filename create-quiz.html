@@ -9,35 +9,46 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg: #0a0a0a;
-  --bg2: #111111;
-  --bg3: #181818;
-  --bg4: #202020;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-  --border3: rgba(255,255,255,0.22);
-  --text: #f5f5f0;
-  --text2: #888880;
-  --text3: #444440;
-  --accent: #f5f5f0;
-  --accent-dim: rgba(245,245,240,0.06);
-  --red: #ef4444;
-  --red-bg: rgba(239,68,68,0.08);
-  --green: #4ade80;
-  --green-bg: rgba(74,222,128,0.08);
-  --amber: #fbbf24;
-  --amber-bg: rgba(251,191,36,0.08);
-  --purple: #a855f7;
-  --purple-bg: rgba(168,85,247,0.08);
-  --teal: #14b8a6;
-  --teal-bg: rgba(20,184,166,0.08);
+:root {
+  /* Основные фоны: от чисто белого к светло-серому */
+  --bg: #ffffff;
+  --bg2: #f7f7f7;
+  --bg3: #eeeeee;
+  --bg4: #e5e5e5;
+
+  /* Границы: теперь на базе черного с низкой прозрачностью */
+  --border: rgba(0, 0, 0, 0.06);
+  --border2: rgba(0, 0, 0, 0.1);
+  --border3: rgba(0, 0, 0, 0.18);
+
+  /* Текст: инвертирован в темные тона */
+  --text: #000000;
+  --text2: #666666;
+  --text3: #999999;
+  --text4: #ffffff;
+
+  /* Акцент: теперь темный (черный/графитовый) */
+  --accent: #1a1a1a;
+  --accent-dim: rgba(0, 0, 0, 0.04);
+
+  /* Статусные цвета: стали чуть более насыщенными для лучшей читаемости на белом */
+  --red: #dc2626;
+  --red-bg: rgba(220, 38, 38, 0.08);
+  --green: #16a34a;
+  --green-bg: rgba(22, 163, 74, 0.08);
+  --amber: #d97706;
+  --amber-bg: rgba(217, 119, 6, 0.08);
+  --purple: #9333ea;
+  --purple-bg: rgba(147, 51, 234, 0.08);
+  --teal: #0d9488;
+  --teal-bg: rgba(13, 148, 136, 0.08);
+
+  /* Системные параметры остаются прежними */
   --r: 3px;
   --r2: 5px;
   --font: 'Onest', sans-serif;
   --mono: 'DM Mono', monospace;
 }
-
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -166,7 +177,7 @@ body {
 .btn { padding: 10px 20px; border-radius: var(--r); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .15s; border: none; letter-spacing: 0.03em; }
 .btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
 .btn-ghost:hover { border-color: var(--border3); color: var(--text); }
-.btn-primary, .btn-publish { background: var(--text); color: var(--bg); font-weight: 700; }
+.btn-primary, .btn-publish { background: none; color: var(--bg); font-weight: 700; }
 .btn-primary:hover, .btn-publish:hover { opacity: 0.85; }
 .btn-primary:disabled, .btn-publish:disabled { opacity: 0.3; cursor: not-allowed; }
 .btn-sm { padding: 8px 16px; font-size: 12px; }
@@ -175,7 +186,7 @@ body {
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 16px 24px; display: flex; justify-content: center; z-index: 100; }
 .bottom-nav-inner { max-width: 900px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
 .nav-step-info { font-family: var(--mono); font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
-.nav-step-info strong { color: var(--text); }
+.nav-step-info strong { color: var(--text4); }
 
 /* TOAST */
 .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); border-radius: var(--r); padding: 10px 20px; font-size: 13px; font-weight: 600; color: var(--bg); opacity: 0; transition: all .3s; z-index: 400; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
@@ -364,15 +375,13 @@ body {
 </div>
 
 <div id="step-success">
-  <div class="success-icon">🎮</div>
+  <div class="success-icon"></div>
   <h2>Квиз создан!</h2>
-  <p>Поделитесь этим PIN-кодом с участниками, чтобы они могли присоединиться к игре.</p>
-  <div class="pin-display" id="generatedPin">000 000</div>
+  <p id="successText">Квиз готов! Теперь вы можете запустить его со страницы своих квизов.</p>
   <div class="success-actions">
     <button class="btn btn-ghost" onclick="resetAll()">Создать ещё</button>
     <button class="btn btn-primary" onclick="goToProfile()">Перейти к квизам</button>
   </div>
-</div>
 </div>
 
 <div class="bottom-nav" id="bottomNav">
@@ -935,9 +944,6 @@ async function publishQuiz() {
     const coverPreview = document.getElementById('coverPreview');
     const img = coverPreview.querySelector('img');
     const cover = img ? img.src : '';
-    
-    // Генерируем 6-значный ПИН-код (как в Kahoot)
-    const pinCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     const quizData = {
       title: document.getElementById('quizTitleInp').value.trim(),
@@ -947,7 +953,7 @@ async function publishQuiz() {
       cover: cover,
       tags: [...document.querySelectorAll('#tagsGrid .chip.selected')].map(c => c.textContent),
       questions: quizQuestions,
-      pin: pinCode,
+      // pin убран
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -958,11 +964,15 @@ async function publishQuiz() {
         throw new Error("Модуль Firebase не загрузился.");
     }
 
+    // Обновлённый успех без PIN
     const successTitle = window.editQuizId ? "Квиз обновлен" : "Квиз создан!";
-    const successText = window.editQuizId ? "Ваши изменения успешно сохранены." : "Поделитесь этим PIN-кодом с участниками, чтобы они могли присоединиться к игре.";
+    const successText = window.editQuizId 
+      ? "Ваши изменения успешно сохранены." 
+      : "Квиз готов! Теперь вы можете запустить его со страницы своих квизов.";
+
     document.querySelector('#step-success h2').textContent = successTitle;
     document.querySelector('#step-success p').textContent = successText;
-    document.getElementById('generatedPin').textContent = window.editQuizId ? (quizData.pin || pinCode) : pinCode;
+    document.getElementById('generatedPin').style.display = 'none'; // скрываем блок с PIN
 
     document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('step-success').classList.add('active');
@@ -977,7 +987,6 @@ async function publishQuiz() {
     btn.disabled = false;
   }
 }
-
 function showToast(msg) {
   const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);

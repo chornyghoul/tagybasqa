@@ -10,8 +10,6 @@
     href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;700;900&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="./static/css/styles.css">
-
-
 </head>
 
 <canvas id="particle-field"
@@ -76,6 +74,7 @@
 
     <main class="main-content">
 
+      <!-- ГЛАВНАЯ -->
       <div id="view-menu" class="view-section active">
         <div class="tabs-container">
           <div class="tab menu-tab active" data-menu-target="menu-recommended">Для вас</div>
@@ -85,11 +84,16 @@
 
         <div id="menu-recommended" class="inner-view active">
           <div style="padding: 28px;">
+
+            <!-- УЛУЧШЕНИЕ 6: Статистика платформы -->
+            <div id="platformStats"></div>
+
             <p class="section-heading">Рекомендованные курсы</p>
             <div class="courses-grid">
               <div class="course-card" onclick="window.location.href='./course.html'">
                 <span class="course-num">01 / Новинка</span>
-                <span class="course-emoji-wrap">🌐</span>
+                <span class="course-emoji-wrap">
+                </span>
                 <span class="course-badge">HTML & CSS</span>
                 <div class="course-title">Web-разработка: HTML & CSS</div>
                 <div class="course-desc">Освойте верстку сайтов с нуля. Flexbox, Grid, анимации и современные подходы к
@@ -156,83 +160,226 @@
               <button class="publish-btn" disabled>Опубликовать</button>
             </div>
           </div>
-          <div class="empty-state" style="margin: 24px;">Лента пока пуста — будьте первым, кто поделится чем-то
-            интересным!</div>
-        </div>
-
-        <div id="menu-subscriptions" class="inner-view">
-          <div style="padding: 28px 28px 0;">
-            <p class="section-heading">Мои подписки</p>
-          </div>
-          <div class="empty-state" style="margin: 0 28px;">Подпишитесь на авторов или курсы, чтобы видеть их здесь.
-          </div>
+          <!-- УЛУЧШЕНИЕ 5: пустое состояние ленты с иконкой -->
+          <div class="empty-state" style="margin: 24px; display: flex; flex-direction: column; align-items: center;">
+            <span class="empty-icon"><svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
+                fill="#000000">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <title>comment-1</title>
+                  <desc>Created with Sketch Beta.</desc>
+                  <defs> </defs>
+                  <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+                    <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-100.000000, -255.000000)"
+                      fill="#000000">
+                      <path
+                        d="M116,281 C114.832,281 113.704,280.864 112.62,280.633 L107.912,283.463 L107.975,278.824 C104.366,276.654 102,273.066 102,269 C102,262.373 108.268,257 116,257 C123.732,257 130,262.373 130,269 C130,275.628 123.732,281 116,281 L116,281 Z M116,255 C107.164,255 100,261.269 100,269 C100,273.419 102.345,277.354 106,279.919 L106,287 L113.009,282.747 C113.979,282.907 114.977,283 116,283 C124.836,283 132,276.732 132,269 C132,261.269 124.836,255 116,255 L116,255 Z"
+                        id="comment-1" sketch:type="MSShapeGroup"> </path>
+                    </g>
+                  </g>
+                </g>
+              </svg></span>
+          <div class="empty-title">Лента пока пуста</div>
+          <div class="empty-sub">Будьте первым, кто поделится чем-то интересным!</div>
         </div>
       </div>
 
-      <div id="view-profile" class="view-section">
-        <div class="profile-header">
-          <div class="profile-banner">
-            <button class="banner-edit-icon" title="Изменить баннер">
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-              </svg>
-            </button>
+      <div id="menu-subscriptions" class="inner-view">
+        <div style="padding: 28px 28px 0;">
+          <p class="section-heading">Мои подписки</p>
+        </div>
+        <!-- УЛУЧШЕНИЕ 5: пустое состояние с иконкой -->
+        <div style="margin: 0 28px;">
+          <div class="empty-state-rich">
+            <div class="empty-icon">🔔</div>
+            <div class="empty-title">Вы ещё ни на кого не подписаны</div>
           </div>
-          <div class="header-content">
-            <div class="avatar-container">
-              <div class="main-avatar"></div>
-            </div>
-            <div class="action-buttons">
-              <button class="edit-profile-btn">Редактировать профиль</button>
-            </div>
-            <div class="user-info-text">
-              <div class="user-name-row">
-                <h1>Загрузка...</h1>
-              </div>
-              <span class="handle">@username</span>
-              <div class="stats-row">
-                <span><strong>0</strong> подписчиков</span>
-                <span><strong>0</strong> подписок</span>
-              </div>
-              <div class="reg-date">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
-                </svg>
-                Присоединился в 2026 г.
-              </div>
+        </div>
+      </div>
+  </div>
+
+  <!-- ПРОФИЛЬ -->
+  <div id="view-profile" class="view-section">
+    <div class="profile-header">
+      <div class="profile-banner">
+        <button class="banner-edit-icon" title="Изменить баннер">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+          </svg>
+        </button>
+      </div>
+      <div class="header-content">
+        <div class="avatar-container">
+          <div class="main-avatar"></div>
+        </div>
+        <div class="action-buttons">
+          <button class="edit-profile-btn">Редактировать профиль</button>
+        </div>
+        <div class="user-info-text">
+          <div class="user-name-row">
+            <h1>Загрузка...</h1>
+          </div>
+          <span class="handle">@username</span>
+          <div class="stats-row">
+            <span><strong>0</strong> подписчиков</span>
+            <span><strong>0</strong> подписок</span>
+          </div>
+          <div class="reg-date">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+            </svg>
+            Присоединился в 2026 г.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs-container" style="margin-top: 0;">
+      <div class="tab profile-tab active" data-profile-target="profile-courses">Мои проекты</div>
+      <div class="tab profile-tab" data-profile-target="profile-achievements">Достижения</div>
+      <div class="tab profile-tab" data-profile-target="profile-progress">Прогресс</div>
+    </div>
+
+    <div id="profile-courses" class="inner-view active" style="padding: 28px;">
+      <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="section-heading" style="margin:0;">Мои курсы</h2>
+        <button onclick="window.location.href='./create-course.html'" class="save-btn"
+          style="background:var(--text); color:var(--bg); padding:10px 20px;">
+          + Создать новый курс
+        </button>
+      </div>
+
+      <div id="myCoursesContainer"></div>
+
+      
+    </div>
+
+    <div id="profile-achievements" class="inner-view" style="padding: 28px;">
+      <p class="section-heading">Достижения</p>
+      <div class="achievements-grid">
+        <div class="achievement-card">
+          <div class="ach-icon">🔥</div>
+          <div class="ach-name">Начало пути</div>
+          <div class="ach-desc">Первый урок пройден</div>
+        </div>
+        <div class="achievement-card">
+          <div class="ach-icon">⚡</div>
+          <div class="ach-name">Быстрый старт</div>
+          <div class="ach-desc">3 урока за один день</div>
+        </div>
+        <div class="achievement-card locked">
+          <div class="ach-icon">🏆</div>
+          <div class="ach-name">Мастер</div>
+          <div class="ach-desc">Первый курс завершён</div>
+        </div>
+        <div class="achievement-card locked">
+          <div class="ach-icon">💎</div>
+          <div class="ach-name">Эксперт</div>
+          <div class="ach-desc">5 курсов завершено</div>
+        </div>
+        <div class="achievement-card locked">
+          <div class="ach-icon">🌟</div>
+          <div class="ach-name">Автор</div>
+          <div class="ach-desc">Первый курс создан</div>
+        </div>
+        <div class="achievement-card locked">
+          <div class="ach-icon">🤝</div>
+          <div class="ach-name">Наставник</div>
+          <div class="ach-desc">100 подписчиков</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="profile-progress" class="inner-view" style="padding: 28px;">
+      <p class="section-heading">Прогресс обучения</p>
+
+      <!-- УЛУЧШЕНИЕ 3: Стрик виджет -->
+      <div id="streakWidget"></div>
+
+      <div id="enrolledCoursesContainer" class="courses-progress-grid">
+        <div class="empty-state">Загрузка данных...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- КВИЗЫ -->
+  <section id="view-quizzes" class="view-section">
+
+        <div class="quiz-action-bar">
+          <button class="quiz-action-tab active" onclick="quizTab('create', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Создать</span>
+          </button>
+          <button class="quiz-action-tab" onclick="quizTab('launch', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            <span>Запустить</span>
+          </button>
+          <button class="quiz-action-tab" onclick="quizTab('my', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            <span>Мои квизы</span>
+          </button>
+        </div>
+
+        <!-- CREATE -->
+        <div id="qp-create" class="quiz-panel active">
+          <div class="quiz-create-wrap">
+            <div class="quiz-create-options">
+              <button class="quiz-create-option" onclick="window.location.href='./create-quiz.html'">
+                <div class="qco-icon">📝</div>
+                <div class="qco-title">С нуля</div>
+                <div class="qco-desc">Открыть конструктор вопросов</div>
+              </button>
+              <button class="quiz-create-option" onclick="showToast('✨ ИИ-генерация — скоро!')">
+                <div class="qco-icon">✨</div>
+                <div class="qco-title">С помощью ИИ</div>
+                <div class="qco-desc">По теме курса автоматически</div>
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="tabs-container" style="margin-top: 0;">
-          <div class="tab profile-tab active" data-profile-target="profile-courses">Мои проекты</div>
-          <div class="tab profile-tab" data-profile-target="profile-achievements">Достижения</div>
-          <div class="tab profile-tab" data-profile-target="profile-progress">Прогресс</div>
+        <!-- LAUNCH -->
+        <div id="qp-launch" class="quiz-panel">
+          <div class="quiz-launch-wrap">
+            <p style="text-align:center; color:var(--text2); padding:40px 20px;">
+              Выберите квиз в разделе «Мои квизы» и нажмите «Запустить»
+            </p>
+          </div>
         </div>
 
-        <div id="profile-courses" class="inner-view active" style="padding: 28px;">
-          <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
-            <h2 class="section-heading" style="margin:0;">Мои курсы</h2>
-            <button onclick="window.location.href='./create-course.html'" class="save-btn"
-              style="background:var(--text); color:var(--bg); padding:10px 20px;">
-              + Создать новый курс
-            </button>
-          </div>
-
-          <div id="myCoursesContainer">
-            <div class="empty-state" id="noCoursesMessage">
-              У вас пока нет созданных курсов.<br>Создайте первый курс прямо сейчас!
+        <!-- MY QUIZZES -->
+        <div id="qp-my" class="quiz-panel">
+          <div class="quiz-my-header">
+            <span class="quiz-my-header-title">Мои квизы</span>
+            <div class="quiz-search-bar">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" placeholder="Поиск квизов..." oninput="quizFilter(this.value)">
             </div>
           </div>
 
-          <div style="margin-top: 48px; display: flex; justify-content: space-between; align-items: center;">
-            <p class="section-heading" style="margin: 0;">Мои квизы</p>
-            <button onclick="window.location.href='./create-quiz.html'" class="save-btn"
-              style="background:var(--text); color:var(--bg); padding:8px 16px;">
-              + Создать квиз
-            </button>
+          <div class="quiz-stats-row">
+            <div class="quiz-stat-chip">
+              <span class="quiz-stat-num" id="qs-total">—</span>
+              <span class="quiz-stat-lbl">Всего</span>
+            </div>
+            <div class="quiz-stat-chip">
+              <span class="quiz-stat-num" id="qs-pub" style="color:var(--green);">—</span>
+              <span class="quiz-stat-lbl">Публичных</span>
+            </div>
           </div>
 
           <div class="courses-grid" style="margin-top: 20px;" id="myQuizzesContainer">
@@ -240,127 +387,43 @@
           </div>
         </div>
 
-        <div id="profile-achievements" class="inner-view" style="padding: 28px;">
-          <p class="section-heading">Достижения</p>
-          <div class="achievements-grid">
-            <div class="achievement-card">
-              <div class="ach-icon">🔥</div>
-              <div class="ach-name">Начало пути</div>
-              <div class="ach-desc">Первый урок пройден</div>
-            </div>
-            <div class="achievement-card">
-              <div class="ach-icon">⚡</div>
-              <div class="ach-name">Быстрый старт</div>
-              <div class="ach-desc">3 урока за один день</div>
-            </div>
-            <div class="achievement-card locked">
-              <div class="ach-icon">🏆</div>
-              <div class="ach-name">Мастер</div>
-              <div class="ach-desc">Первый курс завершён</div>
-            </div>
-            <div class="achievement-card locked">
-              <div class="ach-icon">💎</div>
-              <div class="ach-name">Эксперт</div>
-              <div class="ach-desc">5 курсов завершено</div>
-            </div>
-            <div class="achievement-card locked">
-              <div class="ach-icon">🌟</div>
-              <div class="ach-name">Автор</div>
-              <div class="ach-desc">Первый курс создан</div>
-            </div>
-            <div class="achievement-card locked">
-              <div class="ach-icon">🤝</div>
-              <div class="ach-name">Наставник</div>
-              <div class="ach-desc">100 подписчиков</div>
-            </div>
-          </div>
-        </div>
+      </section>
 
-        <div id="profile-progress" class="inner-view" style="padding: 28px;">
-          <p class="section-heading">Прогресс обучения</p>
-          <div id="enrolledCoursesContainer" class="courses-progress-grid">
-            <div class="empty-state">Загрузка данных...</div>
-          </div>
-        </div>
+  <!-- КУРСЫ -->
+  <div id="view-courses" class="view-section">
+
+    <!-- УЛУЧШЕНИЕ 2: Pill-фильтры вместо вкладок -->
+    <div id="courseFilterPills" class="filter-pills">
+      <button class="filter-pill active" data-filter="all">Все</button>
+      <button class="filter-pill" data-filter="Программирование">Программирование</button>
+      <button class="filter-pill" data-filter="Дизайн">Дизайн</button>
+      <button class="filter-pill" data-filter="HTML">HTML & CSS</button>
+      <button class="filter-pill" data-filter="Python">Python</button>
+      <button class="filter-pill" data-filter="Начинающих">Для начинающих</button>
+    </div>
+
+    <div style="padding: 28px;">
+      <div class="courses-grid" id="publicCoursesContainer">
+        <div class="empty-state">Загрузка курсов...</div>
       </div>
+    </div>
+  </div>
 
-      <div id="view-quizzes" class="view-section">
-        <div style="padding: 28px;">
-          <div class="kahoot-join-card">
-            <h2>Играть в Квиз</h2>
-            <p>Введите ПИН-код игры, чтобы подключиться к сессии</p>
-            <div class="pin-input-group">
-              <input type="number" id="quizPinInput" placeholder="PIN-код игры" maxlength="6">
-              <button id="joinQuizBtn">Ввод</button>
-            </div>
-          </div>
+  </main>
 
-          <div style="margin-top: 48px; display: flex; justify-content: space-between; align-items: center;">
-            <p class="section-heading" style="margin: 0;">Популярные квизы</p>
-          </div>
-
-          <div class="courses-grid" style="margin-top: 20px;" id="publicQuizzesContainer">
-            <div class="empty-state">Загрузка квизов...</div>
-          </div>
-
-        </div>
-      </div>
-
-      <div id="view-courses" class="view-section">
-        <div class="tabs-container">
-          <div class="tab active">Все курсы</div>
-          <div class="tab">Программирование</div>
-          <div class="tab">Дизайн</div>
-        </div>
-        <div style="padding: 28px;">
-          <div class="courses-grid" id="publicCoursesContainer">
-            <div class="empty-state">Загрузка курсов...</div>
-          </div>
-        </div>
-      </div>
-
-    </main>
-
-    <aside class="right-sidebar">
-      <div class="sidebar-widget">
-        <div class="widget-title">Кого читать</div>
-        <div class="suggested-user">
-          <div class="su-ava">🦁</div>
-          <div class="su-info">
-            <div class="su-name">User1</div>
-            <div class="su-handle">@example · Python</div>
-          </div>
-          <button class="follow-btn">Следить</button>
-        </div>
-        <div class="suggested-user">
-          <div class="su-ava">🐺</div>
-          <div class="su-info">
-            <div class="su-name">user2</div>
-            <div class="su-handle">@example</div>
-          </div>
-          <button class="follow-btn">Следить</button>
-        </div>
-        <div class="suggested-user">
-          <div class="su-ava">🦊</div>
-          <div class="su-info">
-            <div class="su-name">user3</div>
-            <div class="su-handle">@example · Fullstack</div>
-          </div>
-          <button class="follow-btn">Следить</button>
-        </div>
-      </div>
-
-      <div class="footer-links">
-        <a href="#">Вакансии</a>
-        <a href="#">Статус серверов</a>
-        <a href="#">Условия использования</a>
-        <a href="#">Конфиденциальность</a>
-        <span>© 2026 ООО «Tagybasqa»</span>
-      </div>
-    </aside>
+  <aside class="right-sidebar">
+    <div class="footer-links">
+      <a href="#">Вакансии</a>
+      <a href="#">Статус серверов</a>
+      <a href="#">Условия использования</a>
+      <a href="#">Конфиденциальность</a>
+      <span>© 2026 ООО «Tagybasqa»</span>
+    </div>
+  </aside>
 
   </div>
 
+  <!-- МОДАЛ РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
   <div id="editProfileModal" class="modal-overlay">
     <div class="settings-modal-content">
 
@@ -471,7 +534,7 @@
       }, 700);
     });
 
-    // Tab navigation
+    // ─── Tab navigation (basic, DOMContentLoaded в main.js делает полную логику) ───
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -481,7 +544,6 @@
       });
     });
 
-    // Inner tabs - menu
     document.querySelectorAll('.menu-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
@@ -491,31 +553,12 @@
       });
     });
 
-    // Inner tabs - profile
     document.querySelectorAll('.profile-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         document.querySelectorAll('#view-profile .inner-view').forEach(v => v.classList.remove('active'));
         document.getElementById(tab.dataset.profileTarget)?.classList.add('active');
-      });
-    });
-
-    // Settings tabs
-    document.querySelectorAll('.settings-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
-        document.getElementById(tab.dataset.settingsTarget)?.classList.add('active');
-      });
-    });
-
-    // Courses view tabs
-    document.querySelectorAll('#view-courses .tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('#view-courses .tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
       });
     });
 
@@ -542,30 +585,35 @@
       charCount.style.color = remaining < 20 ? 'var(--red)' : 'var(--text3)';
     });
 
-    // Create course
-    document.getElementById('createCourseBtn')?.addEventListener('click', () => {
-      window.location.href = './create-course.html';
-    });
+    // ─── УЛУЧШЕНИЕ 4: PIN-поле — только цифры, автоотправка на 6 символов ───
+    const pinInput = document.getElementById('quizPinInput');
+    const pinHint = document.getElementById('pinHint');
 
-    // Create quiz (ДОБАВИТЬ ЭТОТ БЛОК)
-    document.getElementById('createQuizBtn')?.addEventListener('click', () => {
-      window.location.href = './create-quiz.html';
-    });
+    pinInput?.addEventListener('input', (e) => {
+      // Только цифры
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
 
-    // Quiz Join interaction (Просто визуал для кнопки Ввод)
-    document.getElementById('joinQuizBtn')?.addEventListener('click', () => {
-      const pin = document.getElementById('quizPinInput').value;
-      if (pin.length > 3) {
-        alert('Подключение к игре с ПИН-кодом ' + pin + '... (В разработке)');
+      const len = e.target.value.length;
+      if (len === 0) {
+        pinHint.textContent = '';
+      } else if (len < 6) {
+        pinHint.textContent = `Введите ещё ${6 - len} цифр${len === 5 ? 'у' : 'ы'}`;
       } else {
-        alert('Введите корректный ПИН-код!');
+        pinHint.textContent = 'Подключаемся...';
+        // Автоматически запускаем поиск
+        setTimeout(() => document.getElementById('joinQuizBtn').click(), 300);
+      }
+    });
+
+    pinInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && pinInput.value.length >= 4) {
+        document.getElementById('joinQuizBtn').click();
       }
     });
   </script>
 
-  <script src="./static/js/main.js" type="module"></script>
+  <!-- Particle Background -->
   <script>
-    // Particle Background для Tagybasqa
     const canvas = document.getElementById("particle-field");
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -576,9 +624,7 @@
       const mouse = { x: 0, y: 0 };
 
       class Particle {
-        constructor() {
-          this.reset();
-        }
+        constructor() { this.reset(); }
         reset() {
           this.x = Math.random();
           this.y = Math.random();
@@ -590,7 +636,6 @@
         update() {
           this.x += this.vx;
           this.y += this.vy;
-
           if (this.x < 0 || this.x > 1) this.vx *= -1;
           if (this.y < 0 || this.y > 1) this.vy *= -1;
         }
@@ -613,37 +658,31 @@
 
       function draw() {
         ctx.clearRect(0, 0, width, height);
-
-        const ax = [], ay = []; // для оптимизации
+        const ax = [], ay = [];
 
         particles.forEach((p, i) => {
           p.update();
-
           const px = p.x * width;
           const py = p.y * height;
           ax[i] = px;
           ay[i] = py;
 
-          // Точка
           ctx.beginPath();
-          ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`; // мягкий голубой
+          ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
           ctx.arc(px, py, p.radius, 0, Math.PI * 2);
           ctx.fill();
 
-          // Лёгкое свечение
           ctx.beginPath();
           ctx.fillStyle = `rgba(120, 200, 255, ${p.alpha * 0.25})`;
           ctx.arc(px, py, p.radius * 2.2, 0, Math.PI * 2);
           ctx.fill();
         });
 
-        // Линии между частицами
         for (let i = 0; i < particles.length; i++) {
           for (let j = i + 1; j < particles.length; j++) {
             const dx = ax[i] - ax[j];
             const dy = ay[i] - ay[j];
             const dist = Math.hypot(dx, dy);
-
             if (dist < 160) {
               const opacity = 0.09 * (1 - dist / 160);
               ctx.beginPath();
@@ -656,14 +695,11 @@
           }
         }
 
-        // Линии к курсору (нежное взаимодействие)
-        const mx = mouse.x;
-        const my = mouse.y;
+        const mx = mouse.x, my = mouse.y;
         particles.forEach((_, i) => {
           const dx = ax[i] - mx;
           const dy = ay[i] - my;
           const dist = Math.hypot(dx, dy);
-
           if (dist < 220) {
             const opacity = 0.06 * (1 - dist / 220);
             ctx.beginPath();
@@ -678,28 +714,20 @@
         requestAnimationFrame(draw);
       }
 
-      // Инициализация
-      window.addEventListener("resize", () => {
-        resize();
-      });
+      window.addEventListener("resize", resize);
+      window.addEventListener("mousemove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
 
-      window.addEventListener("mousemove", (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-      });
-
-      // Запуск
       resize();
-      createParticles(50);        // количество частиц (можно менять от 50 до 90)
+      createParticles(50);
       draw();
 
-      // Дополнительно: плавное появление canvas
       setTimeout(() => {
         canvas.style.transition = "opacity 5s ease";
         canvas.style.opacity = "0.5";
       }, 800);
     }
   </script>
+
   <script type="module">
     import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getFirestore, collection, getDocs, query, where, addDoc, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -718,30 +746,39 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // ==========================================
-    // РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ
-    // ==========================================
     window.editQuiz = function (quizId) {
       window.location.href = `./create-quiz.html?edit=${quizId}`;
     };
 
     window.deleteQuiz = async function (quizId) {
-      if (!confirm("Вы уверены, что хотите удалить этот квиз? Это действие необратимо.")) return;
+      if (!confirm("Вы уверены, что хотите удалить этот квиз?")) return;
       try {
         await deleteDoc(doc(db, "quizzes", quizId));
-        alert("Квиз успешно удален!");
-        // Перезагружаем списки
+        alert("Квиз удалён");
         if (auth.currentUser) loadMyQuizzes(auth.currentUser.uid);
-        loadPublicQuizzes();
       } catch (error) {
-        console.error("Ошибка при удалении:", error);
-        alert("Ошибка при удалении квиза. Убедитесь, что вы являетесь его автором.");
+        console.error(error);
+        alert("Ошибка при удалении");
       }
     };
 
-    // ==========================================
-    // ЗАГРУЗКА ЛИЧНЫХ КВИЗОВ (ПРОФИЛЬ)
-    // ==========================================
+    function getQuizAvatar(quiz) {
+      if (quiz.cover && quiz.cover.startsWith('http')) {
+        return `<img src="${quiz.cover}" style="width:100%;height:100%;object-fit:cover;">`;
+      }
+      const title = quiz.title || 'К';
+      const firstLetter = title.charAt(0).toUpperCase();
+      const colors = ['#1a1a1a', '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e'];
+      const color = colors[title.length % colors.length];
+
+      return `
+        <div style="width:100%;height:100%;background:linear-gradient(135deg, ${color}, #111); 
+                    display:flex; align-items:center; justify-content:center; 
+                    color:white; font-size:32px; font-weight:700; font-family:Onest,sans-serif;">
+          ${firstLetter}
+        </div>`;
+    }
+
     async function loadMyQuizzes(userId) {
       const container = document.getElementById('myQuizzesContainer');
       if (!container) return;
@@ -751,59 +788,69 @@
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
-          container.innerHTML = '<div class="empty-state">У вас пока нет созданных квизов. Создайте первый!</div>';
+          container.innerHTML = `
+            <div class="empty-state-rich" style="grid-column: 1/-1;">
+              <div class="empty-icon"></div>
+              <div class="empty-title">У вас пока нет квизов</div>
+              <button class="empty-action-btn" onclick="window.location.href='./create-quiz.html'">Создать первый квиз →</button>
+            </div>`;
           return;
         }
 
         let html = '';
+        let total = 0, pub = 0;
+
         snapshot.forEach((d) => {
           const quiz = d.data();
           const quizId = d.id;
-          const questionsCount = quiz.questions ? quiz.questions.length : 0;
+          const count = quiz.questions ? quiz.questions.length : 0;
           const title = quiz.title || 'Без названия';
-          const pin = quiz.pin || '---';
+          total++;
+          if (quiz.visibility === 'public') pub++;
 
           html += `
-        <div class="course-card modern">
-          <div class="card-header">
-            <span class="course-category">${quiz.category || 'Квиз'}</span>
-            <span class="status-dot ${quiz.visibility === 'public' ? 'published' : 'draft'}"></span>
-          </div>
-          <div class="quiz-card-content">
-            <div class="quiz-icon">🎮</div>
-            <h3 class="course-title-modern">${title}</h3>
-            <p class="course-description-modern">${questionsCount} вопросов · ПИН: ${pin}</p>
-          </div>
-          <div class="card-footer-modern" style="display:flex; gap:8px;">
-             <button class="btn-primary-modern" style="flex:1; background:var(--bg3); color:var(--text); border:1px solid var(--border);" onclick="editQuiz('${quizId}')">Изменить</button>
-             <button class="btn-primary-modern" style="background:var(--red-bg); color:var(--red); border:1px solid rgba(239,68,68,0.3);" onclick="deleteQuiz('${quizId}')">Удалить</button>
-          </div>
-        </div>`;
+            <div class="course-card modern">
+              <div class="card-header">
+                <span class="course-category">${quiz.category || 'Квиз'}</span>
+                <span class="status-dot ${quiz.visibility === 'public' ? 'published' : 'draft'}"></span>
+              </div>
+              <div class="quiz-card-content">
+                <div class="quiz-icon" style="width:64px;height:64px;border-radius:12px;overflow:hidden;">
+                  ${getQuizAvatar(quiz)}
+                </div>
+                <h3 class="course-title-modern">${title}</h3>
+                <p class="course-description-modern">${count} вопросов</p>
+              </div>
+              <div class="card-footer-modern" style="display:flex; gap:8px;">
+                <button class="btn-primary-modern" style="flex:1;" onclick="editQuiz('${quizId}')">Изменить</button>
+                <button class="btn-primary-modern" style="background:var(--red-bg); color:var(--red);" onclick="deleteQuiz('${quizId}')">Удалить</button>
+                <button class="btn-primary-modern" style="background:var(--accent); color:white;" onclick="launchQuiz('${quizId}', '${title.replace(/'/g, "\\'")}')">Запустить</button>
+              </div>
+            </div>`;
         });
 
         container.innerHTML = html;
+        document.getElementById('qs-total').textContent = total;
+        document.getElementById('qs-pub').textContent = pub;
+
       } catch (error) {
         console.error(error);
-        container.innerHTML = '<div class="empty-state" style="color:var(--red);">Ошибка загрузки квизов</div>';
+        container.innerHTML = '<div class="empty-state">Ошибка загрузки квизов</div>';
       }
     }
 
-    // ==========================================
-    // ЗАГРУЗКА ПУБЛИЧНЫХ КВИЗОВ И КНОПКА "ЗАПУСТИТЬ"
-    // ==========================================
-    window.launchQuiz = async function (quizId, pin, title) {
+    window.launchQuiz = async function (quizId, title) {
       const user = auth.currentUser;
       if (!user) {
-        alert("Пожалуйста, войдите в аккаунт, чтобы запускать игры.");
+        alert("Пожалуйста, войдите в аккаунт");
         return;
       }
 
       try {
         const sessionRef = await addDoc(collection(db, "sessions"), {
-          quizId: quizId,
+          quizId,
           quizTitle: title,
           hostId: user.uid,
-          pin: pin,
           status: 'waiting',
           currentQuestion: -1,
           players: {},
@@ -811,107 +858,112 @@
         });
         window.location.href = `./host-game.html?session=${sessionRef.id}`;
       } catch (error) {
-        console.error("Ошибка при создании сессии:", error);
-        alert("Не удалось запустить квиз.");
+        console.error(error);
+        alert("Не удалось запустить квиз");
       }
     };
 
-    async function loadPublicQuizzes() {
-      const container = document.getElementById('publicQuizzesContainer');
-      if (!container) return;
+    // Tab switcher для квизов
+    window.quizTab = function (name, btn) {
+      document.querySelectorAll('.quiz-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.quiz-action-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('qp-' + name)?.classList.add('active');
+      btn?.classList.add('active');
+    };
 
-      try {
-        const q = query(collection(db, "quizzes"), where("visibility", "==", "public"));
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-          container.innerHTML = '<div class="empty-state">Пока нет доступных квизов. Будьте первым, кто создаст!</div>';
-          return;
+    window.quizFilter = function (q) {
+      document.querySelectorAll('#myQuizzesContainer .course-card').forEach(card => {
+        const titleEl = card.querySelector('.course-title-modern');
+        if (titleEl) {
+          card.style.display = titleEl.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
         }
+      });
+    };
 
-        let html = '';
-        snapshot.forEach((doc) => {
-          const quiz = doc.data();
-          const quizId = doc.id;
-          const questionsCount = quiz.questions ? quiz.questions.length : 0;
-          const category = quiz.category || 'Без категории';
-          const title = quiz.title || 'Без названия';
-          const pin = quiz.pin || '123456';
-
-          let icon = '🎮';
-          if (category.includes('Программирование') || category.includes('IT')) icon = '💻';
-          else if (category.includes('Дизайн')) icon = '🎨';
-
-          html += `
-        <div class="course-card modern">
-          <div class="card-header">
-            <span class="course-category">${category}</span>
-            <span class="status-dot published"></span>
-          </div>
-          <div class="quiz-card-content">
-            <div class="quiz-icon">${icon}</div>
-            <h3 class="course-title-modern">${title}</h3>
-            <p class="course-description-modern">${questionsCount} вопросов · Автор: ${quiz.userName || 'Аноним'}</p>
-          </div>
-          <div class="card-footer-modern">
-             <button class="btn-primary-modern" style="width: 100%; justify-content: center;" onclick="launchQuiz('${quizId}', '${pin}', '${title.replace(/'/g, "\\'")}')">Запустить (ПИН: ${pin})</button>
-          </div>
-        </div>`;
-        });
-
-        container.innerHTML = html;
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    // ==========================================
-    // ВХОД ИГРОКА ПО ПИН-КОДУ
-    // ==========================================
-    document.getElementById('joinQuizBtn')?.addEventListener('click', async () => {
-      const pin = document.getElementById('quizPinInput').value.trim();
-      if (pin.length < 3) { alert('Введите корректный ПИН-код!'); return; }
-
-      const btn = document.getElementById('joinQuizBtn');
-      const originalText = btn.textContent;
-      btn.textContent = 'Поиск...';
-      btn.disabled = true;
-
-      try {
-        const q = query(collection(db, "sessions"), where("pin", "==", pin), where("status", "==", "waiting"));
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-          alert(`Игра с ПИН-кодом ${pin} не найдена или уже началась.`);
-          btn.textContent = originalText;
-          btn.disabled = false;
-          return;
-        }
-
-        const sessionId = snapshot.docs[0].id;
-        localStorage.setItem('joinSessionId', sessionId);
-        window.location.href = `./player-game.html?session=${sessionId}`;
-
-      } catch (error) {
-        console.error(error);
-        alert("Ошибка при подключении.");
-        btn.textContent = originalText;
-        btn.disabled = false;
-      }
-    });
-
-    // Отслеживаем авторизацию: если пользователь вошел, грузим его личные квизы
     onAuthStateChanged(auth, (user) => {
       if (user) {
         loadMyQuizzes(user.uid);
       } else {
-        const myContainer = document.getElementById('myQuizzesContainer');
-        if (myContainer) myContainer.innerHTML = '<div class="empty-state">Войдите, чтобы увидеть свои квизы.</div>';
+        const c = document.getElementById('myQuizzesContainer');
+        if (c) c.innerHTML = `<div class="empty-state-rich"><div class="empty-title">Войдите, чтобы увидеть свои квизы</div></div>`;
       }
     });
+  </script>
 
-    // Сразу загружаем публичные квизы
-    loadPublicQuizzes();
+  <script src="./static/js/main.js" type="module"></script>
+  <!-- JS -->
+  <script>
+    function quizTab(name, btn) {
+      document.querySelectorAll('.quiz-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.quiz-action-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('qp-' + name)?.classList.add('active');
+      btn?.classList.add('active');
+    }
+
+    function quizJoin() {
+      const pin = document.getElementById('quizPinInput')?.value?.trim();
+      if (!pin || pin.length < 4) { showToast('Введите корректный PIN'); return; }
+      window.location.href = `./quiz-play.html?pin=${pin}`;
+    }
+
+    function quizShowForm() {
+      const f = document.getElementById('quizCreateForm');
+      f.classList.add('open');
+      f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function quizSave() {
+      const title = document.getElementById('qfTitle')?.value.trim();
+      if (!title) { showToast('Введите название квиза'); return; }
+      // await addDoc(collection(db, "quizzes"), { title, ... });
+      showToast('✅ Квиз «' + title + '» создан!');
+      document.getElementById('quizCreateForm').classList.remove('open');
+      document.getElementById('qfTitle').value = '';
+      document.getElementById('qfCategory').value = '';
+    }
+
+    function quizFilter(q) {
+      document.querySelectorAll('.quiz-card[data-title]').forEach(c => {
+        c.style.display = c.dataset.title.includes(q.toLowerCase()) ? '' : 'none';
+      });
+    }
+
+    async function loadMyQuizzes() {
+      const grid = document.getElementById('quizCardsGrid');
+      if (!grid) return;
+      // Заменить на:
+      // const snap = await getDocs(query(collection(db,"quizzes"), where("uid","==",auth.currentUser.uid)));
+      const mock = [
+        { id: '1', emoji: '🐍', title: 'Python: списки и словари', category: 'Программирование', questions: 10, plays: 42, status: 'public' },
+        { id: '2', emoji: '⚡', title: 'JavaScript основы', category: 'Веб-разработка', questions: 15, plays: 28, status: 'public' },
+        { id: '3', emoji: '🧮', title: 'Алгоритмы: сложность', category: 'CS', questions: 8, plays: 17, status: 'draft' },
+        { id: '4', emoji: '🗄️', title: 'SQL для начинающих', category: 'Базы данных', questions: 12, plays: 35, status: 'public' },
+      ];
+      document.getElementById('qs-total').textContent = mock.length;
+      document.getElementById('qs-pub').textContent = mock.filter(q => q.status === 'public').length;
+      document.getElementById('qs-plays').textContent = mock.reduce((a, q) => a + q.plays, 0);
+      grid.innerHTML = mock.map((q, i) => `
+    <div class="quiz-card" data-title="${q.title.toLowerCase()}">
+      <div class="quiz-card-top">
+        <span class="quiz-card-num">${String(i + 1).padStart(2, '0')} / ${q.category}</span>
+        <span class="quiz-card-status ${q.status === 'public' ? 'pub' : 'draft'}">
+          ${q.status === 'public' ? 'Публичный' : 'Черновик'}
+        </span>
+      </div>
+      <div class="quiz-card-icon">${q.emoji}</div>
+      <div class="quiz-card-title">${q.title}</div>
+      <div class="quiz-card-meta">
+        <span>❓ ${q.questions} вопросов</span>
+        <span>▶ ${q.plays} игр</span>
+      </div>
+      <div class="quiz-card-footer">
+        <button class="qc-btn" onclick="showToast('✏️ Редактор — скоро!')">Изменить</button>
+        <button class="qc-btn primary" onclick="showToast('🚀 Запуск...')">Запустить →</button>
+      </div>
+    </div>`).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { loadMyQuizzes(); });
   </script>
 </body>
 

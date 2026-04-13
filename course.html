@@ -6,179 +6,830 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Курс — Tagybasqa</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;700;900&display=swap"
+    rel="stylesheet">
   <style>
     :root {
-       --bg: #0a0a0a;
-       --bg2: #111111;
-       --bg3: #181818;
-       --border: rgba(255, 255, 255, 0.07);
-       --border2: rgba(255, 255, 255, 0.12);
-       --border3: rgba(255, 255, 255, 0.22);
-       --text: #f5f5f0;
-       --text2: #888880;
-       --text3: #444440;
-       --accent-dim: rgba(245, 245, 240, 0.06);
-       --red: #ef4444;
-       --red-bg: rgba(239, 68, 68, 0.08);
-       --green: #4ade80;
-       --green-bg: rgba(74, 222, 128, 0.08);
-       --blue: #3b82f6;
-       --blue-bg: rgba(59, 130, 246, 0.08);
-       --gold: #fbbf24;
-       --r: 3px;
-       --r2: 5px;
-       --font: 'Onest', sans-serif;
-       --mono: 'DM Mono', monospace;
+      --bg: #ffffff;
+      --bg2: #f8f8f8;
+      --bg3: #f0f0f0;
+      --bg4: #e8e8e8;
+
+      /* Границы: теперь они темные на светлом фоне */
+      --border: rgba(0, 0, 0, 0.08);
+      --border2: rgba(0, 0, 0, 0.12);
+      --border3: rgba(0, 0, 0, 0.22);
+
+      /* Текст: от глубокого черного до серого */
+      --text: #1a1a1a;
+      --text2: #555555;
+      --text3: #888888;
+      --text4: #ffffff;
+      --accent-dim: rgba(0, 0, 0, .03);
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, .08);
+      --green: #22c55e;
+      --green-bg: rgba(34, 197, 94, .08);
+      --blue: #3b82f6;
+      --blue-bg: rgba(59, 130, 246, .08);
+      --gold: #f59e0b;
+      --r: 3px;
+      --r2: 5px;
+      --font: 'Onest', sans-serif;
+      --mono: 'DM Mono', monospace
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-    
-    .app { display: grid; grid-template-columns: 280px 1fr 300px; min-height: 100vh; }
-    
-    /* LEFT SIDEBAR */
-    .sidebar-l { position: sticky; top: 0; height: 100vh; padding: 32px 16px; display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow-y: auto; }
-    .sidebar-l::-webkit-scrollbar { width: 4px; }
-    .sidebar-l::-webkit-scrollbar-thumb { background: var(--border2); }
-    
-    .logo-container { margin-bottom: 32px; padding: 0 8px; }
-    .logo { font-size: 20px; font-weight: 900; color: var(--text); letter-spacing: -1px; line-height: 1; text-decoration: none; display: block; }
-    .logo-sub { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; display: block; }
-    
-    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r); background: transparent; color: var(--text3); font-family: var(--font); font-size: 13px; cursor: pointer; transition: all .15s; width: 100%; border: none; text-align: left; margin-bottom: 24px; }
-    .nav-item svg { width: 16px; height: 16px; opacity: 0.6; }
-    .nav-item:hover { color: var(--text); background: var(--bg2); }
-    .nav-item:hover svg { opacity: 1; }
-
-    .curriculum-container { display: flex; flex-direction: column; gap: 24px; }
-    .sb-module { display: flex; flex-direction: column; gap: 4px; }
-    .sb-module-title { font-family: var(--mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; padding: 0 12px; margin-bottom: 4px; }
-    
-    .sb-lesson { display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; border-radius: var(--r); cursor: pointer; transition: all 0.15s; color: var(--text2); text-decoration: none; }
-    .sb-lesson:hover { background: var(--bg2); color: var(--text); }
-    .sb-lesson.active-reading { background: var(--blue-bg); color: var(--blue); border-left: 2px solid var(--blue); border-radius: 0 var(--r) var(--r) 0; }
-    
-    .sb-lesson-icon { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; background: var(--bg); transition: all 0.2s; color: var(--text3); }
-    .sb-lesson-icon svg { width: 10px; height: 10px; }
-    .sb-lesson-text { font-size: 13px; font-weight: 500; line-height: 1.4; flex: 1; }
-    
-    /* Состояния обычных уроков */
-    .sb-lesson.done .sb-lesson-icon { background: var(--green); border-color: var(--green); color: var(--bg); }
-    .sb-lesson.done .sb-lesson-text { color: var(--text); }
-    .sb-lesson.active-node .sb-lesson-icon { border-color: var(--text); color: var(--text); }
-    .sb-lesson.active-node .sb-lesson-text { color: var(--text); }
-    .sb-lesson.locked { opacity: 0.4; cursor: not-allowed; }
-    .sb-lesson.locked:hover { background: transparent; color: var(--text2); }
-
-    /* СТИЛИ ДЛЯ ИТОГОВОГО ТЕСТА МОДУЛЯ */
-    .sb-module-test { border: 1px solid rgba(251, 191, 36, 0.15); background: rgba(251, 191, 36, 0.03); margin-top: 6px; }
-    .sb-module-test:hover { background: rgba(251, 191, 36, 0.08); color: var(--gold); }
-    .sb-module-test .sb-lesson-icon { color: var(--gold); border-color: rgba(251, 191, 36, 0.3); }
-    .sb-module-test.active-reading { background: rgba(251, 191, 36, 0.15); border-left: 2px solid var(--gold); color: var(--gold); }
-    .sb-module-test.active-node .sb-lesson-icon { border-color: var(--gold); color: var(--gold); }
-    .sb-module-test.done .sb-lesson-icon { background: var(--gold); border-color: var(--gold); color: var(--bg); }
-    .sb-module-test.done .sb-lesson-text { color: var(--gold); }
-
-    /* MAIN */
-    .main { overflow-y: auto; position: relative; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-    .lesson-content-wrapper { padding: 60px; max-width: 800px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
-    
-    /* Course Intro */
-    .course-intro { margin-top: 40px; }
-    .course-badge { display: inline-block; font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--blue); border: 1px solid var(--blue-bg); background: var(--blue-bg); padding: 4px 8px; border-radius: 3px; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 20px; }
-    .course-title { font-size: 32px; font-weight: 700; margin-bottom: 16px; line-height: 1.2; letter-spacing: -0.5px; color: var(--text); }
-    .course-sub { color: var(--text2); font-size: 15px; margin-bottom: 32px; line-height: 1.6; }
-    
-    .course-stats { display: flex; gap: 24px; font-family: var(--mono); font-size: 12px; color: var(--text3); border-top: 1px solid var(--border); padding-top: 24px; margin-top: 32px; }
-    .course-stats-item { display: flex; align-items: center; gap: 6px; }
-    .course-stats-item svg { width: 14px; height: 14px; color: var(--text3); }
-    .course-stats-item span { color: var(--text); font-weight: 500; }
-
-    /* Theory/Test */
-    .step-counter { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
-    .step-counter svg { width: 14px; height: 14px; flex-shrink: 0; }
-    .step-progress-wrap { flex: 1; height: 2px; background: var(--border2); max-width: 200px; }
-    .step-progress-fill { height: 100%; background: var(--blue); transition: width 0.3s; }
-    
-    .lesson-q { font-size: 28px; font-weight: 700; line-height: 1.3; margin-bottom: 32px; color: var(--text); letter-spacing: -0.5px; }
-    
-    .theory-content { font-size: 16px; color: var(--text2); line-height: 1.8; margin-bottom: 40px; flex: 1; }
-    .theory-content p { margin-bottom: 16px; }
-    .theory-content strong { color: var(--text); font-weight: 600; }
-    
-    .answers-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
-    .answer-btn { background: transparent; border: 1px solid var(--border2); border-radius: var(--r); color: var(--text2); padding: 18px 24px; font-family: var(--font); font-size: 15px; text-align: left; cursor: pointer; transition: all 0.15s; }
-    .answer-btn:hover:not(:disabled) { border-color: var(--border3); color: var(--text); background: var(--bg2); }
-    .answer-btn.selected { border-color: var(--text); color: var(--text); }
-    .answer-btn.correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
-    .answer-btn.wrong { border-color: var(--red); background: var(--red-bg); color: var(--red); }
-    
-    .feedback-bar { padding: 16px 20px; display: none; align-items: flex-start; gap: 12px; margin-bottom: 24px; border: 1px solid transparent; border-radius: var(--r); }
-    .feedback-bar.show-correct { display: flex; background: var(--green-bg); border-color: rgba(74, 222, 128, 0.2); }
-    .feedback-bar.show-wrong { display: flex; background: var(--red-bg); border-color: rgba(239, 68, 68, 0.2); }
-    .fb-icon { display: flex; align-items: center; justify-content: center; margin-top: 2px; }
-    .fb-icon svg { width: 18px; height: 18px; }
-    .show-correct .fb-icon { color: var(--green); }
-    .show-wrong .fb-icon { color: var(--red); }
-    
-    .fb-text h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .fb-text p { font-size: 13px; color: var(--text2); line-height: 1.5; }
-    .correct-text h4 { color: var(--green); } .wrong-text h4 { color: var(--red); }
-    
-    .check-btn { width: max-content; padding: 14px 40px; border: none; border-radius: var(--r); font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-top: auto; }
-    .check-btn.ready { background: var(--text); color: var(--bg); }
-    .check-btn.ready:hover:not(:disabled) { opacity: 0.9; }
-    .check-btn.disabled, .check-btn:disabled { background: var(--bg3); color: var(--text3); cursor: not-allowed; }
-    .check-btn.next { background: var(--blue); color: var(--bg); }
-    
-    .completion { text-align: left; display: none; flex-direction: column; justify-content: center; height: 100%; animation: fadeUpSmooth 0.5s ease; }
-    .completion.show { display: flex; }
-    .comp-icon { margin-bottom: 24px; color: var(--gold); }
-    .comp-icon svg { width: 48px; height: 48px; }
-    .comp-title { font-size: 32px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
-    .comp-sub { font-size: 15px; color: var(--text2); margin-bottom: 40px; }
-
-    /* RIGHT SIDEBAR */
-    .sidebar-r { padding: 40px 24px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 32px; }
-    
-    .profile-card { display: flex; align-items: center; gap: 14px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
-    .profile-ava { width: 40px; height: 40px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background-size: cover; background-position: center; border: 1px solid var(--border2); color: var(--text); font-weight: bold; }
-    .profile-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-    .profile-info span { font-family: var(--mono); font-size: 10px; color: var(--text3); }
-    
-    .widget-title { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px; }
-    
-    .progress-widget { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; }
-    .progress-val { font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1; }
-    .progress-lbl { font-size: 12px; color: var(--text2); margin-bottom: 16px; }
-    .progress-bar { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; margin-bottom: 16px; }
-    .progress-fill { height: 100%; background: var(--text); transition: width 0.4s ease; }
-    
-    .stats-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); padding-top: 16px; }
-    .stats-row span { color: var(--text); }
-
-    .xp-popup { position: fixed; bottom: 40px; right: 40px; background: var(--bg2); border: 1px solid var(--border2); color: var(--gold); font-family: var(--mono); font-size: 14px; font-weight: 500; padding: 12px 24px; z-index: 999; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; pointer-events: none; border-radius: var(--r); }
-    .xp-popup.burst { opacity: 1; transform: translateY(0); }
-    #confettiCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 998; }
-
-    .loading-state { text-align: center; padding: 100px 20px; font-family: var(--mono); color: var(--text3); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; width: 100%; }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes fadeUpSmooth { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-    @media (max-width: 1100px) {
-      .app { grid-template-columns: 260px 1fr; }
-      .sidebar-r { display: none; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
     }
-    @media (max-width: 768px) {
-      .app { display: flex; flex-direction: column; }
-      .sidebar-l { position: static; height: auto; max-height: 40vh; border-right: none; border-bottom: 1px solid var(--border); padding: 20px; }
-      .lesson-content-wrapper { padding: 32px 20px; }
-      .check-btn { width: 100%; text-align: center; }
-      .course-title { font-size: 24px; }
-      .course-stats { flex-direction: column; gap: 12px; }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr 300px;
+      min-height: 100vh
+    }
+
+    .sidebar-l {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 32px 16px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      overflow-y: auto
+    }
+
+    .sidebar-l::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .sidebar-l::-webkit-scrollbar-thumb {
+      background: var(--border2)
+    }
+
+    .logo-container {
+      margin-bottom: 32px;
+      padding: 0 8px
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -1px;
+      line-height: 1;
+      text-decoration: none;
+      display: block
+    }
+
+    .logo-sub {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text3);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 4px;
+      display: block
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--r);
+      background: transparent;
+      color: var(--text3);
+      font-family: var(--font);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s;
+      width: 100%;
+      border: none;
+      text-align: left;
+      margin-bottom: 24px
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.6
+    }
+
+    .nav-item:hover {
+      color: var(--text);
+      background: var(--bg2)
+    }
+
+    .nav-item:hover svg {
+      opacity: 1
+    }
+
+    .curriculum-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px
+    }
+
+    .sb-module {
+      display: flex;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .sb-module-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0 12px;
+      margin-bottom: 4px
+    }
+
+    .sb-lesson {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all .15s;
+      color: var(--text2);
+      text-decoration: none
+    }
+
+    .sb-lesson:hover {
+      background: var(--bg2);
+      color: var(--text)
+    }
+
+    .sb-lesson.active-reading {
+      background: var(--blue-bg);
+      color: var(--blue);
+      border-left: 2px solid var(--blue);
+      border-radius: 0 var(--r) var(--r) 0
+    }
+
+    .sb-lesson-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      background: var(--bg);
+      transition: all .2s;
+      color: var(--text3)
+    }
+
+    .sb-lesson-icon svg {
+      width: 10px;
+      height: 10px
+    }
+
+    .sb-lesson-text {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.4;
+      flex: 1
+    }
+
+    .sb-lesson.done .sb-lesson-icon {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--bg)
+    }
+
+    .sb-lesson.done .sb-lesson-text {
+      color: var(--text)
+    }
+
+    .sb-lesson.active-node .sb-lesson-icon {
+      border-color: var(--text);
+      color: var(--text)
+    }
+
+    .sb-lesson.active-node .sb-lesson-text {
+      color: var(--text)
+    }
+
+    .sb-lesson.locked {
+      opacity: 0.4;
+      cursor: not-allowed
+    }
+
+    .sb-lesson.locked:hover {
+      background: transparent;
+      color: var(--text2)
+    }
+
+    .sb-module-test {
+      border: 1px solid rgba(251, 191, 36, .15);
+      background: rgba(251, 191, 36, .03);
+      margin-top: 6px
+    }
+
+    .sb-module-test:hover {
+      background: rgba(251, 191, 36, .08);
+      color: var(--gold)
+    }
+
+    .sb-module-test .sb-lesson-icon {
+      color: var(--gold);
+      border-color: rgba(251, 191, 36, .3)
+    }
+
+    .sb-module-test.active-reading {
+      background: rgba(251, 191, 36, .15);
+      border-left: 2px solid var(--gold);
+      color: var(--gold)
+    }
+
+    .sb-module-test.active-node .sb-lesson-icon {
+      border-color: var(--gold);
+      color: var(--gold)
+    }
+
+    .sb-module-test.done .sb-lesson-icon {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--bg)
+    }
+
+    .sb-module-test.done .sb-lesson-text {
+      color: var(--gold)
+    }
+
+    .main {
+      overflow-y: auto;
+      position: relative;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column
+    }
+
+    .lesson-content-wrapper {
+      padding: 60px;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn .4s ease
+    }
+
+    .course-intro {
+      margin-top: 40px
+    }
+
+    .course-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--blue);
+      border: 1px solid var(--blue-bg);
+      background: var(--blue-bg);
+      padding: 4px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 20px
+    }
+
+    .course-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      color: var(--text)
+    }
+
+    .course-sub {
+      color: var(--text2);
+      font-size: 15px;
+      margin-bottom: 32px;
+      line-height: 1.6
+    }
+
+    .course-stats {
+      display: flex;
+      gap: 24px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text3);
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      margin-top: 32px
+    }
+
+    .course-stats-item {
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .course-stats-item svg {
+      width: 14px;
+      height: 14px;
+      color: var(--text3)
+    }
+
+    .course-stats-item span {
+      color: var(--text);
+      font-weight: 500
+    }
+
+    .step-counter {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .step-counter svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0
+    }
+
+    .step-progress-wrap {
+      flex: 1;
+      height: 2px;
+      background: var(--border2);
+      max-width: 200px
+    }
+
+    .step-progress-fill {
+      height: 100%;
+      background: var(--blue);
+      transition: width .3s
+    }
+
+    .lesson-q {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 32px;
+      color: var(--text);
+      letter-spacing: -0.5px
+    }
+
+    .theory-content {
+      font-size: 16px;
+      color: var(--text2);
+      line-height: 1.8;
+      margin-bottom: 40px;
+      flex: 1
+    }
+
+    .theory-content p {
+      margin-bottom: 16px
+    }
+
+    .theory-content strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .answers-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px
+    }
+
+    .answer-btn {
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      color: var(--text2);
+      padding: 18px 24px;
+      font-family: var(--font);
+      font-size: 15px;
+      text-align: left;
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .answer-btn:hover:not(:disabled) {
+      border-color: var(--border3);
+      color: var(--text);
+      background: var(--bg2)
+    }
+
+    .answer-btn.selected {
+      border-color: var(--text);
+      color: var(--text)
+    }
+
+    .answer-btn.correct {
+      border-color: var(--green);
+      background: var(--green-bg);
+      color: var(--green)
+    }
+
+    .answer-btn.wrong {
+      border-color: var(--red);
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    .feedback-bar {
+      padding: 16px 20px;
+      display: none;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 24px;
+      border: 1px solid transparent;
+      border-radius: var(--r)
+    }
+
+    .feedback-bar.show-correct {
+      display: flex;
+      background: var(--green-bg);
+      border-color: rgba(74, 222, 128, .2)
+    }
+
+    .feedback-bar.show-wrong {
+      display: flex;
+      background: var(--red-bg);
+      border-color: rgba(239, 68, 68, .2)
+    }
+
+    .fb-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px
+    }
+
+    .star-icon {
+      transition: transform 0.2s, fill 0.2s, stroke 0.2s;
+    }
+
+    .reason-options button {
+      padding: 8px 14px;
+      font-size: 13px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .reason-options button.active {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .fb-icon svg {
+      width: 18px;
+      height: 18px
+    }
+
+    .show-correct .fb-icon {
+      color: var(--green)
+    }
+
+    .show-wrong .fb-icon {
+      color: var(--red)
+    }
+
+    .fb-text h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px
+    }
+
+    .fb-text p {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.5
+    }
+
+    .correct-text h4 {
+      color: var(--green)
+    }
+
+    .wrong-text h4 {
+      color: var(--red)
+    }
+
+    .check-btn {
+      width: max-content;
+      padding: 14px 40px;
+      border: none;
+      border-radius: var(--r);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      margin-top: auto
+    }
+
+    .check-btn.ready {
+      background: var(--text);
+      color: var(--bg)
+    }
+
+    .check-btn.ready:hover:not(:disabled) {
+      opacity: 0.9
+    }
+
+    .check-btn.disabled,
+    .check-btn:disabled {
+      background: var(--bg3);
+      color: var(--text3);
+      cursor: not-allowed
+    }
+
+    .check-btn.next {
+      background: var(--blue);
+      color: var(--bg)
+    }
+
+    .completion {
+      text-align: left;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      animation: fadeUpSmooth .5s ease
+    }
+
+    .completion.show {
+      display: flex
+    }
+
+    .comp-icon {
+      margin-bottom: 24px;
+      color: var(--gold)
+    }
+
+    .comp-icon svg {
+      width: 48px;
+      height: 48px
+    }
+
+    .comp-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text)
+    }
+
+    .comp-sub {
+      font-size: 15px;
+      color: var(--text2);
+      margin-bottom: 40px
+    }
+
+    .sidebar-r {
+      padding: 40px 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 32px
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .profile-ava {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      background-size: cover;
+      background-position: center;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-weight: bold
+    }
+
+    .profile-info h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px
+    }
+
+    .profile-info span {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3)
+    }
+
+    .widget-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text3);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px
+    }
+
+    .progress-widget {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 20px
+    }
+
+    .progress-val {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1
+    }
+
+    .progress-lbl {
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 16px
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--bg3);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 16px
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--text);
+      transition: width .4s ease
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      border-top: 1px solid var(--border);
+      padding-top: 16px
+    }
+
+    .stats-row span {
+      color: var(--text)
+    }
+
+    .xp-popup {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 12px 24px;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all .4s ease;
+      pointer-events: none;
+      border-radius: var(--r)
+    }
+
+    .xp-popup.burst {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 998
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 100px 20px;
+      font-family: var(--mono);
+      color: var(--text3);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      width: 100%
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes fadeUpSmooth {
+      from {
+        opacity: 0;
+        transform: translateY(15px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @media(max-width:1100px) {
+      .app {
+        grid-template-columns: 260px 1fr
+      }
+
+      .sidebar-r {
+        display: none
+      }
+    }
+
+    @media(max-width:768px) {
+      .app {
+        display: flex;
+        flex-direction: column
+      }
+
+      .sidebar-l {
+        position: static;
+        height: auto;
+        max-height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 20px
+      }
+
+      .lesson-content-wrapper {
+        padding: 32px 20px
+      }
+
+      .check-btn {
+        width: 100%;
+        text-align: center
+      }
+
+      .course-title {
+        font-size: 24px
+      }
+
+      .course-stats {
+        flex-direction: column;
+        gap: 12px
+      }
     }
   </style>
 </head>
@@ -191,7 +842,11 @@
         <a href="./index.html" class="logo">Tagybasqa<span class="logo-sub">Platform / 2026</span></a>
       </div>
       <button class="nav-item" onclick="window.location.href='./index.html'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M19 12H5"></path>
+          <path d="M12 19l-7-7 7-7"></path>
+        </svg>
         К списку курсов
       </button>
       <div class="curriculum-container" id="sidebarCurriculum"></div>
@@ -216,481 +871,771 @@
       <div class="progress-widget">
         <div class="progress-val" id="progressPercentUi">0%</div>
         <div class="progress-lbl">Пройдено материала</div>
-        
         <div class="progress-bar">
           <div class="progress-fill" id="progressBarUi" style="width: 0%;"></div>
         </div>
-        
         <div class="stats-row">
           Завершено <span id="completedLessonsUi">0 / 0</span>
         </div>
       </div>
-    </aside>
+
+      <!-- БЛОК ОЦЕНКИ -->
+      <div class="widget-title">Оцените курс</div>
+      <div class="progress-widget" id="ratingWidget" style="padding: 24px 20px;">
+        <div class="stars-container" style="display: flex; gap: 8px; margin-bottom: 20px; justify-content: center;">
+          <svg class="star-icon" data-value="1" width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="cursor:pointer;">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+            </polygon>
+          </svg>
+          <svg class="star-icon" data-value="2" width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="cursor:pointer;">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+            </polygon>
+          </svg>
+          <svg class="star-icon" data-value="3" width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="cursor:pointer;">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+            </polygon>
+          </svg>
+          <svg class="star-icon" data-value="4" width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="cursor:pointer;">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+            </polygon>
+          </svg>
+          <svg class="star-icon" data-value="5" width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="cursor:pointer;">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+            </polygon>
+          </svg>
+        </div>
+      </div>
+
+      <div id="ratingStatus"
+        style="font-family: var(--mono); font-size: 11px; color: var(--text3); text-align: center; margin-bottom: 16px;">
+        Нажмите на звёзды, чтобы оценить курс
+      </div>
+
+      <div id="reasonContainer" style="display: none; margin-bottom: 20px;">
+        <div style="font-size: 13px; color: var(--text2); margin-bottom: 8px;">Почему такая оценка?</div>
+        <div class="reason-options" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;"></div>
+        <textarea id="customReason" placeholder="Или напишите свой комментарий..."
+          style="width: 100%; height: 80px; padding: 12px; border: 1px solid var(--border2); border-radius: var(--r); font-family: var(--font); font-size: 14px; resize: vertical;"></textarea>
+      </div>
+
+      <button id="submitRatingBtn" class="check-btn disabled" style="width: 100%;"
+        onclick="window.submitCourseRating()">
+        Отправить оценку
+      </button>
+  </div>
+  </aside>
   </div>
 
   <div class="xp-popup" id="xpPopup">+10 XP</div>
   <canvas id="confettiCanvas"></canvas>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
-      authDomain: "pystart-dd2db.firebaseapp.com",
-      projectId: "pystart-dd2db",
-      storageBucket: "pystart-dd2db.firebasestorage.app",
-      messagingSenderId: "9188811255",
-      appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+    authDomain: "pystart-dd2db.firebaseapp.com",
+    projectId: "pystart-dd2db",
+    storageBucket: "pystart-dd2db.firebasestorage.app",
+    messagingSenderId: "9188811255",
+    appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const courseId = urlParams.get('id');
+  const urlParams = new URLSearchParams(window.location.search);
+  const courseId = urlParams.get('id');
 
-    let currentCourseData = null;
-    let FLAT_LESSONS = []; 
+  // Глобальные переменные
+  let currentCourseData = null;
+  let FLAT_LESSONS = [];
+  let currentLessonIdx = null;
+  let currentStepIdx = 0;
+  let answered = false;
+  let selectedAnswer = null;
+  let lessonSteps = [];
+  let isSavingProgress = false;
 
-    let currentLessonIdx = null; 
-    let currentStepIdx = 0;
-    let answered = false;
-    let selectedAnswer = null;
-    let lessonSteps = [];
-    
-    // ПЕРЕМЕННАЯ ДЛЯ БЛОКИРОВКИ ДВОЙНЫХ КЛИКОВ
-    let isSavingProgress = false; 
+  let userStats = { courseProgress: {}, xp: 0, lessons: 0 };
+  let currentUserProfile = {};
 
-    let userStats = { courseProgress: {}, xp: 0, lessons: 0 };
-    let currentUserProfile = {};
+  // === БЛОК ОЦЕНКИ ===
+  let userRating = 0;
+  let selectedReason = '';
+  let ratingListenersAdded = false;
 
-    // SVG Иконки
-    const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-    const SVG_PLAY = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
-    const SVG_LOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
-    const SVG_DOT = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"></circle></svg>`;
-    
-    const SVG_MODULES = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
-    const SVG_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
-    const SVG_USER = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
-    const SVG_THEORY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`;
-    const SVG_QUIZ = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`;
-    const SVG_TROPHY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>`;
-    const SVG_CROSS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+  const reasonsByRating = {
+    1: ["Слишком сложно", "Неинтересно", "Много ошибок", "Не то, что ожидал"],
+    2: ["Слишком просто", "Мало материала", "Не понравился стиль", "Были баги"],
+    3: ["Средне", "Есть недочёты", "Нормально, но можно лучше", "Не хватило практики"],
+    4: ["Хорошо", "Интересный материал", "Полезно", "Почти всё понравилось"],
+    5: ["Отлично!", "Очень полезный курс", "Лучший курс по теме", "Рекомендую всем"]
+  };
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!courseId) {
-        document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Курс не найден.</div>';
-        return;
+  // SVG иконки (оставляем все как было)
+  const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+  const SVG_PLAY = `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+  const SVG_LOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+  const SVG_DOT = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"></circle></svg>`;
+  const SVG_MODULES = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
+  const SVG_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+  const SVG_USER = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+  const SVG_THEORY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`;
+  const SVG_QUIZ = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`;
+  const SVG_TROPHY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>`;
+  const SVG_CROSS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+  function getRatingColor(rating) {
+    if (rating <= 2) return 'var(--red)';
+    if (rating === 3) return 'var(--gold)';
+    return 'var(--green)';
+  }
+
+  function highlightStars(count) {
+    document.querySelectorAll('.star-icon').forEach(star => {
+      const val = parseInt(star.dataset.value);
+      const color = getRatingColor(count);
+      if (val <= count) {
+        star.setAttribute('fill', color);
+        star.setAttribute('stroke', color);
+      } else {
+        star.setAttribute('fill', 'none');
+        star.setAttribute('stroke', 'var(--text3)');
       }
-      if (user) {
-        const userSnap = await getDoc(doc(db, "users", user.uid));
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          currentUserProfile = data;
-          userStats.courseProgress = data.courseProgress || {};
-          userStats.xp = data.xp || 0;
-          userStats.lessons = data.lessons || 0;
+    });
+  }
+
+  function renderReasonOptions() {
+    const container = document.querySelector('.reason-options');
+    container.innerHTML = '';
+    const options = reasonsByRating[userRating] || [];
+
+    options.forEach(reason => {
+      const btn = document.createElement('button');
+      btn.textContent = reason;
+      btn.onclick = () => {
+        selectedReason = reason;
+        document.querySelectorAll('.reason-options button').forEach(b =>
+          b.classList.toggle('active', b.textContent === reason)
+        );
+        checkSubmitButton();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function checkSubmitButton() {
+    const submitBtn = document.getElementById('submitRatingBtn');
+    const hasReason = selectedReason || document.getElementById('customReason').value.trim() !== '';
+    if (userRating > 0 && hasReason) {
+      submitBtn.classList.remove('disabled');
+      submitBtn.disabled = false;
+    } else {
+      submitBtn.classList.add('disabled');
+      submitBtn.disabled = true;
+    }
+  }
+
+  // ====================== ОСНОВНЫЕ ФУНКЦИИ ОЦЕНКИ ======================
+
+  async function setupRatingSystem() {
+    const statusEl = document.getElementById('ratingStatus');
+    const reasonContainer = document.getElementById('reasonContainer');
+    const submitBtn = document.getElementById('submitRatingBtn');
+
+    // Сброс
+    userRating = 0;
+    selectedReason = '';
+    reasonContainer.style.display = 'none';
+    submitBtn.style.display = 'block';
+    submitBtn.textContent = "Отправить оценку";
+    submitBtn.classList.add('disabled');
+
+    highlightStars(0);
+
+    // Загружаем оценку пользователя
+    await loadUserRating();
+
+    // Добавляем слушатели только один раз
+    if (!ratingListenersAdded) {
+      document.querySelectorAll('.star-icon').forEach(star => {
+        star.addEventListener('mouseover', () => {
+          if (userRating === 0) highlightStars(parseInt(star.dataset.value));
+        });
+
+        star.addEventListener('mouseout', () => highlightStars(userRating));
+
+        star.addEventListener('click', () => {
+          if (!auth.currentUser) {
+            alert("Войдите в аккаунт, чтобы оставить оценку");
+            return;
+          }
+
+          userRating = parseInt(star.dataset.value);
+          highlightStars(userRating);
+          selectedReason = '';
+
+          reasonContainer.style.display = 'block';
+          renderReasonOptions();
+
+          statusEl.textContent = `Вы поставили ${userRating} из 5`;
+          statusEl.style.color = getRatingColor(userRating);
+
+          checkSubmitButton();
+        });
+      });
+
+      document.getElementById('customReason').addEventListener('input', checkSubmitButton);
+      ratingListenersAdded = true;
+    }
+  }
+
+  async function loadUserRating() {
+    if (!auth.currentUser || !courseId) return;
+
+    try {
+      const ratingDoc = await getDoc(doc(db, "courseReviews", `${courseId}_${auth.currentUser.uid}`));
+
+      if (ratingDoc.exists()) {
+        const data = ratingDoc.data();
+        userRating = data.rating || 0;
+
+        highlightStars(userRating);
+
+        const status = document.getElementById('ratingStatus');
+        status.textContent = `Ваша оценка: ${userRating}/5`;
+        status.style.color = getRatingColor(userRating);
+
+        document.getElementById('reasonContainer').style.display = 'none';
+        document.getElementById('submitRatingBtn').style.display = 'none';
+
+        // Блокируем звёзды
+        document.querySelectorAll('.star-icon').forEach(s => s.style.pointerEvents = 'none');
+      }
+    } catch (e) {
+      console.error("Ошибка загрузки рейтинга:", e);
+    }
+  }
+
+  async function submitCourseRating() {
+    if (!userRating || !auth.currentUser) return;
+
+    const customReason = document.getElementById('customReason').value.trim();
+    const finalReason = selectedReason || customReason || "Без комментария";
+
+    const submitBtn = document.getElementById('submitRatingBtn');
+    submitBtn.textContent = "Сохранение...";
+    submitBtn.disabled = true;
+
+    try {
+      await saveRatingToDb(userRating, finalReason);
+
+      const status = document.getElementById('ratingStatus');
+      status.textContent = "Спасибо! Ваша оценка сохранена ✓";
+      status.style.color = "var(--green)";
+
+      document.querySelectorAll('.star-icon').forEach(s => s.style.pointerEvents = 'none');
+      document.getElementById('reasonContainer').style.opacity = '0.6';
+      submitBtn.style.display = 'none';
+
+    } catch (e) {
+      alert("Ошибка при сохранении оценки");
+      console.error(e);
+      submitBtn.textContent = "Отправить оценку";
+      submitBtn.disabled = false;
+    }
+  }
+
+  async function saveRatingToDb(rating, reason = "") {
+    if (!auth.currentUser || !courseId) return;
+
+    const uid = auth.currentUser.uid;
+
+    try {
+      await setDoc(doc(db, "courseReviews", `${courseId}_${uid}`), {
+        courseId,
+        userId: uid,
+        rating: Number(rating),
+        reason,
+        timestamp: new Date()
+      });
+
+      // Пересчёт среднего рейтинга
+      const q = query(collection(db, "courseReviews"), where("courseId", "==", courseId));
+      const snapshot = await getDocs(q);
+
+      let total = 0;
+      snapshot.forEach(d => total += d.data().rating);
+
+      const average = snapshot.size > 0 ? Number((total / snapshot.size).toFixed(1)) : 0;
+
+      await updateDoc(doc(db, "courses", courseId), {
+        rating: average,
+        ratingCount: snapshot.size,
+        lastRatedAt: new Date()
+      });
+
+      console.log(`✅ Рейтинг курса ${courseId} обновлён: ${average}`);
+    } catch (e) {
+      console.error("Ошибка сохранения рейтинга:", e);
+      if (e.code === 'permission-denied') {
+        console.warn("Проверь Security Rules Firebase!");
+      }
+      throw e;
+    }
+  }
+
+  // ====================== ОСНОВНОЙ КОД КУРСА ======================
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!courseId) {
+      document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Курс не найден.</div>';
+      return;
+    }
+
+    if (user) {
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+      if (userSnap.exists()) {
+        currentUserProfile = userSnap.data();
+        userStats.courseProgress = currentUserProfile.courseProgress || {};
+        userStats.xp = currentUserProfile.xp || 0;
+        userStats.lessons = currentUserProfile.lessons || 0;
+      }
+    }
+
+    updateRightSidebarUi();
+    await fetchCourseData();
+
+    if (user) {
+      await setupRatingSystem();
+    }
+  });
+
+  async function fetchCourseData() {
+    try {
+      const docSnap = await getDoc(doc(db, "courses", courseId));
+      if (docSnap.exists()) {
+        currentCourseData = docSnap.data();
+        let authorName = currentCourseData.userName || "Автор";
+        if (currentCourseData.uid) {
+          const authorDoc = await getDoc(doc(db, "users", currentCourseData.uid));
+          if (authorDoc.exists() && authorDoc.data().name) authorName = authorDoc.data().name;
         }
+        currentCourseData.actualAuthorName = authorName;
+
+        renderSidebarCurriculum();
+        renderCourseIntro();
+      } else {
+        document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Курс не найден.</div>';
       }
-      updateRightSidebarUi();
-      await fetchCourseData();
+    } catch (error) {
+      document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Ошибка загрузки.</div>';
+    }
+  }
+
+  function renderSidebarCurriculum() {
+    const c = currentCourseData;
+    let html = '';
+
+    if (!c.modules || c.modules.length === 0) {
+      document.getElementById('sidebarCurriculum').innerHTML = '<div style="color:var(--text3); font-size:12px; padding: 0 12px;">Уроки еще не добавлены.</div>';
+      return;
+    }
+
+    FLAT_LESSONS = [];
+    let globalLessonIndex = 0;
+
+    c.modules.forEach((mod, modIdx) => {
+      html += `<div class="sb-module"><div class="sb-module-title">Модуль ${modIdx + 1}: ${escHtml(mod.title || 'Без названия')}</div>`;
+
+      if (mod.lessons && mod.lessons.length > 0) {
+        mod.lessons.forEach((lesson, lIdx) => {
+          FLAT_LESSONS.push(lesson);
+
+          const isLastInModule = (lIdx === mod.lessons.length - 1);
+          const isTestOnly = (lesson.quiz && lesson.quiz.length > 0 && !lesson.content);
+          const isModuleTest = lesson.isModuleTest || (isLastInModule && isTestOnly);
+          lesson._isModuleTest = isModuleTest;
+
+          if (isModuleTest) {
+            html += `
+              <div class="sb-lesson sb-module-test locked" data-lesson-id="${globalLessonIndex}" onclick="window.openLesson(${globalLessonIndex})">
+                <div class="sb-lesson-icon" id="sb-icon-${globalLessonIndex}">${SVG_LOCK}</div>
+                <div class="sb-lesson-text">${escHtml(lesson.title || 'Итоговый тест модуля')}</div>
+              </div>`;
+          } else {
+            html += `
+              <div class="sb-lesson locked" data-lesson-id="${globalLessonIndex}" onclick="window.openLesson(${globalLessonIndex})">
+                <div class="sb-lesson-icon" id="sb-icon-${globalLessonIndex}">${SVG_LOCK}</div>
+                <div class="sb-lesson-text">${globalLessonIndex + 1}. ${escHtml(lesson.title || 'Урок')}</div>
+              </div>`;
+          }
+          globalLessonIndex++;
+        });
+      }
+      html += `</div>`;
     });
 
-    async function fetchCourseData() {
-      try {
-        const docSnap = await getDoc(doc(db, "courses", courseId));
-        if (docSnap.exists()) {
-          currentCourseData = docSnap.data();
-          
-          let authorName = currentCourseData.userName || "Автор";
-          if (currentCourseData.uid) {
-            try {
-              const authorDoc = await getDoc(doc(db, "users", currentCourseData.uid));
-              if (authorDoc.exists() && authorDoc.data().name) {
-                 authorName = authorDoc.data().name;
-              }
-            } catch (e) { console.error("Ошибка загрузки автора", e); }
-          }
-          currentCourseData.actualAuthorName = authorName;
+    document.getElementById('sidebarCurriculum').innerHTML = html;
+    updateSidebarLessonsState();
+    updateRightSidebarUi();
+  }
 
-          renderSidebarCurriculum();
-          renderCourseIntro(); 
-        } else {
-          document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Курс не найден.</div>';
-        }
-      } catch (error) {
-        document.getElementById('lessonContent').innerHTML = '<div class="loading-state">Ошибка загрузки.</div>';
-      }
-    }
+  function updateSidebarLessonsState() {
+    let completedInThisCourse = userStats.courseProgress[courseId] || [];
+    const nextLessonId = completedInThisCourse.length;
 
-    function renderSidebarCurriculum() {
-      const c = currentCourseData;
-      let html = '';
+    document.querySelectorAll('.sb-lesson[data-lesson-id]').forEach(node => {
+      const lessonId = parseInt(node.getAttribute('data-lesson-id'));
+      const statusIcon = node.querySelector('.sb-lesson-icon');
+      const lesson = FLAT_LESSONS[lessonId];
 
-      if (!c.modules || c.modules.length === 0) {
-        document.getElementById('sidebarCurriculum').innerHTML = '<div style="color:var(--text3); font-size:12px; padding: 0 12px;">Уроки еще не добавлены.</div>';
-        return;
+      node.classList.remove('done', 'active-node', 'locked', 'active-reading');
+
+      if (completedInThisCourse.includes(lessonId)) {
+        node.classList.add('done');
+        statusIcon.innerHTML = SVG_CHECK;
+      } else if (lessonId === nextLessonId) {
+        node.classList.add('active-node');
+        statusIcon.innerHTML = lesson._isModuleTest ? SVG_TROPHY : SVG_PLAY;
+      } else {
+        node.classList.add('locked');
+        statusIcon.innerHTML = SVG_LOCK;
       }
 
-      FLAT_LESSONS = []; 
-      let globalLessonIndex = 0; 
-
-      c.modules.forEach((mod, modIdx) => {
-        html += `
-          <div class="sb-module">
-            <div class="sb-module-title">Модуль ${modIdx + 1}: ${escHtml(mod.title || 'Без названия')}</div>
-        `;
-
-        if (mod.lessons && mod.lessons.length > 0) {
-          mod.lessons.forEach((lesson, lIdx) => {
-            FLAT_LESSONS.push(lesson);
-            
-            const isLastInModule = (lIdx === mod.lessons.length - 1);
-            const isTestOnly = (lesson.quiz && lesson.quiz.length > 0 && !lesson.content);
-            const isModuleTest = lesson.isModuleTest || (isLastInModule && isTestOnly);
-            lesson._isModuleTest = isModuleTest; 
-
-            if (isModuleTest) {
-              html += `
-                <div class="sb-lesson sb-module-test locked" data-lesson-id="${globalLessonIndex}" onclick="window.openLesson(${globalLessonIndex})">
-                  <div class="sb-lesson-icon" id="sb-icon-${globalLessonIndex}">${SVG_LOCK}</div>
-                  <div class="sb-lesson-text">${escHtml(lesson.title || 'Итоговый тест модуля')}</div>
-                </div>
-              `;
-            } else {
-              html += `
-                <div class="sb-lesson locked" data-lesson-id="${globalLessonIndex}" onclick="window.openLesson(${globalLessonIndex})">
-                  <div class="sb-lesson-icon" id="sb-icon-${globalLessonIndex}">${SVG_LOCK}</div>
-                  <div class="sb-lesson-text">${globalLessonIndex + 1}. ${escHtml(lesson.title || 'Урок')}</div>
-                </div>
-              `;
-            }
-            globalLessonIndex++;
-          });
+      if (lessonId === currentLessonIdx) {
+        node.classList.add('active-reading');
+        if (!completedInThisCourse.includes(lessonId)) {
+          statusIcon.innerHTML = lesson._isModuleTest ? SVG_TROPHY : SVG_DOT;
         }
-        html += `</div>`; 
-      });
+      }
+    });
+  }
 
-      document.getElementById('sidebarCurriculum').innerHTML = html;
-      updateSidebarLessonsState(); 
-      updateRightSidebarUi();
-    }
+  function renderCourseIntro() {
+    const c = currentCourseData;
+    let completedInThisCourse = userStats.courseProgress[courseId] || [];
+    let nextLessonId = completedInThisCourse.length;
 
-    function updateSidebarLessonsState() {
-      let completedInThisCourse = userStats.courseProgress[courseId] || [];
-      const nextLessonId = completedInThisCourse.length; 
+    let btnText = nextLessonId === 0 ? "Начать курс" : "Продолжить обучение";
+    let startIdx = nextLessonId < FLAT_LESSONS.length ? nextLessonId : 0;
 
-      document.querySelectorAll('.sb-lesson[data-lesson-id]').forEach(node => {
-        const lessonId = parseInt(node.getAttribute('data-lesson-id'));
-        const statusIcon = node.querySelector('.sb-lesson-icon');
-        const lesson = FLAT_LESSONS[lessonId];
-        
-        node.classList.remove('done', 'active-node', 'locked', 'active-reading');
-
-        if (completedInThisCourse.includes(lessonId)) {
-          node.classList.add('done');
-          statusIcon.innerHTML = SVG_CHECK;
-        } else if (lessonId === nextLessonId) {
-          node.classList.add('active-node'); 
-          statusIcon.innerHTML = lesson._isModuleTest ? SVG_TROPHY : SVG_PLAY;
-        } else {
-          node.classList.add('locked'); 
-          statusIcon.innerHTML = SVG_LOCK;
-        }
-
-        if (lessonId === currentLessonIdx) {
-          node.classList.add('active-reading');
-          if (!completedInThisCourse.includes(lessonId)) {
-            statusIcon.innerHTML = lesson._isModuleTest ? SVG_TROPHY : SVG_DOT;
-          }
-        }
-      });
-    }
-
-    function renderCourseIntro() {
-      const c = currentCourseData;
-      let completedInThisCourse = userStats.courseProgress[courseId] || [];
-      let nextLessonId = completedInThisCourse.length;
-      
-      let btnText = nextLessonId === 0 ? "Начать курс" : "Продолжить обучение";
-      let startIdx = nextLessonId < FLAT_LESSONS.length ? nextLessonId : 0;
-
-      const html = `
-        <div class="course-intro">
-          <div class="course-badge">${escHtml(c.level || 'Для всех')}</div>
-          <div class="course-title">${escHtml(c.title || 'Без названия')}</div>
-          <div class="course-sub">${escHtml(c.tagline || c.description || 'Выберите урок в меню слева, чтобы начать.')}</div>
-          
-          <button class="check-btn ready" onclick="window.openLesson(${startIdx})">${btnText}</button>
-
-          <div class="course-stats">
-            <div class="course-stats-item">${SVG_MODULES} Модулей: <span>${c.modules ? c.modules.length : 0}</span></div>
-            <div class="course-stats-item">${SVG_CLOCK} Длительность: <span>${c.duration || '-'}</span></div>
-            <div class="course-stats-item">${SVG_USER} Автор: <span>${escHtml(c.actualAuthorName)}</span></div>
-          </div>
+    const html = `
+      <div class="course-intro">
+        <div class="course-badge">${escHtml(c.level || 'Для всех')}</div>
+        <div class="course-title">${escHtml(c.title || 'Без названия')}</div>
+        <div class="course-sub">${escHtml(c.tagline || c.description || 'Выберите урок в меню слева, чтобы начать.')}</div>
+        <button class="check-btn ready" onclick="window.openLesson(${startIdx})">${btnText}</button>
+        <div class="course-stats">
+          <div class="course-stats-item">${SVG_MODULES} Модулей: <span>${c.modules ? c.modules.length : 0}</span></div>
+          <div class="course-stats-item">${SVG_CLOCK} Длительность: <span>${c.duration || '-'}</span></div>
+          <div class="course-stats-item">${SVG_USER} Автор: <span>${escHtml(c.actualAuthorName)}</span></div>
         </div>
-      `;
-      document.getElementById('lessonContent').innerHTML = html;
-      currentLessonIdx = null;
-      updateSidebarLessonsState();
+      </div>`;
+    
+    document.getElementById('lessonContent').innerHTML = html;
+    currentLessonIdx = null;
+    updateSidebarLessonsState();
+  }
+
+  window.openLesson = function (idx) {
+    if (FLAT_LESSONS.length === 0 || idx >= FLAT_LESSONS.length) return;
+
+    let completedInThisCourse = userStats.courseProgress[courseId] || [];
+    if (!completedInThisCourse.includes(idx) && idx !== completedInThisCourse.length) return;
+
+    currentLessonIdx = idx;
+    currentStepIdx = 0;
+    answered = false;
+    selectedAnswer = null;
+
+    const lesson = FLAT_LESSONS[idx];
+    lessonSteps = [];
+
+    if (lesson.content || lesson.text) {
+      lessonSteps.push({ type: 'theory', title: lesson.title || 'Теория', content: lesson.content || lesson.text });
     }
 
-    window.openLesson = function (idx) {
-      if (FLAT_LESSONS.length === 0) return;
-      if (idx >= FLAT_LESSONS.length) return;
-
-      let completedInThisCourse = userStats.courseProgress[courseId] || [];
-      if (!completedInThisCourse.includes(idx) && idx !== completedInThisCourse.length) {
-        return; 
-      }
-
-      currentLessonIdx = idx;
-      currentStepIdx = 0;
-      answered = false;
-      selectedAnswer = null;
-
-      const lesson = FLAT_LESSONS[idx];
-      lessonSteps = [];
-
-      if (lesson.content || lesson.text) {
-        lessonSteps.push({ type: 'theory', title: lesson.title || 'Теория', content: lesson.content || lesson.text });
-      }
-
-      const tests = lesson.quiz || lesson.steps || [];
-      if (Array.isArray(tests)) {
-        tests.forEach(t => {
-          lessonSteps.push({ type: 'mcq', q: t.question || t.q, options: t.options || [], answer: t.answer !== undefined ? parseInt(t.answer) : 0, explain: t.explain || '' });
+    const tests = lesson.quiz || lesson.steps || [];
+    if (Array.isArray(tests)) {
+      tests.forEach(t => {
+        lessonSteps.push({ 
+          type: 'mcq', 
+          q: t.question || t.q, 
+          options: t.options || [], 
+          answer: t.answer !== undefined ? parseInt(t.answer) : 0, 
+          explain: t.explain || '' 
         });
-      }
+      });
+    }
 
-      if (lessonSteps.length === 0) {
-        lessonSteps = [{ type: "theory", title: "Пустой урок", content: "Материал находится в разработке." }];
-      }
+    if (lessonSteps.length === 0) {
+      lessonSteps = [{ type: "theory", title: "Пустой урок", content: "Материал находится в разработке." }];
+    }
 
-      updateSidebarLessonsState(); 
-      renderLessonStep();
-    };
+    updateSidebarLessonsState();
+    renderLessonStep();
+  };
 
-    function renderLessonStep() {
-      const step = lessonSteps[currentStepIdx];
-      const progress = ((currentStepIdx) / lessonSteps.length) * 100;
-      answered = false; selectedAnswer = null;
-      
+  function renderLessonStep() {
+    const step = lessonSteps[currentStepIdx];
+    const progress = ((currentStepIdx) / lessonSteps.length) * 100;
+    answered = false;
+    selectedAnswer = null;
+
+    const lesson = FLAT_LESSONS[currentLessonIdx];
+    const isModuleTest = lesson._isModuleTest;
+
+    let bodyHtml = '';
+
+    if (step.type === 'theory') {
+      bodyHtml = `
+        <div class="step-counter">
+          ${SVG_THEORY} <span>Чтение · Раздел ${currentStepIdx + 1} из ${lessonSteps.length}</span>
+          <div class="step-progress-wrap"><div class="step-progress-fill" style="width:${progress}%"></div></div>
+        </div>
+        <div class="lesson-q">${escHtml(step.title)}</div>
+        <div class="theory-content">${(step.content || '').replace(/\n/g, '<br>')}</div>
+        <button class="check-btn ready" onclick="window.nextStep()">Понятно, продолжить</button>`;
+    } else {
+      const testHeader = isModuleTest ? "Итоговый тест модуля" : "Проверка знаний";
+      const icon = isModuleTest ? SVG_TROPHY : SVG_QUIZ;
+      bodyHtml = `
+        <div class="step-counter">
+          <span style="color: ${isModuleTest ? 'var(--gold)' : 'inherit'}; display:flex; align-items:center; gap:6px;">${icon}</span>
+          <span style="color: ${isModuleTest ? 'var(--gold)' : 'inherit'};">${testHeader} · Вопрос ${currentStepIdx + 1} из ${lessonSteps.length}</span>
+          <div class="step-progress-wrap"><div class="step-progress-fill" style="width:${progress}%; background: ${isModuleTest ? 'var(--gold)' : 'var(--blue)'};"></div></div>
+        </div>
+        <div class="lesson-q">${escHtml(step.q || 'Выберите правильный ответ')}</div>
+        <div class="answers-grid">
+          ${(step.options || []).map((o, i) => `<button class="answer-btn" onclick="window.selectMCQ(${i})">${escHtml(o)}</button>`).join('')}
+        </div>
+        <div class="feedback-bar" id="feedbackBar"><div class="fb-icon" id="fbIcon"></div><div class="fb-text" id="fbText"></div></div>
+        <button class="check-btn disabled" id="checkBtn" onclick="window.checkAnswer()">Проверить ответ</button>`;
+    }
+
+    document.getElementById('lessonContent').innerHTML = bodyHtml;
+    document.querySelector('.main').scrollTop = 0;
+  }
+
+  window.selectMCQ = function (idx) {
+    if (answered) return;
+    document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.answer-btn')[idx].classList.add('selected');
+    selectedAnswer = idx;
+
+    const btn = document.getElementById('checkBtn');
+    btn.className = 'check-btn ready';
+    btn.disabled = false;
+  };
+
+  window.checkAnswer = function () {
+    if (answered || selectedAnswer === null) return;
+
+    const step = lessonSteps[currentStepIdx];
+    const correct = selectedAnswer === parseInt(step.answer || 0);
+
+    const bar = document.getElementById('feedbackBar');
+    const icon = document.getElementById('fbIcon');
+    const text = document.getElementById('fbText');
+    const btn = document.getElementById('checkBtn');
+    const answerButtons = document.querySelectorAll('.answer-btn');
+
+    btn.disabled = true;
+
+    if (correct) {
+      answered = true;
+      bar.className = 'feedback-bar show-correct';
+      icon.innerHTML = SVG_CHECK;
+      text.className = 'fb-text correct-text';
+      text.innerHTML = `<h4>Верно!</h4><p>${step.explain || 'Отличная работа.'}</p>`;
+
+      answerButtons.forEach(b => b.disabled = true);
+      answerButtons[selectedAnswer].classList.add('correct');
+
+      btn.className = 'check-btn next';
+      btn.textContent = 'Далее';
+      btn.disabled = false;
+      btn.onclick = () => window.nextStep();
+    } else {
+      bar.className = 'feedback-bar show-wrong';
+      icon.innerHTML = SVG_CROSS;
+      text.className = 'fb-text wrong-text';
+      text.innerHTML = `<h4>Неверно</h4><p>${step.explain || 'Попробуйте другой вариант.'}</p>`;
+
+      answerButtons[selectedAnswer].classList.add('wrong');
+      setTimeout(() => {
+        answerButtons[selectedAnswer].classList.remove('wrong', 'selected');
+        btn.className = 'check-btn disabled';
+        btn.disabled = false;
+      }, 1000);
+
+      selectedAnswer = null;
+    }
+  };
+
+  window.nextStep = function () {
+    currentStepIdx++;
+    if (currentStepIdx >= lessonSteps.length) {
+      showCompletion();
+      return;
+    }
+    renderLessonStep();
+  };
+
+  async function showCompletion() {
+    if (isSavingProgress) return;
+    isSavingProgress = true;
+
+    try {
       const lesson = FLAT_LESSONS[currentLessonIdx];
+      const isLastLessonInCourse = currentLessonIdx === FLAT_LESSONS.length - 1;
       const isModuleTest = lesson._isModuleTest;
 
-      let bodyHtml = '';
+      if (!userStats.courseProgress[courseId]) userStats.courseProgress[courseId] = [];
+      if (!userStats.courseProgress[courseId].includes(currentLessonIdx)) {
+        userStats.courseProgress[courseId].push(currentLessonIdx);
+        userStats.xp += isModuleTest ? 50 : 15;
+        userStats.lessons += 1;
+      }
 
-      if (step.type === 'theory') {
-        bodyHtml = `
-          <div class="step-counter">
-            ${SVG_THEORY} <span>Чтение · Раздел ${currentStepIdx + 1} из ${lessonSteps.length}</span>
-            <div class="step-progress-wrap"><div class="step-progress-fill" style="width:${progress}%"></div></div>
-          </div>
-          <div class="lesson-q">${escHtml(step.title)}</div>
-          <div class="theory-content">${(step.content || '').replace(/\n/g, '<br>')}</div>
-          <button class="check-btn ready" onclick="window.nextStep()">Понятно, продолжить</button>`;
+      await saveStatsToDb();
+      updateSidebarLessonsState();
+
+      let nextBtnHtml = isLastLessonInCourse
+        ? `<button class="check-btn ready" onclick="window.location.href='./index.html'">Завершить курс</button>`
+        : `<button class="check-btn ready" onclick="window.openLesson(${currentLessonIdx + 1})">Следующий урок</button>`;
+
+      document.getElementById('lessonContent').innerHTML = `
+        <div class="completion show">
+          <div class="comp-icon">${SVG_TROPHY}</div>
+          <div class="comp-title">${isModuleTest ? 'Тест модуля сдан!' : 'Урок пройден!'}</div>
+          <div class="comp-sub">Вы успешно завершили материал "${escHtml(lesson.title || 'Урок')}".</div>
+          ${nextBtnHtml}
+        </div>`;
+
+      window.launchConfetti();
+      showXP(isModuleTest ? "+50 XP" : "+15 XP");
+
+    } finally {
+      isSavingProgress = false;
+    }
+  }
+
+  function updateRightSidebarUi() {
+    const name = currentUserProfile.name || auth.currentUser?.email?.split('@')[0] || "Студент";
+    document.getElementById('userNameUi').textContent = name;
+    document.getElementById('userHandleUi').textContent = currentUserProfile.handle || "@студент";
+
+    const avaEl = document.getElementById('userAvatarUi');
+    const avatar = currentUserProfile.avatar;
+    if (avatar) {
+      if ([...avatar].length <= 2) {
+        avaEl.textContent = avatar;
+        avaEl.style.backgroundImage = 'none';
       } else {
-        const testHeader = isModuleTest ? "Итоговый тест модуля" : "Проверка знаний";
-        const icon = isModuleTest ? SVG_TROPHY : SVG_QUIZ;
-        bodyHtml = `
-          <div class="step-counter">
-            <span style="color: ${isModuleTest ? 'var(--gold)' : 'inherit'}; display:flex; align-items:center; gap:6px;">${icon}</span>
-            <span style="color: ${isModuleTest ? 'var(--gold)' : 'inherit'};">${testHeader} · Вопрос ${currentStepIdx + 1} из ${lessonSteps.length}</span>
-            <div class="step-progress-wrap"><div class="step-progress-fill" style="width:${progress}%; background: ${isModuleTest ? 'var(--gold)' : 'var(--blue)'};"></div></div>
-          </div>
-          <div class="lesson-q">${escHtml(step.q || 'Выберите правильный ответ')}</div>
-          <div class="answers-grid">
-            ${(step.options || []).map((o, i) => `<button class="answer-btn" onclick="window.selectMCQ(${i})">${escHtml(o)}</button>`).join('')}
-          </div>
-          <div class="feedback-bar" id="feedbackBar"><div class="fb-icon" id="fbIcon"></div><div class="fb-text" id="fbText"></div></div>
-          <button class="check-btn disabled" id="checkBtn" onclick="window.checkAnswer()">Проверить ответ</button>`;
+        avaEl.style.backgroundImage = `url('${avatar}')`;
+        avaEl.textContent = '';
       }
-
-      document.getElementById('lessonContent').innerHTML = bodyHtml;
-      document.querySelector('.main').scrollTop = 0;
+    } else {
+      avaEl.textContent = name[0].toUpperCase();
     }
 
-    window.selectMCQ = function (idx) {
-      if (answered) return;
-      document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
-      document.querySelectorAll('.answer-btn')[idx].classList.add('selected');
-      selectedAnswer = idx;
-      
-      const btn = document.getElementById('checkBtn');
-      btn.className = 'check-btn ready';
-      btn.disabled = false; // Убеждаемся что кнопка активна
-    };
+    if (FLAT_LESSONS.length === 0) return;
 
-    window.checkAnswer = function () {
-      if (answered || selectedAnswer === null) return;
-      
-      const step = lessonSteps[currentStepIdx];
-      const correct = selectedAnswer === parseInt(step.answer || 0);
-      
-      const bar = document.getElementById('feedbackBar');
-      const icon = document.getElementById('fbIcon');
-      const text = document.getElementById('fbText');
-      const btn = document.getElementById('checkBtn');
-      const answerButtons = document.querySelectorAll('.answer-btn');
-      
-      // Визуально отключаем кнопку, чтобы не кликали дважды во время анимации
-      btn.disabled = true;
-      
-      if (correct) {
-        answered = true; 
-        bar.className = 'feedback-bar show-correct'; icon.innerHTML = SVG_CHECK;
-        text.className = 'fb-text correct-text'; text.innerHTML = `<h4>Верно!</h4><p>${step.explain || 'Отличная работа.'}</p>`;
-        
-        answerButtons.forEach(b => b.disabled = true);
-        answerButtons[selectedAnswer].classList.add('correct');
-        
-        btn.className = 'check-btn next';
-        btn.textContent = 'Далее';
-        btn.disabled = false;
-        btn.onclick = () => window.nextStep();
-      } else {
-        bar.className = 'feedback-bar show-wrong'; icon.innerHTML = SVG_CROSS;
-        text.className = 'fb-text wrong-text'; text.innerHTML = `<h4>Неверно</h4><p>${step.explain || 'Попробуйте другой вариант.'}</p>`;
-        
-        answerButtons[selectedAnswer].classList.add('wrong');
-        setTimeout(() => {
-            answerButtons[selectedAnswer].classList.remove('wrong', 'selected');
-            // Возвращаем кнопку в исходное состояние, чтобы можно было выбрать другой вариант
-            btn.className = 'check-btn disabled';
-            btn.disabled = false;
-        }, 1000); 
-        
-        selectedAnswer = null;
-      }
-    };
+    let completedInThisCourse = userStats.courseProgress[courseId] || [];
+    let totalCompleted = completedInThisCourse.length;
+    let totalLessons = FLAT_LESSONS.length;
+    let percent = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
 
-    window.nextStep = function () {
-      currentStepIdx++;
-      if (currentStepIdx >= lessonSteps.length) { showCompletion(); return; }
-      renderLessonStep();
-    };
+    document.getElementById('progressPercentUi').textContent = `${percent}%`;
+    document.getElementById('progressBarUi').style.width = `${percent}%`;
+    document.getElementById('completedLessonsUi').textContent = `${totalCompleted} / ${totalLessons}`;
+  }
 
-    async function showCompletion() {
-      // ЗАЩИТА ОТ ДВОЙНЫХ КЛИКОВ (СПАМА)
-      if (isSavingProgress) return;
-      isSavingProgress = true;
-
-      try {
-          const lesson = FLAT_LESSONS[currentLessonIdx];
-          const isLastLessonInCourse = currentLessonIdx === FLAT_LESSONS.length - 1;
-          const isModuleTest = lesson._isModuleTest;
-
-          if (!userStats.courseProgress[courseId]) userStats.courseProgress[courseId] = [];
-          if (!userStats.courseProgress[courseId].includes(currentLessonIdx)) {
-            userStats.courseProgress[courseId].push(currentLessonIdx);
-            userStats.xp += isModuleTest ? 50 : 15; 
-            userStats.lessons += 1;
-          }
-
-          // Ждем завершения записи в базу данных
-          await saveStatsToDb();
-          updateSidebarLessonsState();
-          
-          let nextBtnHtml = isLastLessonInCourse 
-            ? `<button class="check-btn ready" onclick="window.location.href='./index.html'">Завершить курс</button>`
-            : `<button class="check-btn ready" onclick="window.openLesson(${currentLessonIdx + 1})">Следующий урок</button>`;
-
-          document.getElementById('lessonContent').innerHTML = `
-            <div class="completion show">
-              <div class="comp-icon">${SVG_TROPHY}</div>
-              <div class="comp-title">${isModuleTest ? 'Тест модуля сдан!' : 'Урок пройден!'}</div>
-              <div class="comp-sub">Вы успешно завершили материал "${escHtml(lesson.title || 'Урок')}".</div>
-              ${nextBtnHtml}
-            </div>`;
-
-          window.launchConfetti();
-          showXP(isModuleTest ? "+50 XP" : "+15 XP");
-
-      } finally {
-          // Гарантированно снимаем блокировку
-          isSavingProgress = false;
-      }
+  async function saveStatsToDb() {
+    if (!auth.currentUser) return;
+    try {
+      await setDoc(doc(db, "users", auth.currentUser.uid), {
+        courseProgress: userStats.courseProgress,
+        xp: userStats.xp,
+        lessons: userStats.lessons
+      }, { merge: true });
+      updateRightSidebarUi();
+    } catch (e) {
+      console.error("Ошибка сохранения прогресса:", e);
     }
+  }
 
-    function updateRightSidebarUi() {
-      const name = currentUserProfile.name || auth.currentUser?.email?.split('@')[0] || "Студент";
-      document.getElementById('userNameUi').textContent = name;
-      document.getElementById('userHandleUi').textContent = currentUserProfile.handle || "@студент";
-      
-      const avaEl = document.getElementById('userAvatarUi');
-      const avatar = currentUserProfile.avatar;
-      if (avatar) {
-        if ([...avatar].length <= 2) { avaEl.textContent = avatar; avaEl.style.backgroundImage = 'none'; } 
-        else { avaEl.style.backgroundImage = `url('${avatar}')`; avaEl.textContent = ''; }
-      } else {
-        avaEl.textContent = name[0].toUpperCase();
-      }
+  function showXP(msg) {
+    const popup = document.getElementById('xpPopup');
+    popup.textContent = msg;
+    popup.className = 'xp-popup burst';
+    setTimeout(() => popup.className = 'xp-popup', 1500);
+  }
 
-      if (FLAT_LESSONS.length === 0) return;
-      
-      let completedInThisCourse = userStats.courseProgress[courseId] || [];
-      let totalCompleted = completedInThisCourse.length;
-      let totalLessons = FLAT_LESSONS.length;
-      let percent = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
-      
-      document.getElementById('progressPercentUi').textContent = `${percent}%`;
-      document.getElementById('progressBarUi').style.width = `${percent}%`;
-      document.getElementById('completedLessonsUi').textContent = `${totalCompleted} / ${totalLessons}`;
+  window.launchConfetti = function () {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const pieces = [];
+    const colors = ['#f5f5f0', '#3b82f6', '#4ade80', '#fbbf24'];
+    for (let i = 0; i < 50; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width, y: -20, r: Math.random() * 4 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 5, vy: Math.random() * 3 + 2,
+        rot: Math.random() * 360, vr: (Math.random() - 0.5) * 5
+      });
     }
-
-    async function saveStatsToDb() {
-      if (!auth.currentUser) return;
-      try {
-        await setDoc(doc(db, "users", auth.currentUser.uid), {
-          courseProgress: userStats.courseProgress,
-          xp: userStats.xp,
-          lessons: userStats.lessons
-        }, { merge: true });
-        updateRightSidebarUi();
-      } catch (e) {
-        console.error("Ошибка сохранения прогресса:", e);
-      }
+    let frame = 0;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+        ctx.restore();
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.vy += 0.1;
+      });
+      if (++frame < 120) requestAnimationFrame(draw);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
+    draw();
+  };
 
-    function showXP(msg) {
-      const popup = document.getElementById('xpPopup');
-      popup.textContent = msg; popup.className = 'xp-popup burst';
-      setTimeout(() => popup.className = 'xp-popup', 1500);
-    }
+  function escHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
-    window.launchConfetti = function () {
-      const canvas = document.getElementById('confettiCanvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-      const pieces = [];
-      const colors = ['#f5f5f0', '#3b82f6', '#4ade80', '#fbbf24'];
-      for (let i = 0; i < 50; i++) {
-        pieces.push({
-          x: Math.random() * canvas.width, y: -20, r: Math.random() * 4 + 2,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          vx: (Math.random() - 0.5) * 5, vy: Math.random() * 3 + 2, rot: Math.random() * 360, vr: (Math.random() - 0.5) * 5
-        });
-      }
-      let frame = 0;
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pieces.forEach(p => {
-          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180); ctx.fillStyle = p.color;
-          ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
-          ctx.restore();
-          p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.1;
-        });
-        if (++frame < 120) requestAnimationFrame(draw); else ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      draw();
-    };
-
-    function escHtml(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-  </script>
+  // Глобальные функции для onclick
+  window.submitCourseRating = submitCourseRating;
+</script>
 </body>
+
 </html>
