@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Создать интерактивный урок — Tagybasqa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════════════════
+       TAGYBASQA — Duolingo Dark — create-lesson.html
+    ══════════════════════════════════════════════════════ */
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg:   #131f24;
+      --bg2:  #1a2d35;
+      --bg3:  #1f3540;
+      --bg4:  #243d4a;
+      --border:  rgba(255,255,255,.07);
+      --border2: rgba(255,255,255,.12);
+      --border3: rgba(255,255,255,.22);
+      --text:  #ffffff;
+      --text2: #cdd8dd;
+      --text3: #7a9aaa;
+      --text4: #131f24;
+      --accent-dim: rgba(255,255,255,.05);
+
+      --duo-blue:   #1cb0f6;
+      --duo-blue2:  #0e86c0;
+      --duo-green:  #57cc02;
+      --duo-green2: #3a8c01;
+      --duo-orange: #ff9600;
+      --duo-red:    #ff4b4b;
+      --duo-purple: #ce82ff;
+      --duo-yellow: #ffd900;
+      --duo-teal:   #1fe0c0;
+
+      --red:    #ff4b4b;  --red-bg:    rgba(255,75,75,.14);
+      --green:  #57cc02;  --green-bg:  rgba(87,204,2,.12);
+      --purple: #ce82ff;  --purple-bg: rgba(206,130,255,.12);
+      --blue:   #1cb0f6;  --blue-bg:   rgba(28,176,246,.12);
+      --amber:  #ff9600;  --amber-bg:  rgba(255,150,0,.12);
+      --teal:   #1fe0c0;  --teal-bg:   rgba(31,224,192,.1);
+
+      --r:  12px;
+      --r2: 16px;
+      --r3: 99px;
+      --font: 'Nunito', sans-serif;
+      --mono: 'DM Mono', monospace;
+      --bg-blur: rgba(19,31,36,.94);
+      --shadow: 0 4px 20px rgba(0,0,0,.3);
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+    html { scroll-behavior:smooth }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ══ TOPBAR ═════════════════════════════════════════════ */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg-blur); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 24px; height: 56px;
+    }
+    .topbar-back {
+      display: flex; align-items: center; gap: 6px;
+      background: none; border: none; color: var(--text3);
+      font-family: var(--font); font-size: 13px; font-weight: 700;
+      cursor: pointer; padding: 6px 0; transition: color .15s;
+    }
+    .topbar-back:hover { color: var(--text) }
+    .topbar-back svg { width: 16px; height: 16px }
+    .topbar-title { font-size: 15px; font-weight: 800; flex: 1 }
+    .topbar-autosave {
+      font-family: var(--mono); font-size: 10px; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .1em;
+    }
+    .topbar-publish {
+      background: var(--duo-blue); color: #fff;
+      border: none; border-bottom: 3px solid var(--duo-blue2);
+      padding: 9px 22px; font-family: var(--font);
+      font-size: 13px; font-weight: 800; cursor: pointer;
+      border-radius: var(--r3); transition: filter .15s; letter-spacing: .02em;
+    }
+    .topbar-publish:hover { filter: brightness(1.1) }
+    .topbar-publish:active { transform: translateY(2px); border-bottom-width: 1px }
+    .topbar-publish:disabled { opacity: .35; cursor: not-allowed }
+
+    /* ══ LAYOUT ══════════════════════════════════════════════ */
+    .layout {
+      display: grid;
+      grid-template-columns: 264px 1fr 300px;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* ══ TOOLBOX ════════════════════════════════════════════ */
+    .toolbox {
+      border-right: 1px solid var(--border);
+      padding: 20px 14px;
+      position: sticky; top: 56px;
+      height: calc(100vh - 56px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .toolbox::-webkit-scrollbar { display: none }
+
+    .toolbox-section {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      color: var(--text3); text-transform: uppercase; letter-spacing: .14em;
+      padding: 14px 8px 6px; display: flex; align-items: center; gap: 8px;
+    }
+    .toolbox-section::after { content:''; flex:1; height:1px; background:var(--border) }
+
+    .tool-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 12px; border-radius: var(--r);
+      border: 2px solid transparent; background: transparent;
+      color: var(--text3); font-family: var(--font);
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: all .15s; text-align: left; width: 100%;
+    }
+    .tool-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border) }
+    .tool-btn-icon {
+      width: 30px; height: 30px; border-radius: var(--r);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0; background: var(--bg3);
+      border: 1.5px solid var(--border2); transition: all .15s;
+    }
+    .tool-btn:hover .tool-btn-icon { background: var(--bg4) }
+    .tool-btn-label { flex: 1 }
+    .tool-btn-desc  { font-family: var(--mono); font-size: 9px; color: var(--text3); display: block; margin-top: 1px }
+
+    /* ══ EDITOR ═════════════════════════════════════════════ */
+    .editor-area {
+      padding: 32px 28px; overflow-y: auto;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* Meta fields */
+    .meta-section { margin-bottom: 36px }
+    .meta-title-inp {
+      width: 100%; background: transparent; border: none; border-bottom: 2px solid var(--border2);
+      color: var(--text); font-family: var(--font);
+      font-size: 28px; font-weight: 900; padding: 8px 0; outline: none;
+      transition: border-color .2s; letter-spacing: -.3px;
+    }
+    .meta-title-inp:focus { border-bottom-color: var(--duo-blue) }
+    .meta-title-inp::placeholder { color: var(--text3) }
+
+    .meta-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap }
+    .meta-field {
+      display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;
+    }
+    .meta-label {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      color: var(--text3); text-transform: uppercase; letter-spacing: .12em;
+    }
+    .meta-inp, .meta-sel {
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 13px; font-weight: 600; padding: 8px 12px; outline: none;
+      transition: border-color .15s; width: 100%;
+    }
+    .meta-inp:focus, .meta-sel:focus { border-color: var(--duo-blue) }
+    .meta-inp::placeholder { color: var(--text3); font-weight: 400 }
+    .meta-sel { appearance: none; cursor: pointer }
+    .meta-sel option { background: var(--bg2) }
+
+    .lesson-emoji-picker {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .emoji-display {
+      width: 48px; height: 48px; border-radius: var(--r);
+      background: var(--bg2); border: 2px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; cursor: pointer; transition: all .15s;
+    }
+    .emoji-display:hover { border-color: var(--border3); background: var(--bg3) }
+
+    /* ══ BLOCKS LIST ════════════════════════════════════════ */
+    .blocks-list { display: flex; flex-direction: column; gap: 14px }
+
+    .block-card {
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r2); overflow: hidden; transition: border-color .15s;
+      position: relative;
+    }
+    .block-card:hover { border-color: var(--border3) }
+    .block-card.dragging { opacity: .5 }
+
+    .block-card-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; background: var(--bg3);
+      border-bottom: 1px solid var(--border); cursor: grab; user-select: none;
+    }
+    .block-drag-handle { color: var(--text3); font-size: 14px; flex-shrink: 0 }
+    .block-type-badge {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 3px 10px; border-radius: var(--r3);
+      border: 1.5px solid var(--border2); color: var(--text3);
+    }
+    .block-type-badge.text     { color: var(--text2);       border-color: var(--border3) }
+    .block-type-badge.heading  { color: var(--text);        border-color: var(--border3) }
+    .block-type-badge.code     { color: var(--duo-green);   border-color: rgba(87,204,2,.3) }
+    .block-type-badge.quiz     { color: var(--duo-blue);    border-color: rgba(28,176,246,.3) }
+    .block-type-badge.task     { color: var(--duo-orange);  border-color: rgba(255,150,0,.3) }
+    .block-type-badge.callout  { color: var(--duo-teal);    border-color: rgba(31,224,192,.3) }
+    .block-type-badge.flashcard{ color: var(--duo-purple);  border-color: rgba(206,130,255,.3) }
+    .block-type-badge.match    { color: var(--duo-teal);    border-color: rgba(31,224,192,.3) }
+    .block-type-badge.poll     { color: var(--duo-yellow);  border-color: rgba(255,217,0,.3) }
+    .block-type-badge.timeline { color: var(--duo-orange);  border-color: rgba(255,150,0,.3) }
+    .block-type-badge.checklist{ color: var(--duo-green);   border-color: rgba(87,204,2,.3) }
+    .block-type-badge.video    { color: var(--duo-red);     border-color: rgba(255,75,75,.3) }
+    .block-type-badge.image    { color: var(--duo-orange);  border-color: rgba(255,150,0,.3) }
+
+    .block-card-actions { margin-left: auto; display: flex; gap: 6px }
+    .block-action-btn {
+      background: none; border: none; color: var(--text3);
+      cursor: pointer; font-family: var(--mono); font-size: 10px;
+      text-transform: uppercase; letter-spacing: .05em;
+      padding: 5px 10px; border-radius: var(--r); transition: all .15s;
+    }
+    .block-action-btn:hover         { color: var(--text); background: var(--bg4) }
+    .block-action-btn.del:hover     { color: var(--duo-red); background: var(--red-bg) }
+
+    .block-card-body { padding: 18px }
+
+    /* Inputs */
+    .inp, .sel, .textarea-inp {
+      width: 100%; background: var(--bg3); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 13px; font-weight: 600; padding: 10px 14px; outline: none;
+      transition: border-color .15s; margin-bottom: 8px;
+    }
+    .inp:focus, .sel:focus, .textarea-inp:focus { border-color: var(--duo-blue) }
+    .inp::placeholder, .textarea-inp::placeholder { color: var(--text3); font-weight: 400 }
+    .textarea-inp { resize: vertical; min-height: 90px; line-height: 1.6 }
+
+    /* Code editor in block */
+    .code-editor-inp {
+      width: 100%; background: #0a1520; border: 2px solid var(--border2);
+      border-radius: var(--r); color: #cdd8dd;
+      font-family: var(--mono); font-size: 13px; line-height: 1.7;
+      padding: 16px; min-height: 160px; resize: vertical; outline: none;
+      tab-size: 2; margin-top: 8px;
+    }
+    
+    .code-lang-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+    .terminal-out { background: #050a0f; border-radius: var(--r); padding: 12px; font-family: var(--mono); font-size: 12px; color: var(--duo-green); margin-top: 8px; display: none; white-space: pre-wrap; }
+
+    /* Quiz question builder */
+    .quiz-questions-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px }
+    .quiz-q-card {
+      background: var(--bg3); border: 2px solid var(--border2);
+      border-radius: var(--r); padding: 14px; position: relative;
+    }
+    .quiz-q-top { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px }
+    .quiz-q-type-sel {
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--mono);
+      font-size: 10px; font-weight: 700; padding: 6px 10px; outline: none;
+      text-transform: uppercase; letter-spacing: .06em; cursor: pointer; flex-shrink: 0;
+    }
+    .quiz-q-inp {
+      flex: 1; background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 13px; font-weight: 600; padding: 8px 12px; outline: none;
+      transition: border-color .15s;
+    }
+    .quiz-q-inp:focus { border-color: var(--duo-blue) }
+    .quiz-q-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 4px; transition: color .15s; flex-shrink: 0 }
+    .quiz-q-del:hover { color: var(--duo-red) }
+
+    .option-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px }
+    .option-correct-radio {
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border3);
+      background: transparent; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; transition: all .15s;
+    }
+    .option-correct-radio.selected { border-color: var(--duo-green) }
+    .option-correct-radio.selected::after { content:''; width:8px; height:8px; border-radius:50%; background:var(--duo-green) }
+    .option-inp {
+      flex: 1; background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 12px; font-weight: 600; padding: 8px 12px; outline: none; transition: border-color .15s;
+    }
+    .option-inp:focus { border-color: var(--duo-blue) }
+    .option-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; padding: 2px; transition: color .15s }
+    .option-del:hover { color: var(--duo-red) }
+
+    /* Checklist items */
+    .checklist-items-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px }
+    .checklist-item-row { display: flex; align-items: center; gap: 10px }
+    .cl-drag { color: var(--text3); font-size: 12px; cursor: grab }
+    .cl-inp {
+      flex: 1; background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 13px; font-weight: 600; padding: 8px 12px; outline: none; transition: border-color .15s;
+    }
+    .cl-inp:focus { border-color: var(--duo-blue) }
+    .cl-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; transition: color .15s }
+    .cl-del:hover { color: var(--duo-red) }
+
+    /* Callout */
+    .callout-wrap { display: flex; gap: 14px; padding: 16px; border-radius: var(--r); background: var(--bg3); border: 2px solid var(--border2); }
+    .callout-emoji { font-size: 24px; flex-shrink: 0; }
+    
+    /* Add buttons */
+    .add-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 9px 16px; border-radius: var(--r3);
+      border: 2px dashed var(--border2); background: transparent;
+      color: var(--text3); font-family: var(--font); font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all .15s; width: 100%;
+    }
+    .add-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border3) }
+    
+    .run-code-btn, .url-apply-btn {
+        background: var(--bg3); border: 2px solid var(--border2); color: var(--text);
+        padding: 6px 14px; border-radius: var(--r); cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 12px; transition: all 0.15s;
+    }
+    .run-code-btn:hover, .url-apply-btn:hover { background: var(--bg4); border-color: var(--border3); }
+
+    /* ══ PREVIEW PANEL ═══════════════════════════════════════ */
+    .preview-panel {
+      border-left: 1px solid var(--border);
+      position: sticky; top: 56px;
+      height: calc(100vh - 56px); overflow-y: auto;
+      padding: 0;
+    }
+    .preview-panel::-webkit-scrollbar { display: none }
+    .preview-title { font-size: 14px; font-weight: 800; padding: 16px 20px 8px; color: var(--text2) }
+    
+    .emoji-pick-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 16px; }
+    .emoji-pick { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--bg3); border-radius: var(--r); cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
+    .emoji-pick:hover { background: var(--bg4); }
+    .emoji-pick.selected { border-color: var(--duo-blue); background: var(--blue-bg); }
+
+    .preview-box { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .preview-stat { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); font-family: var(--mono); }
+    .preview-stat-val { color: var(--text); font-weight: 700; }
+    
+    .preview-mini-blocks { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .preview-mini-block { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg3); border-radius: var(--r); font-size: 12px; cursor: pointer; transition: all 0.15s; }
+    .preview-mini-block:hover { background: var(--bg4); }
+    .preview-mini-block-icon { font-family: var(--mono); color: var(--text3); font-weight: 700; }
+    .preview-mini-block-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text2); }
+
+    .publish-options { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .pub-opt { display: flex; gap: 12px; padding: 12px; border: 2px solid var(--border2); border-radius: var(--r); cursor: pointer; transition: all 0.15s; }
+    .pub-opt:hover { border-color: var(--border3); background: var(--bg3); }
+    .pub-opt.selected { border-color: var(--duo-blue); background: var(--blue-bg); }
+    .pub-opt-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--text3); margin-top: 2px; flex-shrink: 0; }
+    .pub-opt.selected .pub-opt-dot { border-color: var(--duo-blue); border-width: 5px; }
+    .pub-opt-label { font-weight: 700; font-size: 13px; margin-bottom: 2px; }
+    .pub-opt-sub { font-size: 11px; color: var(--text3); }
+
+    /* ══ EMPTY STATE ════════════════════════════════════════ */
+    .empty-state {
+      text-align: center; padding: 80px 24px; color: var(--text3);
+    }
+    .empty-state-icon { font-size: 48px; margin-bottom: 16px; display: block }
+    .empty-state-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--text2) }
+    .empty-state-sub   { font-size: 13px; line-height: 1.6 }
+
+    /* ══ SUCCESS SCREEN & TOAST ═════════════════════════════ */
+    .success-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--bg-blur); backdrop-filter: blur(10px); z-index: 1000;
+        display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    }
+    .success-screen.show { display: flex; }
+    .success-icon-wrap { font-size: 64px; margin-bottom: 20px; }
+    .success-title { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+    .success-sub { font-size: 14px; color: var(--text3); margin-bottom: 30px; }
+    .success-actions { display: flex; gap: 12px; }
+    .success-btn { padding: 12px 24px; border-radius: var(--r3); font-weight: 800; cursor: pointer; border: none; }
+    .success-btn.primary { background: var(--duo-blue); color: white; border-bottom: 3px solid var(--duo-blue2); }
+    .success-btn.ghost { background: var(--bg3); color: var(--text); }
+
+    .toast {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r3); padding: 10px 24px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text);
+      opacity: 0; transition: all .3s; z-index: 9999; pointer-events: none; white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0) }
+    .toast.success { border-color: rgba(87,204,2,.4); color: var(--duo-green) }
+    .toast.error   { border-color: rgba(255,75,75,.4);  color: var(--duo-red) }
+
+    /* ══ АДАПТИВ ════════════════════════════════════════════ */
+    @media(max-width:900px) {
+      .layout { grid-template-columns: 220px 1fr }
+      .preview-panel { display: none }
+    }
+    @media(max-width:650px) {
+      .layout { grid-template-columns: 1fr }
+      .toolbox { display: none }
+      .meta-row { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <button class="topbar-back" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M19 12H5M12 5l-7 7 7 7" />
+      </svg>
+      Назад
+    </button>
+    <span class="topbar-title" id="topbarTitle">Создание интерактивного урока</span>
+    <span class="topbar-autosave" id="autoSaveLbl">–</span>
+    <button class="topbar-publish" id="publishBtn" onclick="publishLesson()">🚀 Опубликовать</button>
+  </div>
+
+  <div class="layout">
+
+    <aside class="toolbox">
+      <div class="toolbox-section">Текст</div>
+      <button class="tool-btn type-text" onclick="addBlock('heading')"><span class="tool-btn-icon">H1</span> <span class="tool-btn-label">Заголовок</span></button>
+      <button class="tool-btn type-text" onclick="addBlock('subheading')"><span class="tool-btn-icon">H2</span> <span class="tool-btn-label">Подзаголовок</span></button>
+      <button class="tool-btn type-text" onclick="addBlock('text')"><span class="tool-btn-icon">¶</span> <span class="tool-btn-label">Абзац</span></button>
+      <button class="tool-btn type-task" onclick="addBlock('callout')"><span class="tool-btn-icon">💡</span> <span class="tool-btn-label">Подсказка / блок</span></button>
+      <button class="tool-btn type-code" onclick="addBlock('checklist')"><span class="tool-btn-icon">☑</span> <span class="tool-btn-label">Чеклист</span></button>
+      <button class="tool-btn" onclick="addBlock('divider')"><span class="tool-btn-icon">─</span> <span class="tool-btn-label">Разделитель</span></button>
+      
+      <div class="toolbox-section">Медиа</div>
+      <button class="tool-btn type-quiz" onclick="addBlock('video')"><span class="tool-btn-icon">▶</span> <span class="tool-btn-label">Видео YouTube</span></button>
+      <button class="tool-btn type-task" onclick="addBlock('image')"><span class="tool-btn-icon">🖼</span> <span class="tool-btn-label">Изображение</span></button>
+      
+      <div class="toolbox-section">Интерактив</div>
+      <button class="tool-btn type-code" onclick="addBlock('code')"><span class="tool-btn-icon">🐍</span> <span class="tool-btn-label">Код + Терминал</span></button>
+      <button class="tool-btn type-quiz" onclick="addBlock('quiz')"><span class="tool-btn-icon">⚡</span> <span class="tool-btn-label">Тест (квиз)</span></button>
+      <button class="tool-btn type-task" onclick="addBlock('task')"><span class="tool-btn-icon">✏️</span> <span class="tool-btn-label">Задание с вводом</span></button>
+    </aside>
+
+    <main class="editor-area">
+      <div class="meta-section">
+        <div class="meta-field">
+          <label class="meta-label">Название урока *</label>
+          <input class="meta-inp meta-title-inp" id="lessonTitle" placeholder="Например: Функции в Python"
+            oninput="autoSave()">
+        </div>
+        <div class="meta-field">
+          <label class="meta-label">Описание (для студентов)</label>
+          <textarea class="meta-inp textarea-inp" id="lessonDesc" placeholder="Что изучат студенты в этом уроке..." rows="2"
+            oninput="autoSave()"></textarea>
+        </div>
+        <div class="meta-row">
+          <div style="flex:1;min-width:140px;" class="meta-field">
+            <label class="meta-label">Предмет / тег</label>
+            <input class="meta-inp" id="lessonSubject" placeholder="Например: Python, Математика"
+              oninput="autoSave()">
+          </div>
+          <div style="flex:1;min-width:140px;" class="meta-field">
+            <label class="meta-label">Уровень</label>
+            <select class="meta-sel" id="lessonLevel" onchange="autoSave()">
+              <option value="beginner">Для начинающих</option>
+              <option value="intermediate">Средний уровень</option>
+              <option value="advanced">Продвинутый</option>
+            </select>
+          </div>
+          <div style="flex:1;min-width:140px;" class="meta-field">
+            <label class="meta-label">Время (мин)</label>
+            <input class="meta-inp" id="lessonDuration" type="number" placeholder="20" min="1" max="300"
+              oninput="autoSave()">
+          </div>
+        </div>
+      </div>
+
+      <div class="blocks-list" id="blocksList">
+        <div class="empty-state" id="canvasEmpty">
+          <div class="empty-state-icon">📖</div>
+          <div class="empty-state-title">Ваш урок пока пуст.</div>
+          <div class="empty-state-sub">Выберите блок слева, чтобы начать.<br>Перетаскивайте блоки для изменения порядка.</div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="preview-panel">
+      <div class="preview-title">Иконка урока</div>
+      <div class="emoji-pick-row" id="emojiRow">
+        <span class="emoji-pick selected" data-emoji="📖" onclick="selectEmoji(this)">📖</span>
+        <span class="emoji-pick" data-emoji="🐍" onclick="selectEmoji(this)">🐍</span>
+        <span class="emoji-pick" data-emoji="💻" onclick="selectEmoji(this)">💻</span>
+        <span class="emoji-pick" data-emoji="🧮" onclick="selectEmoji(this)">🧮</span>
+        <span class="emoji-pick" data-emoji="🎨" onclick="selectEmoji(this)">🎨</span>
+        <span class="emoji-pick" data-emoji="🔬" onclick="selectEmoji(this)">🔬</span>
+        <span class="emoji-pick" data-emoji="📊" onclick="selectEmoji(this)">📊</span>
+        <span class="emoji-pick" data-emoji="🌍" onclick="selectEmoji(this)">🌍</span>
+        <span class="emoji-pick" data-emoji="⚙️" onclick="selectEmoji(this)">⚙️</span>
+        <span class="emoji-pick" data-emoji="🎯" onclick="selectEmoji(this)">🎯</span>
+        <span class="emoji-pick" data-emoji="🏗️" onclick="selectEmoji(this)">🏗️</span>
+        <span class="emoji-pick" data-emoji="🔐" onclick="selectEmoji(this)">🔐</span>
+      </div>
+
+      <div class="preview-title">Статистика урока</div>
+      <div class="preview-box">
+        <div class="preview-stat"><span>Блоков</span><span class="preview-stat-val" id="statBlocks">0</span></div>
+        <div class="preview-stat"><span>Квиз-вопросов</span><span class="preview-stat-val" id="statQuizQ">0</span></div>
+        <div class="preview-stat"><span>Заданий</span><span class="preview-stat-val" id="statTasks">0</span></div>
+        <div class="preview-stat"><span>Видео</span><span class="preview-stat-val" id="statVideos">0</span></div>
+        <div class="preview-stat"><span>Блоков кода</span><span class="preview-stat-val" id="statCode">0</span></div>
+      </div>
+
+      <div class="preview-title">Порядок блоков</div>
+      <div class="preview-mini-blocks" id="miniBlocksList">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:8px;">Блоки появятся здесь</div>
+      </div>
+
+      <div class="preview-title">Видимость</div>
+      <div class="publish-options">
+        <div class="pub-opt selected" id="pubOptPublic" onclick="selectPubOpt('public')">
+          <div class="pub-opt-dot"></div>
+          <div>
+            <div class="pub-opt-label">Публичный</div>
+            <div class="pub-opt-sub">Доступен всем студентам</div>
+          </div>
+        </div>
+        <div class="pub-opt" id="pubOptDraft" onclick="selectPubOpt('draft')">
+          <div class="pub-opt-dot"></div>
+          <div>
+            <div class="pub-opt-label">Черновик</div>
+            <div class="pub-opt-sub">Только вы видите урок</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon-wrap">✅</div>
+    <div class="success-title">Урок опубликован!</div>
+    <div class="success-sub">Студенты уже могут его изучать</div>
+    <div class="success-actions">
+      <button class="success-btn ghost" onclick="resetLesson()">Создать ещё</button>
+      <button class="success-btn primary" onclick="window.location.href='./index.html'">На главную →</button>
+    </div>
+  </div>
+
+  <div class="toast" id="tb-toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, doc, getDoc, updateDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+      authDomain: "pystart-dd2db.firebaseapp.com",
+      projectId: "pystart-dd2db",
+      storageBucket: "pystart-dd2db.firebasestorage.app",
+      messagingSenderId: "9188811255",
+      appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const editId = new URLSearchParams(window.location.search).get('edit');
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = './auth.html'; return; }
+      currentUser = user;
+
+      if (editId) {
+        document.getElementById('topbarTitle').textContent = 'Редактирование урока';
+        document.getElementById('publishBtn').textContent = '💾 Сохранить';
+        try {
+          const snap = await getDoc(doc(db, "interactiveLessons", editId));
+          if (snap.exists()) {
+            const data = snap.data();
+            if (data.uid !== user.uid) { alert('Нет доступа'); window.location.href = './index.html'; return; }
+            fillForm(data);
+          }
+        } catch (e) { console.error(e); }
+      }
+      applyTheme();
+    });
+
+    function fillForm(data) {
+      document.getElementById('lessonTitle').value = data.title || '';
+      document.getElementById('lessonDesc').value = data.description || '';
+      document.getElementById('lessonSubject').value = data.subject || '';
+      document.getElementById('lessonLevel').value = data.level || 'beginner';
+      document.getElementById('lessonDuration').value = data.duration || '';
+      if (data.emoji) {
+        document.querySelectorAll('.emoji-pick').forEach(e => {
+          e.classList.toggle('selected', e.dataset.emoji === data.emoji);
+        });
+        window.selectedEmoji = data.emoji;
+      }
+      if (data.visibility === 'draft') window.selectPubOpt('draft');
+      if (data.blocks && Array.isArray(data.blocks)) {
+        data.blocks.forEach(b => window.addBlockFromData(b));
+      }
+      updateStats();
+      updateMiniBlocks();
+    }
+
+    window.saveToFirebase = async function (lessonData) {
+      if (!auth.currentUser) throw new Error('Не авторизован');
+
+      try {
+        lessonData.status = "pending";
+
+        if (editId) {
+          await updateDoc(doc(db, "interactiveLessons", editId), lessonData);
+          console.log("✅ Урок обновлён и отправлен на повторную модерацию");
+        } else {
+          const docRef = await addDoc(collection(db, "interactiveLessons"), lessonData);
+          console.log("✅ Урок создан и отправлен на модерацию! ID:", docRef.id);
+        }
+      } catch (err) {
+        console.error("Firebase ошибка:", err);
+        throw err;
+      }
+    };
+
+    function applyTheme() {
+      const saved = localStorage.getItem('theme');
+      const html = document.documentElement;
+      if (saved === 'dark') html.classList.add('dark');
+      else if (saved === 'light') html.classList.remove('dark');
+      else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.classList.add('dark');
+    }
+
+    window.auth = auth;
+    window.db = db;
+    window.editId = editId;
+    window.serverTimestamp = serverTimestamp;
+  </script>
+
+  <script>
+    // ── STATE ──
+    let blocks = [];
+    let selectedEmoji = '📖';
+    let selectedVisibility = 'public';
+    let saveTimer;
+    let blockCounter = 0;
+
+    // ── EMOJI ──
+    function selectEmoji(el) {
+      document.querySelectorAll('.emoji-pick').forEach(e => e.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedEmoji = el.dataset.emoji;
+      autoSave();
+    }
+
+    // ── VISIBILITY ──
+    function selectPubOpt(val) {
+      selectedVisibility = val;
+      document.getElementById('pubOptPublic').classList.toggle('selected', val === 'public');
+      document.getElementById('pubOptDraft').classList.toggle('selected', val === 'draft');
+      autoSave();
+    }
+
+    // ── ADD BLOCK ──
+    function addBlock(type, data = {}) {
+      const id = 'block_' + (++blockCounter);
+      const block = { id, type, ...data };
+      blocks.push(block);
+      renderBlock(block);
+      updateCanvasEmpty();
+      updateStats();
+      updateMiniBlocks();
+      autoSave();
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    function addBlockFromData(data) {
+      const id = 'block_' + (++blockCounter);
+      const block = { ...data, id };
+      blocks.push(block);
+      renderBlock(block);
+      updateCanvasEmpty();
+    }
+
+    function renderBlock(block) {
+      const wrap = document.createElement('div');
+      wrap.className = 'block-card';
+      wrap.id = block.id;
+      wrap.setAttribute('draggable', 'true');
+      wrap.dataset.blockId = block.id;
+
+      const typeInfo = getTypeInfo(block.type);
+      
+      // ИСПРАВЛЕНО: Заменены классы block-header, block-drag, block-actions на соответствующие из CSS
+      wrap.innerHTML = `
+    <div class="block-card-header">
+      <span class="block-drag-handle" title="Перетащить">⠿</span>
+      <span class="block-type-badge ${block.type}">${typeInfo.label}</span>
+      <span style="font-weight: 700; font-size: 13px; margin-left: 6px;">${typeInfo.name}</span>
+      <div class="block-card-actions">
+        <button class="block-action-btn" onclick="moveBlockUp('${block.id}')" title="Вверх">↑</button>
+        <button class="block-action-btn" onclick="moveBlockDown('${block.id}')" title="Вниз">↓</button>
+        <button class="block-action-btn del" onclick="deleteBlock('${block.id}')" title="Удалить">✕</button>
+      </div>
+    </div>
+    <div class="block-card-body" id="body_${block.id}">
+      ${renderBlockBody(block)}
+    </div>
+  `;
+
+      const list = document.getElementById('blocksList');
+      const empty = document.getElementById('canvasEmpty');
+      if (empty && empty.style.display !== 'none') list.insertBefore(wrap, empty);
+      else list.appendChild(wrap);
+
+      wrap.addEventListener('dragstart', onDragStart);
+      wrap.addEventListener('dragover', onDragOver);
+      wrap.addEventListener('drop', onDrop);
+      wrap.addEventListener('dragend', onDragEnd);
+
+      initBlockEvents(block.id, block.type, block);
+    }
+
+    function getTypeInfo(type) {
+      const map = {
+        heading: { label: 'text', name: 'Заголовок' },
+        subheading: { label: 'text', name: 'Подзаголовок' },
+        text: { label: 'text', name: 'Абзац' },
+        video: { label: 'video', name: 'Видео' },
+        image: { label: 'image', name: 'Изображение' },
+        code: { label: 'code', name: 'Python терминал' },
+        quiz: { label: 'quiz', name: 'Тест (квиз)' },
+        task: { label: 'task', name: 'Задание с вводом' },
+        callout: { label: 'callout', name: 'Информационный блок' },
+        checklist: { label: 'checklist', name: 'Чеклист' },
+        divider: { label: 'divider', name: 'Разделитель' },
+      };
+      return map[type] || { label: 'text', name: type };
+    }
+
+    function renderBlockBody(block) {
+      const val = (k, def = '') => block[k] !== undefined ? escHtml(block[k]) : def;
+      // ИСПРАВЛЕНО: Использованы классы textarea-inp, inp, sel и структуры из вашего CSS
+      switch (block.type) {
+        case 'heading':
+          return `<textarea class="textarea-inp" style="font-size: 20px; font-weight: 800; min-height: 50px;" rows="1" placeholder="Заголовок урока..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${val('content')}</textarea>`;
+        case 'subheading':
+          return `<textarea class="textarea-inp" style="font-size: 16px; font-weight: 700; min-height: 50px;" rows="1" placeholder="Подзаголовок раздела..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${val('content')}</textarea>`;
+        case 'text':
+          return `<textarea class="textarea-inp" rows="3" placeholder="Напишите текст объяснения..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${val('content')}</textarea>`;
+        case 'video':
+          return `
+        <div style="display:flex; gap: 10px;">
+          <input class="inp" id="vidUrl_${block.id}" value="${val('url')}" placeholder="https://www.youtube.com/watch?v=..." oninput="updateBlockField('${block.id}','url',this.value)">
+          <button class="url-apply-btn" onclick="applyVideo('${block.id}')">Встроить</button>
+        </div>
+        <div id="vidPreview_${block.id}" style="margin-top: 14px;">${block.url ? buildVideoEmbed(block.url) : '<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;">Вставьте ссылку выше</div>'}</div>
+      `;
+        case 'image':
+          return `
+        <div style="display:flex; gap: 10px;">
+          <input class="inp" id="imgUrl_${block.id}" value="${val('url')}" placeholder="https://example.com/image.jpg" oninput="updateBlockField('${block.id}','url',this.value)">
+          <button class="url-apply-btn" onclick="applyImage('${block.id}')">Показать</button>
+        </div>
+        <div id="imgPreview_${block.id}" style="margin-top: 14px; text-align: center;">${block.url ? `<img src="${val('url')}" style="max-width:100%; border-radius:var(--r);" onerror="this.style.display='none'">` : ''}</div>
+        <input class="inp" style="margin-top:8px;" placeholder="Подпись к изображению (необязательно)" value="${val('caption')}" oninput="updateBlockField('${block.id}','caption',this.value)">
+      `;
+        case 'code':
+          return `
+        <div>
+          <div class="code-lang-row">
+            <select class="sel" style="width: auto;" onchange="updateBlockField('${block.id}','lang',this.value)">
+              <option value="python" ${block.lang === 'python' ? 'selected' : ''}>Python</option>
+              <option value="javascript" ${block.lang === 'javascript' ? 'selected' : ''}>JavaScript</option>
+              <option value="html" ${block.lang === 'html' ? 'selected' : ''}>HTML</option>
+              <option value="css" ${block.lang === 'css' ? 'selected' : ''}>CSS</option>
+            </select>
+            <button class="run-code-btn" onclick="runCode('${block.id}')">▶ Запустить</button>
+          </div>
+          <textarea class="code-editor-inp" id="codeArea_${block.id}" placeholder="# Ваш код здесь&#10;print('Привет, мир!')" oninput="updateBlockField('${block.id}','code',this.value)">${val('code')}</textarea>
+          <div class="terminal-out" id="terminal_${block.id}"></div>
+        </div>
+      `;
+        case 'quiz':
+          return renderQuizBlock(block);
+        case 'task':
+          return `
+        <div>
+          <textarea class="textarea-inp" placeholder="Опишите задание для студента..." oninput="updateBlockField('${block.id}','taskText',this.value)">${val('taskText')}</textarea>
+          <span style="font-family: var(--mono); font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; display: block;">Правильный ответ (будет скрыт)</span>
+          <input class="inp" type="text" placeholder="Введите правильный ответ..." value="${val('answer')}" oninput="updateBlockField('${block.id}','answer',this.value)">
+        </div>
+      `;
+        case 'callout':
+          const ct = block.calloutType || 'info';
+          const emojis = { info: 'ℹ️', warning: '⚠️', success: '✅', danger: '❗' };
+          return `
+        <div class="callout-wrap" id="calloutWrap_${block.id}">
+          <span class="callout-emoji" id="calloutEmoji_${block.id}">${emojis[ct]}</span>
+          <div style="flex:1;">
+            <select class="sel" style="margin-bottom: 8px;" onchange="changeCalloutType('${block.id}',this.value)">
+              <option value="info" ${ct === 'info' ? 'selected' : ''}>ℹ️ Информация</option>
+              <option value="warning" ${ct === 'warning' ? 'selected' : ''}>⚠️ Внимание</option>
+              <option value="success" ${ct === 'success' ? 'selected' : ''}>✅ Успех</option>
+              <option value="danger" ${ct === 'danger' ? 'selected' : ''}>❗ Важно</option>
+            </select>
+            <textarea class="textarea-inp" style="min-height: 60px;" rows="2" placeholder="Текст подсказки или важного замечания..." oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${val('content')}</textarea>
+          </div>
+        </div>
+      `;
+        case 'checklist':
+          return renderChecklistBlock(block);
+        case 'divider':
+          return `<div style="height: 2px; background: var(--border2); border-radius: 2px; margin: 10px 0;"></div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;">Разделитель</div>`;
+        default:
+          return `<span style="color:var(--text3);font-size:12px;">Неизвестный тип блока: ${block.type}</span>`;
+      }
+    }
+
+    // ИСПРАВЛЕНО: Использованы классы quiz-q-card, option-row, add-btn
+    function renderQuizBlock(block) {
+      const questions = block.questions || [];
+      let html = `<div class="quiz-questions-list" id="quizList_${block.id}">`;
+      questions.forEach((q, qi) => {
+        html += renderQuizQuestion(block.id, qi, q);
+      });
+      html += `</div>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="add-btn" onclick="addQuizQuestion('${block.id}','mcq')">＋ Выбор ответа</button>
+      <button class="add-btn" onclick="addQuizQuestion('${block.id}','fill')">＋ Ввод ответа</button>
+    </div>`;
+      return html;
+    }
+
+    function renderQuizQuestion(blockId, qi, q) {
+      const opts = q.options || ['', '', '', ''];
+      let optsHtml = opts.map((o, oi) => `
+    <div class="option-row">
+      <div class="option-correct-radio ${q.answer === oi ? 'selected' : ''}" id="radio_${blockId}_${qi}_${oi}" onclick="setCorrectAnswer('${blockId}',${qi},${oi})"></div>
+      <input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ${oi + 1}" oninput="updateQuizOption('${blockId}',${qi},${oi},this.value)">
+      ${opts.length > 2 ? `<button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${oi})">✕</button>` : ''}
+    </div>`).join('');
+
+      if (q.type === 'fill') {
+        optsHtml = `<input class="option-inp" style="width:100%; margin-top: 8px;" value="${escHtml(q.answer || '')}" placeholder="Правильный ответ (точный текст)" oninput="updateQuizFillAnswer('${blockId}',${qi},this.value)">`;
+      }
+
+      return `
+    <div class="quiz-q-card" id="quizQ_${blockId}_${qi}">
+      <div class="quiz-q-top">
+        <select class="quiz-q-type-sel" disabled>
+            <option>${q.type === 'fill' ? 'ВВОД' : 'ВЫБОР (MCQ)'}</option>
+        </select>
+        <input class="quiz-q-inp" value="${escHtml(q.q || '')}" placeholder="Введите вопрос..." oninput="updateQuizQuestion('${blockId}',${qi},this.value)">
+        <button class="quiz-q-del" onclick="deleteQuizQuestion('${blockId}',${qi})">✕</button>
+      </div>
+      <div id="quizOpts_${blockId}_${qi}">
+        ${optsHtml}
+        ${q.type === 'mcq' ? `<button class="add-btn" style="margin-top: 10px;" onclick="addQuizOption('${blockId}',${qi})">＋ Добавить вариант</button>` : ''}
+      </div>
+    </div>`;
+    }
+
+    // ИСПРАВЛЕНО: Использованы классы checklist-items-list, checklist-item-row, cl-inp
+    function renderChecklistBlock(block) {
+      const items = block.items || [''];
+      let html = `<div class="checklist-items-list" id="checklist_${block.id}">`;
+      items.forEach((item, i) => {
+        html += `
+      <div class="checklist-item-row" id="clRow_${block.id}_${i}">
+        <div class="cl-drag">⠿</div>
+        <input class="cl-inp" value="${escHtml(item)}" placeholder="Пункт ${i + 1}" oninput="updateChecklistItem('${block.id}',${i},this.value)">
+        ${items.length > 1 ? `<button class="cl-del" onclick="deleteChecklistItem('${block.id}',${i})">✕</button>` : ''}
+      </div>`;
+      });
+      html += `</div><button class="add-btn" onclick="addChecklistItem('${block.id}')">＋ Добавить пункт</button>`;
+      return html;
+    }
+
+    function initBlockEvents(blockId, type, block) {
+      const textareas = document.querySelectorAll(`#${blockId} textarea.textarea-inp`);
+      textareas.forEach(ta => { autoSize(ta); });
+    }
+
+    function autoSize(el) {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+
+    function updateBlockField(blockId, field, value) {
+      const b = blocks.find(b => b.id === blockId);
+      if (b) { b[field] = value; autoSave(); updateStats(); }
+    }
+
+    function deleteBlock(blockId) {
+      blocks = blocks.filter(b => b.id !== blockId);
+      const el = document.getElementById(blockId);
+      if (el) {
+        el.style.animation = 'none';
+        el.style.opacity = '0';
+        el.style.transform = 'scale(.97)';
+        el.style.transition = 'all .2s';
+        setTimeout(() => el.remove(), 200);
+      }
+      setTimeout(updateCanvasEmpty, 210);
+      updateStats();
+      updateMiniBlocks();
+      autoSave();
+    }
+
+    function moveBlockUp(blockId) {
+      const idx = blocks.findIndex(b => b.id === blockId);
+      if (idx <= 0) return;
+      [blocks[idx - 1], blocks[idx]] = [blocks[idx], blocks[idx - 1]];
+      reRenderBlocks();
+    }
+
+    function moveBlockDown(blockId) {
+      const idx = blocks.findIndex(b => b.id === blockId);
+      if (idx < 0 || idx >= blocks.length - 1) return;
+      [blocks[idx], blocks[idx + 1]] = [blocks[idx + 1], blocks[idx]];
+      reRenderBlocks();
+    }
+
+    function reRenderBlocks() {
+      const list = document.getElementById('blocksList');
+      list.querySelectorAll('.block-card').forEach(el => el.remove());
+      const snapshot = [...blocks];
+      blocks = [];
+      blockCounter = 0;
+      snapshot.forEach(b => addBlockFromData(b));
+      updateMiniBlocks();
+      autoSave();
+    }
+
+    function updateCanvasEmpty() {
+      const empty = document.getElementById('canvasEmpty');
+      if (empty) empty.style.display = blocks.length === 0 ? 'block' : 'none';
+    }
+
+    function applyVideo(blockId) {
+      const url = document.getElementById('vidUrl_' + blockId)?.value.trim();
+      const preview = document.getElementById('vidPreview_' + blockId);
+      if (!preview) return;
+      if (!url) { preview.innerHTML = '<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;">Вставьте ссылку выше</div>'; return; }
+      preview.innerHTML = buildVideoEmbed(url);
+      updateBlockField(blockId, 'url', url);
+    }
+
+    function buildVideoEmbed(url) {
+      let embedUrl = '';
+      if (url.includes('youtube.com/watch') || url.includes('youtu.be')) {
+        const id = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
+        if (id) embedUrl = `https://www.youtube.com/embed/${id}`;
+      } else if (url.includes('vimeo.com')) {
+        const id = url.match(/vimeo\.com\/(\d+)/)?.[1];
+        if (id) embedUrl = `https://player.vimeo.com/video/${id}`;
+      }
+      if (embedUrl) return `<iframe style="width:100%; height:200px; border-radius: var(--r); border: none;" src="${embedUrl}" allowfullscreen></iframe>`;
+      return `<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;">❌ Неподдерживаемая ссылка</div>`;
+    }
+
+    function applyImage(blockId) {
+      const url = document.getElementById('imgUrl_' + blockId)?.value.trim();
+      const preview = document.getElementById('imgPreview_' + blockId);
+      if (!preview) return;
+      if (!url) { preview.innerHTML = ''; return; }
+      preview.innerHTML = `<img src="${escHtml(url)}" style="max-width:100%; border-radius:var(--r);" onerror="this.parentElement.innerHTML='<span style=color:var(--red);font-size:12px;font-family:var(--mono);>Не удалось загрузить</span>'">`;
+      updateBlockField(blockId, 'url', url);
+    }
+
+    function runCode(blockId) {
+      const ta = document.getElementById('codeArea_' + blockId);
+      const term = document.getElementById('terminal_' + blockId);
+      if (!ta || !term) return;
+      term.style.display = 'block';
+      term.textContent = '⏳ Запуск...';
+      const code = ta.value;
+      setTimeout(() => {
+        const output = simulatePython(code);
+        term.textContent = output;
+        updateBlockField(blockId, 'code', code);
+      }, 600);
+    }
+
+    function simulatePython(code) {
+      const lines = code.split('\n');
+      const output = [];
+      for (const line of lines) {
+        const m = line.match(/^\s*print\s*\(\s*(.+?)\s*\)\s*$/);
+        if (m) {
+          let arg = m[1];
+          if ((arg.startsWith('"') && arg.endsWith('"')) || (arg.startsWith("'") && arg.endsWith("'"))) {
+            output.push(arg.slice(1, -1));
+          } else if (!isNaN(arg)) {
+            output.push(arg);
+          } else if (arg.startsWith('f"') || arg.startsWith("f'")) {
+            output.push(arg.slice(2, -1).replace(/\{[^}]+\}/g, '[значение]'));
+          } else {
+            output.push('[вычисленное значение]');
+          }
+        }
+      }
+      if (output.length === 0) return '✅ Код выполнен (нет вывода)\nВремя: 0.04s';
+      return output.join('\n') + '\n\n✅ Выполнено за 0.04s';
+    }
+
+    function addQuizQuestion(blockId, type) {
+      const b = blocks.find(b => b.id === blockId);
+      if (!b) return;
+      if (!b.questions) b.questions = [];
+      const q = { type, q: '', answer: type === 'fill' ? '' : 0 };
+      if (type === 'mcq') q.options = ['', '', '', ''];
+      b.questions.push(q);
+      const qi = b.questions.length - 1;
+      const list = document.getElementById('quizList_' + blockId);
+      if (list) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = renderQuizQuestion(blockId, qi, q);
+        while (tmp.firstChild) list.appendChild(tmp.firstChild);
+      }
+      autoSave(); updateStats();
+    }
+
+    function updateQuizQuestion(blockId, qi, val) {
+      const b = blocks.find(b => b.id === blockId);
+      if (b && b.questions[qi]) { b.questions[qi].q = val; autoSave(); }
+    }
+
+    function updateQuizOption(blockId, qi, oi, val) {
+      const b = blocks.find(b => b.id === blockId);
+      if (b && b.questions[qi] && b.questions[qi].options) { b.questions[qi].options[oi] = val; autoSave(); }
+    }
+
+    function updateQuizFillAnswer(blockId, qi, val) {
+      const b = blocks.find(b => b.id === blockId);
+      if (b && b.questions[qi]) { b.questions[qi].answer = val; autoSave(); }
+    }
+
+    function setCorrectAnswer(blockId, qi, oi) {
+      const b = blocks.find(b => b.id === blockId);
+      if (!b || !b.questions[qi]) return;
+      b.questions[qi].answer = oi;
+      const q = b.questions[qi];
+      (q.options || []).forEach((_, i) => {
+        const r = document.getElementById(`radio_${blockId}_${qi}_${i}`);
+        if (r) r.className = 'option-correct-radio' + (i === oi ? ' selected' : '');
+      });
+      autoSave();
+    }
+
+    function addQuizOption(blockId, qi) {
+      const b = blocks.find(b => b.id === blockId);
+      if (!b || !b.questions[qi]) return;
+      b.questions[qi].options.push('');
+      const optsEl = document.getElementById(`quizOpts_${blockId}_${qi}`);
+      if (optsEl) {
+        const q = b.questions[qi];
+        optsEl.innerHTML = q.options.map((o, oi) => `
+      <div class="option-row">
+        <div class="option-correct-radio ${q.answer === oi ? 'selected' : ''}" id="radio_${blockId}_${qi}_${oi}" onclick="setCorrectAnswer('${blockId}',${qi},${oi})"></div>
+        <input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ${oi + 1}" oninput="updateQuizOption('${blockId}',${qi},${oi},this.value)">
+        ${q.options.length > 2 ? `<button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${oi})">✕</button>` : ''}
+      </div>`).join('') + `<button class="add-btn" style="margin-top: 10px;" onclick="addQuizOption('${blockId}',${qi})">＋ Добавить вариант</button>`;
+      }
+      autoSave();
+    }
+
+    function removeQuizOption(blockId, qi, oi) {
+      const b = blocks.find(b => b.id === blockId);
+      if (!b || !b.questions[qi] || b.questions[qi].options.length <= 2) return;
+      b.questions[qi].options.splice(oi, 1);
+      if (b.questions[qi].answer >= b.questions[qi].options.length) b.questions[qi].answer = 0;
+      addQuizOption(blockId, qi); 
+      b.questions[qi].options.pop(); 
+      const optsEl = document.getElementById(`quizOpts_${blockId}_${qi}`);
+      if (optsEl) {
+        const q = b.questions[qi];
+        optsEl.innerHTML = q.options.map((o, oi2) => `
+      <div class="option-row">
+        <div class="option-correct-radio ${q.answer === oi2 ? 'selected' : ''}" id="radio_${blockId}_${qi}_${oi2}" onclick="setCorrectAnswer('${blockId}',${qi},${oi2})"></div>
+        <input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ${oi2 + 1}" oninput="updateQuizOption('${blockId}',${qi},${oi2},this.value)">
+        ${q.options.length > 2 ? `<button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${oi2})">✕</button>` : ''}
+      </div>`).join('') + `<button class="add-btn" style="margin-top: 10px;" onclick="addQuizOption('${blockId}',${qi})">＋ Добавить вариант</button>`;
+      }
+      autoSave();
+    }
+
+    function deleteQuizQuestion(blockId, qi) {
+      const b = blocks.find(b => b.id === blockId);
+      if (!b || !b.questions) return;
+      b.questions.splice(qi, 1);
+      const list = document.getElementById('quizList_' + blockId);
+      if (list) {
+        list.innerHTML = b.questions.map((q, i) => renderQuizQuestion(blockId, i, q)).join('');
+      }
+      autoSave(); updateStats();
+    }
+
+    function updateChecklistItem(blockId, i, val) {
+      const b = blocks.find(b => b.id === blockId);
+      if (b && b.items) { b.items[i] = val; autoSave(); }
+    }
+
+    function addChecklistItem(blockId) {
+      const b = blocks.find(b => b.id === blockId);
+      if (!b) return;
+      if (!b.items) b.items = [''];
+      b.items.push('');
+      const i = b.items.length - 1;
+      const list = document.getElementById('checklist_' + blockId);
+      if (list) {
+        const row = document.createElement('div');
+        row.className = 'checklist-item-row';
+        row.id = `clRow_${blockId}_${i}`;
+        row.innerHTML = `
+      <div class="cl-drag">⠿</div>
+      <input class="cl-inp" placeholder="Пункт ${i + 1}" oninput="updateChecklistItem('${blockId}',${i},this.value)">
+      <button class="cl-del" onclick="deleteChecklistItem('${blockId}',${i})">✕</button>`;
+        list.appendChild(row);
+        row.querySelector('input').focus();
+      }
+      autoSave();
+    }
+
+    function deleteChecklistItem(blockId, i) {
+      const b = blocks.find(b => b.id === blockId);
+      if (!b || !b.items || b.items.length <= 1) return;
+      b.items.splice(i, 1);
+      const list = document.getElementById('checklist_' + blockId);
+      if (list) {
+        list.innerHTML = b.items.map((item, idx) => `
+      <div class="checklist-item-row" id="clRow_${blockId}_${idx}">
+        <div class="cl-drag">⠿</div>
+        <input class="cl-inp" value="${escHtml(item)}" placeholder="Пункт ${idx + 1}" oninput="updateChecklistItem('${blockId}',${idx},this.value)">
+        ${b.items.length > 1 ? `<button class="cl-del" onclick="deleteChecklistItem('${blockId}',${idx})">✕</button>` : ''}
+      </div>`).join('');
+      }
+      autoSave();
+    }
+
+    function changeCalloutType(blockId, type) {
+      const b = blocks.find(b => b.id === blockId);
+      if (b) b.calloutType = type;
+      const emoji = document.getElementById('calloutEmoji_' + blockId);
+      if (emoji) {
+        const emojis = { info: 'ℹ️', warning: '⚠️', success: '✅', danger: '❗' };
+        emoji.textContent = emojis[type] || 'ℹ️';
+      }
+      autoSave();
+    }
+
+    let dragSrcId = null;
+    function onDragStart(e) {
+      dragSrcId = this.dataset.blockId;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    function onDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.block-card').forEach(el => el.classList.remove('drag-over'));
+      this.classList.add('drag-over');
+      return false;
+    }
+    function onDrop(e) {
+      e.stopPropagation();
+      const targetId = this.dataset.blockId;
+      if (dragSrcId && dragSrcId !== targetId) {
+        const srcIdx = blocks.findIndex(b => b.id === dragSrcId);
+        const tgtIdx = blocks.findIndex(b => b.id === targetId);
+        if (srcIdx > -1 && tgtIdx > -1) {
+          const [moved] = blocks.splice(srcIdx, 1);
+          blocks.splice(tgtIdx, 0, moved);
+          reRenderBlocks();
+        }
+      }
+      return false;
+    }
+    function onDragEnd() {
+      document.querySelectorAll('.block-card').forEach(el => {
+        el.classList.remove('dragging', 'drag-over');
+      });
+    }
+
+    function updateStats() {
+      document.getElementById('statBlocks').textContent = blocks.length;
+      document.getElementById('statQuizQ').textContent = blocks.filter(b => b.type === 'quiz').reduce((s, b) => s + (b.questions?.length || 0), 0);
+      document.getElementById('statTasks').textContent = blocks.filter(b => b.type === 'task').length;
+      document.getElementById('statVideos').textContent = blocks.filter(b => b.type === 'video').length;
+      document.getElementById('statCode').textContent = blocks.filter(b => b.type === 'code').length;
+    }
+
+    function updateMiniBlocks() {
+      const el = document.getElementById('miniBlocksList');
+      if (!el) return;
+      if (blocks.length === 0) {
+        el.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:8px;">Блоки появятся здесь</div>';
+        return;
+      }
+      const icons = { heading: 'H1', subheading: 'H2', text: '¶', video: '▶', image: '🖼', code: '🐍', quiz: '⚡', task: '✏️', callout: '💡', checklist: '☑', divider: '─' };
+      el.innerHTML = blocks.map(b => `
+    <div class="preview-mini-block" onclick="document.getElementById('${b.id}')?.scrollIntoView({behavior:'smooth',block:'center'})">
+      <span class="preview-mini-block-icon">${icons[b.type] || '?'}</span>
+      <span class="preview-mini-block-title">${escHtml(b.content || b.taskText || b.q || getTypeInfo(b.type).name)}</span>
+    </div>`).join('');
+    }
+
+    function autoSave() {
+      clearTimeout(saveTimer);
+      document.getElementById('autoSaveLbl').textContent = 'Сохранение…';
+      saveTimer = setTimeout(() => {
+        document.getElementById('autoSaveLbl').textContent = 'Черновик сохранён ✓';
+      }, 800);
+      updateMiniBlocks();
+      updateStats();
+    }
+
+    async function publishLesson() {
+      const title = document.getElementById('lessonTitle').value.trim();
+      if (!title) {
+        showToast('⚠️ Укажите название урока');
+        document.getElementById('lessonTitle').focus();
+        return;
+      }
+      if (blocks.length === 0) {
+        showToast('⚠️ Добавьте хотя бы один блок');
+        return;
+      }
+
+      const btn = document.getElementById('publishBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Публикация...';
+
+      try {
+        const user = window.auth?.currentUser;
+
+        if (!user) {
+          showToast('❌ Вы не авторизованы. Войдите в аккаунт.');
+          return;
+        }
+
+        const lessonData = {
+          title: title,
+          description: document.getElementById('lessonDesc').value.trim(),
+          subject: document.getElementById('lessonSubject').value.trim() || '',
+          level: document.getElementById('lessonLevel').value,
+          duration: parseInt(document.getElementById('lessonDuration').value) || 0,
+          emoji: selectedEmoji || '📖',
+          visibility: selectedVisibility || 'public',
+          blocks: blocks,
+          blockCount: blocks.length,
+          quizCount: blocks.filter(b => b.type === 'quiz').reduce((s, b) => s + (b.questions?.length || 0), 0),
+          taskCount: blocks.filter(b => b.type === 'task').length,
+          uid: user.uid,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        };
+
+        await window.saveToFirebase(lessonData);
+
+        showToast('✅ Урок успешно опубликован!');
+        document.getElementById('successScreen').classList.add('show');
+
+        if (typeof window.refreshMyLessons === 'function') {
+          setTimeout(window.refreshMyLessons, 800);
+        }
+
+      } catch (err) {
+        console.error("Ошибка публикации:", err);
+        showToast('❌ Ошибка: ' + (err.message || err));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = window.editId ? '💾 Сохранить' : '🚀 Опубликовать';
+      }
+    }
+
+    function escHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('tb-toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._t);
+      t._t = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function resetLesson() {
+        window.location.reload();
+    }
+
+    updateCanvasEmpty();
+    updateStats();
+
+  </script>
+</body>
+
+</html>

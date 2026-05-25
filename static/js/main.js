@@ -1,4 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { initSubscriptions, toggleFollowStatus } from "./subscriptions.js";
+import { initPythonPath } from "./python-path.js";
 import {
     getAuth, onAuthStateChanged, signOut, deleteUser
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -21,7 +23,6 @@ const firebaseConfig = {
     messagingSenderId: "9188811255",
     appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -45,15 +46,21 @@ onAuthStateChanged(auth, async (user) => {
         });
 
         loadUserProfile(user);
+        recordUserVisit(user);
         setupFeed(user);
         setupSearch(user);
         setupSuggestedUsers(user);
+        initSubscriptions(user, db, auth);
+
 
         if (isIndexPage) {
             loadPlatformStats();          // УЛУЧШЕНИЕ 6: статистика платформы
             loadUserCourses(user);
             loadAllPublicCourses();
             loadUserProgress(user);
+            loadRecommendedCourses();
+            initPythonPath(user, db);
+            loadUserLessons(user);
         }
 
     } else {
@@ -61,7 +68,24 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('global-preloader')?.classList.add('hidden');
     }
 });
+async function recordUserVisit(user) {
+    if (!user) return;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const userRef = doc(db, "users", user.uid);
 
+    try {
+        await updateDoc(userRef, {
+            lastVisit: serverTimestamp(),
+            visitedDates: arrayUnion(todayStr)
+        });
+    } catch (e) {
+        await setDoc(userRef, {
+            visitedDates: [todayStr],
+            streak: 1,
+            lastVisit: serverTimestamp()
+        }, { merge: true });
+    }
+}
 // ─────────────────────────────────────────
 // УЛУЧШЕНИЕ 6: СТАТИСТИКА ПЛАТФОРМЫ
 // ─────────────────────────────────────────
@@ -69,39 +93,56 @@ async function loadPlatformStats() {
     const container = document.getElementById('platformStats');
     if (!container) return;
 
-    try {
-        const [coursesSnap, usersSnap, quizzesSnap] = await Promise.all([
-            getDocs(query(collection(db, "courses"), where("status", "==", "Открытый"))),
-            getDocs(query(collection(db, "users"), limit(200))),
-            getDocs(query(collection(db, "quizzes"), where("visibility", "==", "public")))
-        ]);
+    const coursesRef = query(collection(db, "courses"), where("status", "==", "approved"));
+    const usersRef = collection(db, "users");
+    const quizzesRef = query(collection(db, "quizzes"), where("visibility", "==", "public"));
 
-        const coursesCount = coursesSnap.size;
-        const usersCount = usersSnap.size;
-        const quizzesCount = quizzesSnap.size;
+    // Реальное время
+    onSnapshot(coursesRef, snap => {
+        const coursesCount = snap.size;
+        updateStatsUI(coursesCount, null, null);
+    });
 
-        container.innerHTML = `
-            <div class="stats-strip">
-                <div class="stat-chip">
-                    <span class="stat-chip-num">${usersCount}</span>
-                    <span class="stat-chip-label">Студентов</span>
-                </div>
-                <div class="stat-chip">
-                    <span class="stat-chip-num">${coursesCount}</span>
-                    <span class="stat-chip-label">Курсов</span>
-                </div>
-                <div class="stat-chip">
-                    <span class="stat-chip-num">${quizzesCount}</span>
-                    <span class="stat-chip-label">Квизов</span>
-                </div>
-                <div class="stat-chip">
-                    <span class="stat-chip-num" style="color:var(--green);">онлайн</span>
-                    <span class="stat-chip-label">Статус</span>
-                </div>
-            </div>`;
-    } catch (e) {
-        console.error("Ошибка загрузки статистики:", e);
-    }
+    onSnapshot(usersRef, snap => {
+        const usersCount = snap.size;
+        updateStatsUI(null, usersCount, null);
+    });
+
+    onSnapshot(quizzesRef, snap => {
+        const quizzesCount = snap.size;
+        updateStatsUI(null, null, quizzesCount);
+    });
+}
+
+let statsCache = { users: 0, courses: 0, quizzes: 0 };
+
+function updateStatsUI(courses, users, quizzes) {
+    if (courses !== null) statsCache.courses = courses;
+    if (users !== null) statsCache.users = users;
+    if (quizzes !== null) statsCache.quizzes = quizzes;
+
+    const container = document.getElementById('platformStats');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="stats-strip">
+            <div class="stat-chip">
+                <span class="stat-chip-num">${statsCache.users}</span>
+                <span class="stat-chip-label">Студентов</span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-chip-num">${statsCache.courses}</span>
+                <span class="stat-chip-label">Курсов</span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-chip-num">${statsCache.quizzes}</span>
+                <span class="stat-chip-label">Квизов</span>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-chip-num" style="color:var(--green);">онлайн</span>
+                <span class="stat-chip-label">Статус</span>
+            </div>
+        </div>`;
 }
 
 // ─────────────────────────────────────────
@@ -213,18 +254,99 @@ function loadUserProfile(user) {
     window.addEventListener('click', e => { if (e.target === editModal) editModal.classList.remove('active'); });
     avatarInp?.addEventListener('input', e => renderAvatarPreview(e.target.value.trim(), avatarPreview));
 
+    // Живая проверка username на уникальность при вводе
+    let handleCheckTimer = null;
+    const handleHint = document.createElement('div');
+    handleHint.style.cssText = 'font-family:var(--mono);font-size:11px;margin-top:5px;min-height:16px;transition:color .15s;';
+    handleInp?.parentElement?.appendChild(handleHint);
+
+    handleInp?.addEventListener('input', () => {
+        clearTimeout(handleCheckTimer);
+        const val = handleInp.value.trim().replace('@', '').toLowerCase();
+        if (!val) { handleHint.textContent = ''; return; }
+
+        // Базовая валидация формата
+        if (!/^[a-z0-9_]{3,20}$/.test(val)) {
+            handleHint.textContent = 'Только a-z, 0-9, _ · от 3 до 20 символов';
+            handleHint.style.color = 'var(--red)';
+            return;
+        }
+
+        handleHint.textContent = 'Проверка...';
+        handleHint.style.color = 'var(--text3)';
+
+        handleCheckTimer = setTimeout(async () => {
+            try {
+                const normalizedHandle = `@${val}`;
+                const q = query(
+                    collection(db, "users"),
+                    where("handle", "==", normalizedHandle),
+                    limit(1)
+                );
+                const snap = await getDocs(q);
+                const takenByOther = snap.docs.some(d => d.id !== user.uid);
+
+                if (takenByOther) {
+                    handleHint.textContent = `@${val} уже занят`;
+                    handleHint.style.color = 'var(--red)';
+                } else {
+                    handleHint.textContent = `@${val} свободен ✓`;
+                    handleHint.style.color = 'var(--green)';
+                }
+            } catch {
+                handleHint.textContent = '';
+            }
+        }, 500);
+    });
+
     saveBtn?.addEventListener('click', async () => {
         const name = nameInp?.value.trim();
-        const handle = handleInp?.value.trim();
+        const handle = handleInp?.value.trim().replace('@', '').toLowerCase();
         if (!name) { shake(nameInp); return; }
         if (!handle) { shake(handleInp); return; }
 
-        saveBtn.textContent = 'Сохранение...';
+        // Валидация формата
+        if (!/^[a-z0-9_]{3,20}$/.test(handle)) {
+            handleHint.textContent = 'Только a-z, 0-9, _ · от 3 до 20 символов';
+            handleHint.style.color = 'var(--red)';
+            shake(handleInp);
+            return;
+        }
+
+        saveBtn.textContent = 'Проверка...';
         saveBtn.disabled = true;
+
+        // Проверка уникальности перед сохранением
+        try {
+            const normalizedHandle = `@${handle}`;
+            const q = query(
+                collection(db, "users"),
+                where("handle", "==", normalizedHandle),
+                limit(1)
+            );
+            const snap = await getDocs(q);
+            const takenByOther = snap.docs.some(d => d.id !== user.uid);
+
+            if (takenByOther) {
+                handleHint.textContent = `@${handle} уже занят`;
+                handleHint.style.color = 'var(--red)';
+                shake(handleInp);
+                saveBtn.textContent = 'Сохранить';
+                saveBtn.disabled = false;
+                return;
+            }
+        } catch (err) {
+            saveBtn.textContent = 'Сохранить';
+            saveBtn.disabled = false;
+            alert('Ошибка проверки username: ' + err.message);
+            return;
+        }
+
+        saveBtn.textContent = 'Сохранение...';
 
         const updateData = {
             name,
-            handle: `@${handle.replace('@', '').toLowerCase()}`,
+            handle: `@${handle}`,
             avatar: avatarInp?.value.trim() || ''
         };
 
@@ -265,9 +387,9 @@ function renderProfileStats(data) {
     const statsRow = document.querySelector('.stats-row');
     if (!statsRow) return;
     statsRow.innerHTML = `
-        <span><strong>${data.followers || 0}</strong> подписчиков</span>
-        <span><strong>${data.following || 0}</strong> подписок</span>
-    `;
+            <span><strong>${data.followers || 0}</strong> подписчиков</span>
+            <span><strong>${data.following || 0}</strong> подписок</span>
+        `;
 }
 
 function renderAvatarPreview(val, el) {
@@ -295,74 +417,78 @@ function updateVerifiedBadge(userData) {
 // ─────────────────────────────────────────
 // УЛУЧШЕНИЕ 3: СТРИК + ПРОГРЕСС ОБУЧЕНИЯ
 // ─────────────────────────────────────────
+// Замени весь блок loadUserProgress на этот:
 async function loadUserProgress(user) {
     const container = document.getElementById('enrolledCoursesContainer');
     if (!container) return;
 
-    try {
-        const userSnap = await getDoc(doc(db, "users", user.uid));
-        if (!userSnap.exists()) {
-            renderEmptyState(container, '📚', 'Вы ещё не начали ни одного курса', 'Перейти к курсам', () => {
-                document.querySelector('.tab-btn[data-target="view-courses"]')?.click();
-            });
+    const userRef = doc(db, "users", user.uid);
+
+    onSnapshot(userRef, async (snap) => {
+        if (!snap.exists()) {
+            renderEmptyState(container, '📚', 'Вы ещё не начали ни одного курса',
+                'Перейти к курсам', () => {
+                    document.querySelector('.tab-btn[data-target="view-courses"]')?.click();
+                });
             return;
         }
 
-        const userData = userSnap.data();
+        const userData = snap.data();
         const courseProgress = userData.courseProgress || {};
         const enrolledCourseIds = Object.keys(courseProgress);
 
-        renderStreakWidget(courseProgress, userData);
+        renderStreakWidget(userData);
 
         if (enrolledCourseIds.length === 0) {
-            renderEmptyState(container, '📚', 'Вы ещё не начали ни одного курса', 'Перейти к курсам', () => {
-                document.querySelector('.tab-btn[data-target="view-courses"]')?.click();
-            });
+            renderEmptyState(container, '📚', 'Вы ещё не начали ни одного курса',
+                'Перейти к курсам', () => {
+                    document.querySelector('.tab-btn[data-target="view-courses"]')?.click();
+                });
             return;
         }
 
         container.innerHTML = '';
 
         for (const courseId of enrolledCourseIds) {
-            const courseSnap = await getDoc(doc(db, "courses", courseId));
-            if (courseSnap.exists()) {
-                const courseData = courseSnap.data();
-                let totalLessons = 0;
-                if (courseData.modules) {
-                    courseData.modules.forEach(mod => {
-                        if (mod.lessons) totalLessons += mod.lessons.length;
-                    });
+            try {
+                const courseSnap = await getDoc(doc(db, "courses", courseId));
+                if (courseSnap.exists()) {
+                    const courseData = courseSnap.data();
+                    let totalLessons = 0;
+                    if (courseData.modules) {
+                        courseData.modules.forEach(mod => {
+                            if (mod.lessons) totalLessons += mod.lessons.length;
+                        });
+                    }
+                    const completedLessons = (courseProgress[courseId] || []).length;
+                    let percent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+                    if (percent > 100) percent = 100;
+
+                    renderProgressCard(courseId, courseData, completedLessons, totalLessons, percent, container);
                 }
-                const completedLessons = courseProgress[courseId].length || 0;
-                let percent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-                if (percent > 100) percent = 100;
-                renderProgressCard(courseId, courseData, completedLessons, totalLessons, percent, container);
+            } catch (e) {
+                console.error("Ошибка загрузки курса", courseId, e);
             }
         }
-    } catch (error) {
-        console.error("Ошибка при загрузке прогресса:", error);
-        container.innerHTML = '<div class="empty-state">Не удалось загрузить данные прогресса.</div>';
-    }
+    });
 }
 
-function renderStreakWidget(courseProgress, userData) {
+// ─────────────────────────────────────────
+// СТРИК (исправленная версия)
+// ─────────────────────────────────────────
+function renderStreakWidget(userData) {
     const streakContainer = document.getElementById('streakWidget');
     if (!streakContainer) return;
 
-    const streak = userData.streak || 0;
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0]; // "2026-04-13"
-
-    // Массив дат, в которые пользователь заходил (или выполнял активность)
-    // Это главный массив, который нужно заполнять при заходе пользователя
-    const visitedDates = courseProgress?.visitedDates || userData?.visitedDates || [];
+    const visitedDates = userData?.visitedDates || [];
+    const streak = userData?.streak || 0;
+    const todayStr = new Date().toISOString().split('T')[0];
 
     const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-    
-    // Находим индекс сегодняшнего дня (Понедельник = 0)
-    const todayIdx = (today.getDay() + 6) % 7;
 
-    // Генерируем даты всей недели (с понедельника)
+    const today = new Date();
+    const todayIdx = (today.getDay() + 6) % 7; // Понедельник = 0
+
     const weekDates = [];
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - todayIdx);
@@ -373,10 +499,9 @@ function renderStreakWidget(courseProgress, userData) {
         weekDates.push(d.toISOString().split('T')[0]);
     }
 
-    // Создаём HTML дней
     const daysHTML = days.map((dayName, i) => {
         const dateStr = weekDates[i];
-        const isVisited = visitedDates.includes(dateStr);   // ← главный момент
+        const isVisited = visitedDates.includes(dateStr);
         const isToday = dateStr === todayStr;
 
         let className = 'streak-day';
@@ -387,8 +512,7 @@ function renderStreakWidget(courseProgress, userData) {
             <div class="${className}">
                 <div class="streak-day-dot"></div>
                 <div class="streak-day-name">${dayName}</div>
-            </div>
-        `;
+            </div>`;
     }).join('');
 
     streakContainer.innerHTML = `
@@ -409,6 +533,20 @@ function renderStreakWidget(courseProgress, userData) {
         </div>
     `;
 }
+// При завершении урока
+window.completeLesson = async (courseId, lessonId) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userRef = doc(db, "users", user.uid);
+
+    await updateDoc(userRef, {
+        [`courseProgress.${courseId}`]: arrayUnion(lessonId)
+    });
+
+    // Обновляем локально сразу
+    loadUserProgress(user);
+};
 function renderProgressCard(courseId, courseData, completed, total, percent, container) {
     const isCompleted = percent === 100;
 
@@ -427,54 +565,54 @@ function renderProgressCard(courseId, courseData, completed, total, percent, con
     const hasCertificate = !!courseData.certificate;
 
     container.insertAdjacentHTML('beforeend', `
-        <a href="./course.html?id=${courseId}" 
-           class="progress-card course-card-modern"
-           style="text-decoration:none;color:inherit;">
-            
-            <div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;flex-direction:column;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;cursor:pointer;min-height:260px;">
+            <a href="./course.html?id=${courseId}" 
+            class="progress-card course-card-modern"
+            style="text-decoration:none;color:inherit;">
                 
-                <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;">
-                    <div class="pc-icon" style="width:72px;height:72px;flex-shrink:0;border-radius:16px;overflow:hidden;background:var(--bg2);box-shadow:0 4px 16px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;">
-                        ${iconHtml}
-                    </div>
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;flex-direction:column;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;cursor:pointer;min-height:260px;">
                     
-                    <div style="flex:1;min-width:0;">
-                        <div class="course-title-modern" style="font-size:18px;font-weight:700;line-height:1.3;margin-bottom:6px;color:var(--text);">
-                            ${escHtml(title)}
-                        </div>
-                        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.05em;margin-bottom:16px;">
-                            ${completed} / ${total} уроков пройдено
+                    <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;">
+                        <div class="pc-icon" style="width:72px;height:72px;flex-shrink:0;border-radius:16px;overflow:hidden;background:var(--bg2);box-shadow:0 4px 16px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;">
+                            ${iconHtml}
                         </div>
                         
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div style="flex:1;height:8px;background:var(--bg3);border-radius:9999px;position:relative;overflow:hidden;">
-                                <div class="pc-bar-fill" 
-                                     style="height:100%;width:${percent}%;background:${color};transition:width .4s cubic-bezier(0.34,1.56,0.64,1);">
-                                </div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="course-title-modern" style="font-size:18px;font-weight:700;line-height:1.3;margin-bottom:6px;color:var(--text);">
+                                ${escHtml(title)}
                             </div>
-                            <div class="pc-percent" 
-                                 style="font-family:var(--mono);font-size:17px;font-weight:700;color:${color};white-space:nowrap;min-width:48px;text-align:right;">
-                                ${percent}%
+                            <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.05em;margin-bottom:16px;">
+                                ${completed} / ${total} уроков пройдено
+                            </div>
+                            
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div style="flex:1;height:8px;background:var(--bg3);border-radius:9999px;position:relative;overflow:hidden;">
+                                    <div class="pc-bar-fill" 
+                                        style="height:100%;width:${percent}%;background:${color};transition:width .4s cubic-bezier(0.34,1.56,0.64,1);">
+                                    </div>
+                                </div>
+                                <div class="pc-percent" 
+                                    style="font-family:var(--mono);font-size:17px;font-weight:700;color:${color};white-space:nowrap;min-width:48px;text-align:right;">
+                                    ${percent}%
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                ${isCompleted ? `
-                <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;">
-                    <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;">
-                        <div style="width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 3px var(--gold)"></div>
-                        Курс завершен
-                    </div>
-                    ${hasCertificate ? `
-                    <button onclick="event.stopImmediatePropagation(); event.preventDefault(); downloadCertificate('${courseId}');"
-                            style="background: var(--green);color:white;border:none;padding:9px 20px;border-radius:9999px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:all .2s ease;">
-                        Скачать сертификат
-                    </button>` : ''}
-                </div>` : ''}
-            </div>
-        </a>
-    `);
+                    ${isCompleted ? `
+                    <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                        <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;">
+                            <div style="width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 3px var(--gold)"></div>
+                            Курс завершен
+                        </div>
+                        ${hasCertificate ? `
+                        <button onclick="event.stopImmediatePropagation(); event.preventDefault(); downloadCertificate('${courseId}');"
+                                style="background: var(--green);color:white;border:none;padding:9px 20px;border-radius:9999px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:all .2s ease;">
+                            Скачать сертификат
+                        </button>` : ''}
+                    </div>` : ''}
+                </div>
+            </a>
+        `);
 }
 
 window.downloadCertificate = async function (courseId) {
@@ -507,82 +645,64 @@ window.downloadCertificate = async function (courseId) {
 // УЛУЧШЕНИЕ 1: МОИ КУРСЫ С ПРОГРЕСС-БАРОМ
 // ─────────────────────────────────────────
 async function loadUserCourses(user) {
-    const container = document.getElementById('myCoursesContainer');
+    const container = document.getElementById('user-courses-container');
     if (!container) return;
 
     try {
-        const snap = await getDocs(query(collection(db, "courses"), where("uid", "==", user.uid)));
+        const q = query(
+            collection(db, "courses"),
+            where("uid", "==", user.uid),
+        );
+        
+        const snapshot = await getDocs(q);
+        container.innerHTML = '';
 
-        if (snap.empty) {
-            renderEmptyState(container, '✏️', 'Вы ещё не создали ни одного курса', 'Создать первый курс', () => {
-                window.location.href = './create-course.html';
-            });
+        if (snapshot.empty) {
+            container.innerHTML = '<div class="empty-state">У вас пока нет созданных курсов</div>';
             return;
         }
 
-        let html = '<div class="courses-grid">';
+        let html = '<div class="courses-grid-modern">';
+        
+        snapshot.forEach(docSnap => {
+            const id = docSnap.id;
+            const data = docSnap.data();
+            
+            // Если статуса нет в БД, значит это старый курс, ставим approved
+            const status = data.status || "approved"; 
 
-        // Используем for...of, чтобы дождаться ответа от функции рейтинга
-        for (const d of snap.docs) {
-            const c = d.data();
-            const id = d.id;
-            const isDraft = c.status === 'Черновик';
-
-            const studentsCount = c.studentsCount || 0;
-            const modules = c.modules?.length || 0;
-
-            // Получаем реальный рейтинг из БД
-            let ratingText = await getCourseAverageRating(db, id);
-            ratingText = ratingText.replace('★ ', ''); // Оставляем только число для этого блока
+            // Логика формирования плашки статуса для курса
+            let statusBadge = '';
+            if (status === 'pending') {
+                statusBadge = `<span class="badge-status pending">На модерации</span>`;
+            } else if (status === 'rejected') {
+                statusBadge = `<span class="badge-status rejected">Отклонен</span>`;
+            } else {
+                statusBadge = `<span class="badge-status approved">Опубликован</span>`;
+            }
 
             html += `
-                <div class="course-card modern" onclick="window.viewCourse('${id}')">
-                    <div class="card-header">
-                        <span class="course-category">${escHtml(c.category || 'Общее')}</span>
-                        <div class="card-actions-top">
-                            <span class="status-dot ${isDraft ? 'draft' : 'published'}" title="${isDraft ? 'Черновик' : 'Опубликован'}"></span>
-                            <button onclick="event.stopImmediatePropagation(); window.deleteCourse('${id}')"
-                                    class="delete-course-btn" title="Удалить курс">
-                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                            </button>
-                        </div>
-                    </div>
+            <div class="card-modern" onclick="viewCourse('${id}')">
+              <div class="card-body-modern">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span class="card-tag-modern" style="background:rgba(140,190,255,0.15);">Курс</span>
+                    ${statusBadge}
+                </div>
+                <h3 class="card-title-modern">${escHtml(data.title || 'Без названия')}</h3>
+                <p class="card-text-modern">${escHtml(data.description || 'Описание отсутствует')}</p>
+              </div>
+              <div class="card-footer-modern">
+                <button onclick="event.stopImmediatePropagation(); editCourse('${id}')" class="btn-secondary-modern">Редактировать</button>
+                <button onclick="event.stopImmediatePropagation(); deleteCourse('${id}')" class="btn-secondary-modern" style="color:var(--red);">Удалить</button>
+              </div>
+            </div>`;
+        });
 
-                    <div class="card-body">
-                        <div class="course-icon-main" style="overflow:hidden;">
-    ${c.cover && c.cover.startsWith('http') ? `<img src="${c.cover}" style="width:100%;height:100%;object-fit:cover;display:block;">` : (c.emoji || '<div style="width:100%;height:100%;background:var(--bg3);"></div>')}
-</div>
-                        <h3 class="course-title-modern">${escHtml(c.title || 'Без названия')}</h3>
-                        <p class="course-description-modern">${escHtml((c.tagline || c.description || '').substring(0, 70))}...</p>
-                    </div>
+        html += '</div>';
+        container.innerHTML = html;
 
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            <span>${ratingText}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>${modules} модулей</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>${studentsCount} студентов</span>
-                        </div>
-                    </div>
-
-                    <div class="card-footer-modern">
-                        <button onclick="event.stopImmediatePropagation(); window.editCourse('${id}')" class="btn-secondary-modern">
-                            Настроить
-                        </button>
-                        <button onclick="event.stopImmediatePropagation(); window.viewCourse('${id}')" class="btn-primary-modern">
-                            Открыть →
-                        </button>
-                    </div>
-                </div>`;
-        }
-
-        container.innerHTML = html + '</div>';
-    } catch (err) {
-        console.error(err);
+    } catch (e) {
+        console.error("Ошибка при рендере курсов модерации:", e);
         container.innerHTML = '<div class="empty-state">Ошибка загрузки курсов</div>';
     }
 }
@@ -604,7 +724,7 @@ async function loadAllPublicCourses() {
     }
 
     try {
-        const publicCoursesQuery = query(collection(db, "courses"), where("status", "==", "Открытый"));
+        const publicCoursesQuery = query(collection(db, "courses"), where("status", "==", "approved"));
         const snap = await getDocs(publicCoursesQuery);
 
         if (snap.empty) {
@@ -679,29 +799,29 @@ async function loadAllPublicCourses() {
             else if (isStarted) btnText = `Продолжить (${percent}%)`;
 
             html += `
-            <div class="course-card" onclick="window.location.href='./course.html?id=${id}'">
-              <span class="course-num">${num} / ${escHtml(c.category || 'Общее')}</span>
-              <span class="course-emoji-wrap" style="overflow:hidden;">${coverHtml}</span>
-              <span class="course-badge">${escHtml(c.level || 'Для всех')}</span>
-              <div class="course-title">${escHtml(c.title || 'Без названия')}</div>
-              <div class="course-desc">${escHtml((c.tagline || c.description || '').substring(0, 70))}...</div>
-              ${isStarted ? `
-              <div class="course-progress-wrap">
-                <div class="course-progress-bar" style="width:${percent}%;background:${isCompleted ? 'var(--gold)' : 'var(--text)'};"></div>
-              </div>
-              <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px;">${isCompleted ? '✓ Завершён' : `${percent}% пройдено`}</div>` : ''}
-              <div class="course-meta">
-                <span>${escHtml(c.duration || '-')}</span>
-                <span style="color: var(--gold); font-weight: 500;">★ ${c.rating || '0.0'}</span>
-              </div>
-              <div class="course-footer">
-                <div class="course-author">
-                  ${avatarHtml}
-                  <span class="author-name">${escHtml(authorName)}</span>
+                <div class="course-card" onclick="window.location.href='./course.html?id=${id}'">
+                <span class="course-num">${num} / ${escHtml(c.category || 'Общее')}</span>
+                <span class="course-emoji-wrap" style="overflow:hidden;">${coverHtml}</span>
+                <span class="course-badge">${escHtml(c.level || 'Для всех')}</span>
+                <div class="course-title">${escHtml(c.title || 'Без названия')}</div>
+                <div class="course-desc">${escHtml((c.tagline || c.description || '').substring(0, 70))}...</div>
+                ${isStarted ? `
+                <div class="course-progress-wrap">
+                    <div class="course-progress-bar" style="width:${percent}%;background:${isCompleted ? 'var(--gold)' : 'var(--text)'};"></div>
                 </div>
-                <button class="course-btn" style="${isCompleted ? 'color:var(--gold);border-color:#16a34a;' : ''}">${btnText}</button>
-              </div>
-            </div>`;
+                <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px;">${isCompleted ? '✓ Завершён' : `${percent}% пройдено`}</div>` : ''}
+                <div class="course-meta">
+                    <span>${escHtml(c.duration || '-')}</span>
+                    <span style="color: var(--gold); font-weight: 500;">★ ${c.rating || '0.0'}</span>
+                </div>
+                <div class="course-footer">
+                    <div class="course-author" data-uid="${c.uid}" style="cursor:pointer;" title="Открыть профиль автора">
+                    ${avatarHtml}
+                    <span class="author-name">${escHtml(authorName)}</span>
+                    </div>
+                    <button class="course-btn" style="${isCompleted ? 'color:var(--gold);border-color:#16a34a;' : ''}">${btnText}</button>
+                </div>
+                </div>`;
             index++;
         }
 
@@ -876,9 +996,9 @@ function setupFeed(user) {
         if (snap.empty) {
             if (emptyState) {
                 emptyState.innerHTML = `
-                    <div class="empty-icon"><svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>comment-1</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-100.000000, -255.000000)" fill="#000000"> <path d="M116,281 C114.832,281 113.704,280.864 112.62,280.633 L107.912,283.463 L107.975,278.824 C104.366,276.654 102,273.066 102,269 C102,262.373 108.268,257 116,257 C123.732,257 130,262.373 130,269 C130,275.628 123.732,281 116,281 L116,281 Z M116,255 C107.164,255 100,261.269 100,269 C100,273.419 102.345,277.354 106,279.919 L106,287 L113.009,282.747 C113.979,282.907 114.977,283 116,283 C124.836,283 132,276.732 132,269 C132,261.269 124.836,255 116,255 L116,255 Z" id="comment-1" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>   </div>
-                    <div class="empty-title">Лента пока пуста</div>
-                    <div class="empty-sub">Будьте первым, кто поделится чем-то интересным!</div>`;
+                        <div class="empty-icon"><svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>comment-1</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-100.000000, -255.000000)" fill="#000000"> <path d="M116,281 C114.832,281 113.704,280.864 112.62,280.633 L107.912,283.463 L107.975,278.824 C104.366,276.654 102,273.066 102,269 C102,262.373 108.268,257 116,257 C123.732,257 130,262.373 130,269 C130,275.628 123.732,281 116,281 L116,281 Z M116,255 C107.164,255 100,261.269 100,269 C100,273.419 102.345,277.354 106,279.919 L106,287 L113.009,282.747 C113.979,282.907 114.977,283 116,283 C124.836,283 132,276.732 132,269 C132,261.269 124.836,255 116,255 L116,255 Z" id="comment-1" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>   </div>
+                        <div class="empty-title">Лента пока пуста</div>
+                        <div class="empty-state-rich">Будьте первым, кто поделится чем-то интересным!</div>`;
                 emptyState.style.display = 'flex';
             }
             return;
@@ -907,26 +1027,27 @@ function setupFeed(user) {
             const el = document.createElement('article');
             el.className = 'post-item';
             el.dataset.postId = data.id;
+            el.dataset.authorUid = data.uid || '';
             el.innerHTML = `
-                <div class="post-avatar-col">${buildAvatarHtml(avatar, name, 'create-post-avatar')}</div>
-                <div class="post-content-col">
-                    <div class="post-header">
-                        <div class="post-author-info">
-                            <span class="post-author-name">${escHtml(name)}</span>
-                            ${handle ? `<span class="post-author-handle">${escHtml(handle)}</span>` : ''}
-                            <span class="post-time">· ${time}</span>
+                    <div class="post-avatar-col">${buildAvatarHtml(avatar, name, 'create-post-avatar')}</div>
+                    <div class="post-content-col">
+                        <div class="post-header">
+                            <div class="post-author-info">
+                                <span class="post-author-name">${escHtml(name)}</span>
+                                ${handle ? `<span class="post-author-handle">${escHtml(handle)}</span>` : ''}
+                                <span class="post-time">· ${time}</span>
+                            </div>
+                            ${data.uid === user.uid ? `<button class="action-btn delete-post-btn" data-id="${data.id}" title="Удалить">✕</button>` : ''}
                         </div>
-                        ${data.uid === user.uid ? `<button class="action-btn delete-post-btn" data-id="${data.id}" title="Удалить">✕</button>` : ''}
-                    </div>
-                    ${data.text ? `<p class="post-text">${escHtml(data.text).replace(/\n/g, '<br>')}</p>` : ''}
-                    ${data.imageUrl ? `<div class="post-media-container"><img src="${data.imageUrl}" loading="lazy" alt=""></div>` : ''}
-                    ${data.poll ? buildPollHtml(data.id, data.poll, user.uid) : ''}
-                    <div class="post-actions">
-                        <button class="action-btn like-post-btn ${liked ? 'liked' : ''}" data-id="${data.id}">
-                            ${heartSVG(liked)}<span>${data.likes || 0}</span>
-                        </button>
-                    </div>
-                </div>`;
+                        ${data.text ? `<p class="post-text">${escHtml(data.text).replace(/\n/g, '<br>')}</p>` : ''}
+                        ${data.imageUrl ? `<div class="post-media-container"><img src="${data.imageUrl}" loading="lazy" alt=""></div>` : ''}
+                        ${data.poll ? buildPollHtml(data.id, data.poll, user.uid) : ''}
+                        <div class="post-actions">
+                            <button class="action-btn like-post-btn ${liked ? 'liked' : ''}" data-id="${data.id}">
+                                ${heartSVG(liked)}<span>${data.likes || 0}</span>
+                            </button>
+                        </div>
+                    </div>`;
 
             if (emptyState) emptyState.insertAdjacentElement('beforebegin', el);
             else feedContainer.appendChild(el);
@@ -1000,19 +1121,19 @@ function buildPollHtml(postId, poll, uid) {
         const pct = totalVotes > 0 && hasVoted ? Math.round((opt.votes || 0) / totalVotes * 100) : 0;
         const isMyVote = myVote === i;
         return `
-            <button class="poll-option-btn ${hasVoted ? 'voted' : ''} ${isMyVote ? 'my-vote' : ''}"
-                    data-post-id="${postId}" data-option-index="${i}"
-                    ${hasVoted ? 'disabled' : ''}>
-                <span class="poll-option-bar" style="width:${pct}%"></span>
-                <span class="poll-option-text">${escHtml(opt.text)}</span>
-                ${hasVoted ? `<span class="poll-option-pct">${pct}%</span>` : ''}
-            </button>`;
+                <button class="poll-option-btn ${hasVoted ? 'voted' : ''} ${isMyVote ? 'my-vote' : ''}"
+                        data-post-id="${postId}" data-option-index="${i}"
+                        ${hasVoted ? 'disabled' : ''}>
+                    <span class="poll-option-bar" style="width:${pct}%"></span>
+                    <span class="poll-option-text">${escHtml(opt.text)}</span>
+                    ${hasVoted ? `<span class="poll-option-pct">${pct}%</span>` : ''}
+                </button>`;
     }).join('');
 
     return `<div class="poll-block">
-        ${optionsHtml}
-        <div class="poll-footer">${totalVotes} ${declension(totalVotes, ['голос', 'голоса', 'голосов'])}</div>
-    </div>`;
+            ${optionsHtml}
+            <div class="poll-footer">${totalVotes} ${declension(totalVotes, ['голос', 'голоса', 'голосов'])}</div>
+        </div>`;
 }
 
 function renderPollUpdate(postId, poll, uid) {
@@ -1071,13 +1192,16 @@ async function runSearch(q, container) {
         }
 
         container.innerHTML = results.map(r => `
-            <a class="search-result-item" href="${r.type === 'course' ? `./course.html?id=${r.id}` : '#'}">
-                <div class="sr-icon">${r.icon ? ([...String(r.icon)].length <= 2 ? r.icon : `<img src="${r.icon}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`) : '<div style="width:100%;height:100%;background:var(--bg3);border-radius:50%;"></div>'}</div>
-                <div class="sr-info">
-                    <h4>${escHtml(r.title || '')}</h4>
-                    <p>${escHtml(r.sub)}</p>
-                </div>
-            </a>`).join('');
+                <a class="search-result-item" 
+                   href="${r.type === 'course' ? `./course.html?id=${r.id}` : '#'}"
+                   data-type="${r.type}"
+                   data-uid="${r.type === 'user' ? r.id : ''}">
+                    <div class="sr-icon">${r.icon ? ([...String(r.icon)].length <= 2 ? r.icon : `<img src="${r.icon}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`) : '<div style="width:100%;height:100%;background:var(--bg3);border-radius:50%;"></div>'}</div>
+                    <div class="sr-info">
+                        <h4>${escHtml(r.title || '')}</h4>
+                        <p>${escHtml(r.sub)}</p>
+                    </div>
+                </a>`).join('');
     } catch (err) {
         container.innerHTML = '<div class="empty-state" style="margin-top:24px;">Ошибка поиска</div>';
         console.error(err);
@@ -1091,27 +1215,21 @@ async function setupSuggestedUsers(user) {
     document.querySelectorAll('.follow-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const targetUid = btn.dataset.uid;
-            const isFollowing = btn.classList.contains('following');
+            if (!targetUid) return;
 
-            if (targetUid) {
-                const userRef = doc(db, "users", user.uid);
-                const targetRef = doc(db, "users", targetUid);
-                try {
-                    if (isFollowing) {
-                        await updateDoc(userRef, { following: increment(-1), followingList: arrayRemove(targetUid) });
-                        await updateDoc(targetRef, { followers: increment(-1), followersList: arrayRemove(user.uid) });
-                    } else {
-                        await updateDoc(userRef, { following: increment(1), followingList: arrayUnion(targetUid) });
-                        await updateDoc(targetRef, { followers: increment(1), followersList: arrayUnion(user.uid) });
-                    }
-                } catch (err) { console.error(err); }
+            btn.disabled = true; // Защита от спам-кликов
+            try {
+                const isNowFollowing = await toggleFollowStatus(targetUid);
+                
+                btn.classList.toggle('following', isNowFollowing);
+                btn.textContent = isNowFollowing ? 'Вы следите' : 'Следить';
+                btn.style.borderColor = isNowFollowing ? 'var(--border3)' : '';
+                btn.style.color = isNowFollowing ? 'var(--text)' : '';
+            } catch (err) { 
+                console.error("Ошибка при подписке:", err); 
+            } finally {
+                btn.disabled = false;
             }
-
-            btn.classList.toggle('following');
-            const following = btn.classList.contains('following');
-            btn.textContent = following ? 'Вы следите' : 'Следить';
-            btn.style.borderColor = following ? 'var(--border3)' : '';
-            btn.style.color = following ? 'var(--text)' : '';
         });
     });
 }
@@ -1179,11 +1297,11 @@ function setupCourseFilters() {
 // ─────────────────────────────────────────
 function renderEmptyState(container, icon, text, btnText, btnAction) {
     container.innerHTML = `
-        <div class="empty-state-rich">
-            <div class="empty-icon">${icon}</div>
-            <div class="empty-title">${text}</div>
-            ${btnText ? `<button class="empty-action-btn">${btnText} →</button>` : ''}
-        </div>`;
+            <div class="empty-state-rich">
+                <div class="empty-icon">${icon}</div>
+                <div class="empty-title">${text}</div>
+                ${btnText ? `<button class="empty-action-btn">${btnText} →</button>` : ''}
+            </div>`;
     if (btnAction) {
         container.querySelector('.empty-action-btn')?.addEventListener('click', btnAction);
     }
@@ -1197,257 +1315,257 @@ function injectStyles() {
     const s = document.createElement('style');
     s.id = 'tbq-injected-styles';
     s.textContent = `
-    /* ПОСТЫ */
-    .post-item {
-        display: flex; gap: 12px;
-        padding: 18px 24px;
-        border-bottom: 1px solid var(--border);
-        animation: fadeUp .2s ease;
-    }
-    .post-avatar-col { flex-shrink: 0; }
-    .post-content-col { flex: 1; min-width: 0; }
-    .post-header {
-        display: flex; align-items: flex-start;
-        justify-content: space-between; gap: 8px; margin-bottom: 6px;
-    }
-    .post-author-info { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-    .post-author-name { font-size: 14px; font-weight: 700; }
-    .post-author-handle { font-family: var(--mono); font-size: 11px; color: var(--text3); }
-    .post-time { font-family: var(--mono); font-size: 11px; color: var(--text3); }
-    .post-text { font-size: 15px; line-height: 1.6; margin-bottom: 10px; word-break: break-word; }
-    .post-media-container { margin-bottom: 10px; }
-    .post-media-container img {
-        max-width: 100%; max-height: 360px;
-        object-fit: cover; border: 1px solid var(--border2); display: block;
-    }
-    .post-actions { display: flex; gap: 16px; padding-top: 4px; }
-    .action-btn {
-        display: inline-flex; align-items: center; gap: 6px;
-        background: transparent; border: none;
-        color: var(--text3); font-family: var(--mono); font-size: 12px;
-        cursor: pointer; padding: 4px 0; transition: color .15s;
-    }
-    .action-btn svg { width: 16px; height: 16px; }
-    .like-post-btn:hover { color: #ef4444; }
-    .like-post-btn.liked { color: #ef4444; }
-    .delete-post-btn { color: var(--text3); font-size: 11px; padding: 4px 6px; }
-    .delete-post-btn:hover { color: var(--red); }
+        /* ПОСТЫ */
+        .post-item {
+            display: flex; gap: 12px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            animation: fadeUp .2s ease;
+        }
+        .post-avatar-col { flex-shrink: 0; }
+        .post-content-col { flex: 1; min-width: 0; }
+        .post-header {
+            display: flex; align-items: flex-start;
+            justify-content: space-between; gap: 8px; margin-bottom: 6px;
+        }
+        .post-author-info { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+        .post-author-name { font-size: 14px; font-weight: 700; }
+        .post-author-handle { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+        .post-time { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+        .post-text { font-size: 15px; line-height: 1.6; margin-bottom: 10px; word-break: break-word; }
+        .post-media-container { margin-bottom: 10px; }
+        .post-media-container img {
+            max-width: 100%; max-height: 360px;
+            object-fit: cover; border: 1px solid var(--border2); display: block;
+        }
+        .post-actions { display: flex; gap: 16px; padding-top: 4px; }
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: transparent; border: none;
+            color: var(--text3); font-family: var(--mono); font-size: 12px;
+            cursor: pointer; padding: 4px 0; transition: color .15s;
+        }
+        .action-btn svg { width: 16px; height: 16px; }
+        .like-post-btn:hover { color: #ef4444; }
+        .like-post-btn.liked { color: #ef4444; }
+        .delete-post-btn { color: var(--text3); font-size: 11px; padding: 4px 6px; }
+        .delete-post-btn:hover { color: var(--red); }
 
-    /* ОПРОСЫ */
-    .poll-block { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
-    .poll-option-btn {
-        position: relative; overflow: hidden;
-        background: var(--bg2); border: 1px solid var(--border2);
-        color: var(--text); padding: 10px 14px; text-align: left;
-        cursor: pointer; font-family: var(--font); font-size: 13px;
-        display: flex; align-items: center; justify-content: space-between; gap: 8px;
-        transition: border-color .15s; width: 100%;
-    }
-    .poll-option-btn:not([disabled]):hover { border-color: var(--border3); }
-    .poll-option-btn.my-vote { border-color: var(--text); }
-    .poll-option-bar {
-        position: absolute; left: 0; top: 0; bottom: 0;
-        background: var(--accent-dim); transition: width .5s ease; pointer-events: none;
-    }
-    .poll-option-text { position: relative; z-index: 1; }
-    .poll-option-pct { font-family: var(--mono); font-size: 11px; color: var(--text3); position: relative; z-index: 1; }
-    .poll-footer { font-family: var(--mono); font-size: 10px; color: var(--text3); text-align: right; margin-top: 2px; }
+        /* ОПРОСЫ */
+        .poll-block { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+        .poll-option-btn {
+            position: relative; overflow: hidden;
+            background: var(--bg2); border: 1px solid var(--border2);
+            color: var(--text); padding: 10px 14px; text-align: left;
+            cursor: pointer; font-family: var(--font); font-size: 13px;
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            transition: border-color .15s; width: 100%;
+        }
+        .poll-option-btn:not([disabled]):hover { border-color: var(--border3); }
+        .poll-option-btn.my-vote { border-color: var(--text); }
+        .poll-option-bar {
+            position: absolute; left: 0; top: 0; bottom: 0;
+            background: var(--accent-dim); transition: width .5s ease; pointer-events: none;
+        }
+        .poll-option-text { position: relative; z-index: 1; }
+        .poll-option-pct { font-family: var(--mono); font-size: 11px; color: var(--text3); position: relative; z-index: 1; }
+        .poll-footer { font-family: var(--mono); font-size: 10px; color: var(--text3); text-align: right; margin-top: 2px; }
 
-    /* УЛУЧШЕНИЕ 1: Прогресс в карточке курса */
-    .course-progress-wrap {
-        height: 2px; background: var(--border);
-        margin-bottom: 6px; overflow: hidden;
-    }
-    .course-progress-bar {
-        height: 100%; transition: width .5s ease;
-    }
+        /* УЛУЧШЕНИЕ 1: Прогресс в карточке курса */
+        .course-progress-wrap {
+            height: 2px; background: var(--border);
+            margin-bottom: 6px; overflow: hidden;
+        }
+        .course-progress-bar {
+            height: 100%; transition: width .5s ease;
+        }
 
-    /* УЛУЧШЕНИЕ 3: СТРИК */
-        .streak-widget {
-        display: flex;
-        align-items: center;
-        gap: 24px;
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        padding: 16px 20px;
-        margin-bottom: 24px;
-        border-radius: 12px; /* опционально, для красоты */
-    }
+        /* УЛУЧШЕНИЕ 3: СТРИК */
+            .streak-widget {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border-radius: 12px; /* опционально, для красоты */
+        }
 
-    .streak-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-shrink: 0;
-    }
+        .streak-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
 
-    .streak-fire {
-        font-size: 32px;
-    }
+        .streak-fire {
+            font-size: 32px;
+        }
 
-    .streak-num {
-        font-size: 32px;
-        font-weight: 900;
-        line-height: 1;
-    }
+        .streak-num {
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1;
+        }
 
-    .streak-text {
-        font-family: var(--mono);
-        font-size: 10px;
-        color: var(--text3);
-        text-transform: uppercase;
-        letter-spacing: .08em;
-    }
+        .streak-text {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
 
-    .streak-days-col {
-        flex: 1;
-    }
+        .streak-days-col {
+            flex: 1;
+        }
 
-    .streak-label-top {
-        font-family: var(--mono);
-        font-size: 10px;
-        color: var(--text3);
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
+        .streak-label-top {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text3);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
 
-    .streak-days-row {
-        display: flex;
-        gap: 8px;
-        justify-content: space-between; /* или space-around */
-    }
+        .streak-days-row {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between; /* или space-around */
+        }
 
-    .streak-day {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        flex: 1;
-    }
+        .streak-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
 
-    .streak-day-dot {
-        width: 22px;
-        height: 22px;
-        border: 2px solid var(--border2);
-        border-radius: 6px;
-        transition: all 0.2s ease;
-    }
+        .streak-day-dot {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border2);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
 
-    .streak-day.done .streak-day-dot {
-        background: #22c55e;        /* зелёный для выполненных */
-        border-color: #22c55e;
-    }
+        .streak-day.done .streak-day-dot {
+            background: #22c55e;        /* зелёный для выполненных */
+            border-color: #22c55e;
+        }
 
-    .streak-day.today .streak-day-dot {
-        border-color: var(--text);
-        background: transparent;
-        box-shadow: 0 0 0 3px rgba(255,255,255,0.1); /* подсветка сегодня */
-    }
+        .streak-day.today .streak-day-dot {
+            border-color: var(--text);
+            background: transparent;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.1); /* подсветка сегодня */
+        }
 
-    .streak-day-name {
-        font-family: var(--mono);
-        font-size: 9px;
-        color: var(--text3);
-    }
+        .streak-day-name {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--text3);
+        }
 
-    /* УЛУЧШЕНИЕ 5: ПУСТЫЕ СОСТОЯНИЯ */
-    .empty-state-rich {
-        display: flex; flex-direction: column; align-items: center;
-        padding: 48px 24px; text-align: center;
-        border: 1px dashed var(--border); margin: 8px auto;
-        width: 90%; box-sizing: border-box;
-    }
-    .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: .7; }
-    .empty-title { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 16px; line-height: 1.6; }
-    .empty-sub { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 16px; }
-    .empty-action-btn {
-        background: var(--text); color: var(--bg);
-        border: none; padding: 8px 20px;
-        font-family: var(--font); font-size: 12px; font-weight: 700;
-        cursor: pointer; transition: opacity .15s; letter-spacing: .03em;
-    }
-    .empty-action-btn:hover { opacity: .8; }
+        /* УЛУЧШЕНИЕ 5: ПУСТЫЕ СОСТОЯНИЯ */
+        .empty-state-rich {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 48px 24px; text-align: center;
+            border: 1px dashed var(--border); margin: 8px auto;
+            width: 90%; box-sizing: border-box;
+        }
+        .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: .7; }
+        .empty-title { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 16px; line-height: 1.6; }
+        .empty-sub { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 16px; }
+        .empty-action-btn {
+            background: var(--text); color: var(--bg);
+            border: none; padding: 8px 20px;
+            font-family: var(--font); font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: opacity .15s; letter-spacing: .03em;
+        }
+        .empty-action-btn:hover { opacity: .8; }
 
-    /* УЛУЧШЕНИЕ 6: СТАТИСТИКА */
-    .stats-strip {
-        display: flex; gap: 1px; margin-bottom: 28px;
-        background: var(--border);
-        border: 1px solid var(--border);
-    }
-    .stat-chip {
-        flex: 1; background: var(--bg);
-        padding: 16px 12px; text-align: center;
-    }
-    .stat-chip-num {
-        display: block; font-size: 20px; font-weight: 900;
-        line-height: 1; margin-bottom: 4px;
-    }
-    .stat-chip-label {
-        display: block; font-family: var(--mono);
-        font-size: 9px; color: var(--text3);
-        text-transform: uppercase; letter-spacing: .1em;
-    }
+        /* УЛУЧШЕНИЕ 6: СТАТИСТИКА */
+        .stats-strip {
+            display: flex; gap: 1px; margin-bottom: 28px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+        .stat-chip {
+            flex: 1; background: var(--bg);
+            padding: 16px 12px; text-align: center;
+        }
+        .stat-chip-num {
+            display: block; font-size: 20px; font-weight: 900;
+            line-height: 1; margin-bottom: 4px;
+        }
+        .stat-chip-label {
+            display: block; font-family: var(--mono);
+            font-size: 9px; color: var(--text3);
+            text-transform: uppercase; letter-spacing: .1em;
+        }
 
-    /* УЛУЧШЕНИЕ 2: PILL ФИЛЬТРЫ */
-    .filter-pills {
-        display: flex; gap: 8px; flex-wrap: wrap;
-        padding: 16px 28px; border-bottom: 1px solid var(--border);
-    }
-    .filter-pill {
-        background: transparent; border: 1px solid var(--border2);
-        color: var(--text3); padding: 5px 14px;
-        font-family: var(--font); font-size: 12px; font-weight: 500;
-        cursor: pointer; border-radius: 99px; transition: all .15s;
-        letter-spacing: .02em;
-    }
-    .filter-pill:hover { border-color: var(--border3); color: var(--text2); }
-    .filter-pill.active {
-        background: var(--text); color: var(--bg);
-        border-color: var(--text);
-    }
+        /* УЛУЧШЕНИЕ 2: PILL ФИЛЬТРЫ */
+        .filter-pills {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            padding: 16px 28px; border-bottom: 1px solid var(--border);
+        }
+        .filter-pill {
+            background: transparent; border: 1px solid var(--border2);
+            color: var(--text3); padding: 5px 14px;
+            font-family: var(--font); font-size: 12px; font-weight: 500;
+            cursor: pointer; border-radius: 99px; transition: all .15s;
+            letter-spacing: .02em;
+        }
+        .filter-pill:hover { border-color: var(--border3); color: var(--text2); }
+        .filter-pill.active {
+            background: var(--text); color: var(--bg);
+            border-color: var(--text);
+        }
 
-    /* FOLLOW */
-    .follow-btn.following { border-color: var(--border3); color: var(--text); }
+        /* FOLLOW */
+        .follow-btn.following { border-color: var(--border3); color: var(--text); }
 
-    /* TOAST */
-    #tbq-toast {
-        position: fixed; bottom: 80px; left: 50%;
-        transform: translateX(-50%) translateY(20px);
-        background: var(--text); color: var(--bg);
-        padding: 10px 24px; font-family: var(--mono); font-size: 12px; font-weight: 500;
-        z-index: 9999; opacity: 0;
-        transition: opacity .25s, transform .25s;
-        pointer-events: none; white-space: nowrap;
-    }
-    #tbq-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        /* TOAST */
+        #tbq-toast {
+            position: fixed; bottom: 80px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--text); color: var(--bg);
+            padding: 10px 24px; font-family: var(--mono); font-size: 12px; font-weight: 500;
+            z-index: 9999; opacity: 0;
+            transition: opacity .25s, transform .25s;
+            pointer-events: none; white-space: nowrap;
+        }
+        #tbq-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    @keyframes shake {
-        0%,100% { transform: translateX(0); }
-        20%,60%  { transform: translateX(-6px); }
-        40%,80%  { transform: translateX(6px); }
-    }
-    .shake { animation: shake .3s ease; }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%,60%  { transform: translateX(-6px); }
+            40%,80%  { transform: translateX(6px); }
+        }
+        .shake { animation: shake .3s ease; }
 
-    /* ФИКС РАЗМЕРА ОБЛОЖЕК И ВЫРАВНИВАНИЕ КАРТОЧЕК */
-    .course-emoji-wrap,
-    .course-icon-main {
-        display: block; width: 100%; height: 180px;
-        background: var(--bg3); overflow: hidden;
-        flex-shrink: 0; border-radius: var(--r); margin-bottom: 12px;
-    }
-    .course-emoji-wrap img,
-    .course-icon-main img {
-        width: 100%; height: 100%;
-        object-fit: cover; display: block;
-    }
-    .course-card {
-        display: flex; flex-direction: column; height: 100%;
-    }
-    .course-footer {
-        margin-top: auto; padding-top: 16px;
-    }
-    `;
+        /* ФИКС РАЗМЕРА ОБЛОЖЕК И ВЫРАВНИВАНИЕ КАРТОЧЕК */
+        .course-emoji-wrap,
+        .course-icon-main {
+            display: block; width: 100%; height: 180px;
+            background: var(--bg3); overflow: hidden;
+            flex-shrink: 0; border-radius: var(--r); margin-bottom: 12px;
+        }
+        .course-emoji-wrap img,
+        .course-icon-main img {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+        }
+        .course-card {
+            display: flex; flex-direction: column; height: 100%;
+        }
+        .course-footer {
+            margin-top: auto; padding-top: 16px;
+        }
+        `;
     document.head.appendChild(s);
 }
 
@@ -1532,3 +1650,769 @@ async function getCourseAverageRating(db, courseId) {
         return "★ —";
     }
 }
+
+
+
+
+//ПЕРЕКЛЮЧЕНИЕ ТЕМЫ 
+
+function applyTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const html = document.documentElement;
+
+    if (savedTheme === 'dark') {
+        html.classList.add('dark');
+    } else if (savedTheme === 'light') {
+        html.classList.remove('dark');
+    } else {
+        // Системная тема
+        const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isSystemDark) html.classList.add('dark');
+        else html.classList.remove('dark');
+    }
+    updateActiveButton();
+}
+
+function setTheme(mode) {
+    const html = document.documentElement;
+
+    if (mode === 'dark') {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    } else if (mode === 'light') {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    } else {
+        // system
+        localStorage.removeItem('theme');
+        const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isSystemDark) html.classList.add('dark');
+        else html.classList.remove('dark');
+    }
+    updateActiveButton();
+}
+
+function updateActiveButton() {
+    const saved = localStorage.getItem('theme');
+    const lightBtn = document.getElementById('themeLightBtn');
+    const darkBtn = document.getElementById('themeDarkBtn');
+    const sysBtn = document.getElementById('themeSystemBtn');
+
+    if (!lightBtn || !darkBtn || !sysBtn) return;
+
+    lightBtn.classList.toggle('active', saved === 'light');
+    darkBtn.classList.toggle('active', saved === 'dark');
+    sysBtn.classList.toggle('active', !saved);
+}
+
+// Инициализация переключателя
+function initThemeSwitcher() {
+    applyTheme();
+
+    // Слушаем изменение системной темы
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (!localStorage.getItem('theme')) applyTheme();
+    });
+
+    // Кнопки
+    const lightBtn = document.getElementById('themeLightBtn');
+    const darkBtn = document.getElementById('themeDarkBtn');
+    const sysBtn = document.getElementById('themeSystemBtn');
+
+    if (lightBtn) lightBtn.addEventListener('click', () => setTheme('light'));
+    if (darkBtn) darkBtn.addEventListener('click', () => setTheme('dark'));
+    if (sysBtn) sysBtn.addEventListener('click', () => setTheme('system'));
+}
+
+// Запуск после загрузки страницы
+window.addEventListener('load', initThemeSwitcher);
+
+
+// ─────────────────────────────────────────
+// РЕКОМЕНДОВАННЫЕ КУРСЫ — ТОЛЬКО С РЕЙТИНГОМ > 4.0
+// ─────────────────────────────────────────
+async function loadRecommendedCourses() {
+    const grid = document.getElementById('recommendedCoursesGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '<div class="empty-state">Загрузка лучших курсов</div>';
+
+    try {
+        const publicQuery = query(collection(db, "courses"), where("status", "==", "approved"));
+        const snap = await getDocs(publicQuery);
+
+        if (snap.empty) {
+            grid.innerHTML = `
+                <div class="empty-state-rich">
+                    <div class="empty-icon">⭐</div>
+                    <div class="empty-title">Пока нет курсов</div>
+                </div>`;
+            return;
+        }
+
+        // Кэш авторов
+        const uidSet = new Set();
+        snap.forEach(d => uidSet.add(d.data().uid));
+        const userCache = {};
+        await Promise.all([...uidSet].map(async uid => {
+            if (!uid) return;
+            try {
+                const ud = await getDoc(doc(db, "users", uid));
+                if (ud.exists()) userCache[uid] = ud.data();
+            } catch (e) { }
+        }));
+
+        let highRated = [];
+
+        for (const docSnap of snap.docs) {
+            const c = docSnap.data();
+
+            // ВСЕГДА считаем актуальный рейтинг из отзывов
+            let ratingNum = 0;
+            const ratingStr = await getCourseAverageRating(db, docSnap.id);
+
+            if (ratingStr && ratingStr.includes('★')) {
+                ratingNum = parseFloat(ratingStr.replace('★ ', '')) || 0;
+            } else if (c.rating) {
+                ratingNum = parseFloat(c.rating) || 0;
+            }
+
+            if (ratingNum > 4) {
+                highRated.push({
+                    id: docSnap.id,
+                    ...c,
+                    rating: ratingNum   // сохраняем число
+                });
+            }
+        }
+
+        // Сортируем по убыванию рейтинга
+        highRated.sort((a, b) => b.rating - a.rating);
+        highRated = highRated.slice(0, 8); // максимум 8 лучших
+
+        if (highRated.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-sub">Как только появятся — они сразу попадут сюда</div>
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        highRated.forEach((course, i) => {
+            const num = String(i + 1).padStart(2, '0');
+            const author = userCache[course.uid] || {};
+            const authorName = author.name || 'Автор';
+
+            let avatarHtml = author.avatar
+                ? ([...author.avatar].length <= 2
+                    ? `<div class="author-avatar" style="background:var(--accent-dim);color:var(--text);font-size:14px;display:flex;align-items:center;justify-content:center;">${author.avatar}</div>`
+                    : `<div class="author-avatar" style="background:url('${author.avatar}') center/cover;"></div>`)
+                : `<div class="author-avatar" style="background:var(--accent-dim);color:var(--text);display:flex;align-items:center;justify-content:center;">${authorName[0]?.toUpperCase() || 'А'}</div>`;
+
+            let coverHtml = course.cover && course.cover.startsWith('http')
+                ? `<img src="${course.cover}" style="width:100%;height:100%;object-fit:cover;">`
+                : course.emoji
+                    ? `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;">${course.emoji}</div>`
+                    : `<div style="width:100%;height:100%;background:var(--bg3);"></div>`;
+
+            html += `
+            <div class="course-card" onclick="window.location.href='./course.html?id=${course.id}'">
+              <span class="course-num">${num} / Рекомендация</span>
+              <span class="course-emoji-wrap" style="overflow:hidden;">${coverHtml}</span>
+              <span class="course-badge">${escHtml(course.level || course.category || 'Для всех')}</span>
+              <div class="course-title">${escHtml(course.title || 'Без названия')}</div>
+              <div class="course-desc">${escHtml((course.tagline || course.description || '').substring(0, 110))}...</div>
+              <div class="course-meta">
+                <span>${escHtml(course.duration || '12 ч.')}</span>
+                <span style="color:var(--gold);font-weight:500;">★ ${course.rating.toFixed(1)}</span>
+                <span>${course.studentsCount || 0} студентов</span>
+              </div>
+              <div class="course-footer">
+                <div class="course-author">
+                  ${avatarHtml}
+                  <span class="author-name">${escHtml(authorName)}</span>
+                </div>
+                <button class="course-btn" onclick="event.stopPropagation(); window.location.href='./course.html?id=${course.id}'">Начать →</button>
+              </div>
+            </div>`;
+        });
+
+        grid.innerHTML = html;
+
+    } catch (err) {
+        console.error("Ошибка загрузки рекомендаций:", err);
+        grid.innerHTML = '<div class="empty-state">Не удалось загрузить рекомендации</div>';
+    }
+}
+
+// Python Path — перенесён в python-path.js
+
+
+// ===================== ИНТЕРАКТИВНЫЕ УРОКИ =====================
+
+// ══════════════════════════════════════════════════════════════
+// ИНТЕРАКТИВНЫЕ УРОКИ — полный хаб (view-story)
+// ══════════════════════════════════════════════════════════════
+
+let _storyUser = null;         // текущий пользователь
+let _allLessons = [];          // кэш всех уроков
+let _myLessons = [];           // кэш уроков пользователя
+let _docsCache = [];           // кэш документов
+let _storyTab = 'all';         // активная вкладка
+let _storySearch = '';
+let _storyLevel = '';
+let _storySubject = '';
+let _sessionActive = false;
+let _importSelectedTag = '';
+
+async function loadUserLessons(user) {
+    _storyUser = user;
+    initStoryHub(user);
+}
+
+function initStoryHub(user) {
+    // Переключение вкладок
+    document.querySelectorAll('.story-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.story-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.story-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            _storyTab = btn.dataset.storyTab;
+            const panel = document.getElementById(`story-tab-${_storyTab}`);
+            if (panel) panel.classList.add('active');
+            onStoryTabChange(_storyTab, user);
+        });
+    });
+
+    // Поиск и фильтры
+    document.getElementById('storySearch')?.addEventListener('input', e => {
+        _storySearch = e.target.value.toLowerCase();
+        renderLessonsGrid(_storyTab === 'mine' ? _myLessons : _allLessons, 
+                          _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
+    });
+    document.getElementById('storyFilterLevel')?.addEventListener('change', e => {
+        _storyLevel = e.target.value;
+        renderLessonsGrid(_storyTab === 'mine' ? _myLessons : _allLessons,
+                          _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
+    });
+    document.getElementById('storyFilterSubject')?.addEventListener('change', e => {
+        _storySubject = e.target.value;
+        renderLessonsGrid(_storyTab === 'mine' ? _myLessons : _allLessons,
+                          _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
+    });
+    document.getElementById('storyFilterReset')?.addEventListener('click', () => {
+        _storySearch = ''; _storyLevel = ''; _storySubject = '';
+        document.getElementById('storySearch').value = '';
+        document.getElementById('storyFilterLevel').value = '';
+        document.getElementById('storyFilterSubject').value = '';
+        renderLessonsGrid(_allLessons, 'allLessonsGrid', user);
+        renderLessonsGrid(_myLessons, 'myLessonsGrid', user);
+    });
+
+    // Кнопки импорта
+    document.getElementById('btnImportDoc')?.addEventListener('click', openImportModal);
+    document.getElementById('btnStartSession')?.addEventListener('click', startLessonSession);
+
+    // Drop zone в панели документов
+    setupDropZone('docsDropZone', 'docFileInput', handleDocFiles);
+    document.getElementById('docFileInput')?.addEventListener('change', e => handleDocFiles(e.target.files));
+
+    // Импорт модал
+    setupImportModal(user);
+
+    // Загружаем данные
+    fetchAllLessons(user);
+    fetchMyLessons(user);
+    fetchUserDocs(user);
+    updateStoryStats(user);
+}
+
+function onStoryTabChange(tab, user) {
+    if (tab === 'all' && !_allLessons.length) fetchAllLessons(user);
+    if (tab === 'mine' && !_myLessons.length) fetchMyLessons(user);
+    if (tab === 'docs') fetchUserDocs(user);
+    if (tab === 'running') renderRunningHub();
+}
+
+// ── ЗАГРУЗКА ВСЕХ УРОКОВ ──
+async function fetchAllLessons(user) {
+    try {
+        const q = query(collection(db, "interactiveLessons"), orderBy("createdAt", "desc"), limit(50));
+        const snap = await getDocs(q);
+        _allLessons = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderLessonsGrid(_allLessons, 'allLessonsGrid', user);
+        updateStoryStats(user);
+    } catch (e) {
+        const g = document.getElementById('allLessonsGrid');
+        if (g) g.innerHTML = emptyState('⚠️', 'Ошибка загрузки', e.message);
+    }
+}
+
+// ── МОИ УРОКИ ──
+async function fetchMyLessons(user) {
+    try {
+        const q = query(collection(db, "interactiveLessons"), where("uid", "==", user.uid));
+        const snap = await getDocs(q);
+        _myLessons = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderLessonsGrid(_myLessons, 'myLessonsGrid', user, true);
+        // Заполнить select в импорт-модале
+        const sel = document.getElementById('importLinkLesson');
+        if (sel) {
+            _myLessons.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.id; opt.textContent = l.title || 'Без названия';
+                sel.appendChild(opt);
+            });
+        }
+        updateStoryStats(user);
+    } catch (e) {
+        const g = document.getElementById('myLessonsGrid');
+        if (g) g.innerHTML = emptyState('⚠️', 'Ошибка загрузки', e.message);
+    }
+}
+
+// ── РЕНДЕР СЕТКИ ──
+function renderLessonsGrid(lessons, containerId, user, isMine = false) {
+    const grid = document.getElementById(containerId);
+    if (!grid) return;
+
+    let filtered = lessons.filter(l => {
+        const title = (l.title || '').toLowerCase();
+        const desc  = (l.description || '').toLowerCase();
+        const matchSearch  = !_storySearch || title.includes(_storySearch) || desc.includes(_storySearch);
+        const matchLevel   = !_storyLevel   || l.level   === _storyLevel;
+        const matchSubject = !_storySubject || l.subject === _storySubject || (l.tags || []).includes(_storySubject);
+        return matchSearch && matchLevel && matchSubject;
+    });
+
+    if (!filtered.length) {
+        grid.innerHTML = emptyState(
+            isMine ? '✏️' : '📚',
+            isMine ? 'Нет созданных уроков' : 'Уроки не найдены',
+            isMine ? 'Создайте свой первый интерактивный урок' : 'Попробуйте изменить фильтры или поиск'
+        );
+        return;
+    }
+
+    grid.innerHTML = filtered.map(l => lessonHubCard(l, user, isMine)).join('');
+}
+
+function lessonHubCard(l, user, isMine) {
+    const status = l.status || 'approved';
+    const isOwn  = user && l.uid === user.uid;
+    const statusTag = status === 'pending'  ? `<span class="lesson-hub-tag status-pending">На модерации</span>` :
+                      status === 'rejected' ? `<span class="lesson-hub-tag status-rejected">Отклонён</span>` :
+                                              `<span class="lesson-hub-tag status-approved">Опубликован</span>`;
+    const levelColors = { beginner: 'green', intermediate: 'orange', advanced: 'purple' };
+    const levelLabel  = { beginner: 'Начинающий', intermediate: 'Средний', advanced: 'Продвинутый' };
+    const lvlTag = l.level ? `<span class="lesson-hub-tag ${levelColors[l.level]||''}">${levelLabel[l.level]||l.level}</span>` : '';
+    const subjectTag = l.subject ? `<span class="lesson-hub-tag blue">${escHtml(l.subject)}</span>` : '';
+    const blocks = Array.isArray(l.blocks) ? l.blocks.length : 0;
+    const dateStr = l.createdAt?.toDate ? l.createdAt.toDate().toLocaleDateString('ru-RU', {day:'numeric',month:'short'}) : '—';
+
+    const editBtns = (isOwn || isMine) ? `
+        <button class="lesson-hub-edit-btn" onclick="event.stopPropagation();editLesson('${l.id}')">✏️ Изменить</button>
+        <button class="lesson-hub-del-btn"  onclick="event.stopPropagation();deleteLesson('${l.id}')">✕</button>` : '';
+
+    return `
+    <div class="lesson-hub-card" onclick="viewLesson('${l.id}')">
+      <div class="lesson-hub-card-top">
+        <span class="lesson-hub-emoji">${l.emoji || '📖'}</span>
+        <div class="lesson-hub-tags">
+          ${statusTag} ${lvlTag} ${subjectTag}
+        </div>
+        <div class="lesson-hub-title">${escHtml(l.title || 'Без названия')}</div>
+        <div class="lesson-hub-desc">${escHtml(l.description || 'Описание отсутствует')}</div>
+        <div class="lesson-hub-meta">
+          <span class="lesson-hub-meta-item">📦 ${blocks} блоков</span>
+          ${l.duration ? `<span class="lesson-hub-meta-item">⏱ ${l.duration} мин</span>` : ''}
+          <span class="lesson-hub-meta-item">📅 ${dateStr}</span>
+        </div>
+      </div>
+      <div class="lesson-hub-footer">
+        <span class="lesson-hub-author">${escHtml(l.userName || 'Автор')}</span>
+        <div class="lesson-hub-btns">
+          ${editBtns}
+          <button class="lesson-hub-run-btn" onclick="event.stopPropagation();viewLesson('${l.id}')">▶ Запустить</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── ДОКУМЕНТЫ / МАТЕРИАЛЫ ──
+async function fetchUserDocs(user) {
+    const grid = document.getElementById('docsGrid');
+    if (!grid) return;
+    try {
+        const q = query(collection(db, "lectureDocs"), where("uid", "==", user.uid), orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
+        _docsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderDocsGrid(_docsCache, user);
+        document.getElementById('statDocs').textContent = _docsCache.length;
+    } catch (e) {
+        grid.innerHTML = emptyState('📄', 'Нет документов', 'Загрузите PDF, DOCX или другие материалы лекций');
+    }
+}
+
+function renderDocsGrid(docs, user) {
+    const grid = document.getElementById('docsGrid');
+    if (!grid) return;
+    if (!docs.length) {
+        grid.innerHTML = `<div class="story-empty" style="grid-column:1/-1">
+            <div class="story-empty-icon">📄</div>
+            <div class="story-empty-title">Нет материалов</div>
+            <div class="story-empty-sub">Загрузите конспекты, лекции или слайды чтобы они всегда были под рукой</div>
+        </div>`;
+        return;
+    }
+    const fileIcons = { pdf:'📕', doc:'📘', docx:'📘', ppt:'📙', pptx:'📙', txt:'📃', png:'🖼️', jpg:'🖼️', jpeg:'🖼️', link:'🔗', text:'📝' };
+    grid.innerHTML = docs.map(d => {
+        const ext = (d.fileType || d.type || 'link').toLowerCase().replace('.','');
+        const icon = fileIcons[ext] || '📄';
+        const dateStr = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'}) : '—';
+        return `
+        <div class="doc-card" onclick="viewDoc('${d.id}')">
+          <div class="doc-card-icon">${icon}</div>
+          <div class="doc-card-body">
+            ${d.tag ? `<span class="doc-card-tag">${escHtml(d.tag)}</span>` : ''}
+            <div class="doc-card-title">${escHtml(d.title || 'Документ')}</div>
+            <div class="doc-card-meta">
+              ${ext !== 'link' && ext !== 'text' ? `<div>📁 ${ext.toUpperCase()}</div>` : ''}
+              <div>📅 ${dateStr}</div>
+              ${d.linkedLesson ? `<div>🔗 Привязан к уроку</div>` : ''}
+            </div>
+          </div>
+          <div class="doc-card-footer">
+            <button class="doc-action-btn primary" onclick="event.stopPropagation();viewDoc('${d.id}')">Открыть</button>
+            <button class="doc-action-btn" onclick="event.stopPropagation();deleteDoc('${d.id}')">Удалить</button>
+          </div>
+        </div>`;
+    }).join('');
+}
+
+// ── ПРОСМОТР ДОКУМЕНТА ──
+window.viewDoc = function(id) {
+    const doc_ = _docsCache.find(d => d.id === id);
+    if (!doc_) return;
+    const modal = document.getElementById('viewDocModal');
+    const title = document.getElementById('viewDocTitle');
+    const meta  = document.getElementById('viewDocMeta');
+    const frame = document.getElementById('viewDocFrame');
+    const dlBtn = document.getElementById('viewDocDownload');
+
+    title.textContent = doc_.title || 'Документ';
+    const dateStr = doc_.createdAt?.toDate ? doc_.createdAt.toDate().toLocaleDateString('ru-RU') : '';
+    meta.textContent = [doc_.tag, dateStr].filter(Boolean).join(' • ');
+
+    const url = doc_.url || doc_.content || '';
+    if (doc_.type === 'text') {
+        frame.src = 'about:blank';
+        setTimeout(() => {
+            frame.contentDocument.open();
+            frame.contentDocument.write(`<html><body style="font-family:sans-serif;padding:28px;background:#1a2d35;color:#cdd8dd;line-height:1.7;font-size:15px;white-space:pre-wrap;">${escHtml(url)}</body></html>`);
+            frame.contentDocument.close();
+        }, 50);
+        dlBtn.style.display = 'none';
+    } else if (url) {
+        // Google Docs embed
+        const isGDocs = url.includes('docs.google.com') || url.includes('drive.google.com');
+        frame.src = isGDocs ? url.replace('/edit', '/preview').replace('/view', '/preview') : url;
+        dlBtn.href = url;
+        dlBtn.style.display = '';
+    }
+    modal.classList.add('active');
+    document.getElementById('closeViewDocModal')?.addEventListener('click', () => modal.classList.remove('active'), {once:true});
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); }, {once:true});
+};
+
+window.deleteDoc = async function(id) {
+    if (!confirm('Удалить этот документ?')) return;
+    try {
+        await deleteDoc(doc(db, "lectureDocs", id));
+        _docsCache = _docsCache.filter(d => d.id !== id);
+        renderDocsGrid(_docsCache, _storyUser);
+        document.getElementById('statDocs').textContent = _docsCache.length;
+        showToast('✅ Документ удалён');
+    } catch(e) { alert('Ошибка: ' + e.message) }
+};
+
+// ── СТАТИСТИКА ──
+async function updateStoryStats(user) {
+    try {
+        document.getElementById('statTotalLessons').textContent = _allLessons.length || '—';
+        document.getElementById('statMyLessons').textContent    = _myLessons.length  || '—';
+        document.getElementById('statDocs').textContent         = _docsCache.length  || '—';
+        // Пройдено — из прогресса
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const progress = userDoc.data()?.lessonProgress || {};
+        const done = Object.values(progress).filter(v => v === true || v === 100).length;
+        document.getElementById('statCompleted').textContent = done || 0;
+    } catch(e) {}
+}
+
+// ── DROP ZONE ──
+function setupDropZone(zoneId, inputId, callback) {
+    const zone  = document.getElementById(zoneId);
+    const input = document.getElementById(inputId);
+    if (!zone) return;
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over') });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault(); zone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length) callback(e.dataTransfer.files);
+    });
+    input?.addEventListener('change', e => callback(e.target.files));
+}
+
+function handleDocFiles(files) {
+    openImportModal();
+    if (files && files[0]) {
+        const f = files[0];
+        document.getElementById('importFilePreview').style.display = 'flex';
+        document.getElementById('importFilePreview').innerHTML = `
+            <div class="import-file-icon">${fileIcon(f.name)}</div>
+            <div class="import-file-info">
+                <div class="import-file-name">${escHtml(f.name)}</div>
+                <div class="import-file-size">${(f.size/1024/1024).toFixed(2)} MB</div>
+            </div>`;
+        document.getElementById('importDrop').style.display = 'none';
+        window._pendingFile = f;
+    }
+}
+
+function fileIcon(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    return {pdf:'📕',doc:'📘',docx:'📘',ppt:'📙',pptx:'📙',txt:'📃',png:'🖼️',jpg:'🖼️',jpeg:'🖼️'}[ext] || '📄';
+}
+
+// ── ИМПОРТ МОДАЛ ──
+function openImportModal() {
+    const m = document.getElementById('importDocModal');
+    m?.classList.add('active');
+}
+
+function setupImportModal(user) {
+    // Закрытие
+    document.getElementById('closeImportModal')?.addEventListener('click', () => {
+        document.getElementById('importDocModal').classList.remove('active');
+    });
+    document.getElementById('cancelImportBtn')?.addEventListener('click', () => {
+        document.getElementById('importDocModal').classList.remove('active');
+    });
+    document.getElementById('importDocModal')?.addEventListener('click', e => {
+        if (e.target.id === 'importDocModal') e.target.classList.remove('active');
+    });
+
+    // Вкладки импорта
+    document.querySelectorAll('.import-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.import-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.import-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`itab-${btn.dataset.itab}`)?.classList.add('active');
+        });
+    });
+
+    // Чипы тегов
+    document.querySelectorAll('.import-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.import-chip').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            _importSelectedTag = chip.dataset.tag;
+        });
+    });
+
+    // Drop внутри модала
+    setupDropZone('importDrop', 'importFileInput', handleDocFiles);
+
+    // Google Docs/Drive кнопки
+    document.getElementById('btnGoogleDrive')?.addEventListener('click', () => {
+        openImportModal();
+        document.querySelector('.import-tab[data-itab="url"]')?.click();
+        document.getElementById('importUrlInput').placeholder = 'https://drive.google.com/...';
+        document.getElementById('importUrlInput').focus();
+    });
+    document.getElementById('btnGoogleDocs')?.addEventListener('click', () => {
+        openImportModal();
+        document.querySelector('.import-tab[data-itab="url"]')?.click();
+        document.getElementById('importUrlInput').focus();
+    });
+
+    // Сохранение
+    document.getElementById('confirmImportBtn')?.addEventListener('click', () => saveDocument(user));
+}
+
+async function saveDocument(user) {
+    const btn = document.getElementById('confirmImportBtn');
+    const activeTab = document.querySelector('.import-tab.active')?.dataset?.itab || 'file';
+    const tag = _importSelectedTag || 'other';
+    const linkedLesson = document.getElementById('importLinkLesson')?.value || '';
+
+    let docData = { uid: user.uid, tag, linkedLesson, createdAt: serverTimestamp() };
+
+    try {
+        btn.textContent = '⏳ Сохранение...'; btn.disabled = true;
+
+        if (activeTab === 'file' && window._pendingFile) {
+            const f = window._pendingFile;
+            const ext = f.name.split('.').pop().toLowerCase();
+            const storageRef = ref(storage, `lectureDocs/${user.uid}/${Date.now()}_${f.name}`);
+            const snap = await uploadBytes(storageRef, f);
+            const url  = await getDownloadURL(snap.ref);
+            docData = { ...docData, title: f.name, url, fileType: ext, type: 'file' };
+
+        } else if (activeTab === 'url') {
+            const url   = document.getElementById('importUrlInput').value.trim();
+            const title = document.getElementById('importUrlTitle').value.trim() || url;
+            if (!url) { alert('Введите ссылку'); btn.textContent = '📥 Сохранить материал'; btn.disabled = false; return; }
+            docData = { ...docData, title, url, type: 'link', fileType: 'link' };
+
+        } else if (activeTab === 'text') {
+            const title   = document.getElementById('importTextTitle').value.trim() || 'Конспект';
+            const content = document.getElementById('importTextContent').value.trim();
+            if (!content) { alert('Введите текст'); btn.textContent = '📥 Сохранить материал'; btn.disabled = false; return; }
+            docData = { ...docData, title, content, type: 'text', fileType: 'text' };
+        }
+
+        const ref_ = await addDoc(collection(db, "lectureDocs"), docData);
+        _docsCache.unshift({ id: ref_.id, ...docData });
+        renderDocsGrid(_docsCache, user);
+        document.getElementById('statDocs').textContent = _docsCache.length;
+        document.getElementById('importDocModal').classList.remove('active');
+        window._pendingFile = null;
+        showToast('✅ Материал сохранён!');
+
+        // Сброс формы
+        document.getElementById('importDrop').style.display = '';
+        document.getElementById('importFilePreview').style.display = 'none';
+        document.getElementById('importUrlInput').value = '';
+        document.getElementById('importUrlTitle').value = '';
+        document.getElementById('importTextTitle').value = '';
+        document.getElementById('importTextContent').value = '';
+        document.querySelectorAll('.import-chip').forEach(c => c.classList.remove('selected'));
+
+    } catch(e) {
+        alert('Ошибка сохранения: ' + e.message);
+    } finally {
+        btn.textContent = '📥 Сохранить материал'; btn.disabled = false;
+    }
+}
+
+// ── СЕССИЯ УРОКА (код для студентов) ──
+function startLessonSession() {
+    if (_storyTab !== 'running') {
+        document.querySelector('.story-tab[data-story-tab="running"]')?.click();
+    }
+    const code = Math.random().toString(36).slice(2,6).toUpperCase();
+    const hub = document.getElementById('runningHub');
+    if (!hub) return;
+    hub.innerHTML = `
+    <div class="session-card">
+        <div class="session-live">🟢 Сессия активна</div>
+        <div class="session-code">${code}</div>
+        <div class="session-info">Поделитесь этим кодом со студентами для подключения</div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:20px">
+            <button class="story-btn-secondary story-btn-sm" onclick="navigator.clipboard.writeText('${code}').then(()=>showToast('Код скопирован!'))">📋 Скопировать</button>
+            <button class="story-btn-secondary story-btn-sm" style="color:var(--duo-red)" onclick="endSession()">⏹ Завершить</button>
+        </div>
+    </div>`;
+    _sessionActive = true;
+}
+
+window.endSession = function() {
+    const hub = document.getElementById('runningHub');
+    if (hub) hub.innerHTML = `<div class="running-empty">
+        <div style="font-size:48px;margin-bottom:16px">📡</div>
+        <div class="running-empty-title">Нет активных сессий</div>
+        <div class="running-empty-sub">Запустите урок в режиме «Вести урок» — студенты смогут подключиться по коду</div>
+        <button class="story-btn-primary" style="margin-top:20px" onclick="startLessonSession()">📡 Начать сессию урока</button>
+    </div>`;
+    _sessionActive = false;
+};
+
+function renderRunningHub() {
+    if (!_sessionActive) {
+        const hub = document.getElementById('runningHub');
+        if (hub && !hub.querySelector('.session-card')) {
+            hub.innerHTML = `<div class="running-empty">
+                <div style="font-size:48px;margin-bottom:16px">📡</div>
+                <div class="running-empty-title">Нет активных сессий</div>
+                <div class="running-empty-sub">Запустите урок в режиме «Вести урок» — студенты смогут подключиться по коду</div>
+                <button class="story-btn-primary" style="margin-top:20px" onclick="startLessonSession()">📡 Начать сессию урока</button>
+            </div>`;
+        }
+    }
+}
+
+// ── HELPERS ──
+function emptyState(icon, title, sub) {
+    return `<div class="story-empty" style="grid-column:1/-1">
+        <div class="story-empty-icon">${icon}</div>
+        <div class="story-empty-title">${title}</div>
+        <div class="story-empty-sub">${sub}</div>
+    </div>`;
+}
+
+// Глобальные функции
+window.viewLesson = (id) => {
+    window.location.href = `./lesson.html?id=${id}`;
+};
+
+window.editLesson = (id) => {
+    window.location.href = `./create-lesson.html?edit=${id}`;
+};
+
+window.deleteLesson = async (id) => {
+    if (!confirm('Удалить этот интерактивный урок навсегда?')) return;
+
+    try {
+        await deleteDoc(doc(db, "interactiveLessons", id));
+        showToast('✅ Урок успешно удалён');
+
+        const user = auth.currentUser;
+        if (user) loadUserLessons(user);
+    } catch (err) {
+        console.error(err);
+        alert('Ошибка удаления');
+    }
+};
+
+
+// Обновление списка уроков после публикации
+window.refreshMyLessons = async function () {
+    const user = auth.currentUser;
+    if (user) {
+        await loadUserLessons(user);
+    }
+};
+
+// ==========================================
+// ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК (ТАБОВ) В ПРОФИЛЕ
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    const tabs = document.querySelectorAll('.material-tab');
+    if (tabs.length > 0) {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Снимаем класс active со всех вкладок профиля
+                document.querySelectorAll('.material-tab').forEach(t => t.classList.remove('active'));
+                // Добавляем active текущей нажатой вкладке
+                tab.classList.add('active');
+
+                const type = tab.getAttribute('data-type');
+                const coursesCont = document.getElementById('user-courses-container');
+                const lessonsCont = document.getElementById('user-lessons-container');
+
+                // Переключаем видимость контейнеров в зависимости от выбранного таба
+                if (type === 'courses') {
+                    if (coursesCont) coursesCont.style.display = 'block';
+                    if (lessonsCont) lessonsCont.style.display = 'none';
+                } else {
+                    if (coursesCont) coursesCont.style.display = 'none';
+                    if (lessonsCont) lessonsCont.style.display = 'block';
+                }
+            });
+        });
+    }
+});

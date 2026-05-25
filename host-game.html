@@ -1,223 +1,1165 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление игрой — Tagybasqa</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Onest:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0a0a0a; --bg2: #111111; --bg3: #181818;
-            --border: rgba(255,255,255,.07); --border2: rgba(255,255,255,.12);
-            --text: #f5f5f0; --text2: #888880; --text3: #444440;
-            --accent: #f5f5f0; --green: #4ade80; --red: #ef4444;
-            --font: 'Onest', sans-serif; --mono: 'DM Mono', monospace;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Управление игрой — Tagybasqa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;600;700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      /* Светлая тема (модерн) */
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --text: #0f172a;
+      --text2: #475569;
+      --text3: #94a3b8;
 
-        body {
-            margin: 0; padding: 0; background: var(--bg); color: var(--text);
-            font-family: var(--font); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; min-height: 100vh;
-        }
+      /* Акценты */
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --green: #10b981;
+      --red: #ef4444;
+      --gold: #f59e0b;
 
-        .host-container {
-            width: 100%; max-width: 800px; background: var(--bg2);
-            border: 1px solid var(--border); border-radius: 12px;
-            padding: 40px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
+      /* Шрифты и радиусы */
+      --font: 'Onest', sans-serif;
+      --mono: 'DM Mono', monospace;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
 
-        .quiz-title { font-size: 24px; color: var(--text2); margin-bottom: 20px; }
-        
-        .pin-box {
-            background: var(--bg); border: 2px dashed var(--border2);
-            padding: 30px; border-radius: 12px; margin-bottom: 40px;
-        }
-        .pin-label { font-family: var(--mono); color: var(--text3); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
-        .pin-number { font-size: 72px; font-weight: 900; letter-spacing: 8px; color: var(--text); line-height: 1; margin-top: 10px; }
+    :root.dark {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --border: #334155;
+      --border-hover: #475569;
+      --text: #f8fafc;
+      --text2: #cbd5e1;
+      --text3: #64748b;
+    }
 
-        .players-section { margin-bottom: 40px; }
-        .players-count { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
-        .players-grid {
-            display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; min-height: 50px;
-        }
-        .player-pill {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
-            padding: 10px 20px; border-radius: 99px; font-weight: 600; font-size: 14px;
-            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .action-btn {
-            background: var(--text); color: var(--bg); border: none;
-            padding: 16px 48px; font-family: var(--font); font-size: 18px; font-weight: 800;
-            border-radius: 8px; cursor: pointer; transition: opacity 0.2s, transform 0.1s;
-        }
-        .action-btn:hover { opacity: 0.9; }
-        .action-btn:active { transform: scale(0.98); }
-        .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
 
-        .end-btn {
-            background: transparent; color: var(--red); border: 1px solid var(--red);
-            padding: 10px 24px; font-size: 14px; font-weight: 600; border-radius: 8px;
-            cursor: pointer; margin-top: 40px; transition: all 0.2s;
-        }
-        .end-btn:hover { background: rgba(239, 68, 68, 0.1); }
+    /* HEADER */
+    .host-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 72px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    }
 
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.4s ease; }
+    .host-logo {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--primary);
+    }
 
-        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
+    .host-logo::before {
+      content: '';
+      display: block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    .host-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 10px 20px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: var(--radius-sm);
+      transition: all .2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-solid {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-solid:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--text);
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-green:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-red {
+      background: var(--red);
+      color: #fff;
+    }
+
+    /* LAYOUT */
+    .host-body {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      min-height: calc(100vh - 72px);
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* LEFT: MAIN CONTENT */
+    .host-main {
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .host-section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    /* PIN DISPLAY */
+    .pin-display {
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      margin-bottom: 32px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pin-display::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      transform: translate(30%, -30%);
+      border-radius: 50%;
+    }
+
+    .pin-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      margin-bottom: 16px;
+    }
+
+    .pin-number {
+      font-size: 80px;
+      font-weight: 900;
+      letter-spacing: 12px;
+      font-family: var(--mono);
+      line-height: 1;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .pin-url {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-top: 16px;
+      background: rgba(0, 0, 0, 0.2);
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* CURRENT QUESTION CARD */
+    .current-q-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .cq-meta {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text2);
+      background: var(--bg);
+      padding: 4px 12px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .cq-text {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+
+    .cq-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .cq-opt {
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .cq-opt::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .cq-opt-key {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 14px;
+      flex-shrink: 0;
+      backdrop-filter: blur(4px);
+    }
+
+    .cq-opt.correct {
+      outline: 4px solid var(--green);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+
+    .cq-opt.correct::after {
+      content: '✓';
+      position: absolute;
+      right: 20px;
+      font-size: 20px;
+      background: var(--green);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    /* PROGRESS BAR */
+    .q-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .q-nav-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .q-nav-dot.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+      transform: scale(1.05);
+    }
+
+    /* CONTROLS */
+    .host-controls {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 24px;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .timer-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 64px;
+    }
+
+    .timer-big {
+      font-size: 48px;
+      font-weight: 900;
+      font-family: var(--mono);
+      line-height: 1;
+    }
+
+    .timer-big.urgent {
+      color: var(--red);
+      animation: pulseTimer 1s infinite;
+    }
+
+    @keyframes pulseTimer {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .timer-bar-container {
+      flex: 1;
+      height: 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    #hostTimerBar {
+      height: 100%;
+      background: var(--primary);
+      transition: width 1s linear, background-color 0.3s;
+      border-radius: 4px;
+    }
+
+    #hostTimerBar.urgent {
+      background: var(--red);
+    }
+
+    /* RIGHT: SIDEBAR */
+    .host-side {
+      padding: 32px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      height: calc(100vh - 72px);
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* PLAYERS */
+    .players-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .player-count-chip {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    .player-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .player-list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .player-list::-webkit-scrollbar-thumb {
+      background: var(--border-hover);
+      border-radius: 4px;
+    }
+
+    .player-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      animation: slideIn .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid transparent;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+
+    .player-item:hover {
+      border-color: var(--border-hover);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .player-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .player-name {
+      font-size: 14px;
+      font-weight: 600;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-score {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .player-status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+      flex-shrink: 0;
+    }
+
+    /* КНОПКА КИКА УЧАСТНИКА */
+    .btn-kick {
+      background: transparent;
+      border: none;
+      color: var(--text3);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      opacity: 0.4;
+    }
+
+    .player-item:hover .btn-kick {
+      opacity: 1;
+    }
+
+    .btn-kick:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--red);
+    }
+
+    /* LEADERBOARD */
+    .lb-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lb-rank {
+      font-size: 18px;
+      min-width: 28px;
+      text-align: center;
+    }
+
+    .lb-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 1;
+    }
+
+    .lb-score {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      z-index: 1;
+    }
+
+    .lb-bar-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      background: rgba(245, 158, 11, 0.15);
+      transition: width .8s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 0;
+      border-right: 2px solid var(--gold);
+    }
+
+    /* WAITING STATE */
+    .waiting-state {
+      text-align: center;
+      padding: 80px 20px;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 2px dashed var(--border);
+      margin-top: 20px;
+    }
+
+    .waiting-anim {
+      font-size: 56px;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+
+    .waiting-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .waiting-sub {
+      font-size: 14px;
+      color: var(--text3);
+      max-width: 300px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    .float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    /* STATUS BAR */
+    .status-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border-radius: 20px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border);
+    }
+
+    .status-dot-live {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink 1.5s ease-in-out infinite;
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .4;
+      }
+    }
+
+    /* TOAST */
+    #hg-toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1e293b;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 30px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      opacity: 0;
+      transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+
+    #hg-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media(max-width: 1024px) {
+      .host-body {
+        grid-template-columns: 1fr;
+      }
+
+      .host-side {
+        position: relative;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        top: 0;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-    <div class="host-container">
-        <div id="screen-lobby" class="screen active">
-            <div class="quiz-title" id="quizTitleDisplay">Загрузка квиза...</div>
-            
-            <div class="pin-box">
-                <div class="pin-label">ПИН-код для подключения</div>
-                <div class="pin-number" id="pinDisplay">------</div>
-            </div>
-
-            <div class="players-section">
-                <div class="players-count">Игроков: <span id="playersCount">0</span></div>
-                <div class="players-grid" id="playersList">
-                    </div>
-            </div>
-
-            <button class="action-btn" id="startBtn" disabled>Начать игру</button>
-            <br>
-            <button class="end-btn" id="cancelBtn">Отменить сессию</button>
-        </div>
-
-        <div id="screen-playing" class="screen">
-            <div class="quiz-title">Игра идет! 🔥</div>
-            <p style="color: var(--text2); margin-bottom: 30px;">Игроки сейчас отвечают на своих устройствах.</p>
-            
-            <button class="action-btn" style="background: var(--bg3); color: var(--text); border: 1px solid var(--border2);">Следующий вопрос →</button>
-            <br>
-            <button class="end-btn" id="endGameBtn">Завершить игру</button>
-        </div>
+  <header class="host-header">
+    <a class="host-logo" href="./index.html">Tagybasqa</a>
+    <div id="sessionStatusArea"
+      style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text3);background:var(--bg);padding:6px 12px;border-radius:12px;">
+      Загрузка...</div>
+    <div class="host-actions">
+      <button class="btn btn-outline" onclick="copyJoinLink()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        Копировать ссылку
+      </button>
+      <button class="btn btn-green" id="nextQBtn" onclick="nextQuestion()" style="display:none;">Следующий вопрос
+        →</button>
+      <button class="btn btn-solid" id="startGameBtn" onclick="startGame()">Начать игру</button>
+      <button class="btn btn-red" id="endGameBtn" onclick="endGame()" style="display:none;">Завершить сессию</button>
     </div>
+  </header>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  <div class="host-body">
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
-            authDomain: "pystart-dd2db.firebaseapp.com",
-            projectId: "pystart-dd2db",
-            storageBucket: "pystart-dd2db.firebasestorage.app",
-            messagingSenderId: "9188811255",
-            appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
-        };
+    <main class="host-main">
+      <div id="resultsSummaryArea" style="display:none;">
+        <div class="card" style="text-align:center; padding: 40px;">
+          <div style="font-size: 64px; margin-bottom: 20px;">🏆</div>
+          <h2>Игра завершена!</h2>
+          <p style="color:var(--text2); margin-bottom: 30px;">Итоговая таблица лидеров</p>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+          <div id="finalLeaderboard" style="max-width: 400px; margin: 0 auto; text-align: left;">
+          </div>
 
-        // Получаем ID сессии из URL (?session=...)
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionId = urlParams.get('session');
+          <div style="margin-top: 40px;">
+            <a href="./index.html" class="btn btn-solid">Вернуться домой</a>
+          </div>
+        </div>
+      </div>
 
-        if (!sessionId) {
-            alert("Сессия не найдена. Возвращаемся на главную.");
-            window.location.href = './index.html';
+      <div class="status-bar">
+        <div class="status-dot-live"></div>
+        <span id="statusText">Ожидание игроков</span>
+      </div>
+
+      <div class="pin-display">
+        <div class="pin-label">Подключайтесь по коду</div>
+        <div class="pin-number" id="pinDisplay">––––––</div>
+        <div class="pin-url" id="pinUrl"></div>
+      </div>
+
+      <div class="waiting-state" id="waitingState">
+        <div class="waiting-anim float">🎮</div>
+        <div class="waiting-title">Ждем участников...</div>
+        <div class="waiting-sub">Покажите этот экран игрокам, чтобы они могли отсканировать QR-код или ввести PIN.</div>
+      </div>
+
+      <div id="qNavArea" style="display:none;">
+        <div class="host-section-label">Прогресс вопросов</div>
+        <div class="q-nav" id="qNav"></div>
+      </div>
+
+      <div id="currentQArea" style="display:none;">
+        <div class="current-q-card" id="currentQCard"></div>
+
+        <div class="host-controls">
+          <div class="timer-wrap">
+            <div class="timer-big" id="hostTimer">—</div>
+            <span style="font-family:var(--mono); font-size:10px; color:var(--text3); font-weight:600;">СЕК</span>
+          </div>
+          <div class="timer-bar-container">
+            <div id="hostTimerBar"></div>
+          </div>
+          <button class="btn btn-outline" onclick="skipQuestion()">Пропустить →</button>
+        </div>
+      </div>
+
+    </main>
+
+    <aside class="host-side">
+
+      <div>
+        <div class="players-header">
+          <span class="host-section-label" style="margin-bottom:0;">Участники</span>
+          <div class="player-count-chip"><span id="playerCountNum">0</span> онлайн</div>
+        </div>
+        <div class="player-list" id="playerList">
+          <div
+            style="font-size:13px;color:var(--text3);text-align:center;padding:24px;background:var(--bg);border-radius:var(--radius-sm);">
+            Пока никто не присоединился
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="host-section-label">Таблица лидеров</div>
+        <div id="leaderboard">
+          <div
+            style="font-size:13px;color:var(--text3);text-align:center;padding:24px;background:var(--bg);border-radius:var(--radius-sm);">
+            Топ появится после старта
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <div id="hg-toast"></div>
+
+  <script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, collection, onSnapshot, query, where, deleteField } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+      authDomain: "pystart-dd2db.firebaseapp.com",
+      projectId: "pystart-dd2db",
+      storageBucket: "pystart-dd2db.firebasestorage.app",
+      messagingSenderId: "9188811255",
+      appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+    };
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+    else if (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark');
+
+    const params = new URLSearchParams(location.search);
+    const sessionId = params.get('session');
+
+    let session = null;
+    let quiz = null;
+    let currentUser = null;
+    let timerInterval = null;
+    let localTimer = 0;
+    let unsubSession = null;
+    let unsubResults = null;
+    let players = {};
+    let scores = {};
+
+    const avatarColors = ['#ef4444', '#f97316', '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
+    const optionColors = ['#e3342f', '#3490dc', '#f6993f', '#38c172', '#9561e2', '#f66d9b'];
+
+    if (!sessionId) {
+      alert('Сессия не найдена');
+      window.location.href = './index.html';
+    }
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = './auth.html'; return; }
+      currentUser = user;
+      initSession();
+    });
+
+    async function initSession() {
+      const pin = generatePin(sessionId);
+      document.getElementById('pinDisplay').textContent = pin;
+      document.getElementById('pinUrl').textContent = `${location.origin}/quiz-play.html?pin=${pin}`;
+
+      try {
+        await updateDoc(doc(db, 'sessions', sessionId), { pin: pin });
+      } catch (e) {
+        console.error("Не удалось сохранить pin", e);
+      }
+
+      unsubSession = onSnapshot(doc(db, 'sessions', sessionId), async snap => {
+        if (!snap.exists()) return;
+        session = { id: snap.id, ...snap.data() };
+
+        if (!quiz && session.quizId) {
+          const qSnap = await getDoc(doc(db, 'quizzes', session.quizId));
+          if (qSnap.exists()) {
+            quiz = { id: qSnap.id, ...qSnap.data() };
+            renderQNav();
+          }
         }
 
-        const sessionRef = doc(db, "sessions", sessionId);
-        let currentSessionData = null;
+        players = session.players || {};
+        renderPlayers();
+        updateStatusUI();
 
-        // Слушаем изменения в сессии в реальном времени
-        const unsubscribe = onSnapshot(sessionRef, (docSnap) => {
-            if (!docSnap.exists()) {
-                alert("Сессия была закрыта или удалена.");
-                window.location.href = './index.html';
-                return;
+        if (session.status === 'playing') {
+          renderCurrentQuestion(session.currentQuestion);
+        }
+      });
+
+      unsubResults = onSnapshot(
+        query(collection(db, 'quizResults'), where('sessionId', '==', sessionId)),
+        snap => {
+          scores = {};
+          snap.forEach(d => {
+            const data = d.data();
+            if (!scores[data.playerName] || scores[data.playerName] < data.score) {
+              scores[data.playerName] = data.score;
             }
+          });
+          renderLeaderboard();
+        }
+      );
+    }
 
-            const data = docSnap.data();
-            currentSessionData = data;
+    function generatePin(id) {
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+      return String(100000 + (hash % 900000));
+    }
 
-            // Обновляем UI Лобби
-            if (data.status === 'waiting') {
-                document.getElementById('quizTitleDisplay').textContent = data.quizTitle || "Квиз";
-                document.getElementById('pinDisplay').textContent = data.pin || "000000";
+    function getStringHash(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return Math.abs(hash);
+    }
 
-                // Парсим объект players, который вы задали в index.html (players: {})
-                const playersObj = data.players || {};
-                const playerNames = Object.values(playersObj); // Предполагаем, что значения это имена
-                
-                document.getElementById('playersCount').textContent = playerNames.length;
-                
-                const playersListEl = document.getElementById('playersList');
-                playersListEl.innerHTML = '';
-                
-                if (playerNames.length > 0) {
-                    playerNames.forEach(name => {
-                        const div = document.createElement('div');
-                        div.className = 'player-pill';
-                        div.textContent = name; // В будущем здесь можно доставать name из объекта игрока
-                        playersListEl.appendChild(div);
-                    });
-                    document.getElementById('startBtn').disabled = false;
-                } else {
-                    playersListEl.innerHTML = '<div style="color: var(--text3); font-family: var(--mono); font-size: 12px;">Пока никого нет...</div>';
-                    document.getElementById('startBtn').disabled = true;
-                }
-            } 
-            // Если статус сменился на 'playing', меняем экран
-            else if (data.status === 'playing') {
-                document.getElementById('screen-lobby').classList.remove('active');
-                document.getElementById('screen-playing').classList.add('active');
-            }
+    function renderPlayers() {
+      const list = document.getElementById('playerList');
+      // Фильтруем пустые/удаленные записи игроков
+      const playerArr = Object.entries(players).filter(([_, p]) => p !== null && p !== undefined);
+      document.getElementById('playerCountNum').textContent = playerArr.length;
+
+      if (!playerArr.length) {
+        list.innerHTML = `<div style="font-size:13px;color:var(--text3);text-align:center;padding:24px;background:var(--bg);border-radius:var(--radius-sm);">Пока никто не присоединился</div>`;
+        return;
+      }
+
+      list.innerHTML = playerArr.map(([uid, p]) => {
+        const name = p.name || 'Гость';
+        const color = avatarColors[getStringHash(uid) % avatarColors.length];
+        return `
+    <div class="player-item">
+      <div class="player-avatar" style="background-color: ${color}">${name[0].toUpperCase()}</div>
+      <div class="player-name">${escHtml(name)}</div>
+      <div class="player-score">${scores[name] || 0}</div>
+      <button class="btn-kick" onclick="kickPlayer('${uid}', '${escHtml(name)}')" title="Исключить игрока">✕</button>
+      <div class="player-status"></div>
+    </div>`;
+      }).join('');
+    }
+
+    // Глобальная функция для исключения игрока
+    window.kickPlayer = async function (uid, name) {
+      if (!confirm(`Вы уверены, что хотите исключить игрока "${name}"?`)) return;
+      try {
+        await updateDoc(doc(db, 'sessions', sessionId), {
+          [`players.${uid}`]: deleteField()
         });
+        showToast(`Игрок ${name} успешно исключен 🚪`);
+      } catch (e) {
+        console.error("Не удалось удалить игрока", e);
+        showToast("Ошибка при исключении игрока");
+      }
+    };
 
-        // Кнопка: Начать игру
-        document.getElementById('startBtn').addEventListener('click', async () => {
-            try {
-                // Меняем статус на 'playing' и ставим первый вопрос
-                await updateDoc(sessionRef, {
-                    status: 'playing',
-                    currentQuestion: 0
-                });
-            } catch (error) {
-                console.error(error);
-                alert("Ошибка запуска игры.");
-            }
-        });
+    function renderLeaderboard() {
+      const lb = document.getElementById('leaderboard');
+      const arr = Object.entries(scores).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      if (!arr.length) {
+        lb.innerHTML = `<div style="font-size:13px;color:var(--text3);text-align:center;padding:24px;background:var(--bg);border-radius:var(--radius-sm);">Данные появятся после ответов</div>`;
+        return;
+      }
 
-        // Кнопка: Отменить сессию (из лобби)
-        document.getElementById('cancelBtn').addEventListener('click', async () => {
-            if(confirm("Отменить эту игру? Все подключенные игроки будут отключены.")) {
-                try {
-                    await deleteDoc(sessionRef); // onSnapshot выкинет всех на главную
-                } catch (error) { console.error(error); }
-            }
-        });
+      const max = arr[0][1] || 1;
+      const rankIcons = ['🥇', '🥈', '🥉'];
 
-        // Кнопка: Завершить игру (во время игры)
-        document.getElementById('endGameBtn').addEventListener('click', async () => {
-            if(confirm("Точно завершить игру?")) {
-                try {
-                    // Можно либо удалить сессию, либо поставить status: 'finished'
-                    await updateDoc(sessionRef, { status: 'finished' });
-                    window.location.href = './index.html';
-                } catch (error) { console.error(error); }
-            }
-        });
+      lb.innerHTML = arr.map(([name, sc], i) => `
+    <div class="lb-item">
+      <div class="lb-bar-fill" style="width:${Math.round(sc / max * 100)}%"></div>
+      <div class="lb-rank">${rankIcons[i] || `<span style="font-family:var(--mono);font-size:14px;color:var(--text3)">${i + 1}</span>`}</div>
+      <div class="lb-name">${escHtml(name)}</div>
+      <div class="lb-score">${sc}</div>
+    </div>`).join('');
+    }
 
-        // Очистка при закрытии вкладки
-        window.addEventListener('beforeunload', () => {
-            if (currentSessionData && currentSessionData.status === 'waiting') {
-                // Опционально: автоматически удалять сессию, если хост закрыл вкладку в лобби
-                // deleteDoc(sessionRef); 
-            }
-        });
+    function renderQNav() {
+      if (!quiz) return;
+      const nav = document.getElementById('qNav');
+      nav.innerHTML = (quiz.questions || []).map((_, i) => `
+    <div class="q-nav-dot${session?.currentQuestion === i ? ' active' : ''}" data-i="${i}">${i + 1}</div>`).join('');
+      document.getElementById('qNavArea').style.display = 'block';
+    }
 
-    </script>
+    function renderCurrentQuestion(idx) {
+      if (!quiz || idx < 0) return;
+      const q = quiz.questions[idx];
+      if (!q) return;
+
+      const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+      const card = document.getElementById('currentQCard');
+
+      card.innerHTML = `
+    <div class="cq-meta">Вопрос ${idx + 1} / ${quiz.questions.length}</div>
+    <div class="cq-text">${escHtml(q.text || q.question || '')}</div>
+    <div class="cq-options">
+      ${(q.options || []).map((opt, i) => `
+        <div class="cq-opt${opt.correct ? ' correct' : ''}" style="background-color: ${optionColors[i % optionColors.length]}">
+          <div class="cq-opt-key">${letters[i]}</div>
+          <div style="flex:1;">${escHtml(typeof opt === 'string' ? opt : (opt.text || ''))}</div>
+        </div>`).join('')}
+    </div>`;
+
+      document.getElementById('currentQArea').style.display = 'block';
+      document.getElementById('waitingState').style.display = 'none';
+
+      startLocalTimer(q.timeLimit || 20);
+    }
+
+    function startLocalTimer(secs) {
+      clearInterval(timerInterval);
+      localTimer = secs;
+      updateTimerUI(secs, secs);
+      timerInterval = setInterval(() => {
+        localTimer--;
+        updateTimerUI(localTimer, secs);
+        if (localTimer <= 0) clearInterval(timerInterval);
+      }, 1000);
+    }
+
+    function updateTimerUI(t, total) {
+      const el = document.getElementById('hostTimer');
+      const bar = document.getElementById('hostTimerBar');
+      el.textContent = t;
+
+      const isUrgent = t <= 5 && t > 0;
+      el.classList.toggle('urgent', isUrgent);
+
+      if (bar) {
+        bar.style.width = Math.round((t / total) * 100) + '%';
+        bar.classList.toggle('urgent', isUrgent);
+      }
+    }
+
+    function updateStatusUI() {
+      const isPlaying = session?.status === 'playing';
+      const isFinished = session?.status === 'finished';
+      const isWaiting = session?.status === 'waiting';
+
+      // Управление видимостью основных блоков
+      document.getElementById('waitingState').style.display = isWaiting ? 'block' : 'none';
+      document.getElementById('currentQArea').style.display = isPlaying ? 'block' : 'none';
+      document.getElementById('qNavArea').style.display = (isPlaying || isFinished) ? 'block' : 'none';
+
+      // Показываем экран итогов
+      document.getElementById('resultsSummaryArea').style.display = isFinished ? 'block' : 'none';
+
+      // Кнопки
+      document.getElementById('startGameBtn').style.display = isWaiting ? 'inline-flex' : 'none';
+      document.getElementById('nextQBtn').style.display = isPlaying ? 'inline-flex' : 'none';
+      document.getElementById('endGameBtn').style.display = isPlaying ? 'inline-flex' : 'none';
+
+      if (isFinished) {
+        renderFinalLeaderboard();
+      }
+    }
+    function renderFinalLeaderboard() {
+      const container = document.getElementById('finalLeaderboard');
+      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+      container.innerHTML = sorted.map(([name, score], i) => `
+    <div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid var(--border);">
+      <span>${i + 1}. ${escHtml(name)}</span>
+      <span style="font-weight:700; color:var(--primary);">${score} очков</span>
+    </div>
+  `).join('');
+    }
+
+    window.startGame = async function () {
+      if (!quiz?.questions?.length) { showToast('Квиз пуст или не загружен'); return; }
+      await updateDoc(doc(db, 'sessions', sessionId), {
+        status: 'playing',
+        currentQuestion: 0
+      });
+      showToast('Поехали! 🚀');
+    };
+
+    window.nextQuestion = async function () {
+      if (!quiz) return;
+      const next = (session?.currentQuestion ?? -1) + 1;
+      if (next >= quiz.questions.length) {
+        await endGame();
+      } else {
+        await updateDoc(doc(db, 'sessions', sessionId), { currentQuestion: next });
+        showToast(`Вопрос ${next + 1} загружен`);
+      }
+    };
+
+    window.skipQuestion = function () { nextQuestion(); };
+
+    window.endGame = async function () {
+      clearInterval(timerInterval);
+      await updateDoc(doc(db, 'sessions', sessionId), { status: 'finished' });
+      showToast('Игра успешно завершена 🏆');
+      document.getElementById('nextQBtn').style.display = 'none';
+      document.getElementById('endGameBtn').style.display = 'none';
+    };
+
+    window.copyJoinLink = function () {
+      const pin = document.getElementById('pinDisplay').textContent;
+      const url = `${location.origin}/quiz-play.html?pin=${pin}`;
+      navigator.clipboard.writeText(url).then(() => showToast('Ссылка скопирована! ✅'));
+    };
+
+    function showToast(msg) {
+      const t = document.getElementById('hg-toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  </script>
 </body>
+
 </html>

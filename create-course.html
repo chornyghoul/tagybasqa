@@ -8,1783 +8,687 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;600;700;900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet">
   <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
+    /* ═══════════════════════════════════════════════════════
+       TAGYBASQA — Duolingo Dark Style (create-course.html)
+       ═══════════════════════════════════════════════════════ */
+
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
 
     :root {
-      --bg: #ffffff;
-      --bg2: #ffffff;
-      --bg3: #eeeeee;
-      --bg4: #dadada;
-      --border: rgba(0, 0, 0, 0.8);
-      --border2: rgba(0, 0, 0, 0.82);
-      --border3: rgba(0, 0, 0, 0.82);
-      --text: #000000;
-      --text2: #888880;
-      --text3: #444440;
-      --accent: #000000;
-      --accent-dim: rgba(0, 0, 0, 0.06);
-      --red: #ef4444;
-      --red-bg: rgba(239, 68, 68, 0.08);
-      --green: #4ade80;
-      --green-bg: rgba(74, 222, 128, 0.08);
-      --amber: #fbbf24;
-      --amber-bg: rgba(251, 191, 36, 0.08);
-      --purple: #a855f7;
-      --purple-bg: rgba(168, 85, 247, 0.08);
-      --teal: #14b8a6;
-      --teal-bg: rgba(20, 184, 166, 0.08);
-      --r: 3px;
-      --r2: 5px;
-      --font: 'Onest', sans-serif;
+      --bg:   #131f24;
+      --bg2:  #1a2d35;
+      --bg3:  #1f3540;
+      --bg4:  #243d4a;
+
+      --border:  rgba(255,255,255,.07);
+      --border2: rgba(255,255,255,.12);
+      --border3: rgba(255,255,255,.22);
+
+      --text:  #ffffff;
+      --text2: #cdd8dd;
+      --text3: #7a9aaa;
+      --text4: #131f24;
+
+      --accent:     #ffffff;
+      --accent-dim: rgba(255,255,255,.05);
+
+      --duo-blue:   #1cb0f6;
+      --duo-blue2:  #0e86c0;
+      --duo-green:  #57cc02;
+      --duo-green2: #3a8c01;
+      --duo-orange: #ff9600;
+      --duo-red:    #ff4b4b;
+      --duo-purple: #ce82ff;
+      --duo-yellow: #ffd900;
+      --duo-teal:   #1fe0c0;
+
+      --red:    #ff4b4b;
+      --green:  #57cc02;
+      --gold:   #ffd900;
+      --amber:  #ff9600;
+      --red-bg: rgba(255,75,75,.12);
+      --green-bg: rgba(87,204,2,.12);
+      --amber-bg: rgba(255,150,0,.12);
+      --purple-bg: rgba(206,130,255,.12);
+      --teal-bg:   rgba(31,224,192,.12);
+      --blue:   #1cb0f6;
+      --blue-bg: rgba(28,176,246,.12);
+      --purple: #ce82ff;
+      --teal:   #1fe0c0;
+
+      --code-bg:      #0d1921;
+      --code-text:    #cdd8dd;
+      --terminal-bg:  #0a1520;
+      --terminal-text:#57cc02;
+
+      --r:  12px;
+      --r2: 16px;
+      --r3: 99px;
+      --font: 'Nunito', sans-serif;
       --mono: 'DM Mono', monospace;
     }
 
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+    html { scroll-behavior:smooth }
     body {
       font-family: var(--font);
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
+      display: flex; align-items: flex-start; justify-content: center;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
     }
 
+    /* ══ ОБОЛОЧКА ═══════════════════════════════════════════ */
     .creator-shell {
-      width: 100%;
-      max-width: 900px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 32px 24px 90px;
+      width: 100%; max-width: 920px; min-height: 100vh;
+      display: flex; flex-direction: column;
+      padding: 32px 24px 110px;
     }
 
-    /* TOP */
+    /* ══ TOP BAR ════════════════════════════════════════════ */
     .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28px;
-    }
-
-    .back-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: none;
-      border: none;
-      color: var(--text2);
-      font-family: var(--font);
-      font-size: 13px;
-      cursor: pointer;
-      padding: 8px 0;
-      transition: color .2s;
-    }
-
-    .back-btn:hover {
-      color: var(--text);
-    }
-
-    .back-btn svg {
-      width: 16px;
-      height: 16px;
-    }
-
-    .top-title {
-      font-family: var(--font);
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      letter-spacing: 0.02em;
-    }
-
-    .top-save {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    /* PROGRESS */
-    .progress-bar-wrap {
-      height: 1px;
-      background: var(--border);
-      margin-bottom: 32px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--text);
-      transition: width .4s ease;
-    }
-
-    /* STEPS NAV */
-    .steps-nav {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 32px;
-      gap: 4px;
-    }
-
-    .step-pill {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 14px 12px;
-      cursor: pointer;
-      transition: all .15s;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid transparent;
-      color: var(--text3);
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: -1px;
-    }
-
-    .step-pill:hover {
-      color: var(--text2);
-    }
-
-    .step-pill.active {
-      color: var(--text);
-      border-bottom-color: var(--text);
-    } 
-
-    .step-pill.done {
-      color: var(--text2);
-    }
-
-    .step-num {
-      display: inline-flex;
-      font-weight: 500;
-    }
-
-    .step-num span::after {
-      content: '.';
-    }
-
-    .step-pill.done .step-num::after {
-      content: '';
-    }
-
-    .step-pill.done .step-num span {
-      display: inline;
-    }
-
-    /* PANELS */
-    .step-panel {
-      display: none;
-      animation: fadeUp .2s ease;
-    }
-
-    .step-panel.active {
-      display: block;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* TYPOGRAPHY */
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .section-sub {
-      font-size: 13px;
-      color: var(--text2);
-      margin-bottom: 32px;
-      line-height: 1.5;
-    }
-
-    /* FORM */
-    .field-group {
+      display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 24px;
     }
+    .back-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: none; border: none; color: var(--text2);
+      font-family: var(--font); font-size: 14px; font-weight: 700;
+      cursor: pointer; padding: 8px 0; transition: color .15s;
+    }
+    .back-btn:hover { color: var(--text) }
+    .back-btn svg { width: 16px; height: 16px }
+    .top-title {
+      font-family: var(--font); font-size: 15px; font-weight: 800; color: var(--text);
+    }
+    .top-save {
+      font-family: var(--mono); font-size: 10px; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .1em;
+    }
 
+    /* ══ ПРОГРЕСС BAR ════════════════════════════════════════ */
+    .progress-bar-wrap {
+      height: 6px; background: var(--bg3); margin-bottom: 28px;
+      overflow: hidden; border-radius: 99px;
+    }
+    .progress-bar-fill {
+      height: 100%; background: var(--duo-blue);
+      border-radius: 99px; transition: width .4s ease;
+    }
+
+    /* ══ ШАГИ НАВИГАЦИИ ════════════════════════════════════ */
+    .steps-nav {
+      display: flex; border-bottom: 1px solid var(--border);
+      margin-bottom: 32px; gap: 4px;
+    }
+    .step-pill {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 13px 12px; cursor: pointer; transition: all .15s;
+      background: transparent; border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text3); font-family: var(--mono);
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: -1px;
+    }
+    .step-pill:hover { color: var(--text2) }
+    .step-pill.active { color: var(--duo-blue); border-bottom-color: var(--duo-blue) }
+    .step-pill.done   { color: var(--duo-green) }
+
+    /* ══ ПАНЕЛИ ШАГОВ ══════════════════════════════════════ */
+    .step-panel { display: none; animation: fadeUp .25s ease }
+    .step-panel.active { display: block }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ══ ЗАГОЛОВКИ СЕКЦИЙ ══════════════════════════════════ */
+    .section-title {
+      font-size: 22px; font-weight: 900; margin-bottom: 8px; letter-spacing: -.3px;
+    }
+    .section-sub { font-size: 14px; color: var(--text2); margin-bottom: 32px; line-height: 1.6 }
+
+    /* ══ ПОЛЯ ══════════════════════════════════════════════ */
+    .field-group { margin-bottom: 24px }
     .field-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--text3);
-      margin-bottom: 10px;
-      display: block;
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .12em; color: var(--text3);
+      margin-bottom: 10px; display: block;
     }
+    .field-hint { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 6px }
 
-    .field-hint {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-      margin-top: 6px;
-    }
-
-    .inp,
-    .sel,
-    .textarea-inp {
-      width: 100%;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 14px;
-      padding: 12px 14px;
-      outline: none;
+    .inp, .sel, .textarea-inp {
+      width: 100%; background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 14px; font-weight: 600; padding: 12px 16px; outline: none;
       transition: border-color .15s;
     }
-
-    .inp:focus,
-    .sel:focus,
-    .textarea-inp:focus {
-      border-color: var(--border3);
-    }
-
-    .inp::placeholder,
-    .textarea-inp::placeholder {
-      color: var(--text3);
-    }
-
-    .textarea-inp {
-      resize: vertical;
-      min-height: 100px;
-      line-height: 1.6;
-    }
-
-    .sel {
-      appearance: none;
-      cursor: pointer;
-    }
-
-    .sel option {
-      background: var(--bg2);
-    }
+    .inp:focus, .sel:focus, .textarea-inp:focus { border-color: var(--duo-blue) }
+    .inp::placeholder, .textarea-inp::placeholder { color: var(--text3); font-weight: 400 }
+    .textarea-inp { resize: vertical; min-height: 100px; line-height: 1.6 }
+    .sel { appearance: none; cursor: pointer }
+    .sel option { background: var(--bg2) }
 
     .char-count {
-      text-align: right;
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-      margin-top: 6px;
+      text-align: right; font-family: var(--mono); font-size: 10px;
+      color: var(--text3); margin-top: 6px;
+    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px }
+    .divider { height: 1px; background: var(--border); margin: 32px 0 }
+
+    /* ══ ЧИПЫ И ПИЛЮЛИ ═════════════════════════════════════ */
+    .chips-grid, .pill-group { display: flex; flex-wrap: wrap; gap: 8px }
+    .chip, .level-pill {
+      padding: 6px 16px; border-radius: var(--r3);
+      border: 2px solid var(--border2); background: transparent;
+      color: var(--text3); font-family: var(--mono); font-size: 10px;
+      text-transform: uppercase; letter-spacing: .05em;
+      cursor: pointer; transition: all .15s; font-weight: 700;
+    }
+    .chip:hover, .level-pill:hover { border-color: var(--border3); color: var(--text2) }
+    .chip.selected, .level-pill.selected {
+      background: var(--duo-blue); border-color: var(--duo-blue2);
+      color: #fff;
     }
 
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 32px 0;
-    }
-
-    .chips-grid,
-    .pill-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip,
-    .level-pill {
-      padding: 6px 14px;
-      border-radius: var(--r);
-      border: 1px solid var(--border2);
-      background: transparent;
-      color: var(--text2);
-      font-family: var(--mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      transition: all .15s;
-      user-select: none;
-    }
-
-    .chip:hover,
-    .level-pill:hover {
-      border-color: var(--border3);
-      color: var(--text);
-    }
-
-    .chip.selected,
-    .level-pill.selected {
-      background: var(--text);
-      border-color: var(--text);
-      color: var(--bg);
-      font-weight: 500;
-    }
-
-    /* COVER */
-    .cover-row {
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
-    }
-
+    /* ══ ОБЛОЖКА ════════════════════════════════════════════ */
+    .cover-row { display: flex; gap: 20px; align-items: flex-start }
     .cover-preview {
-      width: 100px;
-      height: 100px;
-      border-radius: var(--r);
-      background: var(--bg2);
-      border: 1px dashed var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
-      filter: grayscale(0.2);
+      width: 100px; height: 100px; border-radius: var(--r2);
+      background: var(--bg2); border: 2px dashed var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; flex-shrink: 0; position: relative; overflow: hidden;
     }
-
     .cover-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: absolute;
-      top: 0;
-      left: 0;
+      width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;
     }
 
-    .cover-options {
-      flex: 1;
-    }
-
-    /* CURRICULUM */
-    .curriculum-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    /* ══ МОДУЛИ И УРОКИ ════════════════════════════════════ */
+    .curriculum-wrap { display: flex; flex-direction: column; gap: 12px }
 
     .module-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      margin-bottom: 8px;
-      overflow: hidden;
-      transition: border-color .15s;
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r2); overflow: hidden; transition: border-color .15s;
     }
-
-    .module-card:hover {
-      border-color: var(--border2);
-    }
+    .module-card:hover { border-color: var(--border3) }
 
     .module-head {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      user-select: none;
-      background: var(--bg2);
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+      user-select: none; background: var(--bg3);
     }
-
-    .module-drag {
-      color: var(--text3);
-      cursor: grab;
-      flex-shrink: 0;
-      font-size: 14px;
-    }
-
+    .module-drag { color: var(--text3); cursor: grab; flex-shrink: 0; font-size: 14px }
     .module-index {
-      width: 24px;
-      height: 24px;
-      border-radius: var(--r);
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text2);
-      flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: var(--r);
+      background: var(--bg4); border: 2px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 10px; color: var(--text3); flex-shrink: 0;
     }
-
     .module-title-inp {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 14px;
-      font-weight: 600;
-      outline: none;
+      flex: 1; background: transparent; border: none; color: var(--text);
+      font-family: var(--font); font-size: 15px; font-weight: 800; outline: none;
     }
+    .module-title-inp::placeholder { color: var(--text3); font-weight: 400 }
 
-    .module-title-inp::placeholder {
-      color: var(--text3);
-      font-weight: 400;
+    .module-toggle-btn, .module-delete-btn, .sqb-toggle {
+      background: none; border: none; color: var(--text3);
+      cursor: pointer; font-size: 14px; padding: 5px 8px;
+      border-radius: var(--r); transition: all .15s; font-family: var(--mono);
     }
+    .module-toggle-btn:hover, .sqb-toggle:hover { color: var(--text); background: var(--bg4) }
+    .module-delete-btn:hover { background: var(--red-bg); color: var(--duo-red) }
 
-    .module-toggle-btn,
-    .module-delete-btn,
-    .sqb-toggle {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 14px;
-      padding: 4px 8px;
-      border-radius: var(--r);
-      transition: all .15s;
-      font-family: var(--mono);
-    }
-
-    .module-toggle-btn:hover,
-    .sqb-toggle:hover {
-      color: var(--text);
-      background: var(--bg3);
-    }
-
-    .module-delete-btn:hover {
-      background: var(--red-bg);
-      color: var(--red);
-    }
-
-    .module-body {
-      border-top: 1px solid var(--border);
-      padding: 16px;
-    }
+    .module-body { border-top: 1px solid var(--border); padding: 16px }
 
     .module-section-label {
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text3);
-      margin-bottom: 12px;
-      margin-top: 20px;
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em; color: var(--text3);
+      margin-bottom: 12px; margin-top: 20px;
     }
+    .module-section-label:first-child { margin-top: 0 }
 
-    .module-section-label:first-child {
-      margin-top: 0;
-    }
-
-    /* LESSONS */
-    .lessons-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
+    .lessons-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px }
 
     .lesson-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      background: var(--bg2);
-      border-radius: var(--r);
-      border: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 12px; padding: 14px 16px;
+      background: var(--bg3); border-radius: var(--r); border: 2px solid var(--border);
     }
 
-    .lesson-type-badge,
-    .qcard-type-badge {
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 3px 6px;
-      border-radius: var(--r);
-      flex-shrink: 0;
-      border: 1px solid var(--border2);
-      background: transparent;
+    .lesson-type-badge {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 3px 8px; border-radius: var(--r3); flex-shrink: 0;
+      border: 1.5px solid var(--border2); background: transparent;
     }
-
-    .lesson-type-badge.video {
-      color: var(--purple);
-      border-color: rgba(168, 85, 247, 0.3);
-    }
-
-    .lesson-type-badge.audio {
-      color: var(--teal);
-      border-color: rgba(20, 184, 166, 0.3);
-    }
-
-    .lesson-type-badge.text {
-      color: var(--accent);
-      border-color: var(--border3);
-    }
-
-    .lesson-type-badge.quiz {
-      color: var(--amber);
-      border-color: rgba(251, 191, 36, 0.3);
-    }
+    .lesson-type-badge.content { color: var(--text2); border-color: var(--border3) }
+    .lesson-type-badge.coding  { color: var(--duo-orange); border-color: rgba(255,150,0,.3) }
 
     .lesson-inp {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13px;
-      outline: none;
+      flex: 1; background: transparent; border: none; color: var(--text);
+      font-family: var(--font); font-size: 15px; font-weight: 700; outline: none;
     }
+    .lesson-inp::placeholder { color: var(--text3); font-weight: 400 }
 
-    .lesson-inp::placeholder {
-      color: var(--text3);
+    .lesson-heading-inp {
+      background: var(--bg2); border: 2px solid var(--border2); border-radius: var(--r);
+      padding: 8px 12px; font-size: 14px; color: var(--text); width: 100%;
+      font-family: var(--font); outline: none; transition: border-color .15s;
     }
+    .lesson-heading-inp:focus { border-color: var(--duo-blue) }
 
-    .lesson-duration {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-      white-space: nowrap;
+    .lesson-content-inp {
+      background: var(--bg); border: 2px solid var(--border); border-radius: var(--r);
+      padding: 12px 14px; min-height: 140px; font-size: 14px; line-height: 1.6;
+      width: 100%; resize: vertical; color: var(--text); font-family: var(--font);
+      outline: none; transition: border-color .15s;
     }
+    .lesson-content-inp:focus { border-color: var(--duo-blue) }
+
+    .media-row { display: flex; gap: 12px; flex-wrap: wrap }
+    .media-inp { flex: 1; min-width: 220px }
 
     .lesson-del-btn {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 12px;
-      padding: 4px;
-      transition: color .15s;
+      background: none; border: none; color: var(--text3);
+      cursor: pointer; font-size: 12px; padding: 4px;
+      transition: color .15s; align-self: flex-start;
     }
+    .lesson-del-btn:hover { color: var(--duo-red) }
 
-    .lesson-del-btn:hover {
-      color: var(--red);
+    .add-lesson-row { display: flex; gap: 12px; flex-wrap: wrap }
+    .add-lesson-btn {
+      display: flex; align-items: center; gap: 8px; padding: 10px 18px;
+      border-radius: var(--r); border: 2px dashed var(--border2);
+      background: transparent; color: var(--text3); font-size: 14px;
+      font-family: var(--font); cursor: pointer; transition: all .15s; font-weight: 700;
     }
+    .add-lesson-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border3) }
 
-    .add-lesson-row,
-    .add-q-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .add-lesson-btn,
-    .add-q-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: var(--r);
-      border: 1px dashed var(--border2);
-      background: transparent;
-      color: var(--text3);
-      font-size: 11px;
-      font-family: var(--font);
-      cursor: pointer;
-      transition: all .15s;
-    }
-
-    .add-lesson-btn:hover,
-    .add-q-btn:hover {
-      background: var(--bg3);
-      color: var(--text);
-      border-color: var(--border3);
-    }
-
-    /* SECTION QUIZ BUILDER */
+    /* ══ QUIZ BUILDER ═══════════════════════════════════════ */
     .section-quiz-builder {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      margin-top: 16px;
-      overflow: hidden;
+      background: var(--bg3); border: 2px solid var(--border2);
+      border-radius: var(--r2); margin-top: 16px; overflow: hidden;
     }
-
     .sqb-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: var(--bg4); border-bottom: 1px solid var(--border);
     }
-
-    .sqb-icon {
-      font-size: 14px;
-      filter: grayscale(1);
+    .sqb-icon   { font-size: 14px }
+    .sqb-title  {
+      font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--text2);
+      flex: 1; text-transform: uppercase; letter-spacing: .06em;
     }
+    .sqb-count  { font-family: var(--mono); font-size: 10px; color: var(--text3) }
+    .sqb-body   { padding: 16px }
 
-    .sqb-title {
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text2);
-      flex: 1;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .sqb-count {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-    }
-
-    .sqb-body {
-      padding: 16px;
-    }
-
-    /* QUESTION CARDS */
-    .question-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
+    .question-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px }
     .question-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 14px;
-      position: relative;
-      transition: border-color .15s;
+      background: var(--bg2); border: 2px solid var(--border);
+      border-radius: var(--r); padding: 14px; position: relative; transition: border-color .15s;
     }
-
-    .question-card:hover {
-      border-color: var(--border2);
-    }
-
-    .qcard-top {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .qcard-type-badge.mcq {
-      color: var(--accent);
-      border-color: var(--border3);
-    }
-
-    .qcard-type-badge.fill {
-      color: var(--green);
-      border-color: rgba(74, 222, 128, 0.3);
-    }
-
-    .qcard-type-badge.tap {
-      color: var(--purple);
-      border-color: rgba(168, 85, 247, 0.3);
-    }
-
-    .qcard-type-badge.match {
-      color: var(--teal);
-      border-color: rgba(20, 184, 166, 0.3);
-    }
-
+    .question-card:hover { border-color: var(--border2) }
+    .qcard-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px }
+    .qcard-type-badge.mcq  { color: var(--text2);       border-color: var(--border3) }
+    .qcard-type-badge.fill { color: var(--duo-green);   border-color: rgba(87,204,2,.3) }
+    .qcard-type-badge.tap  { color: var(--duo-purple);  border-color: rgba(206,130,255,.3) }
+    .qcard-type-badge.match{ color: var(--duo-teal);    border-color: rgba(31,224,192,.3) }
     .qcard-q {
-      flex: 1;
-      font-size: 13px;
-      color: var(--text);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      flex: 1; font-size: 13px; font-weight: 700; color: var(--text);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-
-    .qcard-del,
-    .qcard-edit {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      padding: 4px 8px;
-      border-radius: var(--r);
-      transition: all .15s;
-      flex-shrink: 0;
+    .qcard-del, .qcard-edit {
+      background: none; border: none; color: var(--text3); cursor: pointer;
+      font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: var(--r3); transition: all .15s; flex-shrink: 0;
     }
+    .qcard-del:hover  { color: var(--duo-red);  background: var(--red-bg) }
+    .qcard-edit:hover { color: var(--text);     background: var(--bg3) }
 
-    .qcard-del:hover {
-      color: var(--red);
-      background: var(--red-bg);
-    }
-
-    .qcard-edit:hover {
-      color: var(--text);
-      background: var(--bg3);
-    }
-
-    /* MODULE QUIZ TOGGLE */
     .module-quiz-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: var(--r);
-      border: 1px dashed var(--border2);
-      background: transparent;
-      color: var(--text3);
-      font-size: 12px;
-      font-family: var(--font);
-      cursor: pointer;
-      transition: all .15s;
-      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 12px; padding: 12px 14px; border-radius: var(--r);
+      border: 2px dashed var(--border2); background: transparent;
+      color: var(--text3); font-size: 13px; font-family: var(--font); font-weight: 700;
+      cursor: pointer; transition: all .15s; width: 100%;
+    }
+    .module-quiz-toggle:hover { background: var(--bg3); color: var(--text); border-color: var(--border3) }
+
+    /* ══ КОД И ТЕРМИНАЛ ═════════════════════════════════════ */
+    .code-task-row { background: var(--bg3); border: 2px solid var(--border); border-radius: var(--r); padding: 12px }
+    .code-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px }
+    .code-editor {
+      font-family: var(--mono); font-size: 13px; background: var(--code-bg);
+      color: var(--code-text); border: 2px solid var(--border2); border-radius: var(--r);
+      padding: 14px; min-height: 160px; width: 100%; resize: vertical;
+      white-space: pre; overflow: auto; outline: none;
+    }
+    .terminal {
+      background: var(--terminal-bg); color: var(--terminal-text);
+      font-family: var(--mono); font-size: 13px; padding: 12px;
+      border-radius: var(--r); min-height: 100px; border: 2px solid var(--border); overflow: auto;
     }
 
-    .module-quiz-toggle:hover {
-      background: var(--bg3);
-      color: var(--text);
-      border-color: var(--border3);
-    }
-
-    /* MODAL (question editor) */
+    /* ══ МОДАЛЬНЫЕ ОКНА ════════════════════════════════════ */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .85);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      position: fixed; inset: 0; background: rgba(0,0,0,.8);
+      backdrop-filter: blur(8px); z-index: 1000;
+      display: none; align-items: center; justify-content: center; padding: 20px;
     }
-
-    .modal-overlay.open {
-      display: flex;
-      animation: fadeIn .2s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
+    .modal-overlay.open { display: flex; animation: fadeIn .2s ease }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
     .modal-box {
-      background: var(--bg);
-      border: 1px solid var(--border2);
-      border-radius: var(--r);
-      width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r2); width: 100%; max-width: 820px;
+      max-height: 90vh; overflow-y: auto;
       animation: slideUp .25s ease;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
     }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(12px);
-        opacity: 0;
-      }
-
-      to {
-        transform: none;
-        opacity: 1;
-      }
-    }
+    @keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:none;opacity:1} }
 
     .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
     }
-
     .modal-header h3 {
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--text);
+      text-transform: uppercase; letter-spacing: .1em;
     }
-
     .modal-close-btn {
-      background: transparent;
-      border: none;
-      color: var(--text3);
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      transition: color .15s;
+      background: transparent; border: none; color: var(--text3);
+      width: 28px; height: 28px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; border-radius: 50%;
+      transition: all .15s;
     }
+    .modal-close-btn:hover { color: var(--duo-red); background: var(--red-bg) }
 
-    .modal-close-btn:hover {
-      color: var(--red);
-    }
-
-    .modal-body {
-      padding: 24px;
-    }
-
+    .modal-body   { padding: 24px }
     .modal-footer {
-      padding: 16px 24px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      background: var(--bg2);
+      padding: 16px 24px; border-top: 1px solid var(--border);
+      display: flex; gap: 12px; justify-content: flex-end; background: var(--bg3);
     }
 
-    /* OPTION ROWS */
-    .options-list,
-    .pairs-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .option-row,
-    .pair-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    /* ══ ВАРИАНТЫ ОТВЕТОВ (МОДАЛ) ══════════════════════════ */
+    .options-list, .pairs-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px }
+    .option-row, .pair-row { display: flex; align-items: center; gap: 12px }
 
     .option-radio {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 1px solid var(--border2);
-      background: transparent;
-      cursor: pointer;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border2);
+      background: transparent; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; transition: all .15s;
     }
-
-    .option-radio.correct {
-      border-color: var(--green);
-    }
-
+    .option-radio.correct { border-color: var(--duo-green) }
     .option-radio.correct::after {
-      content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--green);
+      content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--duo-green);
     }
 
-    .option-inp,
-    .pair-inp {
-      flex: 1;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13px;
-      padding: 10px 12px;
-      outline: none;
-      transition: border-color .15s;
+    .option-inp, .pair-inp {
+      flex: 1; background: var(--bg3); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 13px; font-weight: 600; padding: 9px 12px; outline: none; transition: border-color .15s;
     }
+    .option-inp:focus, .pair-inp:focus { border-color: var(--duo-blue) }
 
-    .option-inp:focus,
-    .pair-inp:focus {
-      border-color: var(--border3);
+    .option-del, .pair-del {
+      background: none; border: none; color: var(--text3); cursor: pointer;
+      font-size: 14px; padding: 4px; transition: color .15s;
     }
-
-    .option-del,
-    .pair-del {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 12px;
-      padding: 4px;
-      transition: color .15s;
-    }
-
-    .option-del:hover,
-    .pair-del:hover {
-      color: var(--red);
-    }
+    .option-del:hover, .pair-del:hover { color: var(--duo-red) }
 
     .add-option-btn {
-      background: none;
-      border: 1px dashed var(--border2);
-      border-radius: var(--r);
-      color: var(--text3);
-      font-size: 11px;
-      padding: 8px 12px;
-      cursor: pointer;
-      transition: all .15s;
-      font-family: var(--font);
-      text-align: left;
-      width: 100%;
+      background: none; border: 2px dashed var(--border2); border-radius: var(--r);
+      color: var(--text3); font-size: 12px; font-weight: 700; padding: 8px 12px;
+      cursor: pointer; transition: all .15s; font-family: var(--font); width: 100%;
     }
+    .add-option-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border3) }
+    .pair-arrow { font-family: var(--mono); color: var(--text3); font-size: 12px; flex-shrink: 0 }
 
-    .add-option-btn:hover {
-      background: var(--bg3);
-      color: var(--text);
-      border-color: var(--border3);
+    /* ══ КНОПКИ ════════════════════════════════════════════ */
+    .btn, .add-module-btn {
+      padding: 10px 22px; border-radius: var(--r3); font-family: var(--font);
+      font-size: 14px; font-weight: 800; cursor: pointer; transition: all .15s;
+      border: none; letter-spacing: .02em;
     }
-
-    .pair-arrow {
-      font-family: var(--mono);
-      color: var(--text3);
-      font-size: 12px;
-      flex-shrink: 0;
-    }
-
-    /* WORDS TAG */
-    .words-tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 10px 12px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      min-height: 48px;
-      margin-bottom: 12px;
-      cursor: text;
-      align-items: center;
-    }
-
-    .word-tag {
-      padding: 4px 10px;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      border-radius: var(--r);
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .word-tag.answer-word {
-      border-color: rgba(74, 222, 128, 0.3);
-      color: var(--green);
-    }
-
-    .word-tag-del {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 10px;
-      padding: 0;
-      transition: color .15s;
-    }
-
-    .word-tag-del:hover {
-      color: var(--red);
-    }
-
-    .words-inp {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13px;
-      outline: none;
-      min-width: 80px;
-      flex: 1;
-    }
-
-    /* BUTTONS */
-    .btn,
-    .add-module-btn {
-      padding: 10px 20px;
-      border-radius: var(--r);
-      font-family: var(--font);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .15s;
-      border: none;
-      letter-spacing: 0.03em;
-    }
-
     .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border2);
-      color: var(--text2);
+      background: transparent; border: 2px solid var(--border2); color: var(--text2);
     }
-
-    .btn-ghost:hover {
-      border-color: var(--border3);
-      color: var(--text);
+    .btn-ghost:hover { border-color: var(--border3); color: var(--text) }
+    .btn-primary, .btn-publish {
+      background: var(--duo-blue); color: #fff;
+      border-bottom: 3px solid var(--duo-blue2);
     }
-
-    .btn-primary,
-    .btn-publish {
-      background: none;
-      color: var(--bg);
-      font-weight: 700;
-    }
-
-    .btn-primary:hover,
-    .btn-publish:hover {
-      opacity: 0.85;
-    }
-
-    .btn-primary:disabled,
-    .btn-publish:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 12px;
-    }
+    .btn-primary:hover, .btn-publish:hover { filter: brightness(1.1) }
+    .btn-primary:active, .btn-publish:active { transform: translateY(2px); border-bottom-width: 1px }
+    .btn-primary:disabled, .btn-publish:disabled { opacity: .3; cursor: not-allowed }
+    .btn-sm { padding: 8px 18px; font-size: 13px }
 
     .add-module-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      border: 1px dashed var(--border2);
-      background: transparent;
-      color: var(--text2);
-      margin-top: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; border: 2px dashed var(--border2); background: transparent;
+      color: var(--text3); margin-top: 8px;
     }
+    .add-module-btn:hover { background: var(--bg2); color: var(--text); border-color: var(--border3) }
 
-    .add-module-btn:hover {
-      background: var(--bg2);
-      color: var(--text);
-      border-color: var(--border3);
-    }
-
-    /* BOTTOM NAV */
+    /* ══ НИЖНЯЯ НАВИГАЦИЯ ═══════════════════════════════════ */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: center;
-      z-index: 100;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(19,31,36,.97); backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border); padding: 16px 24px;
+      display: flex; justify-content: center; z-index: 100;
     }
-
     .bottom-nav-inner {
-      max-width: 900px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      max-width: 920px; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
     }
-
     .nav-step-info {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-family: var(--mono); font-size: 11px; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .06em;
     }
+    .nav-step-info strong { color: var(--duo-blue) }
 
-    .nav-step-info strong {
-      color: var(--text);
-    }
-
-    /* TOAST */
+    /* ══ ТОСТ ════════════════════════════════════════════════ */
     .toast {
-      position: fixed;
-      bottom: 90px;
-      left: 50%;
+      position: fixed; bottom: 90px; left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: var(--text);
-      border-radius: var(--r);
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--bg);
-      opacity: 0;
-      transition: all .3s;
-      z-index: 400;
-      pointer-events: none;
-      white-space: nowrap;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r3); padding: 10px 22px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text);
+      opacity: 0; transition: all .3s; z-index: 400; pointer-events: none;
+      white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.4);
     }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0) }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* STEP 3 Details */
-    .pricing-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
+    /* ══ ЦЕНООБРАЗОВАНИЕ ════════════════════════════════════ */
+    .pricing-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px }
     .pricing-opt {
-      padding: 20px 16px;
-      border-radius: var(--r);
-      border: 1px solid var(--border);
-      background: var(--bg2);
-      cursor: pointer;
-      transition: all .15s;
-      text-align: center;
+      padding: 20px 16px; border-radius: var(--r2); border: 2px solid var(--border2);
+      background: var(--bg2); cursor: pointer; transition: all .15s; text-align: center;
     }
+    .pricing-opt:hover { border-color: var(--border3); background: var(--bg3) }
+    .pricing-opt.selected { border-color: var(--duo-blue); background: rgba(28,176,246,.08) }
+    .pricing-icon { font-size: 26px; margin-bottom: 10px }
+    .pricing-label { font-family: var(--font); font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px }
+    .pricing-desc  { font-family: var(--mono); font-size: 10px; color: var(--text3); line-height: 1.4 }
+    .price-field-wrap { display: none }
+    .price-field-wrap.visible { display: block }
 
-    .pricing-opt:hover {
-      border-color: var(--border3);
-    }
-
-    .pricing-opt.selected {
-      border-color: var(--text);
-      background: var(--bg3);
-    }
-
-    .pricing-icon {
-      font-size: 24px;
-      margin-bottom: 12px;
-      filter: grayscale(1);
-    }
-
-    .pricing-label {
-      font-family: var(--font);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .pricing-desc {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-      line-height: 1.4;
-    }
-
-    .price-field-wrap {
-      display: none;
-    }
-
-    .price-field-wrap.visible {
-      display: block;
-    }
-
-    .list-editor {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .list-item-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .list-bullet {
-      color: var(--text3);
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-
+    /* ══ СПИСКИ (outcomes/req) ══════════════════════════════ */
+    .list-editor { display: flex; flex-direction: column; gap: 8px }
+    .list-item-row { display: flex; align-items: center; gap: 12px }
+    .list-bullet { color: var(--duo-blue); font-size: 16px; flex-shrink: 0 }
     .list-inp {
-      flex: 1;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13px;
-      padding: 10px 12px;
-      outline: none;
-      transition: border-color .15s;
+      flex: 1; background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 13px; font-weight: 600; padding: 10px 12px; outline: none; transition: border-color .15s;
     }
-
-    .list-inp:focus {
-      border-color: var(--border3);
-    }
-
+    .list-inp:focus { border-color: var(--duo-blue) }
     .list-del-btn {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 12px;
-      padding: 4px;
-      transition: color .15s;
+      background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; padding: 4px; transition: color .15s;
     }
-
-    .list-del-btn:hover {
-      color: var(--red);
-    }
-
+    .list-del-btn:hover { color: var(--duo-red) }
     .add-list-btn {
-      background: none;
-      border: 1px dashed var(--border2);
-      border-radius: var(--r);
-      color: var(--text3);
-      font-size: 11px;
-      padding: 8px 12px;
-      cursor: pointer;
-      transition: all .15s;
-      font-family: var(--font);
-      text-align: left;
+      background: none; border: 2px dashed var(--border2); border-radius: var(--r);
+      color: var(--text3); font-size: 12px; font-weight: 700; padding: 8px 14px;
+      cursor: pointer; transition: all .15s; font-family: var(--font);
     }
+    .add-list-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border3) }
 
-    .add-list-btn:hover {
-      background: var(--bg3);
-      color: var(--text);
-      border-color: var(--border3);
+    /* ══ ПУБЛИКАЦИЯ / ПРЕВЬЮ ════════════════════════════════ */
+    .preview-shell { display: grid; grid-template-columns: 1fr 340px; gap: 24px; min-height: 500px }
+    .preview-info  { display: flex; flex-direction: column; gap: 16px }
+
+    .publish-summary, .status-group-wrap, .publish-checks-wrap {
+      background: var(--bg2); border: 2px solid var(--border2); border-radius: var(--r2); padding: 24px;
     }
-
-    /* STEP 4 PREVIEW */
-    .preview-shell {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 24px;
-      min-height: 500px;
-    }
-
-    .preview-info {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .publish-summary,
-    .status-group-wrap,
-    .publish-checks-wrap {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 24px;
-    }
-
     .summary-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px;
     }
-
-    .summary-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .summary-row:first-child {
-      padding-top: 0;
-    }
-
+    .summary-row:last-child  { border-bottom: none; padding-bottom: 0 }
+    .summary-row:first-child { padding-top: 0 }
     .summary-key {
-      color: var(--text2);
-      font-family: var(--mono);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      color: var(--text3); font-family: var(--mono); font-size: 10px;
+      text-transform: uppercase; letter-spacing: .06em;
     }
+    .summary-val { color: var(--text); font-weight: 700 }
+    .summary-val.ok   { color: var(--duo-green) }
+    .summary-val.warn { color: var(--duo-orange) }
+    .summary-val.err  { color: var(--duo-red) }
 
-    .summary-val {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .summary-val.ok {
-      color: var(--green);
-    }
-
-    .summary-val.warn {
-      color: var(--amber);
-    }
-
-    .summary-val.err {
-      color: var(--red);
-    }
-
-    .publish-checks {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .check-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 13px;
-      color: var(--text2);
-    }
-
+    .publish-checks { display: flex; flex-direction: column; gap: 12px }
+    .check-item { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text2) }
     .check-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      flex-shrink: 0;
-      font-family: var(--mono);
-      border: 1px solid transparent;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 800; flex-shrink: 0;
+      font-family: var(--mono); border: 2px solid transparent;
     }
+    .check-dot.ok   { border-color: var(--duo-green);  color: var(--duo-green) }
+    .check-dot.warn { border-color: var(--duo-orange); color: var(--duo-orange) }
+    .check-dot.err  { border-color: var(--duo-red);    color: var(--duo-red) }
 
-    .check-dot.ok {
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .check-dot.warn {
-      border-color: var(--amber);
-      color: var(--amber);
-    }
-
-    .check-dot.err {
-      border-color: var(--red);
-      color: var(--red);
-    }
-
-    /* STUDENT PREVIEW PANEL */
+    /* ══ ПРЕДПРОСМОТР ДЛЯ УЧЕНИКА ═══════════════════════════ */
     .student-preview {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-      position: sticky;
-      top: 24px;
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r2); overflow: hidden; position: sticky; top: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
     }
-
     .sp-header {
-      background: var(--bg2);
-      padding: 24px 20px;
+      background: var(--bg3); padding: 20px;
       border-bottom: 1px solid var(--border);
     }
-
     .sp-badge {
-      display: inline-block;
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 500;
-      color: var(--text3);
-      border: 1px solid var(--border2);
-      padding: 2px 6px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
+      display: inline-block; font-family: var(--mono); font-size: 9px; font-weight: 700;
+      color: var(--duo-blue); border: 1.5px solid rgba(28,176,246,.3);
+      background: rgba(28,176,246,.1); padding: 2px 8px; letter-spacing: .08em;
+      text-transform: uppercase; margin-bottom: 10px; border-radius: var(--r3);
     }
-
-    .sp-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: var(--text);
-      line-height: 1.3;
-    }
-
-    .sp-sub {
-      font-size: 12px;
-      color: var(--text2);
-      line-height: 1.5;
-    }
-
-    .sp-stats {
-      display: flex;
-      gap: 16px;
-      margin-top: 16px;
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-    }
-
-    .sp-body {
-      padding: 20px;
-    }
-
+    .sp-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; color: var(--text); line-height: 1.3 }
+    .sp-sub   { font-size: 12px; color: var(--text2); line-height: 1.5 }
+    .sp-stats { display: flex; gap: 14px; margin-top: 14px; font-family: var(--mono); font-size: 10px; color: var(--text3) }
+    .sp-body  { padding: 18px }
     .sp-section-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--text3);
-      margin-bottom: 16px;
+      font-family: var(--mono); font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--text3); margin-bottom: 14px;
     }
 
-    /* MINI PATH */
-    .mini-path {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 16px;
-    }
-
-    .mini-unit {
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      background: var(--bg2);
-      overflow: hidden;
-    }
-
+    .mini-path { display: flex; flex-direction: column; align-items: stretch; gap: 12px }
+    .mini-unit { border: 2px solid var(--border2); border-radius: var(--r); background: var(--bg3); overflow: hidden }
     .mini-unit-label {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border);
     }
-
     .mini-unit-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: var(--r);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      flex-shrink: 0;
-      filter: grayscale(1);
-      background: var(--bg3);
-      border: 1px solid var(--border2);
+      width: 28px; height: 28px; border-radius: var(--r); background: var(--bg4);
+      border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
     }
-
-    .mini-unit-text {
-      flex: 1;
-    }
-
-    .mini-unit-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-
-    .mini-unit-count {
-      font-family: var(--mono);
-      font-size: 9px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .mini-nodes {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: var(--border);
-    }
-
+    .mini-unit-name  { font-size: 12px; font-weight: 800; color: var(--text); margin-bottom: 2px }
+    .mini-unit-count { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em }
+    .mini-nodes { display: flex; flex-direction: column; gap: 1px; background: var(--border) }
     .mini-node {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      background: var(--bg2);
-      font-size: 12px;
-      color: var(--text2);
-      cursor: default;
+      display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+      background: var(--bg3); font-size: 12px; font-weight: 700; color: var(--text2); cursor: default;
     }
-
-    .mini-node.mn-active {
-      color: var(--text);
-      background: var(--bg3);
-    }
-
-    .mini-node.mn-locked {
-      color: var(--text3);
-    }
-
+    .mini-node.mn-active { color: var(--duo-blue); background: rgba(28,176,246,.08) }
+    .mini-node.mn-locked { color: var(--text3); opacity: .5 }
     .mn-icon-wrap {
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--r);
-      border: 1px solid var(--border2);
-      font-size: 10px;
-      background: var(--bg);
+      width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+      border-radius: var(--r); border: 1.5px solid var(--border2); font-size: 10px; background: var(--bg2);
     }
 
-    .mn-locked .mn-icon-wrap {
-      opacity: 0.5;
-    }
-
-    /* MINI QUIZ PREVIEW inside panel */
+    /* ══ MINI QUIZ PREVIEW ══════════════════════════════════ */
     .mini-quiz-preview {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 20px;
-      margin-top: 8px;
+      background: var(--bg3); border: 2px solid var(--border2);
+      border-radius: var(--r); padding: 18px; margin-top: 8px;
     }
-
-    .mqp-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .mqp-title {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    .mqp-progress {
-      height: 2px;
-      background: var(--border);
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
-    .mqp-progress-fill {
-      height: 100%;
-      background: var(--text);
-      width: 33%;
-      transition: width .3s ease;
-    }
-
-    .mqp-q {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 16px;
-      line-height: 1.4;
-    }
-
-    .mqp-opts {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
+    .mqp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px }
+    .mqp-title { font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em }
+    .mqp-progress { height: 6px; background: var(--bg4); margin-bottom: 18px; overflow: hidden; border-radius: 99px }
+    .mqp-progress-fill { height: 100%; background: var(--duo-blue); width: 33%; transition: width .3s ease; border-radius: 99px }
+    .mqp-q { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 14px; line-height: 1.4 }
+    .mqp-opts { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 14px }
     .mqp-opt {
-      padding: 10px 14px;
-      border-radius: var(--r);
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text2);
-      font-size: 13px;
-      text-align: left;
-      cursor: pointer;
-      transition: all .15s;
-      font-family: var(--font);
+      padding: 10px 14px; border-radius: var(--r); border: 2px solid var(--border2);
+      background: var(--bg2); color: var(--text2); font-size: 13px; font-weight: 700;
+      text-align: left; cursor: pointer; transition: all .15s; font-family: var(--font);
     }
-
-    .mqp-opt:hover {
-      border-color: var(--border3);
-      color: var(--text);
-    }
-
-    .mqp-opt.sel {
-      border-color: var(--text);
-      background: var(--bg3);
-      color: var(--text);
-    }
-
-    .mqp-opt.correct {
-      border-color: var(--green);
-      background: var(--green-bg);
-      color: var(--green);
-    }
+    .mqp-opt:hover     { border-color: var(--duo-blue); color: var(--text) }
+    .mqp-opt.sel       { border-color: var(--duo-blue); background: rgba(28,176,246,.1); color: var(--text) }
+    .mqp-opt.correct   { border-color: var(--duo-green); background: rgba(87,204,2,.1); color: var(--duo-green) }
 
     .mqp-btn {
-      width: 100%;
-      padding: 10px;
-      border-radius: var(--r);
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text3);
-      font-family: var(--font);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: not-allowed;
-      transition: all .15s;
+      width: 100%; padding: 10px; border-radius: var(--r3); border: 2px solid var(--border);
+      background: var(--bg2); color: var(--text3); font-family: var(--font);
+      font-size: 12px; font-weight: 800; cursor: not-allowed; transition: all .15s;
     }
-
     .mqp-btn.ready {
-      background: var(--text);
-      color: var(--bg);
-      border-color: var(--text);
-      cursor: pointer;
+      background: var(--duo-blue); color: #fff; border-color: var(--duo-blue2);
+      border-bottom: 3px solid var(--duo-blue2); cursor: pointer;
     }
+    .mqp-btn.ready:hover { filter: brightness(1.1) }
+    .mqp-btn.next-btn { background: var(--duo-green); border-color: var(--duo-green2); color: #fff; cursor: pointer }
 
-    .mqp-btn.ready:hover {
-      opacity: 0.85;
-    }
-
-    .mqp-btn.next-btn {
-      background: var(--bg3);
-      border-color: var(--border3);
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    .preview-tab-row {
-      display: flex;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-    }
-
+    /* ══ ВКЛАДКИ ПРЕВЬЮ ════════════════════════════════════ */
+    .preview-tab-row { display: flex; background: var(--bg3); border-bottom: 1px solid var(--border) }
     .preview-tab {
-      flex: 1;
-      padding: 14px 10px;
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      text-align: center;
-      cursor: pointer;
-      color: var(--text3);
-      border: none;
-      background: transparent;
-      transition: all .15s;
-      border-bottom: 1px solid transparent;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: -1px;
+      flex: 1; padding: 13px 10px; font-family: var(--mono); font-size: 10px; font-weight: 700;
+      text-align: center; cursor: pointer; color: var(--text3); border: none; background: transparent;
+      transition: all .15s; border-bottom: 3px solid transparent; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: -1px;
     }
+    .preview-tab:hover { color: var(--text2) }
+    .preview-tab.active { color: var(--duo-blue); border-bottom-color: var(--duo-blue) }
+    .preview-content { display: none }
+    .preview-content.active { display: block; animation: fadeUp .2s ease }
 
-    .preview-tab:hover {
-      color: var(--text2);
-    }
-
-    .preview-tab.active {
-      color: var(--text);
-      border-bottom-color: var(--text);
-    }
-
-    .preview-content {
-      display: none;
-    }
-
-    .preview-content.active {
-      display: block;
-      animation: fadeUp .2s ease;
-    }
-
-    /* SUCCESS */
-    #step-success {
-      display: none;
-      text-align: center;
-      padding: 80px 20px;
-    }
-
-    #step-success.active {
-      display: block;
-      animation: fadeUp .3s ease;
-    }
-
+    /* ══ ЭКРАН УСПЕХА ═══════════════════════════════════════ */
+    #step-success { display: none; text-align: center; padding: 80px 20px }
+    #step-success.active { display: block; animation: fadeUp .3s ease }
     .success-icon {
-      width: 64px;
-      height: 64px;
-      border: 1px solid var(--border2);
-      border-radius: var(--r);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      margin: 0 auto 24px;
-      font-family: var(--mono);
-      color: var(--text);
-      background: var(--bg2);
+      width: 72px; height: 72px; border: 2px solid var(--duo-green);
+      border-radius: var(--r2); display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 24px; font-family: var(--mono); color: var(--duo-green);
+      background: rgba(87,204,2,.08); box-shadow: 0 4px 20px rgba(87,204,2,.15);
     }
+    #step-success h2 { font-size: 28px; font-weight: 900; margin-bottom: 12px; letter-spacing: -.3px }
+    #step-success p  { color: var(--text2); font-size: 15px; margin-bottom: 40px; line-height: 1.6; max-width: 420px; margin-left: auto; margin-right: auto }
+    .success-actions { display: flex; gap: 16px; justify-content: center }
 
-    #step-success h2 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      letter-spacing: -0.02em;
-    }
-
-    #step-success p {
-      color: var(--text2);
-      font-size: 14px;
-      margin-bottom: 40px;
-      line-height: 1.6;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .success-actions {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-    }
-
+    /* ══ АДАПТИВ ════════════════════════════════════════════ */
     @media(max-width:700px) {
-      .two-col {
-        grid-template-columns: 1fr;
-      }
-
-      .pricing-cards {
-        grid-template-columns: 1fr;
-      }
-
-      .step-label {
-        display: none;
-      }
-
-      .creator-shell {
-        padding: 20px 16px 90px;
-      }
-
-      .preview-shell {
-        grid-template-columns: 1fr;
-      }
-
-      .student-preview {
-        position: static;
-      }
+      .two-col { grid-template-columns: 1fr }
+      .pricing-cards { grid-template-columns: 1fr }
+      .step-label { display: none }
+      .creator-shell { padding: 20px 16px 100px }
+      .preview-shell { grid-template-columns: 1fr }
+      .student-preview { position: static }
     }
+
   </style>
 </head>
 
 <body>
   <div class="creator-shell">
-
     <div class="top-bar">
       <button class="back-btn" onclick="history.back()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -1795,11 +699,9 @@
       <span class="top-title">Создание курса</span>
       <span class="top-save" id="autoSaveLabel">Черновик сохранён</span>
     </div>
-
     <div class="progress-bar-wrap">
       <div class="progress-bar-fill" id="progressBar" style="width:25%"></div>
     </div>
-
     <div class="steps-nav">
       <button class="step-pill active" data-step="1" onclick="goToStep(1)">
         <div class="step-num"><span>1</span></div><span class="step-label">Основное</span>
@@ -1814,11 +716,9 @@
         <div class="step-num"><span>4</span></div><span class="step-label">Публикация</span>
       </button>
     </div>
-
     <div id="step-1" class="step-panel active">
       <div class="section-title">Основная информация</div>
       <div class="section-sub">Расскажите о своём курсе — это первое, что увидят ученики.</div>
-
       <div class="field-group">
         <label class="field-label">Обложка курса</label>
         <div class="cover-row">
@@ -1882,14 +782,12 @@
         <div class="chips-grid" id="tagsGrid"></div>
       </div>
     </div>
-
     <div id="step-2" class="step-panel">
       <div class="section-title">Программа курса</div>
-      <div class="section-sub">Добавляйте модули, уроки и тесты раздела.</div>
+      <div class="section-sub">Добавляйте модули и полноценные уроки с содержимым</div>
       <div class="curriculum-wrap" id="curriculumWrap"></div>
       <button class="add-module-btn" onclick="addModule()">+ Добавить модуль</button>
     </div>
-
     <div id="step-3" class="step-panel">
       <div class="section-title">Детали и требования</div>
       <div class="section-sub">Помогите ученикам понять, подходит ли им курс.</div>
@@ -1962,7 +860,6 @@
         </div>
       </div>
     </div>
-
     <div id="step-4" class="step-panel">
       <div class="section-title">Публикация</div>
       <div class="section-sub">Проверьте информацию и посмотрите как курс увидят ученики.</div>
@@ -2023,7 +920,6 @@
         </div>
       </div>
     </div>
-
     <div id="step-success">
       <div class="success-icon">✓</div>
       <h2>Курс опубликован</h2>
@@ -2034,7 +930,6 @@
       </div>
     </div>
   </div>
-
   <div class="bottom-nav" id="bottomNav">
     <div class="bottom-nav-inner">
       <div class="nav-step-info">Шаг <strong id="currentStepLabel">1</strong> из 4</div>
@@ -2043,6 +938,21 @@
         <button class="btn btn-primary" id="btnNext" onclick="nextStep()">Далее →</button>
         <button class="btn btn-publish" id="btnPublish" onclick="publishCourse()"
           style="display:none">Опубликовать</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ ДЛЯ РЕДАКТИРОВАНИЯ УРОКА -->
+  <div class="modal-overlay" id="lessonModal">
+    <div class="modal-box" style="max-width:820px">
+      <div class="modal-header">
+        <h3 id="lessonModalTitle">Новый урок</h3>
+        <button class="modal-close-btn" onclick="closeLessonModal()">✕</button>
+      </div>
+      <div class="modal-body" id="lessonModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost btn-sm" onclick="closeLessonModal()">Отмена</button>
+        <button class="btn btn-primary btn-sm" onclick="saveLessonFromModal()">Сохранить урок</button>
       </div>
     </div>
   </div>
@@ -2060,133 +970,94 @@
       </div>
     </div>
   </div>
-
   <div class="toast" id="toast"></div>
 
-
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
-    authDomain: "pystart-dd2db.firebaseapp.com",
-    projectId: "pystart-dd2db",
-    storageBucket: "pystart-dd2db.firebasestorage.app",
-    messagingSenderId: "9188811255",
-    appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+      authDomain: "pystart-dd2db.firebaseapp.com",
+      projectId: "pystart-dd2db",
+      storageBucket: "pystart-dd2db.firebasestorage.app",
+      messagingSenderId: "9188811255",
+      appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-  window.uploadLessonMedia = async function (file, lessonIndex, moduleIndex) {
-    if (!file) return;
+    window.editCourseId = new URLSearchParams(window.location.search).get('edit');
 
-    const storageRef = ref(storage, `course_media/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    window.saveCourseToFirebase = async function (courseData) {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Вы не авторизованы!");
 
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Загрузка: ' + progress + '%');
-      },
-      (error) => {
-        console.error("Ошибка загрузки:", error);
-        // Заменил showToast на alert или console, так как функция showToast ниже по коду
-        alert("Ошибка при загрузке файла");
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        console.log('Файл доступен по ссылке:', downloadURL);
-        modules[moduleIndex].lessons[lessonIndex].mediaUrl = downloadURL;
-        // Для авто-сохранения вызываем глобальную функцию
-        if(window.autoSave) window.autoSave();
-        alert("Файл успешно загружен ✓");
+      // Принудительно ставим статус "ожидает проверки", чтобы курс скрылся из общей ленты
+      courseData.status = "pending";
+
+      if (window.editCourseId) {
+        courseData.updatedAt = serverTimestamp();
+        const courseRef = doc(db, "courses", window.editCourseId);
+        await updateDoc(courseRef, courseData);
+      } else {
+        courseData.uid = user.uid;
+        courseData.createdAt = serverTimestamp();
+        courseData.updatedAt = serverTimestamp();
+        courseData.userName = user.email ? user.email.split('@')[0] : 'Пользователь';
+        await addDoc(collection(db, "courses"), courseData);
       }
-    );
-  };
+    };
 
-  window.editCourseId = new URLSearchParams(window.location.search).get('edit');
-
-  window.saveCourseToFirebase = async function (courseData) {
-    const user = auth.currentUser;
-    if (!user) throw new Error("Вы не авторизованы!");
-
-    if (window.editCourseId) {
-      courseData.updatedAt = serverTimestamp();
-      const courseRef = doc(db, "courses", window.editCourseId);
-      await updateDoc(courseRef, courseData);
-    } else {
-      courseData.uid = user.uid;
-      courseData.createdAt = serverTimestamp();
-      courseData.updatedAt = serverTimestamp();
-      courseData.userName = user.email ? user.email.split('@')[0] : 'Пользователь';
-      await addDoc(collection(db, "courses"), courseData);
-    }
-  };
-
-  onAuthStateChanged(auth, async (user) => {
-    if (user && window.editCourseId) {
-      const docRef = doc(db, "courses", window.editCourseId);
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data.uid !== user.uid) {
-          alert("У вас нет прав на редактирование этого курса");
-          window.location.href = './index.html';
-          return;
+    onAuthStateChanged(auth, async (user) => {
+      if (user && window.editCourseId) {
+        const docRef = doc(db, "courses", window.editCourseId);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.uid !== user.uid) {
+            alert("У вас нет прав на редактирование этого курса");
+            window.location.href = './index.html';
+            return;
+          }
+          if (window.fillCourseFields) window.fillCourseFields(data);
         }
-        if (window.fillCourseFields) window.fillCourseFields(data);
       }
-    }
-  });
-</script>
-
+    });
+  </script>
 
   <script>
     window.fillCourseFields = function (data) {
-      // 1. Основное
       document.getElementById('courseTitleInp').value = data.title || '';
       document.getElementById('taglineInp').value = data.tagline || '';
       document.getElementById('descInp').value = data.description || '';
       document.getElementById('categoryInp').value = data.category || '';
       document.getElementById('langInp').value = data.language || 'ru';
-
-      // 2. Обложка (теперь только URL)
       if (data.cover && data.cover.startsWith('http')) {
         document.getElementById('coverUrlInp').value = data.cover;
         const preview = document.getElementById('coverPreview');
         preview.innerHTML = `<img src="${data.cover}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0;"><span id="coverPlaceholder" style="display:none; font-size: 14px; color: var(--text3); font-family: var(--font);">Фото</span>`;
       }
-
-      // 3. Теги
       if (data.tags) {
         document.querySelectorAll('#tagsGrid .chip').forEach(chip => {
           if (data.tags.includes(chip.textContent)) chip.classList.add('selected');
         });
       }
-
-      // 4. Программа
       if (data.modules) {
         modules = data.modules;
         renderCurriculum();
       }
-
-      // 5. Детали (Сложность, сроки)
       document.getElementById('durationInp').value = data.duration || '';
       document.getElementById('certInp').value = data.certificate ? "1" : "0";
-
       const levels = document.querySelectorAll('#levelGroup .level-pill');
       levels.forEach(l => {
         l.classList.toggle('selected', l.textContent === data.level);
       });
-
-      // 6. Списки
       const outcomesEditor = document.getElementById('outcomesEditor');
       outcomesEditor.innerHTML = '';
       (data.outcomes || []).forEach(val => {
@@ -2195,7 +1066,6 @@
         row.innerHTML = `<span class="list-bullet">•</span><input class="list-inp" type="text" value="${val}"><button class="list-del-btn" onclick="this.parentElement.remove();autoSave()">✕</button>`;
         outcomesEditor.appendChild(row);
       });
-
       const reqEditor = document.getElementById('reqEditor');
       reqEditor.innerHTML = '';
       (data.requirements || []).forEach(val => {
@@ -2204,38 +1074,27 @@
         row.innerHTML = `<span class="list-bullet">•</span><input class="list-inp" type="text" value="${val}"><button class="list-del-btn" onclick="this.parentElement.remove();autoSave()">✕</button>`;
         reqEditor.appendChild(row);
       });
-
-      // 7. Цена
       if (data.pricing) {
         const opt = Array.from(document.querySelectorAll('.pricing-opt')).find(o => o.innerHTML.includes(data.pricing === 'free' ? 'Бесплатно' : data.pricing === 'paid' ? 'Платный' : 'подписке'));
         if (opt) selectPricing(data.pricing, opt);
         if (data.price) document.getElementById('priceInp').value = data.price;
       }
-
-      // 8. Статус
       const statusPills = document.querySelectorAll('#statusGroup .level-pill');
       statusPills.forEach(p => {
         p.classList.toggle('selected', p.textContent === data.status);
       });
-
-      // Синхронизация интерфейса
       syncCharCount(document.getElementById('courseTitleInp'), 'titleCount');
       syncCharCount(document.getElementById('taglineInp'), 'taglineCount');
       document.querySelector('.top-title').textContent = "Редактирование курса";
       document.getElementById('btnPublish').textContent = "Сохранить изменения";
     };
 
-    // ===========================
-    // STATE
-    // ===========================
     let currentStep = 1, totalSteps = 4, modules = [], selectedPricing = 'free';
-    let editingModuleIdx = null, editingQuestionIdx = null, editingQuestionType = null;
-    let tempQuestion = {};
-    let demoQuizState = { mi: -1, qi: 0, sel: null, answered: false };
+    let editingModuleIdx = null, editingLessonIdx = null;
+    let tempLesson = {};
 
     const TAGS = ['Онлайн', 'Практика', 'Проекты', 'Для работы', 'С нуля', 'Карьера', 'Хобби', 'Быстрый старт', 'Сертификат', 'Менторство', 'Живые сессии'];
     const TYPE_LABELS = { mcq: 'Выбор ответа', fill: 'Ввод слова', tap: 'Составить фразу', match: 'Сопоставление' };
-    const TYPE_EMOJI = { mcq: '🎯', fill: '✍️', tap: '🧩', match: '🔗' };
 
     function buildMiniPath() {
       const path = document.getElementById('miniPath');
@@ -2248,12 +1107,14 @@
         const allItems = [...mod.lessons, ...(mod.quiz ? [{ type: 'quiz-section', title: 'Тест раздела' }] : [])];
         const nodesHtml = allItems.map((item, ii) => {
           const isFirst = (mi === 0 && ii === 0);
-          const emoji = item.type === 'quiz-section' ? '⚡' : item.type === 'video' ? '▶' : item.type === 'audio' ? '🎧' : '📄';
+          let emoji = '📖';
+          if (item.type === 'quiz-section') emoji = '⚡';
+          else if (item.type === 'coding') emoji = '💻';
           let cls = 'mini-node ';
           if (isFirst) cls += 'mn-active'; else cls += 'mn-locked';
           return `<div class="${cls}" title="${escHtml(item.title || 'Урок')}">
                 <div class="mn-icon-wrap">${emoji}</div>
-                <span>${escHtml(item.title || (item.type === 'quiz-section' ? 'Тест раздела' : 'Урок ' + (ii + 1)))}</span>
+                <span>${escHtml(item.title || 'Урок ' + (ii + 1))}</span>
               </div>`;
         }).join('');
         html += `
@@ -2271,9 +1132,6 @@
       path.innerHTML = html;
     }
 
-    // ===========================
-    // INIT
-    // ===========================
     document.addEventListener('DOMContentLoaded', () => {
       buildTagsGrid(); renderCurriculum();
       addListItem('outcomesEditor', 'Напишите, что изучат студенты');
@@ -2289,7 +1147,6 @@
         const preview = document.getElementById('coverPreview');
         const ph = document.getElementById('coverPlaceholder');
         const existing = preview.querySelector('img');
-
         if (url) {
           if (!existing) {
             const img = document.createElement('img');
@@ -2315,15 +1172,18 @@
         grid.appendChild(chip);
       });
     }
+
     function syncCharCount(input, countId) {
       const max = parseInt(input.getAttribute('maxlength') || 100);
       const el = document.getElementById(countId);
       if (el) el.textContent = max - input.value.length;
     }
+
     function selectPill(btn, groupId) {
       document.querySelectorAll('#' + groupId + ' .level-pill').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected'); autoSave();
     }
+
     function selectPricing(type, el) {
       selectedPricing = type;
       document.querySelectorAll('.pricing-opt').forEach(o => o.classList.remove('selected'));
@@ -2340,33 +1200,57 @@
         card.className = 'module-card';
         card.dataset.index = mi;
 
-        // 👇 ИЗМЕНЕНИЯ ЗДЕСЬ 👇
-        const lessonsHtml = mod.lessons.map((l, li) => `
-      <div class="lesson-row" data-li="${li}" style="flex-wrap: wrap; padding-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-          <span class="lesson-type-badge ${l.type}">${l.type === 'video' ? 'Видео' : l.type === 'audio' ? 'Аудио' : l.type === 'quiz' ? 'Тест' : 'Текст'}</span>
-          <input class="lesson-inp" value="${escHtml(l.title)}" placeholder="Название урока" onchange="updateLesson(${mi},${li},'title',this.value)">
-          <span class="lesson-duration">${l.duration || ''}</span>
-          <button class="lesson-del-btn" onclick="deleteLesson(${mi},${li})">✕</button>
-        </div>
-        
-        ${l.type === 'video' ? `
-        <div style="width: 100%; padding-left: 55px; margin-top: 6px;">
-          <input class="lesson-inp" 
-                 style="background: var(--bg); border: 1px dashed var(--border2); border-radius: var(--r); font-size: 12px; padding: 6px 10px; width: 100%;" 
-                 value="${escHtml(l.url || '')}" 
-                 placeholder="🔗 Вставьте ссылку на YouTube, Vimeo или Google Drive..." 
-                 onchange="updateLesson(${mi},${li},'url',this.value)">
-        </div>` : ''}
-      </div>`).join('');
-        // 👆 КОНЕЦ ИЗМЕНЕНИЙ 👆
+        const lessonsHtml = mod.lessons.map((l, li) => {
+          if (l.type === 'content') {
+            return `
+            <div class="lesson-row" data-li="${li}">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span class="lesson-type-badge content">ТЕОРИЯ</span>
+                <input class="lesson-inp" value="${escHtml(l.title)}" placeholder="Название урока" onchange="updateLesson(${mi},${li},'title',this.value)">
+                <button class="lesson-del-btn" onclick="deleteLesson(${mi},${li})">✕</button>
+              </div>
+              <input class="lesson-heading-inp" value="${escHtml(l.heading || '')}" placeholder="Заголовок урока (H2)" onchange="updateLesson(${mi},${li},'heading',this.value)">
+              <textarea class="lesson-content-inp" placeholder="Содержание урока..." onchange="updateLesson(${mi},${li},'content',this.value)">${escHtml(l.content || '')}</textarea>
+              <div class="media-row">
+                <div class="media-inp">
+                  <div class="field-label" style="margin-bottom:4px">Видео (YouTube / Vimeo)</div>
+                  <input class="inp" value="${escHtml(l.videoUrl || '')}" placeholder="https://..." onchange="updateLesson(${mi},${li},'videoUrl',this.value)">
+                </div>
+                <div class="media-inp">
+                  <div class="field-label" style="margin-bottom:4px">Фото (иллюстрация)</div>
+                  <input class="inp" value="${escHtml(l.photoUrl || '')}" placeholder="https://example.com/photo.jpg" onchange="updateLesson(${mi},${li},'photoUrl',this.value)">
+                </div>
+              </div>
+            </div>`;
+          } else if (l.type === 'coding') {
+            return `
+            <div class="lesson-row" data-li="${li}">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span class="lesson-type-badge coding">ЗАДАНИЕ С КОДОМ</span>
+                <input class="lesson-inp" value="${escHtml(l.title)}" placeholder="Название задания" onchange="updateLesson(${mi},${li},'title',this.value)">
+                <button class="lesson-del-btn" onclick="deleteLesson(${mi},${li})">✕</button>
+              </div>
+              <textarea class="lesson-content-inp" style="min-height:80px" placeholder="Описание задания..." onchange="updateLesson(${mi},${li},'taskDescription',this.value)">${escHtml(l.taskDescription || '')}</textarea>
+              <div class="code-task-row">
+                <div class="code-header">
+                  <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">Python (по умолчанию)</span>
+                  <span style="font-family:var(--mono);font-size:11px;color:#0f0">Терминал</span>
+                </div>
+                <textarea class="code-editor" placeholder="Стартовый код..." onchange="updateLesson(${mi},${li},'starterCode',this.value)">${escHtml(l.starterCode || '# Ваш код здесь\nprint("Hello, Tagybasqa!")')}</textarea>
+                <div class="terminal" id="terminal-${mi}-${li}">Терминал готов к запуску.<br>Нажмите «Запустить» после сохранения.</div>
+                <button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%" onclick="fakeRunCode(${mi},${li})">▶ Запустить в терминале</button>
+              </div>
+            </div>`;
+          }
+          return '';
+        }).join('');
 
         const quiz = mod.quiz;
         const quizQCount = quiz && quiz.questions ? quiz.questions.length : 0;
         const quizHtml = quiz ? renderQuizBuilder(mi, mod) :
           `<button class="module-quiz-toggle" onclick="addQuizToModule(${mi})">+ Добавить тест раздела</button>`;
-        const isOpen = mod.open !== false;
 
+        const isOpen = mod.open !== false;
         card.innerHTML = `
       <div class="module-head">
         <span class="module-drag">⠿</span>
@@ -2380,16 +1264,140 @@
         <div class="module-section-label">Уроки</div>
         <div class="lessons-list">${lessonsHtml}</div>
         <div class="add-lesson-row">
-          <button class="add-lesson-btn" onclick="addLesson(${mi},'video')">Видео</button>
-          <button class="add-lesson-btn" onclick="addLesson(${mi},'audio')">Аудио</button>
-          <button class="add-lesson-btn" onclick="addLesson(${mi},'text')">Текст</button>
-          <button class="add-lesson-btn" onclick="addLesson(${mi},'quiz')">Задание</button>
+          <button class="add-lesson-btn" onclick="openLessonModal(${mi})">+ Добавить урок</button>
+          <button class="add-lesson-btn" onclick="addCodingTask(${mi})">+ Задание с кодом</button>
         </div>
         <div class="module-section-label" style="margin-top:24px">Тест раздела</div>
         ${quizHtml}
       </div>` : ''}`;
         wrap.appendChild(card);
       });
+    }
+
+    function openLessonModal(mi) {
+      editingModuleIdx = mi;
+      editingLessonIdx = null;
+      tempLesson = {
+        title: '',
+        type: 'content',
+        heading: '',
+        content: '',
+        videoUrl: '',
+        photoUrl: ''
+      };
+      document.getElementById('lessonModalTitle').innerHTML = 'Новый урок';
+      renderLessonModalBody();
+      document.getElementById('lessonModal').classList.add('open');
+    }
+
+    function renderLessonModalBody() {
+      const html = `
+        <div class="field-group">
+          <label class="field-label">Название урока</label>
+          <input class="inp" id="modalLessonTitle" value="${escHtml(tempLesson.title)}" placeholder="Например: Введение в Python" oninput="tempLesson.title=this.value">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Заголовок (H2)</label>
+          <input class="inp" id="modalLessonHeading" value="${escHtml(tempLesson.heading)}" placeholder="Основные понятия и синтаксис" oninput="tempLesson.heading=this.value">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Содержание урока</label>
+          <textarea class="textarea-inp" id="modalLessonContent" style="min-height:220px" placeholder="Полный текст урока..." oninput="tempLesson.content=this.value">${escHtml(tempLesson.content)}</textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Видео (YouTube, Vimeo и т.д.)</label>
+          <input class="inp" id="modalVideoUrl" value="${escHtml(tempLesson.videoUrl)}" placeholder="https://youtube.com/..." oninput="tempLesson.videoUrl=this.value">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Фото (иллюстрация к уроку)</label>
+          <input class="inp" id="modalPhotoUrl" value="${escHtml(tempLesson.photoUrl)}" placeholder="https://example.com/photo.jpg" oninput="tempLesson.photoUrl=this.value">
+        </div>
+      `;
+      document.getElementById('lessonModalBody').innerHTML = html;
+    }
+
+    function closeLessonModal() {
+      document.getElementById('lessonModal').classList.remove('open');
+    }
+
+    function saveLessonFromModal() {
+      const mi = editingModuleIdx;
+      if (!modules[mi].lessons) modules[mi].lessons = [];
+      if (editingLessonIdx === null) {
+        modules[mi].lessons.push(tempLesson);
+      } else {
+        modules[mi].lessons[editingLessonIdx] = tempLesson;
+      }
+      closeLessonModal();
+      renderCurriculum();
+      autoSave();
+    }
+
+    function addCodingTask(mi) {
+      if (!modules[mi].lessons) modules[mi].lessons = [];
+      modules[mi].lessons.push({
+        title: '',
+        type: 'coding',
+        taskDescription: '',
+        starterCode: '# Напишите ваш код здесь\nprint("Hello, Tagybasqa!")',
+        language: 'python'
+      });
+      renderCurriculum();
+      autoSave();
+      setTimeout(() => {
+        const cards = document.querySelectorAll('.module-card');
+        if (cards[mi]) cards[mi].scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+
+    function fakeRunCode(mi, li) {
+      const terminal = document.getElementById(`terminal-${mi}-${li}`);
+      if (!terminal) return;
+      terminal.innerHTML = `<span style="color:#0f0">Запуск...</span><br>✅ Код выполнен успешно<br>Вывод: Hello, Tagybasqa!<br>Время выполнения: 0.03s`;
+      setTimeout(() => {
+        if (terminal) terminal.style.borderColor = '#4ade80';
+      }, 1200);
+    }
+
+    function updateLesson(mi, li, key, val) {
+      if (!modules[mi].lessons[li]) return;
+      modules[mi].lessons[li][key] = val;
+      autoSave();
+    }
+
+    function deleteLesson(mi, li) {
+      if (!confirm('Удалить урок?')) return;
+      modules[mi].lessons.splice(li, 1);
+      renderCurriculum();
+      autoSave();
+    }
+
+    function addModule() {
+      modules.push({ title: '', open: true, lessons: [], quiz: null });
+      renderCurriculum(); autoSave();
+      setTimeout(() => {
+        const cards = document.querySelectorAll('.module-card');
+        const last = cards[cards.length - 1];
+        if (last) { last.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); last.querySelector('.module-title-inp').focus(); }
+      }, 50);
+    }
+
+    function deleteModule(mi) { if (!confirm('Удалить модуль?')) return; modules.splice(mi, 1); renderCurriculum(); autoSave(); }
+    function toggleModule(mi) { modules[mi].open = !modules[mi].open; renderCurriculum(); }
+    function updateModuleTitle(mi, val) { modules[mi].title = val; autoSave(); }
+    function addQuizToModule(mi) {
+      modules[mi].quiz = { questions: [], open: true };
+      renderCurriculum(); autoSave();
+    }
+    function removeQuizFromModule(mi) {
+      if (!confirm('Удалить тест раздела?')) return;
+      modules[mi].quiz = null; renderCurriculum(); autoSave();
+    }
+    function toggleQuizBuilder(mi) {
+      modules[mi].quiz.open = !modules[mi].quiz.open; renderCurriculum();
+    }
+    function deleteQuestion(mi, qi) {
+      modules[mi].quiz.questions.splice(qi, 1); renderCurriculum(); autoSave();
     }
     function renderQuizBuilder(mi, mod) {
       const quiz = mod.quiz;
@@ -2435,48 +1443,6 @@
       if (q.type === 'match' && q.pairs) return `<div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${q.pairs.slice(0, 2).map(p => `${p.left} → ${p.right}`).join(' · ')}${q.pairs.length > 2 ? '…' : ''}</div>`;
       return '';
     }
-
-    function addModule() {
-      modules.push({ title: '', open: true, lessons: [], quiz: null });
-      renderCurriculum(); autoSave();
-      setTimeout(() => {
-        const cards = document.querySelectorAll('.module-card');
-        const last = cards[cards.length - 1];
-        if (last) { last.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); last.querySelector('.module-title-inp').focus(); }
-      }, 50);
-    }
-    function deleteModule(mi) { if (!confirm('Удалить модуль?')) return; modules.splice(mi, 1); renderCurriculum(); autoSave(); }
-    function toggleModule(mi) { modules[mi].open = !modules[mi].open; renderCurriculum(); }
-    function updateModuleTitle(mi, val) { modules[mi].title = val; autoSave(); }
-    function addLesson(mi, type) {
-      // Добавили url: ''
-      modules[mi].lessons.push({ title: '', type, duration: '', url: '' });
-      renderCurriculum();
-      autoSave();
-      setTimeout(() => {
-        const card = document.querySelectorAll('.module-card')[mi];
-        const inps = card ? card.querySelectorAll('.lesson-inp') : [];
-        if (inps.length) inps[inps.length - 1].focus();
-      }, 50);
-    }
-    function deleteLesson(mi, li) { modules[mi].lessons.splice(li, 1); renderCurriculum(); autoSave(); }
-    function updateLesson(mi, li, key, val) { modules[mi].lessons[li][key] = val; autoSave(); }
-
-    function addQuizToModule(mi) {
-      modules[mi].quiz = { questions: [], open: true };
-      renderCurriculum(); autoSave();
-    }
-    function removeQuizFromModule(mi) {
-      if (!confirm('Удалить тест раздела?')) return;
-      modules[mi].quiz = null; renderCurriculum(); autoSave();
-    }
-    function toggleQuizBuilder(mi) {
-      modules[mi].quiz.open = !modules[mi].quiz.open; renderCurriculum();
-    }
-    function deleteQuestion(mi, qi) {
-      modules[mi].quiz.questions.splice(qi, 1); renderCurriculum(); autoSave();
-    }
-
     function openQEditor(mi, qi, type) {
       editingModuleIdx = mi;
       editingQuestionIdx = qi;
@@ -2496,9 +1462,7 @@
       document.getElementById('qModal').classList.add('open');
     }
     function closeQModal() { document.getElementById('qModal').classList.remove('open'); }
-    document.getElementById('qModal').addEventListener('click', e => { if (e.target === document.getElementById('qModal')) closeQModal(); });
-
-    function renderQModalBody() {
+    function renderQModalBody() { /* полный код renderQModalBody без изменений */
       const t = editingQuestionType;
       const q = tempQuestion;
       let html = `
@@ -2572,7 +1536,6 @@
   </div>`;
       document.getElementById('qModalBody').innerHTML = html;
     }
-
     function setCorrectOption(idx) {
       tempQuestion.answer = idx;
       document.querySelectorAll('[id^="oradio"]').forEach((r, i) => r.classList.toggle('correct', i === idx));
@@ -2628,7 +1591,6 @@
     function updatePair(idx, side, val) { if (!tempQuestion.pairs) tempQuestion.pairs = []; tempQuestion.pairs[idx][side] = val; }
     function addPair() { if (!tempQuestion.pairs) tempQuestion.pairs = []; tempQuestion.pairs.push({ left: '', right: '' }); renderQModalBody(); }
     function removePair(idx) { tempQuestion.pairs.splice(idx, 1); renderQModalBody(); }
-
     function saveQuestion() {
       const mi = editingModuleIdx;
       if (!modules[mi].quiz) modules[mi].quiz = { questions: [], open: true };
@@ -2689,7 +1651,6 @@
       }
       return true;
     }
-
     function buildPublishPreview() {
       const title = document.getElementById('courseTitleInp').value.trim();
       const tagline = document.getElementById('taglineInp').value.trim();
@@ -2700,7 +1661,6 @@
       const lang = document.getElementById('langInp');
       const langText = lang.options[lang.selectedIndex].text;
       const cert = document.getElementById('certInp').value === '1' ? 'Да' : 'Нет';
-
       document.getElementById('publishSummary').innerHTML = `
     <div class="summary-row"><span class="summary-key">Название</span><span class="summary-val ${title ? 'ok' : 'err'}">${title || '— не заполнено —'}</span></div>
     <div class="summary-row"><span class="summary-key">Категория</span><span class="summary-val ${category ? 'ok' : 'warn'}">${category || '— не выбрана —'}</span></div>
@@ -2710,7 +1670,6 @@
     <div class="summary-row"><span class="summary-key">Язык</span><span class="summary-val">${langText}</span></div>
     <div class="summary-row"><span class="summary-key">Цена</span><span class="summary-val">${price}</span></div>
     <div class="summary-row"><span class="summary-key">Сертификат</span><span class="summary-val">${cert}</span></div>`;
-
       const checks = [];
       checks.push({ ok: !!title, text: title ? 'Название курса заполнено' : 'Добавьте название курса' });
       checks.push({ ok: !!document.getElementById('descInp').value.trim(), warn: true, text: 'Описание курса' });
@@ -2718,26 +1677,22 @@
       checks.push({ ok: totalLessons > 0, text: totalLessons > 0 ? `${totalLessons} уроков в программе` : 'Добавьте уроки' });
       checks.push({ ok: totalQuizQ > 0, warn: true, text: totalQuizQ > 0 ? `${totalQuizQ} вопросов в тестах` : 'Рекомендуем добавить тесты' });
       checks.push({ ok: !!category, warn: true, text: category ? 'Категория выбрана' : 'Рекомендуем выбрать категорию' });
-
       document.getElementById('publishChecks').innerHTML = checks.map(c => `
     <div class="check-item">
       <div class="check-dot ${c.ok ? 'ok' : c.warn ? 'warn' : 'err'}">${c.ok ? '✓' : c.warn ? '!' : '✕'}</div>
       <span>${c.text}</span>
     </div>`).join('');
-
       document.getElementById('spTitle').textContent = title || 'Название курса';
       document.getElementById('spSub').textContent = tagline || document.getElementById('descInp').value.trim().substring(0, 60) || 'Описание появится здесь';
       buildMiniPath();
       buildQuizDemo();
     }
-
     function switchPreviewTab(tab, btn) {
       document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.preview-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('ptab-' + tab).classList.add('active');
     }
-
     function buildQuizDemo() {
       const area = document.getElementById('quizDemoArea');
       const modWithQuiz = modules.find(m => m.quiz && m.quiz.questions && m.quiz.questions.length > 0);
@@ -2824,11 +1779,7 @@
     </button>
   </div>`;
     }
-
-    window.demoSelect = i => {
-      if (demoQuizState.answered) return;
-      demoQuizState.sel = i; renderDemoQuestion();
-    };
+    window.demoSelect = i => { if (demoQuizState.answered) return; demoQuizState.sel = i; renderDemoQuestion(); };
     window.demoFillInput = inp => {
       demoQuizState.fillVal = inp.value;
       const btn = document.getElementById('demoCheckBtn');
@@ -2880,12 +1831,10 @@
       const btn = document.getElementById('btnPublish');
       btn.textContent = 'Публикация…';
       btn.disabled = true;
-
       try {
         const coverPreview = document.getElementById('coverPreview');
         const img = coverPreview.querySelector('img');
         const cover = img ? img.src : '';
-
         const courseData = {
           title: document.getElementById('courseTitleInp').value.trim(),
           tagline: document.getElementById('taglineInp').value.trim(),
@@ -2906,24 +1855,20 @@
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
-
         if (window.saveCourseToFirebase) {
           await window.saveCourseToFirebase(courseData);
         } else {
           throw new Error("Модуль Firebase не загрузился.");
         }
-
         const successTitle = window.editCourseId ? "Курс обновлен" : "Курс опубликован";
         const successText = window.editCourseId ? "Ваши изменения успешно сохранены." : "Ваш курс успешно создан и теперь доступен студентам.";
         document.querySelector('#step-success h2').textContent = successTitle;
         document.querySelector('#step-success p').textContent = successText;
-
         document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
         document.getElementById('step-success').classList.add('active');
         document.getElementById('bottomNav').style.display = 'none';
         document.querySelector('.steps-nav').style.display = 'none';
         document.querySelector('.progress-bar-wrap').style.display = 'none';
-
       } catch (error) {
         console.error(error);
         alert("Ошибка при публикации: " + error.message);
@@ -2931,7 +1876,6 @@
         btn.disabled = false;
       }
     }
-
     function showToast(msg) {
       const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2800);
@@ -2939,6 +1883,10 @@
     function escHtml(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function resetAll() { location.reload(); }
     function goToProfile() { window.location.href = './index.html'; }
+
+    let editingQuestionIdx = null, editingQuestionType = null;
+    let tempQuestion = {};
+    let demoQuizState = { mi: -1, qi: 0, sel: null, answered: false };
   </script>
 </body>
 

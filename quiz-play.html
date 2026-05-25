@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Играть — Tagybasqa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Onest:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text2: #475569;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --green: #10b981;
+      --red: #ef4444;
+      --font: 'Onest', sans-serif;
+      --mono: 'DM Mono', monospace;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    /* HEADER */
+    .player-header { background: var(--surface); padding: 16px 24px; text-align: center; border-bottom: 1px solid var(--border); font-weight: 900; font-size: 20px; color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+
+    /* MAIN CONTAINER */
+    .container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; max-width: 600px; margin: 0 auto; width: 100%; }
+
+    /* SCREENS */
+    .screen { display: none; width: 100%; text-align: center; animation: fadeIn 0.3s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* INPUTS & BUTTONS */
+    .input-group { margin-bottom: 16px; text-align: left; }
+    .input-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .input-field { width: 100%; padding: 16px; font-family: var(--font); font-size: 16px; border: 2px solid var(--border); border-radius: var(--radius-md); transition: border-color 0.2s; background: var(--surface); color: var(--text); }
+    .input-field:focus { outline: none; border-color: var(--primary); }
+    
+    .btn { width: 100%; padding: 16px; font-family: var(--font); font-size: 16px; font-weight: 700; cursor: pointer; border: none; border-radius: var(--radius-md); transition: transform 0.1s; background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); margin-top: 8px; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    /* GAMEPLAY */
+    .status-badge { display: inline-block; padding: 8px 16px; background: rgba(99, 102, 241, 0.1); color: var(--primary); font-weight: 700; border-radius: 20px; margin-bottom: 24px; }
+    
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+    @media (max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
+    
+    .option-btn { min-height: 120px; padding: 20px; border-radius: var(--radius-md); border: none; font-family: var(--font); font-size: 18px; font-weight: 700; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.1s, filter 0.2s; position: relative; overflow: hidden; }
+    .option-btn:active { transform: scale(0.96); }
+    .option-btn.disabled { filter: grayscale(80%); cursor: not-allowed; transform: none; }
+    .option-btn.selected { box-shadow: 0 0 0 4px var(--text); }
+
+    /* TOAST */
+    #toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: white; padding: 14px 28px; border-radius: 30px; font-weight: 600; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 1000; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <header class="player-header">Tagybasqa</header>
+
+  <div class="container">
+    <div id="joinScreen" class="screen active">
+      <h2 style="margin-bottom: 24px;">Присоединиться к игре</h2>
+      <div class="input-group">
+        <label>PIN-код игры</label>
+        <input type="text" id="pinInput" class="input-field" placeholder="Например: 123456" inputmode="numeric" maxlength="6">
+      </div>
+      <div class="input-group">
+        <label>Ваше имя</label>
+        <input type="text" id="nameInput" class="input-field" placeholder="Как вас зовут?" maxlength="20">
+      </div>
+      <button class="btn" id="joinBtn">Войти в игру</button>
+    </div>
+
+    <div id="waitingScreen" class="screen">
+      <div class="status-badge">Вы в игре!</div>
+      <h2>Ожидаем ведущего...</h2>
+      <p style="color: var(--text2); margin-top: 12px;">Посмотрите на главный экран, скоро начнется игра.</p>
+      <div style="font-size: 48px; margin-top: 24px; animation: pulse 2s infinite;">👀</div>
+    </div>
+
+    <div id="playScreen" class="screen">
+      <div class="status-badge" id="qNumberBadge">Вопрос 1</div>
+      <h3 id="questionText" style="font-size: 20px; margin-bottom: 16px;">Загрузка вопроса...</h3>
+      <div class="options-grid" id="optionsContainer">
+        </div>
+    </div>
+
+    <div id="endScreen" class="screen">
+      <div style="font-size: 64px; margin-bottom: 16px;">🏁</div>
+      <h2 style="margin-bottom: 8px;">Игра завершена!</h2>
+      <p style="color: var(--text2); margin-bottom: 24px;">Посмотрите на главный экран, чтобы узнать победителей.</p>
+      <div style="background: var(--surface); border: 2px solid var(--border); padding: 20px; border-radius: var(--radius-md);">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text2); text-transform: uppercase;">Ваш счет</div>
+        <div id="finalScore" style="font-size: 36px; font-weight: 900; color: var(--primary);">0</div>
+      </div>
+      <button class="btn" onclick="location.reload()" style="margin-top: 24px; background: var(--bg); color: var(--text); border: 2px solid var(--border); box-shadow: none;">Выйти</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, query, where, getDocs, doc, onSnapshot, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+    authDomain: "pystart-dd2db.firebaseapp.com",
+    projectId: "pystart-dd2db",
+    storageBucket: "pystart-dd2db.firebasestorage.app",
+    messagingSenderId: "9188811255",
+    appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+  };
+  const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  const db = getFirestore(app);
+
+  const optionColors = ['#e3342f', '#3490dc', '#f6993f', '#38c172', '#9561e2', '#f66d9b'];
+  const params = new URLSearchParams(location.search);
+  
+  // Состояние игрока
+  let sessionId = null;
+  let quizData = null;
+  let playerId = Math.random().toString(36).substring(2, 10); // Генерируем уникальный ID для игрока (если нет регистрации)
+  let playerName = "";
+  let playerScore = 0;
+  let hasAnsweredCurrent = false;
+
+  // Если в URL есть pin, подставляем его автоматически
+  if (params.get('pin')) {
+    document.getElementById('pinInput').value = params.get('pin');
+    document.getElementById('nameInput').focus();
+  }
+
+  document.getElementById('joinBtn').addEventListener('click', async () => {
+    const pin = document.getElementById('pinInput').value.trim();
+    playerName = document.getElementById('nameInput').value.trim();
+
+    if (!pin || !playerName) {
+      showToast("Введите PIN-код и имя!");
+      return;
+    }
+
+    const btn = document.getElementById('joinBtn');
+    btn.textContent = "Подключение...";
+    btn.disabled = true;
+
+    try {
+      // 1. Ищем сессию по PIN
+      const q = query(collection(db, 'sessions'), where('pin', '==', pin));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        showToast("Сессия с таким PIN не найдена");
+        btn.textContent = "Войти в игру";
+        btn.disabled = false;
+        return;
+      }
+
+      const sessionDoc = querySnapshot.docs[0];
+      sessionId = sessionDoc.id;
+      const sessionData = sessionDoc.data();
+
+      // 2. Добавляем игрока в лобби
+      await updateDoc(doc(db, 'sessions', sessionId), {
+        [`players.${playerId}`]: { name: playerName }
+      });
+
+      // 3. Загружаем сам квиз, чтобы знать правильные ответы
+      if (sessionData.quizId) {
+        const qSnap = await getDoc(doc(db, 'quizzes', sessionData.quizId));
+        if (qSnap.exists()) quizData = qSnap.data();
+      }
+
+      // 4. Подписываемся на обновления сессии
+      listenToSession();
+
+    } catch (e) {
+      console.error(e);
+      showToast("Ошибка подключения");
+      btn.textContent = "Войти в игру";
+      btn.disabled = false;
+    }
+  });
+
+  function listenToSession() {
+    onSnapshot(doc(db, 'sessions', sessionId), (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.data();
+
+      // Если ведущий исключил игрока (удалил его из players)
+      if (data.players && data.players[playerId] === undefined && data.status !== 'finished') {
+        alert("Вы были исключены из игры ведущим.");
+        location.reload();
+      }
+
+      // Управление экранами в зависимости от статуса сессии
+      if (data.status === 'waiting') {
+        showScreen('waitingScreen');
+      } 
+      else if (data.status === 'playing') {
+        showScreen('playScreen');
+        renderQuestion(data.currentQuestion);
+      } 
+      else if (data.status === 'finished') {
+        showScreen('endScreen');
+        document.getElementById('finalScore').textContent = playerScore;
+      }
+    });
+  }
+
+  let lastQuestionIndex = -1;
+
+  function renderQuestion(qIndex) {
+    if (!quizData || !quizData.questions || qIndex < 0) return;
+    
+    // Если вопрос поменялся, сбрасываем состояние "ответил"
+    if (lastQuestionIndex !== qIndex) {
+      hasAnsweredCurrent = false;
+      lastQuestionIndex = qIndex;
+    }
+
+    const question = quizData.questions[qIndex];
+    document.getElementById('qNumberBadge').textContent = `Вопрос ${qIndex + 1}`;
+    document.getElementById('questionText').textContent = question.text || question.question;
+
+    const container = document.getElementById('optionsContainer');
+    
+    container.innerHTML = (question.options || []).map((opt, i) => {
+      const text = typeof opt === 'string' ? opt : (opt.text || '');
+      return `<button class="option-btn" id="opt-${i}" style="background-color: ${optionColors[i % optionColors.length]}">
+                ${escHtml(text)}
+              </button>`;
+    }).join('');
+
+    // Вешаем слушатели на кнопки
+    if (!hasAnsweredCurrent) {
+      const buttons = container.querySelectorAll('.option-btn');
+      buttons.forEach((btn, idx) => {
+        btn.addEventListener('click', () => handleAnswer(idx, question, qIndex, buttons));
+      });
+    } else {
+      // Если игрок перезагрузил страницу и уже ответил, блокируем кнопки
+      container.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
+    }
+  }
+
+  async function handleAnswer(selectedIndex, question, qIndex, allButtons) {
+    if (hasAnsweredCurrent) return;
+    hasAnsweredCurrent = true;
+
+    // Визуально блокируем остальные кнопки
+    allButtons.forEach((btn, i) => {
+      if (i !== selectedIndex) btn.classList.add('disabled');
+      else btn.classList.add('selected');
+    });
+
+    const isCorrect = typeof question.options[selectedIndex] === 'object' 
+                      ? question.options[selectedIndex].correct 
+                      : false;
+
+    // Начисляем баллы (простая логика, можно усложнить в зависимости от времени)
+    if (isCorrect) {
+      playerScore += 100;
+      showToast("Ответ принят! (+100)");
+    } else {
+      showToast("Ответ принят!");
+    }
+
+    // Сохраняем/обновляем результат в базу (чтобы ведущий обновил таблицу лидеров)
+    // ID документа делаем комбинированным, чтобы он не дублировался
+    const resultDocId = `${sessionId}_${playerId}`;
+    try {
+      await setDoc(doc(db, 'quizResults', resultDocId), {
+        sessionId: sessionId,
+        playerName: playerName,
+        score: playerScore,
+        timestamp: Date.now()
+      });
+    } catch (e) {
+      console.error("Ошибка сохранения ответа", e);
+    }
+  }
+
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

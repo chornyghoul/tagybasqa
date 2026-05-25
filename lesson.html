@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок — Tagybasqa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════════════════
+       TAGYBASQA — Duolingo Dark — lesson.html
+    ══════════════════════════════════════════════════════ */
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg:   #131f24;
+      --bg2:  #1a2d35;
+      --bg3:  #1f3540;
+      --bg4:  #243d4a;
+      --border:  rgba(255,255,255,.07);
+      --border2: rgba(255,255,255,.12);
+      --border3: rgba(255,255,255,.22);
+      --text:  #ffffff;
+      --text2: #cdd8dd;
+      --text3: #7a9aaa;
+      --text4: #131f24;
+      --accent-dim: rgba(255,255,255,.05);
+
+      --duo-blue:   #1cb0f6;
+      --duo-blue2:  #0e86c0;
+      --duo-green:  #57cc02;
+      --duo-green2: #3a8c01;
+      --duo-orange: #ff9600;
+      --duo-red:    #ff4b4b;
+      --duo-purple: #ce82ff;
+      --duo-yellow: #ffd900;
+      --duo-teal:   #1fe0c0;
+
+      --red:    #ff4b4b;  --red-bg:    rgba(255,75,75,.14);
+      --green:  #57cc02;  --green-bg:  rgba(87,204,2,.12);
+      --purple: #ce82ff;  --purple-bg: rgba(206,130,255,.12);
+      --blue:   #1cb0f6;  --blue-bg:   rgba(28,176,246,.12);
+      --amber:  #ff9600;  --amber-bg:  rgba(255,150,0,.12);
+      --teal:   #1fe0c0;  --teal-bg:   rgba(31,224,192,.1);
+
+      --r:  12px;
+      --r2: 16px;
+      --r3: 99px;
+      --font: 'Nunito', sans-serif;
+      --mono: 'DM Mono', monospace;
+      --bg-blur: rgba(19,31,36,.94);
+      --shadow: 0 4px 20px rgba(0,0,0,.3);
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+    html { scroll-behavior:smooth }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ══ TOPBAR ═════════════════════════════════════════════ */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg-blur); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 24px; height: 56px;
+    }
+    .topbar-back {
+      display: flex; align-items: center; gap: 6px;
+      background: none; border: none; color: var(--text3);
+      font-family: var(--font); font-size: 13px; font-weight: 700;
+      cursor: pointer; padding: 6px 0; transition: color .15s;
+    }
+    .topbar-back:hover { color: var(--text) }
+    .topbar-back svg { width: 16px; height: 16px }
+    .topbar-title { font-size: 15px; font-weight: 800; flex: 1; display: flex; align-items: center; gap: 8px; }
+    
+    /* Progress bar */
+    .progress-container { flex: 1; max-width: 600px; background: var(--bg3); height: 16px; border-radius: var(--r3); overflow: hidden; position: relative; border: 2px solid var(--border); margin: 0 20px; }
+    .progress-bar { height: 100%; background: var(--duo-green); border-bottom: 3px solid var(--duo-green2); width: 0%; transition: width 0.3s ease; border-radius: var(--r3); }
+
+    /* ══ LAYOUT ══════════════════════════════════════════════ */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      min-height: calc(100vh - 56px);
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    /* ══ EDITOR/CANVAS AREA ═════════════════════════════════ */
+    .editor-area {
+      padding: 32px 24px;
+    }
+    .lesson-header-box { margin-bottom: 32px; }
+    .lesson-meta-badge { font-family: var(--mono); font-size: 10px; color: var(--duo-blue); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 6px; display: block; }
+    .lesson-main-title { font-size: 32px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 12px; }
+    .lesson-main-desc { color: var(--text2); font-size: 15px; line-height: 1.6; }
+
+    .blocks-list { display: flex; flex-direction: column; gap: 20px }
+
+    /* Block Cards for View mode */
+    .block-card {
+      background: var(--bg2); border: 2px solid var(--border2);
+      border-radius: var(--r2); overflow: hidden;
+    }
+    .block-card-body { padding: 24px }
+
+    /* Typography styles */
+    .block-h1 { font-size: 22px; font-weight: 900; margin-bottom: 4px; color: #fff; }
+    .block-h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; color: var(--text2); }
+    .block-p { font-size: 15px; line-height: 1.6; color: var(--text2); white-space: pre-wrap; }
+
+    /* Inputs & Interactives */
+    .inp {
+      width: 100%; background: var(--bg3); border: 2px solid var(--border2);
+      border-radius: var(--r); color: var(--text); font-family: var(--font);
+      font-size: 14px; font-weight: 600; padding: 12px 16px; outline: none;
+      transition: border-color .15s; margin-top: 10px;
+    }
+    .inp:focus { border-color: var(--duo-blue) }
+    .inp::placeholder { color: var(--text3); font-weight: 400 }
+
+    /* Code View */
+    .code-editor-inp {
+      width: 100%; background: #0a1520; border: 2px solid var(--border2);
+      border-radius: var(--r); color: #cdd8dd;
+      font-family: var(--mono); font-size: 13px; line-height: 1.7;
+      padding: 16px; min-height: 120px; outline: none; white-space: pre-wrap; margin-top: 10px;
+    }
+    .terminal-out { background: #050a0f; border-radius: var(--r); padding: 12px; font-family: var(--mono); font-size: 12px; color: var(--duo-green); margin-top: 8px; display: none; white-space: pre-wrap; border-left: 3px solid var(--duo-green); }
+
+    /* Buttons */
+    .run-code-btn, .check-btn {
+        background: var(--bg3); border: 2px solid var(--border2); color: var(--text);
+        padding: 8px 18px; border-radius: var(--r); cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 13px; transition: all 0.15s; margin-top: 10px;
+    }
+    .run-code-btn:hover, .check-btn:hover { background: var(--bg4); border-color: var(--border3); }
+    .check-btn.correct { background: var(--green-bg); border-color: var(--duo-green); color: var(--duo-green); }
+    .check-btn.wrong { background: var(--red-bg); border-color: var(--duo-red); color: var(--duo-red); }
+
+    /* Quiz Option Styles */
+    .quiz-options-container { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .view-option-row {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: var(--bg3); border: 2px solid var(--border2);
+      border-radius: var(--r); cursor: pointer; transition: all 0.15s; font-weight: 600; font-size: 14px;
+    }
+    .view-option-row:hover { background: var(--bg4); border-color: var(--border3); }
+    .view-option-row.selected { border-color: var(--duo-blue); background: var(--blue-bg); }
+    .view-option-row.correct { border-color: var(--duo-green); background: var(--green-bg); color: var(--duo-green); }
+    .view-option-row.wrong { border-color: var(--duo-red); background: var(--red-bg); color: var(--duo-red); }
+    
+    .view-option-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--text3); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .view-option-row.selected .view-option-dot { border-color: var(--duo-blue); border-width: 5px; }
+    .view-option-row.correct .view-option-dot { border-color: var(--duo-green); background: var(--duo-green); }
+    .view-option-row.wrong .view-option-dot { border-color: var(--duo-red); background: var(--duo-red); }
+
+    /* Checklist view */
+    .checklist-items-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .checklist-item-row { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; font-weight: 600; cursor: pointer; user-select: none; }
+    .cl-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border3); background: var(--bg3); flex-shrink: 0; transition: all 0.15s; position: relative; }
+    .checklist-item-row.checked .cl-checkbox { background: var(--duo-green); border-color: var(--duo-green); }
+    .checklist-item-row.checked .cl-checkbox::after { content: '✓'; color: white; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; }
+    .checklist-item-row.checked .cl-text { color: var(--text3); text-decoration: line-through; }
+    .cl-text { line-height: 20px; color: var(--text2); }
+
+    /* Callout */
+    .callout-wrap { display: flex; gap: 16px; padding: 18px; border-radius: var(--r); background: var(--bg3); border: 2px solid var(--border2); margin-top: 6px; }
+    .callout-wrap.info { border-left: 4px solid var(--duo-blue); }
+    .callout-wrap.warning { border-left: 4px solid var(--duo-orange); }
+    .callout-wrap.success { border-left: 4px solid var(--duo-green); }
+    .callout-wrap.danger { border-left: 4px solid var(--duo-red); }
+    .callout-emoji { font-size: 24px; flex-shrink: 0; line-height: 1; }
+
+    /* Image & Video */
+    .media-container { margin-top: 10px; text-align: center; }
+    .media-img { max-width: 100%; border-radius: var(--r); border: 1px solid var(--border2); }
+    .media-caption { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 6px; display: block; }
+
+    /* ══ SIDEBAR PANEL ══════════════════════════════════════ */
+    .sidebar-panel {
+      border-left: 1px solid var(--border);
+      position: sticky; top: 56px;
+      height: calc(100vh - 56px); overflow-y: auto;
+      padding: 24px 20px; display: flex; flex-direction: column; gap: 20px;
+    }
+    .side-title { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+    .stats-card { background: var(--bg2); border: 2px solid var(--border2); border-radius: var(--r2); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .stat-line { display: flex; justify-content: space-between; font-size: 13px; color: var(--text3); font-family: var(--mono); }
+    .stat-val { color: var(--text); font-weight: 700; }
+
+    /* ══ LOADING & EMPTY STATE ══════════════════════════════ */
+    .loading-state { text-align: center; padding: 100px 24px; color: var(--text3); font-family: var(--mono); font-size: 14px; }
+    
+    @media(max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <button class="topbar-back" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M19 12H5M12 5l-7 7 7 7" />
+      </svg>
+      Назад
+    </button>
+    <div class="progress-container">
+      <div class="progress-bar" id="lessonProgress"></div>
+    </div>
+    <span class="topbar-title" id="lessonEmojiTitle">📖 Урок</span>
+  </div>
+
+  <div class="layout">
+    <main class="editor-area">
+      <div class="lesson-header-box" id="lessonHeader">
+        </div>
+
+      <div class="blocks-list" id="blocksContainer">
+        <div class="loading-state">⏳ Загрузка материалов интерактивного урока...</div>
+      </div>
+    </main>
+
+    <aside class="sidebar-panel">
+      <div>
+        <div class="side-title">Ориентиры урока</div>
+        <div class="stats-card">
+          <div class="stat-line"><span>Сложность:</span><span class="stat-val" id="sideLevel">—</span></div>
+          <div class="stat-line"><span>Время изучения:</span><span class="stat-val" id="sideDuration">—</span></div>
+          <div class="stat-line"><span>Интерактивные цели:</span><span class="stat-val" id="sideInteractions">—</span></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+      authDomain: "pystart-dd2db.firebaseapp.com",
+      projectId: "pystart-dd2db",
+      storageBucket: "pystart-dd2db.firebasestorage.app",
+      messagingSenderId: "9188811255",
+      appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const lessonId = new URLSearchParams(window.location.search).get('id');
+    let loadedBlocks = [];
+    let completedInteractions = new Set();
+    let totalInteractions = 0;
+
+    if (!lessonId) {
+      document.getElementById('blocksContainer').innerHTML = '<div class="loading-state">❌ Идентификатор урока не указан в URL</div>';
+    } else {
+      loadLessonData();
+    }
+
+    async function loadLessonData() {
+      try {
+        const snap = await getDoc(doc(db, "interactiveLessons", lessonId));
+        if (!snap.exists()) {
+          document.getElementById('blocksContainer').innerHTML = '<div class="loading-state">❌ Урок не найден или удален.</div>';
+          return;
+        }
+        const data = snap.data();
+        renderLessonHeader(data);
+        loadedBlocks = data.blocks || [];
+        calculateTotalInteractions();
+        renderLessonBlocks();
+        updateProgress();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('blocksContainer').innerHTML = '<div class="loading-state">❌ Ошибка при получении данных из Firebase</div>';
+      }
+    }
+
+    function renderLessonHeader(data) {
+      document.getElementById('lessonEmojiTitle').textContent = `${data.emoji || '📖'} Урок`;
+      
+      const levels = { beginner: 'Для начинающих', intermediate: 'Средний уровень', advanced: 'Продвинутый' };
+      document.getElementById('sideLevel').textContent = levels[data.level] || 'Общий';
+      document.getElementById('sideDuration').textContent = data.duration ? `${data.duration} мин` : 'Не указано';
+
+      document.getElementById('lessonHeader').innerHTML = `
+        <span class="lesson-meta-badge">${escHtml(data.subject || 'Общее')}</span>
+        <h1 class="lesson-main-title">${escHtml(data.title || 'Интерактивный урок')}</h1>
+        ${data.description ? `<p class="lesson-main-desc">${escHtml(data.description)}</p>` : ''}
+      `;
+    }
+
+    function calculateTotalInteractions() {
+      totalInteractions = loadedBlocks.filter(b => ['quiz', 'task', 'checklist', 'code'].includes(b.type)).length;
+      document.getElementById('sideInteractions').textContent = totalInteractions;
+    }
+
+    function renderLessonBlocks() {
+      const container = document.getElementById('blocksContainer');
+      container.innerHTML = '';
+
+      if (loadedBlocks.length === 0) {
+        container.innerHTML = '<div class="loading-state">В этом уроке пока нет контента.</div>';
+        return;
+      }
+
+      loadedBlocks.forEach((block, idx) => {
+        const card = document.createElement('div');
+        card.className = 'block-card';
+        card.id = `block_${idx}`;
+
+        const body = document.createElement('div');
+        body.className = 'block-card-body';
+        body.innerHTML = buildBlockHtml(block, idx);
+
+        card.appendChild(body);
+        container.appendChild(card);
+      });
+    }
+
+    function buildBlockHtml(block, idx) {
+      const val = (str) => escHtml(str || '');
+      
+      switch (block.type) {
+        case 'heading':
+          return `<h2 class="block-h1">${val(block.content)}</h2>`;
+        case 'subheading':
+          return `<h3 class="block-h2">${val(block.content)}</h3>`;
+        case 'text':
+          return `<p class="block-p">${val(block.content)}</p>`;
+        case 'divider':
+          return `<div style="height: 2px; background: var(--border2); border-radius: 2px; margin: 4px 0;"></div>`;
+        case 'callout':
+          const ct = block.calloutType || 'info';
+          const emojis = { info: 'ℹ️', warning: '⚠️', success: '✅', danger: '❗' };
+          return `
+            <div class="callout-wrap ${ct}">
+              <span class="callout-emoji">${emojis[ct] || 'ℹ️'}</span>
+              <p class="block-p" style="margin: 0; flex: 1;">${val(block.content)}</p>
+            </div>
+          `;
+        case 'image':
+          return `
+            <div class="media-container">
+              <img src="${block.url}" class="media-img" alt="Изображение" onerror="this.style.display='none'">
+              ${block.caption ? `<span class="media-caption">${val(block.caption)}</span>` : ''}
+            </div>
+          `;
+        case 'video':
+          let embedUrl = '';
+          if (block.url && (block.url.includes('youtube.com') || block.url.includes('youtu.be'))) {
+            const id = block.url.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
+            if (id) embedUrl = `https://www.youtube.com/embed/${id}`;
+          }
+          if (embedUrl) {
+            return `
+              <div class="media-container">
+                <iframe style="width:100%; height:360px; max-height: 50vw; border-radius: var(--r); border: none;" src="${embedUrl}" allowfullscreen></iframe>
+              </div>
+            `;
+          }
+          return `<div style="color:var(--text3); font-size:13px;">▶ Ссылка на видео: <a href="${block.url}" target="_blank" style="color:var(--duo-blue);">${val(block.url)}</a></div>`;
+        
+        case 'checklist':
+          const items = block.items || [];
+          return `
+            <div class="checklist-items-list">
+              ${items.map((item, i) => `
+                <div class="checklist-item-row" onclick="window.toggleChecklistItem(this, ${idx}, ${i})">
+                  <div class="cl-checkbox"></div>
+                  <span class="cl-text">${val(item)}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+
+        case 'code':
+          return `
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-family:var(--mono); font-size:11px; color:var(--text3); text-transform:uppercase;">Среда разработки: ${block.lang || 'python'}</span>
+                <button class="run-code-btn" onclick="window.executeLessonCode(${idx})">▶ Запустить код</button>
+              </div>
+              <div class="code-editor-inp" id="codeText_${idx}">${val(block.code || '# Нет кода')}</div>
+              <div class="terminal-out" id="termOut_${idx}"></div>
+            </div>
+          `;
+
+        case 'task':
+          return `
+            <div>
+              <p class="block-p" style="font-weight: 700; color: #fff; margin-bottom: 8px;">Практическое задание:</p>
+              <p class="block-p">${val(block.taskText)}</p>
+              <input class="inp" id="taskInp_${idx}" placeholder="Введите ваш ответ сюда...">
+              <button class="check-btn" id="taskBtn_${idx}" onclick="window.checkTaskAnswer(${idx}, '${escQuotes(block.answer)}')">Проверить ответ</button>
+            </div>
+          `;
+
+        case 'quiz':
+          const qs = block.questions || [];
+          return `
+            <div class="quiz-block-view">
+              ${qs.map((q, qi) => `
+                <div style="margin-bottom: 20px;" id="quizQ_${idx}_${qi}">
+                  <p class="block-p" style="font-weight: 700; color: #fff; margin-bottom: 10px;">Вопрос: ${val(q.q)}</p>
+                  <div class="quiz-options-container">
+                    ${q.type === 'fill' ? `
+                      <input class="inp" style="margin-top:0;" id="quizInp_${idx}_${qi}" placeholder="Напишите точный ответ...">
+                      <button class="check-btn" style="width:max-content;" id="quizBtn_${idx}_${qi}" onclick="window.checkQuizFill(${idx}, ${qi}, '${escQuotes(q.answer)}')">Проверить ввод</button>
+                    ` : `
+                      ${(q.options || []).map((opt, oi) => `
+                        <div class="view-option-row" id="optRow_${idx}_${qi}_${oi}" onclick="window.selectQuizOption(${idx}, ${qi}, ${oi}, ${q.answer})">
+                          <div class="view-option-dot"></div>
+                          <span class="opt-txt">${val(opt)}</span>
+                        </div>
+                      `).join('')}
+                    `}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+
+        default:
+          return `<div style="color:var(--text3); font-size:12px;">Компонент ${block.type} готов к просмотру</div>`;
+      }
+    }
+
+    // INTERACTION MECHANICS
+    window.toggleChecklistItem = function(el, blockIdx, itemIdx) {
+      el.classList.toggle('checked');
+      // Чеклист считается завершенным шагом интерактива, если отмечен хотя бы один пункт
+      markInteractionDone(blockIdx);
+    };
+
+    window.executeLessonCode = function(idx) {
+      const term = document.getElementById(`termOut_${idx}`);
+      const code = document.getElementById(`codeText_${idx}`).textContent;
+      if (!term) return;
+
+      term.style.display = 'block';
+      term.textContent = '⏳ Компиляция и запуск...';
+
+      setTimeout(() => {
+        // Симуляция вывода принтов Python
+        const lines = code.split('\n');
+        const output = [];
+        lines.forEach(line => {
+          const m = line.match(/^\s*print\s*\(\s*(.+?)\s*\)\s*$/);
+          if (m) {
+            let arg = m[1];
+            if ((arg.startsWith('"') && arg.endsWith('"')) || (arg.startsWith("'") && arg.endsWith("'"))) {
+              output.push(arg.slice(1, -1));
+            } else {
+              output.push(arg);
+            }
+          }
+        });
+        if (output.length === 0) term.textContent = '✅ Программа успешно выполнена (вывода нет).';
+        else term.textContent = output.join('\n');
+        
+        markInteractionDone(idx);
+      }, 500);
+    };
+
+    window.checkTaskAnswer = function(idx, correct) {
+      const inp = document.getElementById(`taskInp_${idx}`);
+      const btn = document.getElementById(`taskBtn_${idx}`);
+      if (!inp || !btn) return;
+
+      if (inp.value.trim().toLowerCase() === correct.trim().toLowerCase()) {
+        btn.className = "check-btn correct";
+        btn.textContent = "✨ Абсолютно верно!";
+        inp.disabled = true;
+        markInteractionDone(idx);
+      } else {
+        btn.className = "check-btn wrong";
+        btn.textContent = "❌ Попробуйте ещё раз";
+        setTimeout(() => {
+          if (inp.disabled) return;
+          btn.className = "check-btn";
+          btn.textContent = "Проверить ответ";
+        }, 2000);
+      }
+    };
+
+    window.selectQuizOption = function(blockIdx, qi, oi, correctIdx) {
+      const container = document.getElementById(`quizQ_${blockIdx}_${qi}`);
+      // Если на вопрос уже ответили верно, блокируем клики
+      if (container.dataset.solved === "true") return;
+
+      const rows = container.querySelectorAll('.view-option-row');
+      rows.forEach(r => r.className = 'view-option-row');
+
+      const selectedRow = document.getElementById(`optRow_${blockIdx}_${qi}_${oi}`);
+      
+      if (oi === correctIdx) {
+        selectedRow.classList.add('correct');
+        container.dataset.solved = "true";
+        // Проверяем, отвечены ли все вопросы в этом квиз-блоке
+        checkQuizBlockStatus(blockIdx);
+      } else {
+        selectedRow.classList.add('wrong');
+      }
+    };
+
+    window.checkQuizFill = function(blockIdx, qi, correctAns) {
+      const inp = document.getElementById(`quizInp_${blockIdx}_${qi}`);
+      const btn = document.getElementById(`quizBtn_${blockIdx}_${qi}`);
+      if (!inp || !btn) return;
+
+      if (inp.value.trim().toLowerCase() === correctAns.trim().toLowerCase()) {
+        btn.className = "check-btn correct";
+        btn.textContent = "Правильно!";
+        inp.disabled = true;
+        checkQuizBlockStatus(blockIdx);
+      } else {
+        btn.className = "check-btn wrong";
+        btn.textContent = "Неверно";
+        setTimeout(() => {
+          if (inp.disabled) return;
+          btn.className = "check-btn";
+          btn.textContent = "Проверить ввод";
+        }, 1500);
+      }
+    };
+
+    function checkQuizBlockStatus(blockIdx) {
+      const block = loadedBlocks[blockIdx];
+      const totalQ = block.questions?.length || 0;
+      
+      const container = document.getElementById(`block_${blockIdx}`);
+      const solvedCount = container.querySelectorAll('[data-solved="true"]').length;
+      
+      // Считаем также текстовые инпуты в квизах, которые заблокированы (правильные)
+      const solvedFills = container.querySelectorAll('input.inp:disabled').length;
+
+      if ((solvedCount + solvedFills) === totalQ) {
+        markInteractionDone(blockIdx);
+      }
+    }
+
+    function markInteractionDone(idx) {
+      if (completedInteractions.has(idx)) return;
+      completedInteractions.add(idx);
+      updateProgress();
+    }
+
+    function updateProgress() {
+      if (totalInteractions === 0) {
+        document.getElementById('lessonProgress').style.width = '100%';
+        return;
+      }
+      const pct = Math.min((completedInteractions.size / totalInteractions) * 100, 100);
+      document.getElementById('lessonProgress').style.width = `${pct}%`;
+    }
+
+    function escHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function escQuotes(str) {
+      return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
