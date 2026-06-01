@@ -11,6 +11,7 @@
     rel="stylesheet">
   <link rel="stylesheet" href="./static/css/styles.css">
   <link rel="stylesheet" href="./static/css/quizzes-styles.css">
+  <link rel="stylesheet" href="./static/css/story-hub.css">
 </head>
 <!-- авто импорт документа для лекций и тп -->
 <canvas id="particle-field"
@@ -119,17 +120,279 @@
 
 
 
-      <!-- ══════════════════ ИНТЕРАКТИВНЫЙ УРОК ═══════════════════ -->
+      <!-- ══════════════════ ИНТЕРАКТИВНЫЙ УРОК — ХАБ ═══════════════════ -->
       <div id="view-story" class="view-section">
-        <div class="lesson-container">
 
+        <!-- Топ-бар хаба -->
+        <div class="story-header">
+          <div class="story-header-left">
+            <h2 class="story-header-title">🎓 Интерактивные уроки</h2>
+            <p class="story-header-sub">Создавайте, изучайте и делитесь интерактивными уроками</p>
+          </div>
+          <div class="story-header-actions">
+            <button class="story-btn-secondary" id="btnImportDoc">📂 Загрузить материал</button>
+            <button class="story-btn-primary" onclick="window.location.href='./create-lesson.html'">+ Создать
+              урок</button>
+          </div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="story-stats-strip">
+          <div class="story-stat"><span class="story-stat-num" id="statTotalLessons">—</span><span
+              class="story-stat-lbl">Всего уроков</span></div>
+          <div class="story-stat"><span class="story-stat-num" id="statMyLessons">—</span><span
+              class="story-stat-lbl">Моих уроков</span></div>
+          <div class="story-stat"><span class="story-stat-num" id="statCompleted">—</span><span
+              class="story-stat-lbl">Пройдено</span></div>
+          <div class="story-stat"><span class="story-stat-num" id="statDocs">—</span><span
+              class="story-stat-lbl">Материалов</span></div>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="story-tabs-bar">
+          <button class="story-tab active" data-story-tab="all">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            Все уроки
+          </button>
+          <button class="story-tab" data-story-tab="mine">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Мои уроки
+          </button>
+          <button class="story-tab" data-story-tab="docs">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Материалы
+          </button>
+          <button class="story-tab" data-story-tab="running">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            Вести урок
+          </button>
+          <button class="story-tab" data-story-tab="langlab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
+            Лаборатория
+          </button>
+        </div>
+
+        <!-- Фильтры (для all/mine) -->
+        <div class="story-filters" id="storyFilters">
+          <div class="story-search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input type="text" id="storySearch" placeholder="Поиск по теме, описанию...">
+          </div>
+          <select id="storyFilterLevel" class="story-select">
+            <option value="">Все уровни</option>
+            <option value="beginner">🟢 Начинающий</option>
+            <option value="intermediate">🟡 Средний</option>
+            <option value="advanced">🔴 Продвинутый</option>
+          </select>
+          <select id="storyFilterSubject" class="story-select">
+            <option value="">Все предметы</option>
+            <option value="Python">Python</option>
+            <option value="JavaScript">JavaScript</option>
+            <option value="Алгоритмы">Алгоритмы</option>
+            <option value="Казахский">Казахский язык</option>
+            <option value="Математика">Математика</option>
+          </select>
+          <button class="story-btn-secondary story-btn-sm" id="storyFilterReset">Сбросить</button>
+        </div>
+
+        <!-- ── ПАНЕЛЬ: ВСЕ УРОКИ ── -->
+        <div id="story-tab-all" class="story-panel active">
+          <div class="story-lessons-grid" id="allLessonsGrid">
+            <div class="story-loading">
+              <div class="story-loading-dot"></div>
+              <div class="story-loading-dot"></div>
+              <div class="story-loading-dot"></div>
+              <span>Загрузка уроков...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ПАНЕЛЬ: МОИ УРОКИ ── -->
+        <div id="story-tab-mine" class="story-panel">
+          <div style="padding:16px 20px 0; display:flex; justify-content:flex-end;">
+            <button class="story-btn-primary" onclick="window.location.href='./create-lesson.html'">+ Новый
+              урок</button>
+          </div>
+          <div class="story-lessons-grid" id="myLessonsGrid">
+            <div class="story-loading">
+              <div class="story-loading-dot"></div>
+              <div class="story-loading-dot"></div>
+              <div class="story-loading-dot"></div>
+              <span>Загрузка...</span>
+            </div>
+          </div>
+        </div>
+        <div id="story-tab-langlab" class="story-panel">
+          <div id="lang-lab-root" style="min-height:600px;"></div>
+        </div>
+
+        <!-- ── ПАНЕЛЬ: МАТЕРИАЛЫ ── -->
+        <div id="story-tab-docs" class="story-panel">
+          <div style="padding:20px;">
+            <div class="story-docs-top">
+              <p class="section-heading" style="margin:0;">📚 Учебные материалы</p>
+              <button class="story-btn-secondary" id="btnImportDoc2"
+                onclick="document.getElementById('btnImportDoc').click()">+ Загрузить</button>
+            </div>
+
+            <!-- Drop Zone -->
+            <div class="story-drop-zone" id="docsDropZone">
+              <input type="file" id="docFileInput" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+                style="display:none">
+              <div class="story-drop-icon">📂</div>
+              <div class="story-drop-title">Перетащите файлы сюда</div>
+              <div class="story-drop-sub">PDF, DOCX, PPTX, изображения · до 25 МБ</div>
+              <button class="story-btn-secondary story-btn-sm"
+                onclick="document.getElementById('docFileInput').click()">Выбрать файл</button>
+            </div>
+
+            <div class="story-docs-grid" id="docsGrid">
+              <div class="story-empty" style="grid-column:1/-1">
+                <div class="story-empty-icon">📄</div>
+                <div class="story-empty-title">Нет материалов</div>
+                <div class="story-empty-sub">Загрузите конспекты, лекции или слайды</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ПАНЕЛЬ: ВЕСТИ УРОК ── -->
+        <div id="story-tab-running" class="story-panel">
+          <div style="padding:20px;">
+            <p class="section-heading" style="margin-bottom:20px;">📡 Управление сессией</p>
+            <div id="runningHub">
+              <div class="running-empty">
+                <div style="font-size:48px;margin-bottom:16px">📡</div>
+                <div class="running-empty-title">Нет активных сессий</div>
+                <div class="running-empty-sub">Запустите урок в режиме «Вести урок» — студенты смогут подключиться по
+                  коду</div>
+                <button class="story-btn-primary" style="margin-top:20px" onclick="startLessonSession()">📡 Начать
+                  сессию урока</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══ МОДАЛ: ЗАГРУЗИТЬ МАТЕРИАЛ ═══ -->
+      <div class="modal-overlay" id="importDocModal">
+        <div class="settings-modal-content" style="max-width:600px;height:auto;max-height:90vh;overflow:auto;">
+          <button class="modal-close-btn" id="closeImportModal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <div style="padding:28px;">
+            <h2 style="margin:0 0 6px;">📂 Загрузить материал</h2>
+            <p style="color:var(--text3);margin-bottom:24px;font-size:13px;">Прикрепите конспект, лекцию или учебник</p>
+
+            <!-- Тип загрузки -->
+            <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+              <button class="import-chip selected" data-import-tab="file">📎 Файл</button>
+              <button class="import-chip" data-import-tab="url">🔗 Ссылка</button>
+              <button class="import-chip" data-import-tab="text">📝 Текст</button>
+            </div>
+
+            <!-- Файл -->
+            <div id="importTabFile">
+              <div class="story-drop-zone" id="importDrop">
+                <input type="file" id="importFileInput" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg">
+                <div class="story-drop-icon">📂</div>
+                <div class="story-drop-title">Перетащите файл</div>
+                <div class="story-drop-sub">PDF, DOCX, PPTX, изображения</div>
+                <button class="story-btn-secondary story-btn-sm"
+                  onclick="document.getElementById('importFileInput').click()">Выбрать</button>
+              </div>
+              <div class="import-file-preview" id="importFilePreview" style="display:none;"></div>
+            </div>
+
+            <!-- Ссылка -->
+            <div id="importTabUrl" style="display:none;">
+              <div class="settings-field-row"
+                style="flex-direction:column;gap:8px;border:none;padding:0;margin-bottom:16px;">
+                <label style="font-family:var(--mono);font-size:11px;color:var(--text3);">Название</label>
+                <input type="text" id="importUrlTitle" class="settings-input" placeholder="Название материала">
+              </div>
+              <div class="settings-field-row" style="flex-direction:column;gap:8px;border:none;padding:0;">
+                <label style="font-family:var(--mono);font-size:11px;color:var(--text3);">URL документа</label>
+                <input type="url" id="importUrlInput" class="settings-input" placeholder="https://docs.google.com/...">
+              </div>
+            </div>
+
+            <!-- Текст -->
+            <div id="importTabText" style="display:none;">
+              <div class="settings-field-row"
+                style="flex-direction:column;gap:8px;border:none;padding:0;margin-bottom:16px;">
+                <label style="font-family:var(--mono);font-size:11px;color:var(--text3);">Название конспекта</label>
+                <input type="text" id="importTextTitle" class="settings-input" placeholder="Название конспекта">
+              </div>
+              <div class="settings-field-row" style="flex-direction:column;gap:8px;border:none;padding:0;">
+                <label style="font-family:var(--mono);font-size:11px;color:var(--text3);">Текст конспекта</label>
+                <textarea id="importTextContent" class="settings-input" rows="6"
+                  placeholder="Вставьте текст конспекта..."></textarea>
+              </div>
+            </div>
+
+            <!-- Привязать к уроку -->
+            <div class="settings-field-row"
+              style="flex-direction:column;gap:8px;border:none;padding:0;margin-top:16px;">
+              <label style="font-family:var(--mono);font-size:11px;color:var(--text3);">Привязать к уроку
+                (необязательно)</label>
+              <select id="importLinkLesson" class="settings-input">
+                <option value="">— Без привязки —</option>
+              </select>
+            </div>
+
+            <div class="settings-footer" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+              <button id="cancelImportBtn" class="settings-cancel-btn">Отмена</button>
+              <button id="saveImportBtn" class="settings-save-btn">📥 Сохранить материал</button>
+            </div>
+          </div>
         </div>
       </div>
 
-
-
-
-
+      <!-- ═══ МОДАЛ: ПРОСМОТР ДОКУМЕНТА ═══ -->
+      <div class="modal-overlay" id="viewDocModal">
+        <div class="settings-modal-content" style="max-width:900px;width:95vw;height:90vh;">
+          <button class="modal-close-btn" id="closeViewDocModal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <div
+            style="padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;">
+            <div>
+              <div id="viewDocTitle" style="font-size:17px;font-weight:800;"></div>
+              <div id="viewDocMeta" style="font-size:12px;color:var(--text3);font-family:var(--mono);margin-top:3px;">
+              </div>
+            </div>
+            <a id="viewDocDownload" href="#" target="_blank" class="story-btn-secondary story-btn-sm">⬇ Скачать</a>
+          </div>
+          <div style="flex:1;overflow:hidden;height:calc(100% - 80px);">
+            <iframe id="viewDocFrame" style="width:100%;height:100%;border:none;"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+          </div>
+        </div>
+      </div>
 
 
       <!-- ═══════════════════ ГЛАВНАЯ ═══════════════════ -->
@@ -374,6 +637,44 @@
 
         <!-- ════════════════ ПАНЕЛЬ: БОССЫ ════════════════ -->
         <div id="qp-bosses" class="quiz-panel active">
+
+          <!-- Глобальная статистика боссов -->
+          <div class="boss-global-stats">
+            <div class="bgs-stat">
+              <div class="bgs-stat-num" id="bgsTotal">4</div>
+              <div class="bgs-stat-lbl">Боссов</div>
+            </div>
+            <div class="bgs-stat">
+              <div class="bgs-stat-num" id="bgsDefeated" style="color:var(--duo-green);">0</div>
+              <div class="bgs-stat-lbl">Побеждено</div>
+            </div>
+            <div class="bgs-stat">
+              <div class="bgs-stat-num" id="bgsXP" style="color:var(--duo-yellow);">0</div>
+              <div class="bgs-stat-lbl">XP заработано</div>
+            </div>
+            <div class="bgs-stat">
+              <div class="bgs-stat-num" id="bgsPlayers" style="color:var(--duo-blue);">0</div>
+              <div class="bgs-stat-lbl">Участников</div>
+            </div>
+          </div>
+
+          <!-- Карточки боссов -->
+          <div class="boss-cards-grid" id="bossCardsContainer">
+            <div class="story-loading" style="grid-column:1/-1">
+              <div class="story-loading-dot"></div>
+              <div class="story-loading-dot"></div>
+              <div class="story-loading-dot"></div>
+              <span>Загрузка боссов...</span>
+            </div>
+          </div>
+
+          <!-- Быстрые испытания -->
+          <div class="quick-challenges">
+            <p class="section-heading" style="margin-bottom:12px;">⚡ Быстрые испытания</p>
+            <div class="qc-grid" id="quickChallengesContainer">
+              <div class="story-loading"><span>Загрузка...</span></div>
+            </div>
+          </div>
 
         </div>
 
@@ -868,7 +1169,7 @@
   <!-- ═══════════════════ MAIN.JS ═══════════════════ -->
   <script src="./static/js/main.js" type="module"></script>
   <script src="./static/js/quizzes.js" type="module"></script>
-  <script type="module" src="./static/js/lesson.js"></script>
+  <script type="module" src="./static/js/lang-lab.js"></script>
 </body>
 
 </html>

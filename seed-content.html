@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Tagybasqa — Заполнение платформы контентом</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#0f1923;color:#e2e8f0;min-height:100vh;padding:32px 24px}
+  h1{font-size:24px;font-weight:900;color:#1cb0f6;margin-bottom:6px}
+  .sub{font-size:13px;color:#7a9aaa;margin-bottom:32px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:32px}
+  .card{background:#1a2d35;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px}
+  .card h3{font-size:15px;font-weight:800;margin-bottom:6px;color:#fff}
+  .card p{font-size:12px;color:#7a9aaa;margin-bottom:14px;line-height:1.5}
+  .count{font-family:monospace;font-size:20px;font-weight:900;color:#57cc02;margin-bottom:8px}
+  .btn{background:#1cb0f6;border:none;border-bottom:3px solid #0e86c0;color:#fff;padding:10px 20px;border-radius:99px;font-weight:800;font-size:13px;cursor:pointer;width:100%;transition:filter .15s}
+  .btn:hover{filter:brightness(1.1)}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn-all{background:#57cc02;border-bottom-color:#3a8c01;font-size:15px;padding:14px 32px;width:auto;margin-bottom:24px}
+  .log{background:#0f1923;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;font-family:monospace;font-size:12px;height:200px;overflow-y:auto;color:#7a9aaa;white-space:pre-wrap}
+  .log .ok{color:#57cc02} .log .err{color:#ff4b4b} .log .info{color:#1cb0f6}
+  .progress{height:6px;background:#1a2d35;border-radius:99px;overflow:hidden;margin:12px 0}
+  .progress-fill{height:100%;background:#1cb0f6;border-radius:99px;transition:width .3s;width:0}
+  .status{font-size:12px;color:#7a9aaa;font-family:monospace}
+</style>
+</head>
+<body>
+
+<h1>🚀 Tagybasqa — Заполнение контентом</h1>
+<p class="sub">Запусти сидер чтобы платформа выглядела полноценно. Заполняет: курсы, уроки, квизы, боссов.</p>
+
+<div style="margin-bottom:24px">
+  <button class="btn btn-all" id="seedAll">⚡ Заполнить всё сразу</button>
+  <span class="status" id="mainStatus"></span>
+</div>
+
+<div class="progress"><div class="progress-fill" id="mainProgress"></div></div>
+
+<div class="grid">
+  <div class="card">
+    <div class="count" id="cnt-courses">5</div>
+    <h3>📚 Курсы</h3>
+    <p>Python основы, JavaScript, Алгоритмы, Web-разработка, Базы данных</p>
+    <button class="btn" id="btn-courses">Создать курсы</button>
+  </div>
+  <div class="card">
+    <div class="count" id="cnt-lessons">8</div>
+    <h3>🎓 Интерактивные уроки</h3>
+    <p>Готовые уроки с блоками: видео, тест, код, задание</p>
+    <button class="btn" id="btn-lessons">Создать уроки</button>
+  </div>
+  <div class="card">
+    <div class="count" id="cnt-quizzes">6</div>
+    <h3>⚡ Квизы</h3>
+    <p>По Python, JS, алгоритмам — публичные, готовы к запуску</p>
+    <button class="btn" id="btn-quizzes">Создать квизы</button>
+  </div>
+  <div class="card">
+    <div class="count" id="cnt-bosses">4</div>
+    <h3>🐉 Боссы</h3>
+    <p>Дракон переменных, Кибер-Циклоид, Архимаг функций, Повелитель ООП</p>
+    <button class="btn" id="btn-bosses">Создать боссов</button>
+  </div>
+  <div class="card">
+    <div class="count" id="cnt-posts">6</div>
+    <h3>📰 Посты в ленте</h3>
+    <p>Стартовые посты от платформы — советы, новости, анонсы</p>
+    <button class="btn" id="btn-posts">Создать посты</button>
+  </div>
+  <div class="card">
+    <div class="count" id="cnt-path">12</div>
+    <h3>🗺️ Python Путь</h3>
+    <p>Шаги дуолинго-роадмапа: переменные → ООП → алгоритмы</p>
+    <button class="btn" id="btn-path">Создать путь</button>
+  </div>
+</div>
+
+<h3 style="margin-bottom:10px;font-size:14px;color:#7a9aaa">ЛОГ:</h3>
+<div class="log" id="logEl">Нажмите кнопку чтобы начать...\n</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import {
+  getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, writeBatch, getDocs, query, limit
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+
+const app = initializeApp({
+  apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+  authDomain: "pystart-dd2db.firebaseapp.com",
+  projectId: "pystart-dd2db",
+  storageBucket: "pystart-dd2db.firebasestorage.app",
+  messagingSenderId: "9188811255",
+  appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+});
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+onAuthStateChanged(auth, u => { currentUser = u; if(u) log(`✅ Авторизован: ${u.email}`, 'ok'); });
+
+const logEl = document.getElementById('logEl');
+function log(msg, type='info') {
+  const line = document.createElement('div');
+  line.className = type;
+  line.textContent = msg;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function setProgress(pct) {
+  document.getElementById('mainProgress').style.width = pct + '%';
+}
+
+// ══════════════════════════════════════════
+// ДАННЫЕ
+// ══════════════════════════════════════════
+
+const COURSES = [
+  {
+    title: 'Python с нуля до джуна',
+    description: 'Полный курс Python для начинающих. Переменные, циклы, функции, файлы, ООП. Более 80 практических задач.',
+    tagline: 'От "Hello World" до реальных проектов',
+    category: 'Python', level: 'Начинающий', duration: '32 ч.',
+    emoji: '🐍', rating: 4.8, studentsCount: 1247, status: 'approved',
+    modules: [
+      { title: 'Основы Python', lessons: [
+        { title: 'Установка Python и среды', duration: 15 },
+        { title: 'Переменные и типы данных', duration: 20 },
+        { title: 'Операторы и выражения', duration: 18 },
+        { title: 'Ввод и вывод данных', duration: 15 },
+      ]},
+      { title: 'Управляющие конструкции', lessons: [
+        { title: 'Условный оператор if/elif/else', duration: 22 },
+        { title: 'Цикл while: счётчики и флаги', duration: 20 },
+        { title: 'Цикл for и range()', duration: 25 },
+        { title: 'break, continue, else в циклах', duration: 18 },
+      ]},
+      { title: 'Функции', lessons: [
+        { title: 'Определение и вызов функций', duration: 25 },
+        { title: 'Аргументы и возвращаемые значения', duration: 22 },
+        { title: 'Область видимости переменных', duration: 20 },
+        { title: 'Рекурсия', duration: 28 },
+      ]},
+      { title: 'Структуры данных', lessons: [
+        { title: 'Списки: создание и операции', duration: 25 },
+        { title: 'Словари и множества', duration: 22 },
+        { title: 'Кортежи', duration: 15 },
+        { title: 'Генераторы списков', duration: 20 },
+      ]},
+      { title: 'ООП', lessons: [
+        { title: 'Классы и объекты', duration: 30 },
+        { title: 'Атрибуты и методы', duration: 25 },
+        { title: 'Наследование', duration: 28 },
+        { title: 'Полиморфизм и инкапсуляция', duration: 25 },
+      ]},
+    ]
+  },
+  {
+    title: 'JavaScript: Современный фронтенд',
+    description: 'ES6+, DOM-манипуляции, асинхронный JS, Fetch API. Создай интерактивные веб-приложения с нуля.',
+    tagline: 'Делай сайты живыми',
+    category: 'JavaScript', level: 'Средний', duration: '28 ч.',
+    emoji: '⚡', rating: 4.7, studentsCount: 892, status: 'approved',
+    modules: [
+      { title: 'Основы JavaScript', lessons: [
+        { title: 'Переменные: var, let, const', duration: 18 },
+        { title: 'Типы данных и операторы', duration: 20 },
+        { title: 'Функции и стрелочные функции', duration: 22 },
+        { title: 'Массивы и объекты', duration: 25 },
+      ]},
+      { title: 'DOM и события', lessons: [
+        { title: 'Работа с DOM-деревом', duration: 25 },
+        { title: 'Обработчики событий', duration: 20 },
+        { title: 'Формы и валидация', duration: 22 },
+        { title: 'Анимации через JS', duration: 18 },
+      ]},
+      { title: 'Асинхронный JS', lessons: [
+        { title: 'Callback-функции', duration: 20 },
+        { title: 'Promise и цепочки', duration: 25 },
+        { title: 'async/await', duration: 22 },
+        { title: 'Fetch API и работа с JSON', duration: 28 },
+      ]},
+    ]
+  },
+  {
+    title: 'Алгоритмы и структуры данных',
+    description: 'Сортировки, поиск, стеки, очереди, деревья, графы. Подготовка к техническим собеседованиям.',
+    tagline: 'Думай как программист',
+    category: 'Алгоритмы', level: 'Продвинутый', duration: '40 ч.',
+    emoji: '🧠', rating: 4.9, studentsCount: 534, status: 'approved',
+    modules: [
+      { title: 'Сложность алгоритмов', lessons: [
+        { title: 'Big O нотация', duration: 20 },
+        { title: 'Оценка времени и памяти', duration: 18 },
+      ]},
+      { title: 'Сортировки', lessons: [
+        { title: 'Пузырьковая и выборочная', duration: 22 },
+        { title: 'Быстрая сортировка', duration: 25 },
+        { title: 'Сортировка слиянием', duration: 25 },
+      ]},
+      { title: 'Структуры данных', lessons: [
+        { title: 'Стек и очередь', duration: 20 },
+        { title: 'Связные списки', duration: 25 },
+        { title: 'Деревья и BST', duration: 30 },
+        { title: 'Хеш-таблицы', duration: 25 },
+      ]},
+    ]
+  },
+  {
+    title: 'HTML & CSS: Верстка с нуля',
+    description: 'Семантическая HTML5-разметка, CSS Flexbox, Grid, адаптивный дизайн. Создай свой первый сайт.',
+    tagline: 'Строй веб с нуля',
+    category: 'HTML', level: 'Начинающий', duration: '20 ч.',
+    emoji: '🎨', rating: 4.6, studentsCount: 1580, status: 'approved',
+    modules: [
+      { title: 'HTML5 основы', lessons: [
+        { title: 'Структура HTML-документа', duration: 15 },
+        { title: 'Текст, ссылки, изображения', duration: 18 },
+        { title: 'Формы и таблицы', duration: 20 },
+        { title: 'Семантические теги', duration: 15 },
+      ]},
+      { title: 'CSS стилизация', lessons: [
+        { title: 'Селекторы и специфичность', duration: 20 },
+        { title: 'Box model и отступы', duration: 18 },
+        { title: 'Flexbox — полный гайд', duration: 25 },
+        { title: 'CSS Grid', duration: 25 },
+        { title: 'Адаптивность и медиа-запросы', duration: 22 },
+      ]},
+    ]
+  },
+  {
+    title: 'SQL и базы данных',
+    description: 'PostgreSQL, MySQL. SELECT, JOIN, транзакции, индексы. Работа с реальными базами данных.',
+    tagline: 'Данные — это новая нефть',
+    category: 'Базы данных', level: 'Средний', duration: '24 ч.',
+    emoji: '🗄️', rating: 4.5, studentsCount: 423, status: 'approved',
+    modules: [
+      { title: 'Основы SQL', lessons: [
+        { title: 'Что такое база данных?', duration: 15 },
+        { title: 'SELECT, FROM, WHERE', duration: 20 },
+        { title: 'ORDER BY, LIMIT, OFFSET', duration: 15 },
+        { title: 'Агрегация: COUNT, SUM, GROUP BY', duration: 22 },
+      ]},
+      { title: 'Работа с таблицами', lessons: [
+        { title: 'JOIN: INNER, LEFT, RIGHT', duration: 28 },
+        { title: 'Подзапросы', duration: 22 },
+        { title: 'Индексы и оптимизация', duration: 20 },
+        { title: 'Транзакции', duration: 18 },
+      ]},
+    ]
+  }
+];
+
+const INTERACTIVE_LESSONS = [
+  {
+    title: 'Переменные Python: всё что надо знать',
+    description: 'Типы данных, именование, область видимости. 4 блока с практикой.',
+    emoji: '📦', level: 'beginner', subject: 'Python',
+    tags: ['Python', 'Переменные'], duration: 20, status: 'approved',
+    blocks: [
+      { type: 'text', content: 'Переменная — это именованная ячейка памяти. Python автоматически определяет тип.' },
+      { type: 'code', lang: 'python', code: 'name = "Алибек"\nage = 17\ngpa = 4.75\nis_student = True\nprint(type(name))  # <class \'str\'>' },
+      { type: 'quiz', question: 'Какой тип у переменной x = 3.14?', options: ['int','float','str','bool'], correct: 1 },
+      { type: 'task', description: 'Создайте переменные: имя, возраст, оценка и выведите их через print()' },
+    ]
+  },
+  {
+    title: 'Циклы for и while в Python',
+    description: 'range(), итерация по коллекциям, break/continue. 5 блоков.',
+    emoji: '🔄', level: 'beginner', subject: 'Python',
+    tags: ['Python', 'Циклы'], duration: 25, status: 'approved',
+    blocks: [
+      { type: 'text', content: 'Цикл for перебирает элементы коллекции. Цикл while повторяется пока условие истинно.' },
+      { type: 'code', lang: 'python', code: '# for с range\nfor i in range(1, 6):\n    print(i)  # 1 2 3 4 5\n\n# for по списку\nfruits = ["яблоко", "банан"]\nfor fruit in fruits:\n    print(fruit)' },
+      { type: 'quiz', question: 'Что выведет range(0, 10, 3)?', options: ['0,3,6,9','0,3,6','3,6,9','0,3,6,9,12'], correct: 0 },
+      { type: 'code', lang: 'python', code: '# while с break\ncount = 0\nwhile True:\n    count += 1\n    if count == 5:\n        break\nprint(count)  # 5' },
+      { type: 'task', description: 'Напишите цикл который выводит все чётные числа от 2 до 20.' },
+    ]
+  },
+  {
+    title: 'Функции: def, args, return',
+    description: 'Объявление, аргументы по умолчанию, *args, **kwargs, лямбды.',
+    emoji: '⚙️', level: 'intermediate', subject: 'Python',
+    tags: ['Python', 'Функции'], duration: 30, status: 'approved',
+    blocks: [
+      { type: 'text', content: 'Функция — блок переиспользуемого кода. DRY: Don\'t Repeat Yourself.' },
+      { type: 'code', lang: 'python', code: 'def greet(name, greeting="Привет"):\n    return f"{greeting}, {name}!"\n\nprint(greet("Алибек"))       # Привет, Алибек!\nprint(greet("Дана", "Сәлем")) # Сәлем, Дана!' },
+      { type: 'quiz', question: 'Что такое аргумент по умолчанию?', options: ['Обязательный параметр','Значение при отсутствии аргумента','Тип возвращаемого значения','Имя функции'], correct: 1 },
+      { type: 'code', lang: 'python', code: '# *args — переменное число аргументов\ndef total(*nums):\n    return sum(nums)\n\nprint(total(1, 2, 3, 4))  # 10\n\n# lambda\nsquare = lambda x: x ** 2\nprint(square(5))  # 25' },
+      { type: 'task', description: 'Напишите функцию max_of_three(a, b, c) которая возвращает максимум из трёх чисел.' },
+    ]
+  },
+  {
+    title: 'JavaScript: DOM и события',
+    description: 'querySelector, addEventListener, изменение стилей и контента.',
+    emoji: '🌐', level: 'intermediate', subject: 'JavaScript',
+    tags: ['JavaScript', 'DOM'], duration: 28, status: 'approved',
+    blocks: [
+      { type: 'text', content: 'DOM (Document Object Model) — программный интерфейс HTML. JS может читать и менять любой элемент страницы.' },
+      { type: 'code', lang: 'javascript', code: '// Найти элемент\nconst btn = document.querySelector("#myBtn");\nconst title = document.querySelector("h1");\n\n// Изменить содержимое\ntitle.textContent = "Привет, мир!";\ntitle.style.color = "#1cb0f6";\n\n// Добавить обработчик\nbtn.addEventListener("click", () => {\n    alert("Кнопка нажата!");\n});' },
+      { type: 'quiz', question: 'Какой метод находит первый совпадающий элемент?', options: ['getElementById','querySelector','querySelectorAll','getElement'], correct: 1 },
+      { type: 'task', description: 'Создайте кнопку которая при клике меняет цвет фона страницы на случайный.' },
+    ]
+  },
+  {
+    title: 'ООП Python: классы и объекты',
+    description: '__init__, методы экземпляра, наследование, super().',
+    emoji: '🏛️', level: 'advanced', subject: 'Python',
+    tags: ['Python', 'ООП'], duration: 35, status: 'approved',
+    blocks: [
+      { type: 'text', content: 'ООП — парадигма, где программа моделируется как набор взаимодействующих объектов.' },
+      { type: 'code', lang: 'python', code: 'class Student:\n    school = "Tagybasqa"  # атрибут класса\n    \n    def __init__(self, name, grade):\n        self.name = name      # атрибут экземпляра\n        self.grade = grade\n    \n    def introduce(self):\n        return f"Я {self.name}, {self.grade} класс"\n\ns = Student("Алибек", 11)\nprint(s.introduce())  # Я Алибек, 11 класс' },
+      { type: 'quiz', question: 'Что делает метод __init__?', options: ['Удаляет объект','Инициализирует объект','Копирует класс','Выводит объект'], correct: 1 },
+      { type: 'code', lang: 'python', code: '# Наследование\nclass PremiumStudent(Student):\n    def __init__(self, name, grade, mentor):\n        super().__init__(name, grade)\n        self.mentor = mentor\n    \n    def introduce(self):\n        base = super().introduce()\n        return f"{base}, ментор: {self.mentor}"' },
+      { type: 'task', description: 'Создайте класс Car с атрибутами brand, speed и методом accelerate(km) который увеличивает speed.' },
+    ]
+  },
+  {
+    title: 'Алгоритм бинарного поиска',
+    description: 'Принцип «делением пополам», O(log n), реализация на Python.',
+    emoji: '🔍', level: 'intermediate', subject: 'Алгоритмы',
+    tags: ['Алгоритмы', 'Поиск'], duration: 22, status: 'approved',
+    blocks: [
+      { type: 'text', content: 'Бинарный поиск работает только на ОТСОРТИРОВАННОМ массиве. Каждая итерация делит область поиска пополам — O(log n).' },
+      { type: 'code', lang: 'python', code: 'def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    \n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    \n    return -1\n\nnums = [1, 3, 5, 7, 9, 11, 13]\nprint(binary_search(nums, 7))   # 3\nprint(binary_search(nums, 10))  # -1' },
+      { type: 'quiz', question: 'Сколько шагов нужно для поиска в массиве из 1024 элементов?', options: ['1024','512','10','100'], correct: 2 },
+      { type: 'task', description: 'Реализуй бинарный поиск рекурсивно (без while, используй рекурсию).' },
+    ]
+  },
+  {
+    title: 'Git: Контроль версий с нуля',
+    description: 'git init, add, commit, branch, merge, pull request.',
+    emoji: '🌿', level: 'beginner', subject: 'Инструменты',
+    tags: ['Git', 'Инструменты'], duration: 20, status: 'approved',
+    blocks: [
+      { type: 'text', content: 'Git — система контроля версий. Позволяет отслеживать изменения кода и работать в команде.' },
+      { type: 'code', lang: 'bash', code: '# Инициализация репозитория\ngit init\n\n# Добавить файлы\ngit add .              # все файлы\ngit add main.py        # конкретный файл\n\n# Создать коммит\ngit commit -m "feat: добавил функцию авторизации"\n\n# История коммитов\ngit log --oneline' },
+      { type: 'quiz', question: 'Что делает git add?', options: ['Создаёт коммит','Добавляет файлы в staging','Создаёт ветку','Удаляет файлы'], correct: 1 },
+      { type: 'code', lang: 'bash', code: '# Работа с ветками\ngit branch feature-login   # создать\ngit checkout feature-login # переключиться\ngit checkout -b hotfix     # создать и переключиться\n\n# Слияние\ngit checkout main\ngit merge feature-login' },
+      { type: 'task', description: 'Создайте репозиторий, добавьте файл README.md и сделайте первый коммит.' },
+    ]
+  },
+  {
+    title: 'Async/Await и Promises в JavaScript',
+    description: 'Event loop, Promise, async/await, обработка ошибок, параллельный запросы.',
+    emoji: '⏳', level: 'advanced', subject: 'JavaScript',
+    tags: ['JavaScript', 'Асинхронность'], duration: 32, status: 'approved',
+    blocks: [
+      { type: 'text', content: 'JavaScript однопоточный, но асинхронный. Event loop позволяет выполнять долгие операции не блокируя интерфейс.' },
+      { type: 'code', lang: 'javascript', code: '// Promise\nfunction fetchUser(id) {\n    return new Promise((resolve, reject) => {\n        setTimeout(() => {\n            if (id > 0) resolve({ id, name: "Алибек" });\n            else reject(new Error("Неверный ID"));\n        }, 1000);\n    });\n}\n\n// Использование\nfetchUser(1)\n    .then(user => console.log(user.name))\n    .catch(err => console.error(err));' },
+      { type: 'quiz', question: 'Что возвращает async функция?', options: ['Обычное значение','Promise','undefined','Object'], correct: 1 },
+      { type: 'code', lang: 'javascript', code: '// async/await — читаемее\nasync function loadData() {\n    try {\n        const user = await fetchUser(1);\n        const posts = await fetchPosts(user.id);\n        return posts;\n    } catch (error) {\n        console.error("Ошибка:", error);\n    }\n}\n\n// Параллельно\nconst [users, posts] = await Promise.all([\n    fetchUsers(),\n    fetchPosts()\n]);' },
+      { type: 'task', description: 'Напишите async функцию которая делает запрос к https://jsonplaceholder.typicode.com/posts и выводит заголовки первых 5 постов.' },
+    ]
+  }
+];
+
+const QUIZZES = [
+  {
+    title: 'Python Основы: Тест новичка',
+    category: 'Python', visibility: 'public',
+    questions: [
+      { type:'multiple', text:'Как вывести текст в Python?', question:'Как вывести текст в Python?', options:[{text:'console.log("текст")',correct:false},{text:'print("текст")',correct:true},{text:'echo "текст"',correct:false},{text:'System.out.println("текст")',correct:false}], correctIndex:1, explanation:'print() — встроенная функция вывода в Python', timeLimit:20, points:100 },
+      { type:'multiple', text:'Какой тип у 3.14?', question:'Какой тип у 3.14?', options:[{text:'int',correct:false},{text:'str',correct:false},{text:'float',correct:true},{text:'double',correct:false}], correctIndex:2, explanation:'Числа с точкой — тип float (floating point)', timeLimit:20, points:100 },
+      { type:'multiple', text:'Как создать список?', question:'Как создать список?', options:[{text:'list = (1,2,3)',correct:false},{text:'list = {1,2,3}',correct:false},{text:'list = [1,2,3]',correct:true},{text:'list = <1,2,3>',correct:false}], correctIndex:2, explanation:'Список создаётся квадратными скобками []', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что делает len()?', question:'Что делает len()?', options:[{text:'Возвращает длину объекта',correct:true},{text:'Удаляет элементы',correct:false},{text:'Сортирует список',correct:false},{text:'Копирует объект',correct:false}], correctIndex:0, explanation:'len() возвращает количество элементов', timeLimit:20, points:100 },
+      { type:'multiple', text:'Как написать комментарий?', question:'Как написать комментарий?', options:[{text:'// комментарий',correct:false},{text:'/* комментарий */',correct:false},{text:'# комментарий',correct:true},{text:'-- комментарий',correct:false}], correctIndex:2, explanation:'В Python однострочный комментарий начинается с #', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что такое индекс списка?', question:'Что такое индекс списка?', options:[{text:'Название переменной',correct:false},{text:'Позиция элемента (с 0)',correct:true},{text:'Тип данных',correct:false},{text:'Размер списка',correct:false}], correctIndex:1, explanation:'Индексация начинается с 0. lst[0] — первый элемент', timeLimit:20, points:100 },
+      { type:'multiple', text:'Как проверить тип переменной?', question:'Как проверить тип переменной?', options:[{text:'typeof(x)',correct:false},{text:'x.type()',correct:false},{text:'type(x)',correct:true},{text:'gettype(x)',correct:false}], correctIndex:2, explanation:'type() — встроенная функция для получения типа', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что вернёт 10 % 3?', question:'Что вернёт 10 % 3?', options:[{text:'3',correct:false},{text:'1',correct:true},{text:'0',correct:false},{text:'3.33',correct:false}], correctIndex:1, explanation:'% — оператор остатка от деления. 10 = 3*3 + 1', timeLimit:20, points:100 },
+    ]
+  },
+  {
+    title: 'Python Циклы и функции',
+    category: 'Python', visibility: 'public',
+    questions: [
+      { type:'multiple', text:'Что выведет range(5)?', question:'Что выведет range(5)?', options:[{text:'1,2,3,4,5',correct:false},{text:'0,1,2,3,4',correct:true},{text:'0,1,2,3,4,5',correct:false},{text:'1,2,3,4',correct:false}], correctIndex:1, explanation:'range(n) генерирует числа от 0 до n-1', timeLimit:20, points:100 },
+      { type:'multiple', text:'Ключевое слово для функции?', question:'Ключевое слово для функции?', options:[{text:'function',correct:false},{text:'func',correct:false},{text:'def',correct:true},{text:'fn',correct:false}], correctIndex:2, explanation:'def — define (определить). Синтаксис: def name():', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что делает break?', question:'Что делает break?', options:[{text:'Продолжает цикл',correct:false},{text:'Прерывает текущую итерацию',correct:false},{text:'Выходит из цикла полностью',correct:true},{text:'Возвращает значение',correct:false}], correctIndex:2, explanation:'break немедленно завершает цикл', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что делает return?', question:'Что делает return?', options:[{text:'Выводит значение',correct:false},{text:'Завершает функцию и возвращает значение',correct:true},{text:'Создаёт переменную',correct:false},{text:'Вызывает функцию',correct:false}], correctIndex:1, explanation:'return завершает функцию и передаёт значение вызывающему коду', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что такое рекурсия?', question:'Что такое рекурсия?', options:[{text:'Цикл for',correct:false},{text:'Вызов функции самой себя',correct:true},{text:'Тип данных',correct:false},{text:'Импорт модуля',correct:false}], correctIndex:1, explanation:'Рекурсия — функция которая вызывает себя. Нужен базовый случай.', timeLimit:20, points:100 },
+    ]
+  },
+  {
+    title: 'JavaScript ES6+ Основы',
+    category: 'JavaScript', visibility: 'public',
+    questions: [
+      { type:'multiple', text:'Разница let и var?', question:'Разница let и var?', options:[{text:'Нет разницы',correct:false},{text:'let — блочная область видимости',correct:true},{text:'var — современный синтаксис',correct:false},{text:'let нельзя переопределить',correct:false}], correctIndex:1, explanation:'let имеет блочную область видимости, var — функциональную', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что такое стрелочная функция?', question:'Что такое стрелочная функция?', options:[{text:'Функция с именем',correct:false},{text:'Короткий синтаксис: (x) => x * 2',correct:true},{text:'Рекурсивная функция',correct:false},{text:'Асинхронная функция',correct:false}], correctIndex:1, explanation:'Стрелочные функции — краткий синтаксис ES6, без своего this', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что делает spread оператор?', question:'Что делает spread оператор?', options:[{text:'Удаляет элементы',correct:false},{text:'Разворачивает итерируемый объект',correct:true},{text:'Создаёт копию',correct:false},{text:'Сортирует массив',correct:false}], correctIndex:1, explanation:'...arr разворачивает элементы: [...arr1, ...arr2] объединяет массивы', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что такое деструктуризация?', question:'Что такое деструктуризация?', options:[{text:'Удаление объекта',correct:false},{text:'Извлечение значений из объекта/массива',correct:true},{text:'Копирование объекта',correct:false},{text:'Сравнение объектов',correct:false}], correctIndex:1, explanation:'const {name, age} = user; — деструктуризация объекта', timeLimit:20, points:100 },
+      { type:'multiple', text:'Promise.all() делает запросы...', question:'Promise.all() делает запросы...', options:[{text:'Последовательно',correct:false},{text:'Параллельно',correct:true},{text:'Случайно',correct:false},{text:'Один раз',correct:false}], correctIndex:1, explanation:'Promise.all выполняет все промисы параллельно и ждёт завершения всех', timeLimit:20, points:100 },
+      { type:'multiple', text:'typeof null возвращает?', question:'typeof null возвращает?', options:[{text:'"null"',correct:false},{text:'"undefined"',correct:false},{text:'"object"',correct:true},{text:'"boolean"',correct:false}], correctIndex:2, explanation:'Это историческая ошибка JavaScript. typeof null === "object" — баг спецификации', timeLimit:20, points:100 },
+    ]
+  },
+  {
+    title: 'Алгоритмы: Big O и сортировки',
+    category: 'Алгоритмы', visibility: 'public',
+    questions: [
+      { type:'multiple', text:'O(n²) у какого алгоритма?', question:'O(n²) у какого алгоритма?', options:[{text:'Бинарный поиск',correct:false},{text:'Пузырьковая сортировка',correct:true},{text:'Быстрая сортировка (среднее)',correct:false},{text:'Поиск в хеш-таблице',correct:false}], correctIndex:1, explanation:'Пузырьковая сортировка — O(n²), два вложенных цикла', timeLimit:25, points:100 },
+      { type:'multiple', text:'O(log n) — это?', question:'O(log n) — это?', options:[{text:'Линейный рост',correct:false},{text:'Логарифмический рост (очень эффективно)',correct:true},{text:'Квадратичный рост',correct:false},{text:'Константное время',correct:false}], correctIndex:1, explanation:'O(log n): удвоение данных добавляет лишь один шаг. Бинарный поиск — O(log n)', timeLimit:25, points:100 },
+      { type:'multiple', text:'Лучший случай для быстрой сортировки?', question:'Лучший случай для быстрой сортировки?', options:[{text:'O(n)',correct:false},{text:'O(n log n)',correct:true},{text:'O(n²)',correct:false},{text:'O(1)',correct:false}], correctIndex:1, explanation:'Быстрая сортировка в среднем O(n log n), но в худшем O(n²)', timeLimit:25, points:100 },
+      { type:'multiple', text:'Хеш-таблица: среднее время поиска?', question:'Хеш-таблица: среднее время поиска?', options:[{text:'O(n)',correct:false},{text:'O(log n)',correct:false},{text:'O(1)',correct:true},{text:'O(n²)',correct:false}], correctIndex:2, explanation:'Хеш-таблица даёт O(1) в среднем — самая быстрая структура для поиска', timeLimit:25, points:100 },
+    ]
+  },
+  {
+    title: 'HTML & CSS: Проверка знаний',
+    category: 'HTML', visibility: 'public',
+    questions: [
+      { type:'multiple', text:'Тег для заголовка первого уровня?', question:'Тег для заголовка первого уровня?', options:[{text:'<title>',correct:false},{text:'<h1>',correct:true},{text:'<header>',correct:false},{text:'<heading>',correct:false}], correctIndex:1, explanation:'<h1>—<h6> — теги заголовков. h1 самый важный', timeLimit:20, points:100 },
+      { type:'multiple', text:'CSS Flexbox — justify-content: center делает?', question:'CSS Flexbox — justify-content: center делает?', options:[{text:'Выравнивает по вертикали',correct:false},{text:'Выравнивает по главной оси (обычно горизонтально)',correct:true},{text:'Увеличивает элементы',correct:false},{text:'Добавляет пространство между',correct:false}], correctIndex:1, explanation:'justify-content управляет выравниванием по главной оси flex-контейнера', timeLimit:20, points:100 },
+      { type:'multiple', text:'Что такое семантический HTML?', question:'Что такое семантический HTML?', options:[{text:'HTML без CSS',correct:false},{text:'Теги описывающие смысл содержимого',correct:true},{text:'HTML5 синтаксис',correct:false},{text:'Минифицированный HTML',correct:false}], correctIndex:1, explanation:'<article>, <nav>, <main> — семантические теги. Помогают SEO и accessibility', timeLimit:20, points:100 },
+      { type:'multiple', text:'CSS Grid vs Flexbox: основное отличие?', question:'CSS Grid vs Flexbox: основное отличие?', options:[{text:'Grid быстрее',correct:false},{text:'Grid — двумерный (строки+столбцы), Flex — одномерный',correct:true},{text:'Flexbox только для мобильных',correct:false},{text:'Grid работает только в Chrome',correct:false}], correctIndex:1, explanation:'Grid — для двумерных раскладок. Flex — для однонаправленных (строка или колонка)', timeLimit:20, points:100 },
+    ]
+  },
+  {
+    title: 'SQL: Запросы к базам данных',
+    category: 'Базы данных', visibility: 'public',
+    questions: [
+      { type:'multiple', text:'Что делает SELECT *?', question:'Что делает SELECT *?', options:[{text:'Удаляет все строки',correct:false},{text:'Выбирает все столбцы таблицы',correct:true},{text:'Создаёт таблицу',correct:false},{text:'Обновляет данные',correct:false}], correctIndex:1, explanation:'SELECT * FROM table — выбрать все столбцы всех строк таблицы', timeLimit:20, points:100 },
+      { type:'multiple', text:'JOIN объединяет...', question:'JOIN объединяет...', options:[{text:'Строки одной таблицы',correct:false},{text:'Данные из нескольких таблиц',correct:true},{text:'Столбцы одной таблицы',correct:false},{text:'Базы данных',correct:false}], correctIndex:1, explanation:'JOIN соединяет строки из двух или более таблиц по условию', timeLimit:20, points:100 },
+      { type:'multiple', text:'WHERE фильтрует...', question:'WHERE фильтрует...', options:[{text:'Столбцы',correct:false},{text:'Таблицы',correct:false},{text:'Строки по условию',correct:true},{text:'Базы данных',correct:false}], correctIndex:2, explanation:'WHERE age > 18 — выберет только строки где age больше 18', timeLimit:20, points:100 },
+      { type:'multiple', text:'COUNT(*) возвращает?', question:'COUNT(*) возвращает?', options:[{text:'Первую строку',correct:false},{text:'Количество строк',correct:true},{text:'Сумму значений',correct:false},{text:'Максимальное значение',correct:false}], correctIndex:1, explanation:'COUNT(*) — агрегатная функция, считает количество строк', timeLimit:20, points:100 },
+    ]
+  }
+];
+
+const BOSSES = [
+  {
+    order: 1, emoji: '🐉', name: 'Дракон Переменных', subtitle: 'Глава I',
+    topics: 'Типы данных, операторы, переменные', questions: 20,
+    participants: 1240, xp: 200, trophyLabel: 'Бронзовый трофей',
+    hpPercent: 100, color: ['#7f1d1d','#dc2626'], requiredLevel: 1,
+    description: 'Первый страж Tagybasqa. Проверит базовые знания Python: переменные, типы данных и основные операторы.',
+    reward: 'Значок "Укротитель переменных"',
+    quizRef: 'python-basics',
+  },
+  {
+    order: 2, emoji: '🤖', name: 'Кибер-Циклоид', subtitle: 'Глава II',
+    topics: 'Циклы for/while, условия, break/continue', questions: 15,
+    participants: 860, xp: 300, trophyLabel: 'Серебряный трофей',
+    hpPercent: 60, color: ['#1e3a5f','#3b82f6'], requiredLevel: 3,
+    description: 'Механический страж циклов. Задаст вопросы о for, while, range() и управляющих конструкциях.',
+    reward: 'Значок "Мастер Итераций"',
+    quizRef: 'python-loops',
+  },
+  {
+    order: 3, emoji: '🧙', name: 'Архимаг Функций', subtitle: 'Глава III',
+    topics: 'Функции, lambda, декораторы, рекурсия', questions: 25,
+    participants: 430, xp: 500, trophyLabel: 'Золотой трофей',
+    hpPercent: 30, color: ['#4c1d95','#7c3aed'], requiredLevel: 7,
+    description: 'Древний маг знающий все секреты функций. Испытает знание def, return, *args, **kwargs и lambda.',
+    reward: 'Значок "Архитектор Функций"',
+    quizRef: 'python-functions',
+  },
+  {
+    order: 4, emoji: '🔒', name: 'Повелитель ООП', subtitle: 'Глава IV',
+    topics: 'Классы, наследование, инкапсуляция, полиморфизм', questions: 30,
+    participants: 0, xp: 750, trophyLabel: 'Платиновый трофей',
+    hpPercent: 15, color: ['#064e3b','#10b981'], requiredLevel: 12,
+    description: 'Финальный босс. Владыка объектно-ориентированного программирования. Только истинные мастера смогут победить.',
+    reward: 'Значок "Повелитель Объектов" + Сертификат',
+    quizRef: 'python-oop',
+  }
+];
+
+const POSTS = [
+  { text: '🐍 Совет дня: используй enumerate() вместо range(len(lst))!\n\n```python\n# ❌ Старый способ\nfor i in range(len(fruits)):\n    print(i, fruits[i])\n\n# ✅ Pythonic\nfor i, fruit in enumerate(fruits):\n    print(i, fruit)\n```', userName: 'Tagybasqa', userHandle: '@tagybasqa', likes: 47 },
+  { text: '⚡ JavaScript-факт: typeof null === "object" — это баг в спецификации, существующий с 1995 года. Браузеры не могут его исправить ради обратной совместимости. 🤯', userName: 'Tagybasqa', userHandle: '@tagybasqa', likes: 63 },
+  { text: '🏆 Топ-3 совета для новичков в Python:\n\n1. Читай официальную документацию — она отличная\n2. Пиши код каждый день, даже 20 минут\n3. Не копируй — перепечатывай вручную, это тренирует мышечную память\n\nКакой совет дали бы вы?', userName: 'Tagybasqa', userHandle: '@tagybasqa', likes: 89 },
+  { text: '📊 Интересный факт: Python — самый популярный язык программирования по индексу TIOBE 2024. Используется в AI/ML, веб, автоматизации, науке о данных. Хороший выбор для старта! 🚀', userName: 'Tagybasqa', userHandle: '@tagybasqa', likes: 112 },
+  { text: '💡 Знаешь разницу между is и == в Python?\n\n```python\na = [1, 2, 3]\nb = [1, 2, 3]\n\nprint(a == b)  # True — одинаковые значения\nprint(a is b)  # False — разные объекты в памяти\n```\n\nis проверяет идентичность объекта, == — равенство значений.', userName: 'Tagybasqa', userHandle: '@tagybasqa', likes: 76 },
+  { text: '🎯 Новый раздел «Языковая лаборатория» уже доступен! 5 интерактивных режимов: Code Duel, Bug Hunter, Code Craft, Syntax Story и Skill Map. Зарабатывай XP соревнуясь с AI!', userName: 'Tagybasqa', userHandle: '@tagybasqa', likes: 134 },
+];
+
+const PYTHON_PATH_STEPS = [
+  { id:'step-1', order:1, title:'Привет, Python!', emoji:'👋', type:'lesson', xp:50, description:'Установка, первая программа, print()', unlocked:true, category:'Основы' },
+  { id:'step-2', order:2, title:'Переменные и типы', emoji:'📦', type:'lesson', xp:60, description:'int, float, str, bool, type()', unlocked:false, category:'Основы' },
+  { id:'step-3', order:3, title:'Мини-квиз: Основы', emoji:'⚡', type:'quiz', xp:80, description:'Проверь первые знания', unlocked:false, category:'Проверка' },
+  { id:'step-4', order:4, title:'Операторы', emoji:'➕', type:'lesson', xp:55, description:'Арифметика, сравнение, логика', unlocked:false, category:'Основы' },
+  { id:'step-5', order:5, title:'Условия if/elif/else', emoji:'🔀', type:'lesson', xp:65, description:'Ветвление программы', unlocked:false, category:'Управление' },
+  { id:'step-6', order:6, title:'Цикл for и range()', emoji:'🔄', type:'lesson', xp:65, description:'Итерация, range(), enumerate()', unlocked:false, category:'Управление' },
+  { id:'step-7', order:7, title:'Цикл while', emoji:'♾️', type:'lesson', xp:60, description:'while, break, continue', unlocked:false, category:'Управление' },
+  { id:'step-8', order:8, title:'Босс: Кибер-Циклоид', emoji:'🤖', type:'boss', xp:150, description:'Победи босса и получи серебряный трофей!', unlocked:false, category:'Испытание' },
+  { id:'step-9', order:9, title:'Функции', emoji:'⚙️', type:'lesson', xp:80, description:'def, return, аргументы', unlocked:false, category:'Функции' },
+  { id:'step-10', order:10, title:'Списки и словари', emoji:'📋', type:'lesson', xp:75, description:'list, dict, методы', unlocked:false, category:'Данные' },
+  { id:'step-11', order:11, title:'Строки и методы', emoji:'✍️', type:'lesson', xp:65, description:'.split(), .join(), f-strings', unlocked:false, category:'Данные' },
+  { id:'step-12', order:12, title:'ООП: Классы', emoji:'🏛️', type:'lesson', xp:100, description:'class, __init__, методы', unlocked:false, category:'ООП' },
+  { id:'step-13', order:13, title:'Наследование', emoji:'🧬', type:'lesson', xp:90, description:'super(), override, полиморфизм', unlocked:false, category:'ООП' },
+  { id:'step-14', order:14, title:'Файлы и исключения', emoji:'📁', type:'lesson', xp:80, description:'open(), try/except, with', unlocked:false, category:'Продвинутый' },
+  { id:'step-15', order:15, title:'Финальный Босс: Повелитель ООП', emoji:'🔒', type:'boss', xp:300, description:'Финальное испытание. Только для мастеров!', unlocked:false, category:'Испытание' },
+];
+
+// ══════════════════════════════════════════
+// ФУНКЦИИ СИДИНГА
+// ══════════════════════════════════════════
+
+async function seedCourses() {
+  log('📚 Создаю курсы...', 'info');
+  let count = 0;
+  for (const course of COURSES) {
+    try {
+      await addDoc(collection(db, 'courses'), {
+        ...course,
+        uid: currentUser?.uid || 'tagybasqa-platform',
+        userName: 'Tagybasqa',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      count++;
+      log(`  ✓ Курс: ${course.title}`, 'ok');
+    } catch(e) { log(`  ✗ ${course.title}: ${e.message}`, 'err'); }
+  }
+  log(`✅ Создано курсов: ${count}`, 'ok');
+  return count;
+}
+
+async function seedLessons() {
+  log('🎓 Создаю интерактивные уроки...', 'info');
+  let count = 0;
+  for (const lesson of INTERACTIVE_LESSONS) {
+    try {
+      await addDoc(collection(db, 'interactiveLessons'), {
+        ...lesson,
+        uid: currentUser?.uid || 'tagybasqa-platform',
+        userName: 'Tagybasqa',
+        createdAt: serverTimestamp(),
+      });
+      count++;
+      log(`  ✓ Урок: ${lesson.title}`, 'ok');
+    } catch(e) { log(`  ✗ ${lesson.title}: ${e.message}`, 'err'); }
+  }
+  log(`✅ Создано уроков: ${count}`, 'ok');
+  return count;
+}
+
+async function seedQuizzes() {
+  log('⚡ Создаю квизы...', 'info');
+  let count = 0;
+  for (const quiz of QUIZZES) {
+    try {
+      await addDoc(collection(db, 'quizzes'), {
+        ...quiz,
+        uid: currentUser?.uid || 'tagybasqa-platform',
+        userName: 'Tagybasqa',
+        generatedByAI: false,
+        createdAt: serverTimestamp(),
+      });
+      count++;
+      log(`  ✓ Квиз: ${quiz.title}`, 'ok');
+    } catch(e) { log(`  ✗ ${quiz.title}: ${e.message}`, 'err'); }
+  }
+  log(`✅ Создано квизов: ${count}`, 'ok');
+  return count;
+}
+
+async function seedBosses() {
+  log('🐉 Создаю боссов...', 'info');
+  let count = 0;
+  for (const boss of BOSSES) {
+    try {
+      await setDoc(doc(db, 'bosses', `boss-${boss.order}`), {
+        ...boss,
+        createdAt: serverTimestamp(),
+      });
+      count++;
+      log(`  ✓ Босс: ${boss.name}`, 'ok');
+    } catch(e) { log(`  ✗ ${boss.name}: ${e.message}`, 'err'); }
+  }
+  log(`✅ Создано боссов: ${count}`, 'ok');
+  return count;
+}
+
+async function seedPosts() {
+  log('📰 Создаю посты в ленте...', 'info');
+  let count = 0;
+  for (const post of POSTS) {
+    try {
+      await addDoc(collection(db, 'posts'), {
+        ...post,
+        uid: currentUser?.uid || 'tagybasqa-platform',
+        userAvatar: '🎓',
+        createdAt: serverTimestamp(),
+        likedBy: [],
+        imageUrl: null,
+        poll: null,
+      });
+      count++;
+      log(`  ✓ Пост: ${post.text.substring(0, 40)}...`, 'ok');
+    } catch(e) { log(`  ✗ Пост: ${e.message}`, 'err'); }
+  }
+  log(`✅ Создано постов: ${count}`, 'ok');
+  return count;
+}
+
+async function seedPythonPath() {
+  log('🗺️ Создаю Python Путь...', 'info');
+  let count = 0;
+  for (const step of PYTHON_PATH_STEPS) {
+    try {
+      await setDoc(doc(db, 'pythonPath', step.id), {
+        ...step,
+        createdAt: serverTimestamp(),
+      });
+      count++;
+      log(`  ✓ Шаг ${step.order}: ${step.title}`, 'ok');
+    } catch(e) { log(`  ✗ ${step.title}: ${e.message}`, 'err'); }
+  }
+  log(`✅ Создано шагов пути: ${count}`, 'ok');
+  return count;
+}
+
+// ══════════════════════════════════════════
+// КНОПКИ
+// ══════════════════════════════════════════
+
+async function runSeeder(fn, btnId) {
+  const btn = document.getElementById(btnId);
+  if(btn) { btn.disabled = true; btn.textContent = '⏳ Создаю...'; }
+  try { await fn(); }
+  finally { if(btn) { btn.disabled = false; btn.textContent = '✓ Готово'; btn.style.background = '#57cc02'; } }
+}
+
+document.getElementById('btn-courses').onclick = () => runSeeder(seedCourses, 'btn-courses');
+document.getElementById('btn-lessons').onclick = () => runSeeder(seedLessons, 'btn-lessons');
+document.getElementById('btn-quizzes').onclick = () => runSeeder(seedQuizzes, 'btn-quizzes');
+document.getElementById('btn-bosses').onclick = () => runSeeder(seedBosses, 'btn-bosses');
+document.getElementById('btn-posts').onclick = () => runSeeder(seedPosts, 'btn-posts');
+document.getElementById('btn-path').onclick = () => runSeeder(seedPythonPath, 'btn-path');
+
+document.getElementById('seedAll').onclick = async () => {
+  const btn = document.getElementById('seedAll');
+  btn.disabled = true;
+  btn.textContent = '⏳ Заполняю платформу...';
+  document.getElementById('mainStatus').textContent = 'Идёт заполнение...';
+
+  const steps = [
+    { fn: seedCourses, label: 'Курсы', pct: 16 },
+    { fn: seedLessons, label: 'Уроки', pct: 33 },
+    { fn: seedQuizzes, label: 'Квизы', pct: 50 },
+    { fn: seedBosses, label: 'Боссы', pct: 66 },
+    { fn: seedPosts, label: 'Посты', pct: 83 },
+    { fn: seedPythonPath, label: 'Путь', pct: 100 },
+  ];
+
+  for (const step of steps) {
+    document.getElementById('mainStatus').textContent = `Создаю: ${step.label}...`;
+    await step.fn();
+    setProgress(step.pct);
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  btn.textContent = '🎉 Платформа заполнена!';
+  btn.style.background = '#57cc02';
+  btn.style.borderBottomColor = '#3a8c01';
+  document.getElementById('mainStatus').textContent = '✅ Всё готово! Обнови главную страницу.';
+  log('\n🎉 ГОТОВО! Платформа заполнена реальным контентом.\nОбнови index.html — всё будет отображаться.', 'ok');
+};
+</script>
+</body>
+</html>

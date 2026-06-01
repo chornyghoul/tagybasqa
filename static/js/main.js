@@ -2416,3 +2416,58 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+
+async function sendHelpdeskTicket(user, subject, message) {
+    if (!user || !message.trim()) return;
+ 
+    await addDoc(collection(db, "helpdesk"), {
+        uid:       user.uid,
+        email:     user.email || "",
+        subject:   subject || "Без темы",
+        message:   message.trim(),
+        status:    "open",
+        createdAt: serverTimestamp(),
+    });
+ 
+    showToast("✅ Ваше обращение отправлено администратору!");
+}
+ 
+ 
+// ═══════════════════════════════════════════════════════════
+// 3. ФРОНТЕНД — проверка бана перед публикацией поста
+//    Замените вашу существующую функцию создания поста на эту
+// ═══════════════════════════════════════════════════════════
+ 
+async function createFeedPost(user, text) {
+    // Получаем актуальный профиль
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    if (!userSnap.exists()) return;
+ 
+    const userData = userSnap.data();
+ 
+    if (userData.banned) {
+        const until = userData.bannedUntil?.toDate?.();
+        const msg = until
+            ? `Вы заблокированы до ${until.toLocaleDateString("ru-RU")}.`
+            : "Вы заблокированы администратором.";
+        showToast(`🔴 ${msg}`);
+        return;
+    }
+ 
+    if (userData.canPost === false) {
+        showToast("🚫 Вам ограничено право публикации.");
+        return;
+    }
+ 
+    // Публикуем пост (бот автоматически проверит содержимое)
+    await addDoc(collection(db, "feedPosts"), {
+        uid:       user.uid,
+        text:      text.trim(),
+        createdAt: serverTimestamp(),
+        likes:     0,
+        comments:  0,
+    });
+ 
+    showToast("✅ Пост опубликован!");
+}
