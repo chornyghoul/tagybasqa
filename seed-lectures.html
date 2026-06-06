@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Seed Lectures — Tagybasqa</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0f1923;color:#e2e8f0;padding:32px 24px}
+h1{font-size:22px;font-weight:900;color:#1cb0f6;margin-bottom:6px}
+.sub{font-size:13px;color:#7a9aaa;margin-bottom:24px}
+.btn{background:#57cc02;border:none;border-bottom:3px solid #3a8c01;color:#000;padding:13px 32px;border-radius:99px;font-weight:900;font-size:15px;cursor:pointer;margin-bottom:16px}
+.btn:hover{filter:brightness(1.1)}
+.btn:disabled{opacity:.4;cursor:default}
+.progress{height:6px;background:#1a2d35;border-radius:99px;overflow:hidden;margin:10px 0 16px}
+.pf{height:100%;background:#1cb0f6;border-radius:99px;transition:width .3s;width:0}
+.log{background:#0f1923;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;font-family:monospace;font-size:12px;height:320px;overflow-y:auto;white-space:pre-wrap;color:#7a9aaa}
+.ok{color:#57cc02}.err{color:#ff4b4b}.info{color:#1cb0f6}
+.note{background:#1a2d35;border:1px solid rgba(255,217,0,.3);border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#ffd900;line-height:1.6}
+</style>
+</head>
+<body>
+<h1>📚 Заполнение коллекции lectures</h1>
+<p class="sub">Создаёт 7 полноценных лекций для плеера «Три в одном» с таймлайном, слайдами, квизами и заданиями.</p>
+<div class="note">⚡ Убедись что правила Firestore обновлены (bosses и pythonPath добавлены). Затем нажми кнопку.</div>
+<button class="btn" id="seedBtn">⚡ Создать все лекции</button>
+<div class="progress"><div class="pf" id="pf"></div></div>
+<div class="log" id="log">Готов к запуску...<br></div>
+
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import{getFirestore,collection,addDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import{getAuth,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+
+const app=initializeApp({apiKey:"AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",authDomain:"pystart-dd2db.firebaseapp.com",projectId:"pystart-dd2db",storageBucket:"pystart-dd2db.firebasestorage.app",messagingSenderId:"9188811255",appId:"1:9188811255:web:6f7280f1f7f67b80d90ef2"});
+const db=getFirestore(app);const auth=getAuth(app);let U=null;
+onAuthStateChanged(auth,u=>{U=u;log(u?`✅ ${u.email}`:'❌ Войдите на сайте',u?'ok':'err');});
+const logEl=document.getElementById('log');
+function log(m,t='info'){const d=document.createElement('div');d.className=t;d.textContent=m;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;}
+function setPf(p){document.getElementById('pf').style.width=p+'%';}
+
+const LECTURES = [
+  {
+    title:"Переменные и типы данных в Python",
+    description:"Разберём основы Python: переменные, int, float, str, bool, type(), динамическая типизация и первые программы.",
+    subject:"Python",emoji:"🐍",duration:18,level:"beginner",
+    tags:["переменные","типы данных","основы","int","str","bool"],
+    rating:4.9,studentsCount:2340,
+    videoUrl:"https://www.youtube.com/embed/kqtD5dpn9C8",
+    slides:[
+      {time:0,imageUrl:null,title:"Добро пожаловать в Python"},
+      {time:120,imageUrl:null,title:"Что такое переменная?"},
+      {time:300,imageUrl:null,title:"Типы данных: int, float, str, bool"},
+      {time:480,imageUrl:null,title:"Динамическая типизация"},
+      {time:660,imageUrl:null,title:"Практика: первые программы"},
+    ],
+    timeline:[
+      {time:45,type:"callout",icon:"💡",title:"Важно запомнить",content:"В Python не нужно объявлять тип переменной — интерпретатор определяет его автоматически при присвоении значения."},
+      {time:100,type:"code",title:"Объявление переменных",language:"python",content:"name = \"Алибек\"     # str\nage = 17            # int\ngpa = 4.8           # float\nis_student = True   # bool\n\nprint(type(name))   # <class 'str'>\nprint(type(age))    # <class 'int'>"},
+      {time:200,type:"quiz",title:"⚡ Быстрая проверка",content:"Какой тип данных у переменной x = 3.14?",options:["int","str","float","bool"],correct:2,explanation:"Числа с точкой — это float (число с плавающей запятой). int — только целые числа."},
+      {time:320,type:"text",title:"Зачем нужны типы?",content:"Тип данных определяет какие операции допустимы. Нельзя сложить строку и число без явного преобразования — Python выбросит TypeError. Это защита от ошибок."},
+      {time:420,type:"code",title:"Преобразование типов",language:"python",content:"# Явное преобразование\nnum_str = \"42\"\nnum_int = int(num_str)    # str → int\nnum_float = float(\"3.14\") # str → float\nback_str = str(100)       # int → str\n\nprint(num_int + 8)  # 50"},
+      {time:500,type:"checklist",title:"📋 Что ты уже знаешь",items:["Понимаю что такое переменная","Знаю 4 базовых типа: int, float, str, bool","Понимаю динамическую типизацию","Могу использовать type() и int(), str(), float()"]},
+      {time:600,type:"task",title:"🔧 Практика",content:"Как называется функция для проверки типа переменной в Python?",expected:"type",hint:"Это встроенная функция из 4 букв."},
+      {time:720,type:"quiz",title:"🎯 Финальный квиз",content:"Что выведет print(type(True))?",options:["<class 'int'>","<class 'bool'>","<class 'str'>","True"],correct:1,explanation:"bool — отдельный тип в Python. Хотя True == 1, тип будет именно bool, а не int."}
+    ]
+  },
+  {
+    title:"Циклы Python: for, while, range()",
+    description:"Полный разбор циклов: for по коллекциям, range() с шагом, while с условием, break/continue/else. С задачами.",
+    subject:"Python",emoji:"🔄",duration:20,level:"beginner",
+    tags:["циклы","for","while","range","break","continue"],
+    rating:4.8,studentsCount:1890,
+    videoUrl:"https://www.youtube.com/embed/94UHCEmprCY",
+    slides:[
+      {time:0,imageUrl:null,title:"Зачем нужны циклы?"},
+      {time:150,imageUrl:null,title:"Цикл for: перебор коллекций"},
+      {time:360,imageUrl:null,title:"range(): гибкая последовательность"},
+      {time:600,imageUrl:null,title:"while: пока условие истинно"},
+      {time:800,imageUrl:null,title:"break, continue, else"},
+    ],
+    timeline:[
+      {time:60,type:"callout",icon:"🔁",title:"Принцип DRY",content:"Don't Repeat Yourself — не повторяй себя. Если одно действие нужно сделать 100 раз — пиши цикл, а не 100 строк кода."},
+      {time:160,type:"code",title:"for по списку",language:"python",content:"fruits = [\"яблоко\", \"банан\", \"вишня\"]\nfor fruit in fruits:\n    print(fruit)\n\n# С enumerate — индекс + элемент\nfor i, fruit in enumerate(fruits):\n    print(f\"{i}: {fruit}\")"},
+      {time:280,type:"quiz",title:"⚡ Проверка",content:"Сколько раз выполнится тело цикла for i in range(3, 10, 2)?",options:["3","4","7","2"],correct:1,explanation:"range(3,10,2) даёт: 3, 5, 7, 9 — итого 4 значения. Стоп 10 не включается, шаг 2."},
+      {time:380,type:"code",title:"range() — три варианта",language:"python",content:"# range(stop)\nfor i in range(5):        # 0,1,2,3,4\n    print(i)\n\n# range(start, stop)\nfor i in range(2, 7):    # 2,3,4,5,6\n    print(i)\n\n# range(start, stop, step)\nfor i in range(0,20,5): # 0,5,10,15\n    print(i)"},
+      {time:500,type:"code",title:"while с break",language:"python",content:"# Поиск первого чётного делителя\nn = 27\ndivisor = 2\nwhile divisor <= n:\n    if n % divisor == 0:\n        print(f\"Первый делитель: {divisor}\")\n        break\n    divisor += 1"},
+      {time:620,type:"task",title:"🔧 Задание",content:"Какой оператор пропускает текущую итерацию и переходит к следующей?",expected:"continue",hint:"Противоположность break — не выходит из цикла, а пропускает шаг."},
+      {time:750,type:"checklist",title:"📋 Итоговый чеклист",items:["Умею использовать for по списку","Понимаю все 3 формы range()","Знаю разницу while vs for","Умею применять break и continue"]}
+    ]
+  },
+  {
+    title:"Функции Python: def, return, args",
+    description:"Создание функций, аргументы по умолчанию, *args, **kwargs, lambda. Принцип DRY и чистый код.",
+    subject:"Python",emoji:"⚙️",duration:22,level:"intermediate",
+    tags:["функции","def","return","args","kwargs","lambda"],
+    rating:4.7,studentsCount:1560,
+    videoUrl:"https://www.youtube.com/embed/9Os0o3wzS_I",
+    slides:[
+      {time:0,imageUrl:null,title:"Что такое функция?"},
+      {time:200,imageUrl:null,title:"Синтаксис def и return"},
+      {time:450,imageUrl:null,title:"Аргументы: позиционные, именованные"},
+      {time:700,imageUrl:null,title:"*args и **kwargs"},
+      {time:950,imageUrl:null,title:"lambda: анонимные функции"},
+    ],
+    timeline:[
+      {time:80,type:"callout",icon:"🏗️",title:"Функция = строительный блок",content:"Хорошая функция делает ОДНУ вещь и делает её хорошо. Принцип единственной ответственности (SRP) — основа чистого кода."},
+      {time:200,type:"code",title:"Базовая функция",language:"python",content:"def greet(name, greeting=\"Привет\"):\n    \"\"\"Приветствует пользователя.\"\"\"\n    return f\"{greeting}, {name}!\"\n\nprint(greet(\"Алибек\"))          # Привет, Алибек!\nprint(greet(\"Дана\", \"Сәлем\"))  # Сәлем, Дана!"},
+      {time:310,type:"quiz",title:"⚡ Проверка",content:"Что такое аргумент по умолчанию?",options:["Обязательный параметр","Значение при отсутствии аргумента","Тип возвращаемого значения","Имя функции"],correct:1,explanation:"Аргумент по умолчанию используется если вызывающий код не передаёт этот параметр. В примере greeting=\"Привет\" — дефолт."},
+      {time:440,type:"code",title:"*args и **kwargs",language:"python",content:"def total(*nums):\n    \"\"\"Сумма любого количества аргументов.\"\"\"\n    return sum(nums)\n\nprint(total(1, 2, 3))       # 6\nprint(total(1, 2, 3, 4, 5)) # 15\n\ndef show_info(**data):\n    for key, val in data.items():\n        print(f\"{key}: {val}\")\n\nshow_info(name=\"Алибек\", age=17)"},
+      {time:560,type:"task",title:"🔧 Задание",content:"Как называется ключевое слово для определения функции в Python?",expected:"def",hint:"Сокращение от слова 'define' (определить)."},
+      {time:680,type:"code",title:"Lambda — анонимные функции",language:"python",content:"# Обычная функция\ndef square(x):\n    return x ** 2\n\n# Lambda-эквивалент\nsquare = lambda x: x ** 2\n\n# Часто в sorted()\nnumbers = [3, 1, 4, 1, 5, 9]\nnumbers.sort(key=lambda x: -x)  # Сортировка убыванием\nprint(numbers)"},
+      {time:820,type:"quiz",title:"🎯 Финальный квиз",content:"Функция без оператора return возвращает:",options:["0","False","None","Ошибку"],correct:2,explanation:"В Python функция без явного return возвращает None — специальное значение 'ничего'."}
+    ]
+  },
+  {
+    title:"ООП Python: классы и наследование",
+    description:"Классы, экземпляры, __init__, методы, инкапсуляция, наследование, super(). Реальные примеры из практики.",
+    subject:"Python",emoji:"🏛️",duration:25,level:"advanced",
+    tags:["ООП","классы","наследование","инкапсуляция","__init__","super"],
+    rating:4.8,studentsCount:1120,
+    videoUrl:"https://www.youtube.com/embed/apACNr7DC_s",
+    slides:[
+      {time:0,imageUrl:null,title:"Что такое ООП?"},
+      {time:200,imageUrl:null,title:"Классы и экземпляры"},
+      {time:500,imageUrl:null,title:"Методы и атрибуты"},
+      {time:800,imageUrl:null,title:"Наследование"},
+      {time:1100,imageUrl:null,title:"Принципы SOLID"},
+    ],
+    timeline:[
+      {time:90,type:"callout",icon:"🏛️",title:"4 принципа ООП",content:"Инкапсуляция (скрытие деталей), Наследование (повторное использование), Полиморфизм (разное поведение), Абстракция (упрощение). Все четыре работают вместе."},
+      {time:210,type:"code",title:"Первый класс",language:"python",content:"class Student:\n    school = \"Tagybasqa\"  # атрибут класса\n    \n    def __init__(self, name, grade):\n        self.name = name    # атрибут экземпляра\n        self.grade = grade\n    \n    def introduce(self):\n        return f\"Я {self.name}, {self.grade} класс\"\n\ns = Student(\"Алибек\", 11)\nprint(s.introduce())     # Я Алибек, 11 класс\nprint(s.school)          # Tagybasqa"},
+      {time:350,type:"quiz",title:"⚡ Проверка",content:"Что делает метод __init__?",options:["Удаляет объект","Инициализирует атрибуты экземпляра","Копирует класс","Выводит объект на экран"],correct:1,explanation:"__init__ вызывается автоматически при создании объекта. self — ссылка на сам объект."},
+      {time:500,type:"code",title:"Наследование",language:"python",content:"class PremiumStudent(Student):\n    def __init__(self, name, grade, mentor):\n        super().__init__(name, grade)  # вызов родителя\n        self.mentor = mentor\n    \n    def introduce(self):\n        base = super().introduce()\n        return f\"{base}, ментор: {self.mentor}\"\n\nps = PremiumStudent(\"Дана\", 10, \"Dr.Жаксыбеков\")\nprint(ps.introduce())"},
+      {time:650,type:"task",title:"🔧 Задание",content:"Какая функция используется для вызова метода родительского класса?",expected:"super",hint:"Эта функция возвращает прокси-объект родительского класса."},
+      {time:800,type:"code",title:"Инкапсуляция",language:"python",content:"class BankAccount:\n    def __init__(self, balance):\n        self.__balance = balance  # приватный атрибут\n    \n    def deposit(self, amount):\n        if amount > 0:\n            self.__balance += amount\n    \n    def get_balance(self):\n        return self.__balance\n\nacc = BankAccount(1000)\nacc.deposit(500)\nprint(acc.get_balance())  # 1500"},
+      {time:950,type:"checklist",title:"📋 Итог",items:["Умею создавать классы с __init__","Понимаю разницу атрибута класса и экземпляра","Умею наследовать и использовать super()","Понимаю инкапсуляцию через __приватные атрибуты"]}
+    ]
+  },
+  {
+    title:"JavaScript: DOM, события и Fetch API",
+    description:"Манипуляции с DOM, обработка событий, fetch + async/await, работа с JSON. Строим живую страницу.",
+    subject:"JavaScript",emoji:"⚡",duration:24,level:"intermediate",
+    tags:["DOM","события","fetch","async","await","JSON"],
+    rating:4.7,studentsCount:1680,
+    videoUrl:"https://www.youtube.com/embed/5fb2aPlgoys",
+    slides:[
+      {time:0,imageUrl:null,title:"DOM — дерево документа"},
+      {time:200,imageUrl:null,title:"querySelector и classList"},
+      {time:480,imageUrl:null,title:"addEventListener — обработчики"},
+      {time:750,imageUrl:null,title:"Fetch API и async/await"},
+    ],
+    timeline:[
+      {time:80,type:"callout",icon:"🌳",title:"DOM — это API браузера",content:"DOM (Document Object Model) — программный интерфейс для HTML. JS может читать, изменять, добавлять и удалять любой элемент страницы в реальном времени."},
+      {time:200,type:"code",title:"Поиск и изменение элементов",language:"javascript",content:"// Найти элемент\nconst btn = document.querySelector('#myBtn');\nconst items = document.querySelectorAll('.item');\n\n// Изменить содержимое\nbtn.textContent = 'Нажми меня!';\nbtn.style.background = '#1cb0f6';\nbtn.classList.add('active');\nbtn.classList.toggle('hidden');"},
+      {time:320,type:"quiz",title:"⚡ Проверка",content:"Какой метод находит ВСЕ совпадающие элементы?",options:["getElementById","querySelector","querySelectorAll","getElement"],correct:2,explanation:"querySelectorAll возвращает NodeList всех совпадений. querySelector — только первый."},
+      {time:480,type:"code",title:"Обработчики событий",language:"javascript",content:"const btn = document.querySelector('#btn');\n\nbtn.addEventListener('click', (event) => {\n    event.preventDefault(); // отменить стандартное\n    console.log('Нажато!', event.target);\n    btn.textContent = 'Нажато ✓';\n    btn.disabled = true;\n});\n\n// Делегирование событий\ndocument.querySelector('.list').addEventListener('click', e => {\n    if (e.target.matches('li')) console.log(e.target.textContent);\n});"},
+      {time:620,type:"task",title:"🔧 Задание",content:"Каким методом объекта элемента добавляют обработчик события?",expected:"addEventListener",hint:"add + Event + Listener — три слова слитно, camelCase."},
+      {time:760,type:"code",title:"Fetch API + async/await",language:"javascript",content:"async function loadPosts() {\n    try {\n        const response = await fetch(\n            'https://jsonplaceholder.typicode.com/posts'\n        );\n        const posts = await response.json();\n        \n        posts.slice(0, 3).forEach(post => {\n            console.log(post.title);\n        });\n    } catch (error) {\n        console.error('Ошибка:', error);\n    }\n}\n\nloadPosts();"},
+      {time:900,type:"quiz",title:"🎯 Финальный квиз",content:"Что возвращает async функция?",options:["Обычное значение","Promise","undefined","Object"],correct:1,explanation:"Любая async функция автоматически оборачивает возвращаемое значение в Promise."}
+    ]
+  },
+  {
+    title:"Алгоритмы: сортировки и Big O",
+    description:"Bubble Sort, Quick Sort, Merge Sort. Нотация Big O, сравнение алгоритмов, визуальный разбор с кодом.",
+    subject:"Алгоритмы",emoji:"🧠",duration:22,level:"intermediate",
+    tags:["сортировка","big-o","алгоритмы","bubble-sort","quick-sort","merge-sort"],
+    rating:4.9,studentsCount:1180,
+    videoUrl:"https://www.youtube.com/embed/g-PGLbMth_g",
+    slides:[
+      {time:0,imageUrl:null,title:"Зачем нужна сортировка?"},
+      {time:150,imageUrl:null,title:"Big O: оценка сложности"},
+      {time:400,imageUrl:null,title:"Bubble Sort: O(n²)"},
+      {time:700,imageUrl:null,title:"Quick Sort: O(n log n)"},
+      {time:950,imageUrl:null,title:"Merge Sort: стабильная O(n log n)"},
+    ],
+    timeline:[
+      {time:60,type:"callout",icon:"📊",title:"Big O — язык алгоритмов",content:"O(1) — константа. O(log n) — логарифм. O(n) — линейный. O(n log n) — линейно-логарифмический. O(n²) — квадратичный. Чем ниже в списке, тем хуже при больших данных."},
+      {time:200,type:"code",title:"Bubble Sort",language:"python",content:"def bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(0, n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\n\nprint(bubble_sort([64,34,25,12,22,11,90]))"},
+      {time:310,type:"quiz",title:"⚡ Big O Bubble Sort",content:"Какова сложность Bubble Sort в худшем случае?",options:["O(n)","O(n log n)","O(n²)","O(1)"],correct:2,explanation:"Два вложенных цикла дают квадратичную сложность O(n²). При n=1000 это 1 млн операций."},
+      {time:450,type:"code",title:"Quick Sort",language:"python",content:"def quick_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    mid  = [x for x in arr if x == pivot]\n    right= [x for x in arr if x > pivot]\n    return quick_sort(left) + mid + quick_sort(right)\n\nprint(quick_sort([3,6,8,10,1,2,1]))"},
+      {time:580,type:"task",title:"🔧 Задание",content:"Какой алгоритм сортировки использует принцип 'разделяй и властвуй' и называется 'быстрая сортировка'?",expected:"quick sort",hint:"На английском: quick + sort."},
+      {time:720,type:"code",title:"Сравнение на больших данных",language:"python",content:"import time, random\n\ndata = random.sample(range(100000), 10000)\n\n# Встроенная сортировка Python (Timsort = O(n log n))\nstart = time.time()\nsorted(data)\nprint(f\"Python sort: {time.time()-start:.4f}s\")\n\n# Bubble Sort будет в ~1000 раз медленнее на таких данных"},
+      {time:870,type:"checklist",title:"📋 Итог",items:["Понимаю нотацию Big O","Знаю как работает Bubble Sort (O n²)","Понимаю Quick Sort и его преимущество","Знаю что Python использует Timsort"]}
+    ]
+  },
+  {
+    title:"CSS Grid и Flexbox: современные раскладки",
+    description:"Две главные системы раскладки CSS. Grid для двумерных сеток, Flexbox для одномерных линий. Реальные примеры.",
+    subject:"Фронтенд",emoji:"🎨",duration:20,level:"beginner",
+    tags:["css","grid","flexbox","layout","адаптивность","вёрстка"],
+    rating:4.6,studentsCount:3120,
+    videoUrl:"https://www.youtube.com/embed/T-slCsOrLcc",
+    slides:[
+      {time:0,imageUrl:null,title:"Зачем системы раскладки?"},
+      {time:150,imageUrl:null,title:"Flexbox: главная и поперечная ось"},
+      {time:380,imageUrl:null,title:"CSS Grid: строки и колонки"},
+      {time:680,imageUrl:null,title:"Адаптивность: auto-fill и minmax"},
+      {time:900,imageUrl:null,title:"Когда Grid, когда Flexbox?"},
+    ],
+    timeline:[
+      {time:60,type:"callout",icon:"📐",title:"Главное отличие",content:"Flexbox — одномерный (ИЛИ строка, ИЛИ колонка). Grid — двумерный (строки И колонки одновременно). Выбирай инструмент под задачу."},
+      {time:160,type:"code",title:"Flexbox: центрирование",language:"css",content:".container {\n  display: flex;\n  justify-content: center; /* по горизонтали */\n  align-items: center;     /* по вертикали */\n  gap: 16px;               /* расстояние между */\n  flex-wrap: wrap;         /* перенос на новую строку */\n}"},
+      {time:280,type:"quiz",title:"⚡ Проверка",content:"justify-content управляет выравниванием по...",options:["Вертикальной оси","Главной оси (обычно горизонтально)","Обоим осям","Z-оси"],correct:1,explanation:"justify-content — главная ось. align-items — поперечная ось. В row-direction: justify = горизонталь."},
+      {time:400,type:"code",title:"CSS Grid: базовые сетки",language:"css",content:".grid {\n  display: grid;\n  grid-template-columns: 1fr 2fr 1fr; /* 3 колонки\n  gap: 20px;\n}\n\n/* Адаптивная сетка */\n.auto-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));\n  gap: 16px;\n}"},
+      {time:520,type:"task",title:"🔧 Задание",content:"Какое CSS-свойство задаёт расстояние между элементами в Flex/Grid?",expected:"gap",hint:"Современное свойство, замена margin между элементами. 3 буквы."},
+      {time:640,type:"code",title:"Grid: grid-area и шаблоны",language:"css",content:".layout {\n  display: grid;\n  grid-template-areas:\n    'header header'\n    'sidebar main'\n    'footer footer';\n  grid-template-columns: 250px 1fr;\n}\n.header  { grid-area: header; }\n.sidebar { grid-area: sidebar; }\n.main    { grid-area: main; }\n.footer  { grid-area: footer; }"},
+      {time:800,type:"checklist",title:"📋 Итог",items:["Знаю разницу Flexbox vs Grid","Умею центрировать через Flexbox","Умею создавать адаптивную Grid-сетку","Знаю grid-area для именованных областей"]}
+    ]
+  }
+];
+
+document.getElementById('seedBtn').addEventListener('click', async()=>{
+  if(!U){log('❌ Войдите в аккаунт!','err');return;}
+  const btn=document.getElementById('seedBtn');
+  btn.disabled=true;btn.textContent='⏳ Создаю...';
+  let ok=0;
+  for(let i=0;i<LECTURES.length;i++){
+    const lec=LECTURES[i];
+    try{
+      await addDoc(collection(db,'lectures'),{...lec,uid:U.uid,createdAt:serverTimestamp()});
+      ok++;log(`✓ ${lec.title}`,'ok');
+    }catch(e){log(`✗ ${lec.title}: ${e.message}`,'err');}
+    setPf(Math.round((i+1)/LECTURES.length*100));
+  }
+  btn.textContent=`🎉 Готово! ${ok}/${LECTURES.length} лекций`;
+  btn.style.background='#57cc02';
+  log(`\n✅ Создано ${ok} лекций. Обнови страницу Tagybasqa!`,'ok');
+});
+</script>
+</body>
+</html>
