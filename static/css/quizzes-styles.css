@@ -1,688 +1,291 @@
-/* ═══════════════════════════════════════════════════════════════
-   QUIZZES — согласован с дизайн-системой Tagybasqa (styles.css)
-   Использует только CSS-переменные из :root основного файла.
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   QUIZZES — Minimal
+   Зависит от переменных в styles.css
+   ═══════════════════════════════════════════════ */
 
-/* ══ КАРТОЧКИ БОССОВ ════════════════════════════════════════ */
-
+/* ── КАРТОЧКИ БОССОВ ── */
 .boss-card {
   background: var(--bg2);
-  border: 2px solid var(--border2);
+  border: 1px solid var(--border);
   border-radius: var(--r2);
-  padding: 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  transition: transform .15s, box-shadow .15s, border-color .15s;
-  position: relative;
-  overflow: hidden;
+  gap: 12px;
+  transition: border-color var(--transition);
 }
+.boss-card:hover { border-color: var(--border3) }
+.boss-card.boss-locked { opacity: .5; pointer-events: none }
 
-.boss-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 32px rgba(0,0,0,.35);
-  border-color: var(--duo-blue);
-}
-
-.boss-card.boss-locked {
-  opacity: .55;
-  filter: grayscale(.5);
-}
-
-.boss-header {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-}
-
+.boss-header { display: flex; gap: 12px; align-items: flex-start }
 .boss-avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: var(--r);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  flex-shrink: 0;
-  background: var(--bg3);
-  border: 2px solid var(--border2);
+  width: 44px; height: 44px; border-radius: var(--r);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+  background: var(--bg4); border: 1px solid var(--border);
 }
-
 .boss-info { flex: 1; min-width: 0 }
-
 .boss-label {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: .12em;
-  margin-bottom: 4px;
+  font-family: var(--mono); font-size: 9px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .1em; margin-bottom: 3px;
 }
-
-.boss-name {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.2;
-  margin-bottom: 3px;
-}
-
-.boss-sub {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text3);
-  line-height: 1.4;
-}
-
-.boss-meta {
-  display: flex;
-  gap: 14px;
-}
+.boss-name  { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.2; margin-bottom: 3px }
+.boss-sub   { font-family: var(--mono); font-size: 10px; color: var(--text3); line-height: 1.4 }
+.boss-meta  { display: flex; gap: 12px }
 
 .boss-hp-track {
-  width: 100%;
-  height: 5px;
-  background: var(--bg4);
-  border-radius: 99px;
-  overflow: hidden;
+  width: 100%; height: 3px;
+  background: var(--bg4); border-radius: 2px; overflow: hidden;
 }
-
 .boss-hp-fill {
-  height: 100%;
-  background: var(--duo-red);
-  border-radius: 99px;
-  transition: width .5s cubic-bezier(.4,0,.2,1);
+  height: 100%; background: var(--red); border-radius: 2px;
+  transition: width .5s ease;
 }
 
 .boss-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-  gap: 10px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 10px; border-top: 1px solid var(--border); gap: 8px;
 }
-
 .boss-reward {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--duo-yellow);
-  font-weight: 700;
+  font-family: var(--mono); font-size: 10px; color: var(--gold);
 }
 
-/* Кнопки в карточке босса — Duolingo-стиль */
 .boss-btn {
-  padding: 8px 16px;
-  border-radius: var(--r3);
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: filter .15s, transform .1s;
-  border: none;
-  white-space: nowrap;
-  letter-spacing: .02em;
+  padding: 7px 14px; border-radius: var(--r);
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: opacity var(--transition);
+  border: none; white-space: nowrap;
 }
+.boss-btn-fight  { background: var(--text); color: var(--bg) }
+.boss-btn-fight:hover  { opacity: .85 }
+.boss-btn-repeat { background: var(--green); color: #fff }
+.boss-btn-repeat:hover { opacity: .85 }
+.boss-btn-locked { background: transparent; color: var(--text3); border: 1px solid var(--border2); cursor: not-allowed }
 
-.boss-btn-fight {
-  background: var(--duo-blue);
-  color: #fff;
-  border-bottom: 3px solid var(--duo-blue2);
-}
-.boss-btn-fight:hover  { filter: brightness(1.1) }
-.boss-btn-fight:active { transform: translateY(2px); border-bottom-width: 1px }
-
-.boss-btn-repeat {
-  background: var(--duo-green);
-  color: #fff;
-  border-bottom: 3px solid var(--duo-green2);
-}
-.boss-btn-repeat:hover  { filter: brightness(1.1) }
-.boss-btn-repeat:active { transform: translateY(2px); border-bottom-width: 1px }
-
-.boss-btn-locked {
-  background: transparent;
-  color: var(--text3);
-  border: 2px solid var(--border2);
-  cursor: not-allowed;
-}
-
-/* Глобальные статы боссов */
+/* ── ГЛОБАЛЬНЫЕ СТАТЫ БОССОВ ── */
 .boss-global-stats {
-  display: flex;
-  gap: 1px;
-  background: var(--border);
-  border-radius: var(--r);
-  overflow: hidden;
-  margin-bottom: 20px;
+  display: flex; gap: 1px;
+  background: var(--border); border-radius: var(--r);
+  overflow: hidden; margin-bottom: 16px;
 }
-
-.bgs-chip {
-  flex: 1;
-  background: var(--bg2);
-  padding: 12px 8px;
-  text-align: center;
-}
-
+.bgs-chip { flex: 1; background: var(--bg2); padding: 10px 8px; text-align: center }
 .bgs-num {
-  display: block;
-  font-size: 20px;
-  font-weight: 900;
-  color: var(--duo-blue);
-  line-height: 1;
-  margin-bottom: 3px;
-}
-
-.bgs-lbl {
+  display: block; font-size: 18px; font-weight: 500;
+  color: var(--text); line-height: 1; margin-bottom: 2px;
   font-family: var(--mono);
-  font-size: 9px;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: .1em;
 }
+.bgs-lbl { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em }
 
-/* ══ ИСПЫТАНИЯ (CHALLENGE ROWS) ═══════════════════════════ */
-
+/* ── ИСПЫТАНИЯ ── */
 .challenge-row {
-  background: var(--bg2);
-  border: 2px solid var(--border2);
-  padding: 13px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: transform .15s, border-color .15s, box-shadow .15s;
-  border-radius: var(--r);
-  margin-bottom: 8px;
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 11px 14px; display: flex; justify-content: space-between;
+  align-items: center; cursor: pointer;
+  transition: border-color var(--transition);
+  border-radius: var(--r); margin-bottom: 6px;
 }
-
-.challenge-row:hover {
-  border-color: var(--duo-blue);
-  transform: translateX(3px);
-  box-shadow: 0 4px 16px rgba(0,0,0,.2);
-}
+.challenge-row:hover { border-color: var(--border3) }
 
 .challenge-badge {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 8px;
-  font-weight: 800;
-  background: rgba(255,150,0,.15);
-  color: var(--duo-orange);
-  border: 1px solid rgba(255,150,0,.3);
-  padding: 2px 6px;
-  border-radius: 99px;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  margin-left: 6px;
-  vertical-align: middle;
+  display: inline-block; font-family: var(--mono); font-size: 8px;
+  background: rgba(224,140,69,.1); color: var(--clr-orange);
+  border: 1px solid rgba(224,140,69,.2); padding: 2px 6px;
+  border-radius: var(--r3); text-transform: uppercase;
+  letter-spacing: .08em; margin-left: 6px; vertical-align: middle;
 }
 
 .challenge-btn {
-  background: var(--duo-green);
-  color: #fff;
-  border: none;
-  border-bottom: 3px solid var(--duo-green2);
-  padding: 7px 16px;
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  border-radius: var(--r3);
-  transition: filter .15s, transform .1s;
-  white-space: nowrap;
-  letter-spacing: .02em;
+  background: var(--green); color: #fff; border: none;
+  padding: 6px 14px; font-family: var(--font); font-size: 12px;
+  font-weight: 500; cursor: pointer; border-radius: var(--r);
+  transition: opacity var(--transition); white-space: nowrap;
 }
-.challenge-btn:hover  { filter: brightness(1.1) }
-.challenge-btn:active { transform: translateY(2px); border-bottom-width: 1px }
+.challenge-btn:hover { opacity: .85 }
 
-/* ══ PIN-ВВОД ═════════════════════════════════════════════ */
-
+/* ── PIN-ВВОД ── */
 .qz-pin-card {
-  background: var(--bg2);
-  border: 2px solid var(--border2);
-  border-radius: var(--r2);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
-
-.qz-pin-digits {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
+.qz-pin-digits { display: flex; gap: 6px; justify-content: center }
 .qz-pin-digit {
-  width: 42px;
-  height: 52px;
-  background: var(--bg3);
-  border: 2px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 900;
-  font-family: var(--mono);
-  border-radius: var(--r);
-  transition: border-color .15s;
-  color: var(--text);
-  user-select: none;
+  width: 40px; height: 48px; background: var(--bg3);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 500; font-family: var(--mono);
+  border-radius: var(--r); transition: border-color var(--transition);
+  color: var(--text); user-select: none;
 }
+.qz-pin-digit-active { border-color: var(--border3) }
 
-.qz-pin-digit-active {
-  border-color: var(--duo-blue);
-  background: var(--bg);
-  box-shadow: 0 0 0 3px rgba(28,176,246,.15);
-}
-
-.quiz-pin-input {
-  width: 100%;
-  background: var(--bg3);
-  border: 2px solid var(--border2);
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 22px;
-  font-weight: 800;
-  padding: 12px 16px;
-  text-align: center;
-  letter-spacing: 6px;
-  border-radius: var(--r);
-  outline: none;
-  transition: border-color .15s;
-  max-width: 280px;
-}
-.quiz-pin-input:focus { border-color: var(--duo-blue) }
-
-.quiz-pin-btn {
-  width: 100%;
-  max-width: 280px;
-  background: var(--duo-blue);
-  color: #fff;
-  border: none;
-  border-bottom: 3px solid var(--duo-blue2);
-  padding: 13px;
-  border-radius: var(--r3);
-  font-family: var(--font);
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: filter .15s, transform .1s;
-  letter-spacing: .02em;
-}
-.quiz-pin-btn:hover  { filter: brightness(1.1) }
-.quiz-pin-btn:active { transform: translateY(2px); border-bottom-width: 1px }
-
-/* ══ МОИ КВИЗЫ — хедер и фильтры ══════════════════════════ */
-
+/* ── МОИ КВИЗЫ ХЕДЕР ── */
 .quiz-my-header {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  justify-content: space-between;
-  background: var(--bg-blur);
-  backdrop-filter: blur(20px);
-  position: sticky;
-  top: 49px; /* высота quiz-action-bar */
-  z-index: 9;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 8px; justify-content: space-between;
+  background: var(--bg-blur); backdrop-filter: blur(16px);
+  position: sticky; top: 49px; z-index: 9;
 }
+.quiz-my-header-title { font-size: 13px; font-weight: 500; color: var(--text) }
 
-.quiz-my-header-title {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--text);
-  letter-spacing: .02em;
-}
-
-.qz-filter-row {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
+.qz-filter-row { display: flex; gap: 5px; flex-wrap: wrap }
 .qz-filter-tag {
-  background: var(--bg2);
-  border: 2px solid var(--border2);
-  color: var(--text3);
-  padding: 5px 14px;
-  border-radius: var(--r3);
-  font-family: var(--font);
-  font-size: 11px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all .15s;
-  letter-spacing: .02em;
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text3); padding: 4px 12px; border-radius: var(--r3);
+  font-family: var(--font); font-size: 11px; font-weight: 400;
+  cursor: pointer; transition: all var(--transition);
 }
 .qz-filter-tag:hover { border-color: var(--border3); color: var(--text2) }
-.qz-filter-tag.active {
-  background: var(--duo-blue);
-  color: #fff;
-  border-color: var(--duo-blue);
-  box-shadow: 0 2px 10px rgba(28,176,246,.35);
-}
+.qz-filter-tag.active { background: var(--text); color: var(--bg); border-color: var(--text) }
 
 .quiz-search-bar {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: var(--bg2);
-  border: 2px solid var(--border2);
-  border-radius: var(--r3);
-  padding: 5px 12px;
-  transition: border-color .15s;
+  display: flex; align-items: center; gap: 7px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 5px 10px;
+  transition: border-color var(--transition);
 }
-.quiz-search-bar:focus-within { border-color: var(--duo-blue) }
-.quiz-search-bar svg {
-  width: 13px; height: 13px;
-  color: var(--text3); flex-shrink: 0;
-  fill: none; stroke: currentColor; stroke-width: 2;
-}
+.quiz-search-bar:focus-within { border-color: var(--border3) }
+.quiz-search-bar svg { width: 12px; height: 12px; color: var(--text3); flex-shrink: 0 }
 .quiz-search-bar input {
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 600;
-  outline: none;
-  width: 120px;
+  background: transparent; border: none; color: var(--text);
+  font-family: var(--font); font-size: 12px; outline: none; width: 120px;
 }
 .quiz-search-bar input::placeholder { color: var(--text3) }
 
 .qz-sort-select {
-  background: var(--bg2);
-  border: 2px solid var(--border2);
-  color: var(--text2);
-  padding: 5px 10px;
-  border-radius: var(--r3);
-  font-family: var(--font);
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  outline: none;
-  transition: border-color .15s;
+  background: var(--bg3); border: 1px solid var(--border2); color: var(--text2);
+  padding: 5px 10px; border-radius: var(--r);
+  font-family: var(--font); font-size: 11px;
+  cursor: pointer; outline: none; transition: border-color var(--transition);
 }
-.qz-sort-select:focus { border-color: var(--duo-blue) }
+.qz-sort-select:focus { border-color: var(--border3) }
 
-/* Стрип статистики (используется в "Мои квизы" и "Создать") */
+/* ── СТАТ СТРИП ── */
 .qz-stats-strip {
-  display: flex;
-  gap: 1px;
-  background: var(--border);
-  border-radius: var(--r);
-  overflow: hidden;
-  margin-bottom: 20px;
+  display: flex; gap: 1px; background: var(--border);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 16px;
 }
-.qz-stat {
-  flex: 1;
-  background: var(--bg2);
-  padding: 12px 8px;
-  text-align: center;
-}
+.qz-stat { flex: 1; background: var(--bg2); padding: 10px 8px; text-align: center }
 .qz-stat-num {
-  display: block;
-  font-size: 20px;
-  font-weight: 900;
-  color: var(--duo-blue);
-  line-height: 1;
-  margin-bottom: 3px;
+  display: block; font-size: 18px; font-weight: 500;
+  color: var(--text); line-height: 1; margin-bottom: 2px; font-family: var(--mono);
 }
-.qz-stat-lbl {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: .1em;
-}
+.qz-stat-lbl { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em }
 
-/* Чипы статистики в панели "Мои квизы" */
-.quiz-stats-row {
-  display: flex;
-  gap: 1px;
-  background: var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.quiz-stat-chip {
-  flex: 1;
-  background: var(--bg2);
-  padding: 10px 6px;
-  text-align: center;
-}
-.quiz-stat-num {
-  display: block;
-  font-size: 18px;
-  font-weight: 900;
-  color: var(--duo-blue);
-  line-height: 1;
-  margin-bottom: 2px;
-}
-.quiz-stat-lbl {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: .1em;
-}
+.quiz-stats-row { display: flex; gap: 1px; background: var(--border); border-bottom: 1px solid var(--border) }
+.quiz-stat-chip { flex: 1; background: var(--bg2); padding: 10px 6px; text-align: center }
+.quiz-stat-num  { display: block; font-size: 16px; font-weight: 500; color: var(--text); font-family: var(--mono); line-height: 1; margin-bottom: 2px }
+.quiz-stat-lbl  { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em }
 
-/* Карточка квиза (qz-card) — наследует .course-card из styles.css,
-   здесь только дополнительные элементы внутри */
+/* ── AI БЕЙДЖ ── */
 .qz-ai-badge {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 8px;
-  font-weight: 800;
-  background: rgba(206,130,255,.12);
-  color: var(--duo-purple);
-  border: 1px solid rgba(206,130,255,.3);
-  padding: 2px 7px;
-  border-radius: 99px;
-  text-transform: uppercase;
-  letter-spacing: .08em;
+  display: inline-block; font-family: var(--mono); font-size: 8px;
+  background: rgba(155,127,232,.1); color: var(--clr-purple);
+  border: 1px solid rgba(155,127,232,.2); padding: 2px 6px;
+  border-radius: var(--r3); text-transform: uppercase; letter-spacing: .08em;
   vertical-align: middle;
 }
 
+/* ── СТАТУС ДОТ ── */
 .status-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  display: inline-block;
+  width: 6px; height: 6px; border-radius: 50%;
+  flex-shrink: 0; display: inline-block;
 }
-.status-dot.published { background: var(--duo-green); box-shadow: 0 0 5px rgba(87,204,2,.5) }
-.status-dot.draft     { background: var(--duo-orange) }
+.status-dot.published { background: var(--green) }
+.status-dot.draft     { background: var(--clr-orange) }
 
+/* ── КНОПКА УДАЛЕНИЯ ── */
 .delete-course-btn {
-  background: transparent;
-  border: none;
-  color: var(--text3);
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--r);
-  transition: color .15s, background .15s;
+  background: transparent; border: none; color: var(--text3);
+  cursor: pointer; padding: 4px; display: flex; align-items: center;
+  justify-content: center; border-radius: var(--r);
+  transition: color var(--transition), background var(--transition);
 }
-.delete-course-btn:hover {
-  color: var(--duo-red);
-  background: var(--red-bg);
-}
+.delete-course-btn:hover { color: var(--red); background: var(--red-bg) }
 
 .qz-loading {
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text3);
-  padding: 32px 16px;
+  text-align: center; font-family: var(--mono); font-size: 11px;
+  color: var(--text3); padding: 28px 16px;
 }
 
-/* ══ СОЗДАТЬ КВИЗ — опции ══════════════════════════════════ */
-
+/* ── СОЗДАТЬ КВИЗ ── */
 .quiz-create-options {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
 }
-
 .quiz-create-option {
-  background: var(--bg2);
-  border: 2px solid var(--border2);
-  border-radius: var(--r2);
-  padding: 20px 18px;
-  cursor: pointer;
-  text-align: left;
-  transition: transform .15s, border-color .15s, box-shadow .15s;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  position: relative;
-  overflow: hidden;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 16px 14px; cursor: pointer;
+  text-align: left; transition: border-color var(--transition), transform var(--transition);
+  display: flex; flex-direction: column; gap: 5px; position: relative;
 }
-.quiz-create-option:hover {
-  transform: translateY(-3px);
-  border-color: var(--duo-blue);
-  box-shadow: 0 8px 24px rgba(0,0,0,.25);
-}
+.quiz-create-option:hover { border-color: var(--border3); transform: translateY(-1px) }
 
-.qco-icon {
-  font-size: 26px;
-  margin-bottom: 4px;
-}
-.qco-title {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--text);
-}
-.qco-desc {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text3);
-  line-height: 1.5;
-}
+.qco-icon  { font-size: 22px; margin-bottom: 3px }
+.qco-title { font-size: 13px; font-weight: 500; color: var(--text) }
+.qco-desc  { font-family: var(--mono); font-size: 10px; color: var(--text3); line-height: 1.5 }
 .qco-badge-ai {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  font-family: var(--mono);
-  font-size: 8px;
-  font-weight: 800;
-  background: rgba(206,130,255,.15);
-  color: var(--duo-purple);
-  border: 1px solid rgba(206,130,255,.3);
-  padding: 2px 8px;
-  border-radius: 99px;
-  text-transform: uppercase;
-  letter-spacing: .08em;
+  position: absolute; top: 10px; right: 10px;
+  font-family: var(--mono); font-size: 8px;
+  background: rgba(155,127,232,.1); color: var(--clr-purple);
+  border: 1px solid rgba(155,127,232,.2); padding: 2px 6px;
+  border-radius: var(--r3); text-transform: uppercase; letter-spacing: .08em;
 }
 
-/* ══ ИИ-КВИЗ — выбор модели ════════════════════════════════ */
-
+/* ── ВЫБОР МОДЕЛИ ── */
 .model-btn {
-  flex: 1;
-  min-width: 130px;
-  padding: 10px 14px;
-  border-radius: var(--r);
-  border: 2px solid var(--border2);
-  background: var(--bg2);
-  color: var(--text2);
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all .15s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  text-align: center;
+  flex: 1; min-width: 130px; padding: 9px 12px; border-radius: var(--r);
+  border: 1px solid var(--border2); background: var(--bg2);
+  color: var(--text2); font-family: var(--font); font-size: 12px; font-weight: 400;
+  cursor: pointer; transition: all var(--transition);
+  display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center;
 }
-.model-btn:hover {
-  border-color: var(--border3);
-  background: var(--bg3);
-  color: var(--text);
-}
-.model-btn.active {
-  background: var(--duo-blue);
-  color: #fff;
-  border-color: var(--duo-blue2);
-  border-bottom-width: 3px;
-  box-shadow: 0 4px 16px rgba(28,176,246,.35);
-}
+.model-btn:hover { border-color: var(--border3); background: var(--bg3); color: var(--text) }
+.model-btn.active { background: var(--text); color: var(--bg); border-color: var(--text) }
 .model-btn small {
-  font-family: var(--mono);
-  font-size: 9px;
-  opacity: .7;
-  text-transform: uppercase;
-  letter-spacing: .06em;
+  font-family: var(--mono); font-size: 9px; opacity: .6;
+  text-transform: uppercase; letter-spacing: .06em;
 }
 
-/* ══ АНАЛИТИКА ══════════════════════════════════════════════ */
-
+/* ── АНАЛИТИКА ── */
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 10px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px; margin-bottom: 16px;
 }
-
 .analytics-stat {
-  background: var(--bg2);
-  border: 2px solid var(--border2);
-  padding: 14px 10px;
-  border-radius: var(--r2);
-  text-align: center;
-  transition: border-color .15s;
+  background: var(--bg3); border: 1px solid var(--border);
+  padding: 12px 10px; border-radius: var(--r); text-align: center;
+  transition: border-color var(--transition);
 }
 .analytics-stat:hover { border-color: var(--border3) }
-
 .analytics-stat-value {
-  font-size: 28px;
-  font-weight: 900;
-  color: var(--duo-blue);
-  line-height: 1;
-  margin-bottom: 4px;
+  font-size: 24px; font-weight: 500; color: var(--text);
+  line-height: 1; margin-bottom: 3px; font-family: var(--mono);
 }
-.analytics-stat-label {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: .1em;
-}
+.analytics-stat-label { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .1em }
 
 .analytics-chart {
-  background: var(--bg2);
-  border: 2px solid var(--border2);
-  padding: 18px;
-  border-radius: var(--r2);
-  margin-bottom: 16px;
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 16px; border-radius: var(--r2); margin-bottom: 12px;
 }
 
-/* ══ АДАПТИВ ════════════════════════════════════════════════ */
-
+/* ── АДАПТИВ ── */
 @media (max-width: 768px) {
-  .boss-card { padding: 14px; gap: 10px }
-  .boss-avatar { width: 44px; height: 44px; font-size: 22px }
-  .boss-footer { flex-direction: column; align-items: flex-start; gap: 8px }
-  .boss-btn { width: 100%; text-align: center; justify-content: center; padding: 10px }
-
+  .boss-card { padding: 12px; gap: 10px }
+  .boss-avatar { width: 38px; height: 38px; font-size: 18px }
+  .boss-footer { flex-direction: column; align-items: flex-start; gap: 6px }
+  .boss-btn { width: 100%; text-align: center; padding: 9px }
   .quiz-create-options { grid-template-columns: 1fr }
   .model-btn { width: 100%; min-width: unset }
-
   .analytics-grid { grid-template-columns: repeat(2, 1fr) }
-
-  .qz-pin-digits { gap: 6px }
-  .qz-pin-digit { width: 36px; height: 46px; font-size: 18px }
-
-  .quiz-my-header { top: 49px }
+  .qz-pin-digits { gap: 5px }
+  .qz-pin-digit { width: 34px; height: 42px; font-size: 17px }
 }
 
 @media (max-width: 480px) {
-  .boss-avatar { width: 40px; height: 40px; font-size: 18px }
   .analytics-grid { grid-template-columns: 1fr }
   .qz-stats-strip { flex-wrap: wrap }
   .qz-stat { min-width: 80px }

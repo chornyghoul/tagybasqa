@@ -1,0 +1,481 @@
+/* ═══════════════════════════════════════════════════════════════
+   TAGYBASQA — mobile.css
+   Полная мобильная адаптация (подключать ПОСЛЕ styles.css)
+   Поддержка: 320px – 767px (мобильные)
+              768px – 1099px (планшеты)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── ОБЩИЕ ИСПРАВЛЕНИЯ ── */
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation }
+img  { max-width: 100%; height: auto }
+textarea, input, select { font-size: 16px !important } /* предотвращает zoom на iOS */
+
+/* ══════════════════════════════════════
+   ПЛАНШЕТ 768–1099px
+   ══════════════════════════════════════ */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .app-container { grid-template-columns: 200px 1fr }
+  .right-sidebar  { display: none }
+  .sidebar-left   { padding: 16px 8px }
+  .logo-mark      { font-size: 18px }
+  .nav-item       { font-size: 12px; padding: 10px 12px }
+
+  /* Курсы */
+  .courses-grid { grid-template-columns: repeat(2, 1fr) }
+
+  /* Карточки уроков */
+  #allLessonsGrid, #myLessonsGrid,
+  .story-lessons-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 16px;
+    gap: 12px;
+  }
+
+  /* Урок/курс */
+  .course-layout   { grid-template-columns: 280px 1fr }
+  .lesson-layout   { grid-template-columns: 1fr }
+}
+
+/* ══════════════════════════════════════
+   МОБИЛЬНЫЙ < 768px
+   ══════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── СБРОС ОСНОВНОГО ЛЕЙАУТА ── */
+  body { padding-bottom: 76px }
+  .app-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    min-height: 100dvh;
+  }
+  .right-sidebar  { display: none !important }
+  .main-content   { border: none; min-height: auto }
+
+  /* ── БОКОВАЯ ПАНЕЛЬ → НИЖНИЙ ТАББАР ── */
+  .sidebar-left {
+    position: fixed !important;
+    bottom: 0; left: 0; right: 0; top: auto !important;
+    height: 68px; width: 100%;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-around;
+    padding: 0 4px !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border);
+    background: var(--mobile-nav-bg, rgba(19,31,36,.97)) !important;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 200;
+    overflow: hidden;
+    gap: 0;
+  }
+  .sidebar-logo, .nav-sep, .sidebar-bottom { display: none !important }
+  .nav-links {
+    flex-direction: row !important;
+    width: 100%; gap: 0;
+    justify-content: space-around;
+  }
+  .nav-item {
+    flex-direction: column !important;
+    font-size: 9px !important;
+    padding: 8px 4px !important;
+    gap: 3px !important;
+    border: none !important; border-radius: 0 !important;
+    width: auto; flex: 1;
+    justify-content: center !important;
+    letter-spacing: 0;
+    min-width: 0;
+  }
+  .nav-item svg { width: 22px; height: 22px }
+  .nav-item span { max-width: 52px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+  .nav-item::before { display: none }
+  .nav-item.active {
+    color: var(--duo-blue) !important;
+    background: transparent !important;
+    border: none !important;
+  }
+  .nav-item.logout { display: none !important }
+
+  /* ── СТРАНИЦА ПРИВЕТСТВИЯ ── */
+  .main-content { padding: 0 }
+
+  /* ── ХЕДЕР СЕКЦИЙ ── */
+  .section-header,
+  .story-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px;
+    padding: 16px;
+  }
+  .story-header-actions { width: 100%; flex-wrap: wrap; gap: 8px }
+  .story-header-actions .story-btn-primary,
+  .story-header-actions .story-btn-secondary {
+    flex: 1; justify-content: center; text-align: center;
+    padding: 10px 12px; font-size: 12px;
+  }
+
+  /* ── СТАТС-ПОЛОСА ── */
+  .story-stats-strip {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    border: none;
+    gap: 1px;
+    background: var(--border);
+  }
+  .story-stat { border-right: none !important }
+
+  /* ── ТАББАР УРОКОВ ── */
+  .story-tabs-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .story-tabs-bar::-webkit-scrollbar { display: none }
+  .story-tab { flex-shrink: 0; padding: 11px 14px; font-size: 10px }
+
+  /* ── ФИЛЬТРЫ ── */
+  .story-filters {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .story-search-box { min-width: 100% }
+  .story-select { flex: 1; min-width: 0; font-size: 12px }
+
+  /* ── КАРТОЧКИ УРОКОВ ── */
+  #allLessonsGrid, #myLessonsGrid,
+  .story-lessons-grid {
+    grid-template-columns: 1fr !important;
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+
+  .lesson-hub-card { border-radius: 14px }
+  .lesson-hub-footer {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .lesson-hub-run-btn {
+    padding: 8px 14px;
+    font-size: 11px;
+  }
+
+  /* ── КУРСЫ GRID ── */
+  .courses-grid {
+    grid-template-columns: 1fr !important;
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+  .course-card { border-radius: 14px }
+
+  /* ── ПРОСМОТР КУРСА ── */
+  .course-layout {
+    grid-template-columns: 1fr !important;
+    gap: 0;
+  }
+  .course-sidebar-left {
+    position: static !important;
+    height: auto !important;
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    max-height: none !important;
+  }
+  .course-main { padding: 16px }
+
+  /* ── ЛЕЙАУТ СТРАНИЦЫ УРОКА (lesson.html) ── */
+  .layout { grid-template-columns: 1fr !important }
+  .editor-area { padding: 16px }
+  .lesson-main-title { font-size: 20px }
+
+  /* ── КВИЗЫ СЕТКА → КОЛОНКА ── */
+  .quiz-options-grid { grid-template-columns: 1fr !important }
+
+  /* ── СОЗДАНИЕ КУРСА / УРОКА ── */
+  .editor-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto;
+  }
+  .toolbox {
+    order: 2;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    border-right: none !important;
+    border-top: 1px solid var(--border);
+    padding: 10px;
+    gap: 6px;
+    position: fixed;
+    bottom: 68px; left: 0; right: 0;
+    background: var(--bg);
+    z-index: 100;
+    height: auto;
+    max-height: 50vh;
+    overflow-y: auto;
+    display: none; /* toggleable */
+  }
+  .toolbox.mobile-open { display: flex }
+  .tool-section { width: 100%; padding: 6px 4px 2px; font-size: 8px }
+  .tool-btn { width: auto; flex: 0 0 auto; padding: 7px 10px; font-size: 11px }
+  .rpanel { display: none }
+  .canvas { padding: 12px; order: 1 }
+
+  /* ── МОБИЛЬНЫЙ ТУЛБАР-ПЕРЕКЛЮЧАТЕЛЬ ТУЛБОКСА ── */
+  .mobile-toolbox-toggle {
+    display: flex !important;
+    position: fixed;
+    bottom: 76px; right: 16px;
+    width: 48px; height: 48px;
+    background: var(--duo-blue);
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(28,176,246,.4);
+    z-index: 110;
+    border: none;
+    color: #fff;
+    transition: transform .2s;
+  }
+  .mobile-toolbox-toggle:active { transform: scale(.92) }
+
+  /* ── КОНСТРУКТОР УРОКА — МЕТАДАННЫЕ ── */
+  .meta-section { padding: 14px }
+  .meta-row { flex-direction: column; gap: 10px }
+  .meta-field { min-width: 100% }
+
+  /* ── НАСТРОЙКИ РУМА (setup screen) ── */
+  .settings-grid { grid-template-columns: 1fr !important }
+  .mode-grid { grid-template-columns: 1fr 1fr !important }
+  .teams-row { flex-direction: column }
+  .setup-wrap { padding: 16px }
+  .setup-card { padding: 16px }
+
+  /* ── ИГРОВЫЕ УРОКИ (live-lesson.html) ── */
+  .builder-layout { grid-template-columns: 1fr !important }
+  .game-layout { grid-template-columns: 1fr !important }
+  .room-sidebar { display: none !important }
+  .opts-grid { grid-template-columns: 1fr !important }
+
+  /* ── BOARD — МОНОПОЛИЯ ── */
+  .board {
+    width: min(100vw - 16px, 360px) !important;
+    gap: 1px !important;
+  }
+  .game-sidebar { display: none !important }
+  .game-layout { grid-template-columns: 1fr !important }
+  .board-side { padding: 10px }
+  .timer-box { font-size: 20px; padding: 5px 12px }
+
+  /* ── ЛОББИ / РУМ ── */
+  .lobby {
+    padding: 20px 16px;
+    gap: 16px;
+  }
+  .lobby-pin-display { font-size: clamp(36px, 12vw, 64px) }
+  .lobby-teams { gap: 8px }
+  .lobby-team-col { min-width: 110px; padding: 10px 12px }
+
+  /* ── СТУДЕНТ — ВХОД ── */
+  .join-card { padding: 28px 20px }
+  .pin-inputs { gap: 6px }
+  .pdig { width: 40px; height: 52px; font-size: 22px }
+
+  /* ── ХЭДЕР СТРАНИЦЫ ── */
+  .page-header,
+  .view-header { padding: 16px }
+  .page-title  { font-size: 20px }
+
+  /* ── МОДАЛЫ ── */
+  .modal {
+    padding: 24px 18px !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-top: auto !important;
+  }
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  /* ── ДЕМО SEED ── */
+  .setup-body { grid-template-columns: 1fr !important }
+
+  /* ── НАСТРОЙКИ ── */
+  .settings-modal-content {
+    flex-direction: column !important;
+    max-height: 100dvh;
+    border-radius: 20px 20px 0 0 !important;
+    margin-top: auto !important;
+    height: 90dvh;
+  }
+  .settings-sidebar {
+    width: 100% !important;
+    flex-direction: row;
+    padding: 10px;
+    overflow-x: auto;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-nav { flex-direction: row !important; gap: 4px }
+  .settings-title { display: none }
+  .field-control { width: 100% !important }
+  .settings-field-row { flex-direction: column !important; align-items: flex-start !important }
+
+  /* ── СЕКЦИЯ ВЕСТИ УРОК ── */
+  #story-tab-running .grid-cols-2,
+  #story-tab-running > div > div:first-child {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── СЛАЙД-КАРТОЧКА ── */
+  .slide-card { padding: 24px 20px !important }
+  .slide-main-title { font-size: clamp(18px, 5vw, 28px) !important }
+  .slide-body-text  { font-size: 14px !important }
+
+  /* ── OPEN LESSON HOST ── */
+  .app { grid-template-columns: 1fr !important }
+  .slide-area { padding: 16px !important }
+  .nav-row { gap: 8px; padding: 10px 14px }
+  .nav-btn  { padding: 9px 16px; font-size: 12px }
+
+  /* ── ПОЛЯ ФОРМ ── */
+  .ol-grid { grid-template-columns: 1fr !important }
+  .launch-preview {
+    flex-direction: column !important;
+    text-align: center;
+    gap: 14px;
+  }
+  .launch-pin { font-size: 28px }
+
+  /* ── ДОКУМЕНТЫ ── */
+  .story-docs-grid { grid-template-columns: 1fr !important }
+
+  /* ── ПРЕЛОАДЕР ── */
+  .preloader-logo { font-size: 40px }
+}
+
+/* ══════════════════════════════════════
+   АДАПТИВ ДЛЯ course.html
+   ══════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Шапка курса */
+  .course-hero       { padding: 20px 16px }
+  .course-hero-title { font-size: clamp(18px,5vw,26px) }
+  .course-hero-meta  { flex-wrap: wrap; gap: 8px }
+
+  /* Аккордеон модулей */
+  .module-header     { padding: 12px 14px }
+  .lesson-node       { padding: 10px 14px }
+
+  /* Плеер урока */
+  .lesson-topbar     { padding: 0 12px; height: 50px }
+  .progress-container{ display: none }
+
+  /* Завершение */
+  .completion-card   { padding: 24px 16px }
+  .completion-xp     { font-size: 40px }
+}
+
+/* ══════════════════════════════════════
+   АДАПТИВ ДЛЯ create-course.html
+   ══════════════════════════════════════ */
+@media (max-width: 767px) {
+  .creator-shell  { padding: 16px 12px 90px }
+  .top-bar        { padding: 0 12px; height: 52px }
+  .two-col        { grid-template-columns: 1fr !important }
+  .pricing-cards  { grid-template-columns: 1fr !important }
+  .step-label     { display: none }
+  .preview-shell  { grid-template-columns: 1fr !important }
+  .student-preview{ position: static }
+  .step-dot       { width: 28px; height: 28px; font-size: 11px }
+}
+
+/* ══════════════════════════════════════
+   SAFE AREA (iPhone X+, Android notch)
+   ══════════════════════════════════════ */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .sidebar-left {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+    height: calc(68px + env(safe-area-inset-bottom)) !important;
+  }
+  body { padding-bottom: calc(76px + env(safe-area-inset-bottom)) }
+}
+
+/* ══════════════════════════════════════
+   TOUCH / HOVER IMPROVEMENTS
+   ══════════════════════════════════════ */
+@media (hover: none) {
+  /* Убираем hover-эффекты для тач-устройств */
+  .lesson-hub-card:hover { transform: none }
+  .btn:hover, .story-btn-primary:hover { transform: none; filter: none }
+  .course-card:hover { transform: none; border-color: var(--border2) }
+
+  /* Активное состояние вместо hover */
+  .lesson-hub-card:active  { opacity: .85 }
+  .story-btn-primary:active{ filter: brightness(.92) }
+  .nav-item:active         { background: rgba(255,255,255,.05) !important }
+}
+
+/* ══════════════════════════════════════
+   UTILITY: показывать/скрывать по размеру
+   ══════════════════════════════════════ */
+.mobile-only  { display: none }
+.desktop-only { display: block }
+
+@media (max-width: 767px) {
+  .mobile-only  { display: block }
+  .desktop-only { display: none }
+  .mobile-flex  { display: flex !important }
+  .mobile-hidden{ display: none !important }
+}
+
+/* ══════════════════════════════════════
+   MOBILE TOOLBOX TOGGLE BUTTON
+   (добавляется через JS на страницах редактора)
+   ══════════════════════════════════════ */
+.mobile-toolbox-toggle { display: none }
+
+/* ══════════════════════════════════════
+   МОБИЛЬНЫЙ SIDEBAR DRAWER
+   (для курсов — боковая панель снизу)
+   ══════════════════════════════════════ */
+@media (max-width: 767px) {
+  .mobile-drawer {
+    position: fixed;
+    bottom: 68px; left: 0; right: 0;
+    background: var(--bg2);
+    border-top: 1.5px solid var(--border2);
+    border-radius: 20px 20px 0 0;
+    max-height: 70dvh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.16,1,.3,1);
+    z-index: 150;
+    padding: 16px;
+  }
+  .mobile-drawer.open { transform: translateY(0) }
+  .mobile-drawer-handle {
+    width: 36px; height: 4px;
+    background: var(--border3);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .mobile-drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 149;
+  }
+  .mobile-drawer-overlay.open { display: block }
+}
+
+/* ══════════════════════════════════════
+   СКРОЛЛБАР (мобильный — скрываем)
+   ══════════════════════════════════════ */
+@media (max-width: 767px) {
+  ::-webkit-scrollbar { width: 0; height: 0 }
+  * { scrollbar-width: none }
+}
