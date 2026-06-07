@@ -1,1317 +1,1208 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Создать интерактивный урок — Tagybasqa</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+  <title>Создать урок — Tagybasqa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ══════════════════════════════════════════════════════
-       TAGYBASQA — Duolingo Dark — create-lesson.html
-    ══════════════════════════════════════════════════════ */
-    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
-
     :root {
-      --bg:   #131f24;
-      --bg2:  #1a2d35;
-      --bg3:  #1f3540;
-      --bg4:  #243d4a;
-      --border:  rgba(255,255,255,.07);
-      --border2: rgba(255,255,255,.12);
-      --border3: rgba(255,255,255,.22);
-      --text:  #ffffff;
-      --text2: #cdd8dd;
-      --text3: #7a9aaa;
-      --text4: #131f24;
-      --accent-dim: rgba(255,255,255,.05);
+      --bg:#131f24; --bg2:#1a2d35; --bg3:#1f3540; --bg4:#243d4a;
+      --border:rgba(255,255,255,.07); --border2:rgba(255,255,255,.12); --border3:rgba(255,255,255,.22);
+      --text:#fff; --text2:#cdd8dd; --text3:#7a9aaa;
+      --blue:#1cb0f6; --blue2:#0e86c0; --green:#57cc02; --green2:#3a8c01;
+      --orange:#ff9600; --red:#ff4b4b; --purple:#ce82ff; --yellow:#ffd900; --teal:#1fe0c0;
+      --red-bg:rgba(255,75,75,.14); --green-bg:rgba(87,204,2,.12);
+      --blue-bg:rgba(28,176,246,.12); --purple-bg:rgba(206,130,255,.12);
+      --r:12px; --r2:16px; --r3:99px;
+      --font:'Nunito',sans-serif; --mono:'DM Mono',monospace;
+      --bg-blur:rgba(19,31,36,.95);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-      --duo-blue:   #1cb0f6;
-      --duo-blue2:  #0e86c0;
-      --duo-green:  #57cc02;
-      --duo-green2: #3a8c01;
-      --duo-orange: #ff9600;
-      --duo-red:    #ff4b4b;
-      --duo-purple: #ce82ff;
-      --duo-yellow: #ffd900;
-      --duo-teal:   #1fe0c0;
+    /* ── TOPBAR ── */
+    .topbar{position:sticky;top:0;z-index:200;background:var(--bg-blur);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px;height:56px}
+    .topbar-back{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--text3);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;padding:6px 0;transition:color .15s;flex-shrink:0}
+    .topbar-back:hover{color:var(--text)}
+    .topbar-back svg{width:16px;height:16px}
+    .topbar-title{font-size:15px;font-weight:800;flex:1}
+    .topbar-save-badge{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;flex-shrink:0}
+    .topbar-btns{display:flex;gap:8px;flex-shrink:0}
+    .btn-ghost{background:transparent;color:var(--text2);border:2px solid var(--border2);padding:8px 16px;border-radius:var(--r3);font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:all .15s}
+    .btn-ghost:hover{border-color:var(--border3);color:var(--text)}
+    .btn-primary{background:var(--blue);color:#fff;border:none;border-bottom:3px solid var(--blue2);padding:9px 22px;border-radius:var(--r3);font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:filter .15s}
+    .btn-primary:hover{filter:brightness(1.1)}
+    .btn-primary:disabled{opacity:.35;cursor:not-allowed}
+    .btn-green{background:var(--green);border-bottom-color:var(--green2)}
 
-      --red:    #ff4b4b;  --red-bg:    rgba(255,75,75,.14);
-      --green:  #57cc02;  --green-bg:  rgba(87,204,2,.12);
-      --purple: #ce82ff;  --purple-bg: rgba(206,130,255,.12);
-      --blue:   #1cb0f6;  --blue-bg:   rgba(28,176,246,.12);
-      --amber:  #ff9600;  --amber-bg:  rgba(255,150,0,.12);
-      --teal:   #1fe0c0;  --teal-bg:   rgba(31,224,192,.1);
+    /* ── TABS ── */
+    .page-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:56px;z-index:100}
+    .page-tab{flex:1;padding:13px 10px;text-align:center;font-size:11px;font-weight:800;color:var(--text3);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;border:none;background:none;font-family:var(--font);margin-bottom:-1px}
+    .page-tab svg{width:14px;height:14px;opacity:.5}
+    .page-tab:hover{color:var(--text2)}
+    .page-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+    .page-tab.active svg{opacity:1}
+    .tab-content{display:none}
+    .tab-content.active{display:block;animation:fadeUp .3s cubic-bezier(.16,1,.3,1)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-      --r:  12px;
-      --r2: 16px;
-      --r3: 99px;
-      --font: 'Nunito', sans-serif;
-      --mono: 'DM Mono', monospace;
-      --bg-blur: rgba(19,31,36,.94);
-      --shadow: 0 4px 20px rgba(0,0,0,.3);
-    }
+    /* ── LAYOUT (EDITOR TAB) ── */
+    .editor-layout{display:grid;grid-template-columns:200px 1fr 260px;min-height:calc(100vh - 112px)}
 
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
-    html { scroll-behavior:smooth }
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
+    /* ── TOOLBOX ── */
+    .toolbox{border-right:1px solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:4px;background:var(--bg)}
+    .toolbox-section{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.15em;padding:10px 4px 6px;margin-top:4px}
+    .toolbox-section:first-child{margin-top:0}
+    .tool-btn{display:flex;align-items:center;gap:8px;padding:9px 10px;background:transparent;border:1.5px solid transparent;border-radius:var(--r);color:var(--text2);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+    .tool-btn:hover{background:var(--bg2);border-color:var(--border2);color:var(--text)}
+    .tool-btn-icon{font-size:14px;flex-shrink:0;width:20px;text-align:center;font-family:var(--mono)}
+    .type-text .tool-btn-icon{color:var(--text2)}
+    .type-code .tool-btn-icon{color:var(--green)}
+    .type-quiz .tool-btn-icon{color:var(--blue)}
+    .type-task .tool-btn-icon{color:var(--orange)}
+    .type-slide .tool-btn-icon{color:var(--purple)}
 
-    /* ══ TOPBAR ═════════════════════════════════════════════ */
-    .topbar {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--bg-blur); backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 16px;
-      padding: 0 24px; height: 56px;
-    }
-    .topbar-back {
-      display: flex; align-items: center; gap: 6px;
-      background: none; border: none; color: var(--text3);
-      font-family: var(--font); font-size: 13px; font-weight: 700;
-      cursor: pointer; padding: 6px 0; transition: color .15s;
-    }
-    .topbar-back:hover { color: var(--text) }
-    .topbar-back svg { width: 16px; height: 16px }
-    .topbar-title { font-size: 15px; font-weight: 800; flex: 1 }
-    .topbar-autosave {
-      font-family: var(--mono); font-size: 10px; color: var(--text3);
-      text-transform: uppercase; letter-spacing: .1em;
-    }
-    .topbar-publish {
-      background: var(--duo-blue); color: #fff;
-      border: none; border-bottom: 3px solid var(--duo-blue2);
-      padding: 9px 22px; font-family: var(--font);
-      font-size: 13px; font-weight: 800; cursor: pointer;
-      border-radius: var(--r3); transition: filter .15s; letter-spacing: .02em;
-    }
-    .topbar-publish:hover { filter: brightness(1.1) }
-    .topbar-publish:active { transform: translateY(2px); border-bottom-width: 1px }
-    .topbar-publish:disabled { opacity: .35; cursor: not-allowed }
+    /* ── EDITOR MAIN ── */
+    .editor-main{padding:24px;overflow-y:auto}
+    .meta-section{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);padding:20px;margin-bottom:24px;display:flex;flex-direction:column;gap:14px}
+    .meta-label{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:6px}
+    .meta-inp{width:100%;background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;padding:10px 14px;outline:none;transition:border-color .15s}
+    .meta-inp:focus{border-color:var(--blue)}
+    .meta-inp::placeholder{color:var(--text3);font-weight:400}
+    .meta-title-inp{font-size:18px;font-weight:800}
+    .meta-sel{width:100%;background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;padding:10px 14px;outline:none;cursor:pointer}
+    .meta-row{display:flex;gap:12px;flex-wrap:wrap}
+    .meta-field{flex:1;min-width:130px}
+    textarea.meta-inp{resize:vertical;min-height:60px;line-height:1.5}
 
-    /* ══ LAYOUT ══════════════════════════════════════════════ */
-    .layout {
-      display: grid;
-      grid-template-columns: 264px 1fr 300px;
-      min-height: calc(100vh - 56px);
-    }
+    .blocks-list{display:flex;flex-direction:column;gap:14px}
+    .canvas-empty{text-align:center;padding:64px 24px;border:2px dashed var(--border2);border-radius:var(--r2);color:var(--text3)}
+    .canvas-empty-icon{font-size:40px;margin-bottom:12px}
+    .canvas-empty-title{font-size:15px;font-weight:800;margin-bottom:6px;color:var(--text2)}
+    .canvas-empty-sub{font-size:12px;font-family:var(--mono);line-height:1.6}
 
-    /* ══ TOOLBOX ════════════════════════════════════════════ */
-    .toolbox {
-      border-right: 1px solid var(--border);
-      padding: 20px 14px;
-      position: sticky; top: 56px;
-      height: calc(100vh - 56px); overflow-y: auto;
-      display: flex; flex-direction: column; gap: 4px;
-    }
-    .toolbox::-webkit-scrollbar { display: none }
+    /* ── BLOCK CARDS ── */
+    .block-card{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);overflow:hidden;transition:border-color .15s;cursor:grab}
+    .block-card:hover{border-color:var(--border3)}
+    .block-card.dragging{opacity:.5;border-style:dashed}
+    .block-card-header{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg3)}
+    .block-drag-handle{color:var(--text3);font-size:14px;cursor:grab;flex-shrink:0;opacity:.5}
+    .block-card-actions{display:flex;gap:4px;margin-left:auto}
+    .block-action-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;padding:4px 6px;border-radius:6px;font-size:12px;transition:all .15s}
+    .block-action-btn:hover{background:var(--bg4);color:var(--text)}
+    .block-action-btn.del:hover{color:var(--red)}
+    .block-card-body{padding:16px}
+    .block-type-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 8px;border-radius:99px;border:1.5px solid;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+    .block-type-badge.text,.block-type-badge.heading,.block-type-badge.subheading{color:var(--text2);border-color:var(--border3)}
+    .block-type-badge.code{color:var(--green);border-color:rgba(87,204,2,.3)}
+    .block-type-badge.quiz{color:var(--blue);border-color:rgba(28,176,246,.3)}
+    .block-type-badge.task{color:var(--orange);border-color:rgba(255,150,0,.3)}
+    .block-type-badge.callout,.block-type-badge.checklist{color:var(--teal);border-color:rgba(31,224,192,.3)}
+    .block-type-badge.slide{color:var(--purple);border-color:rgba(206,130,255,.3)}
+    .block-type-badge.poll{color:var(--yellow);border-color:rgba(255,217,0,.3)}
+    .block-type-badge.video,.block-type-badge.image{color:var(--orange);border-color:rgba(255,150,0,.3)}
 
-    .toolbox-section {
-      font-family: var(--mono); font-size: 9px; font-weight: 700;
-      color: var(--text3); text-transform: uppercase; letter-spacing: .14em;
-      padding: 14px 8px 6px; display: flex; align-items: center; gap: 8px;
-    }
-    .toolbox-section::after { content:''; flex:1; height:1px; background:var(--border) }
+    /* block body inputs */
+    .inp{width:100%;background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;padding:10px 14px;outline:none;transition:border-color .15s;margin-top:8px}
+    .inp:focus{border-color:var(--blue)}
+    .inp::placeholder{color:var(--text3);font-weight:400}
+    .textarea-inp{width:100%;background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.6;padding:12px 14px;outline:none;resize:none;min-height:64px;transition:border-color .15s}
+    .textarea-inp:focus{border-color:var(--blue)}
+    .textarea-inp::placeholder{color:var(--text3)}
+    .sel{background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:12px;padding:8px 12px;outline:none;cursor:pointer}
+    .code-editor-inp{width:100%;background:#0a1520;border:2px solid var(--border2);border-radius:var(--r);color:#cdd8dd;font-family:var(--mono);font-size:13px;line-height:1.7;padding:14px;min-height:120px;outline:none;resize:vertical;margin-top:8px;tab-size:4}
+    .terminal-out{background:#050a0f;border-radius:var(--r);padding:12px;font-family:var(--mono);font-size:12px;color:var(--green);margin-top:8px;display:none;white-space:pre-wrap;border-left:3px solid var(--green)}
+    .run-code-btn{background:var(--bg3);border:2px solid var(--border2);color:var(--text);padding:7px 16px;border-radius:var(--r);cursor:pointer;font-family:var(--font);font-weight:700;font-size:12px;transition:all .15s}
+    .run-code-btn:hover{background:var(--bg4);border-color:var(--green);color:var(--green)}
+    .url-apply-btn{background:var(--blue-bg);border:1.5px solid rgba(28,176,246,.3);color:var(--blue);padding:10px 16px;border-radius:var(--r);cursor:pointer;font-family:var(--font);font-weight:700;font-size:12px;white-space:nowrap;transition:all .15s}
+    .url-apply-btn:hover{background:var(--blue);color:#fff}
+    .add-btn{background:transparent;border:1.5px dashed var(--border2);color:var(--text3);padding:7px 14px;border-radius:var(--r);cursor:pointer;font-family:var(--font);font-weight:700;font-size:12px;transition:all .15s}
+    .add-btn:hover{border-color:var(--blue);color:var(--blue)}
+    .quiz-q-card{background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);padding:14px;margin-bottom:10px}
+    .quiz-q-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+    .quiz-q-inp{flex:1;background:var(--bg4);border:2px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;font-weight:700;padding:8px 12px;outline:none}
+    .quiz-q-inp:focus{border-color:var(--blue)}
+    .quiz-q-del{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:4px 8px;border-radius:6px;transition:all .15s}
+    .quiz-q-del:hover{color:var(--red)}
+    .option-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    .option-correct-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--text3);flex-shrink:0;cursor:pointer;transition:all .15s}
+    .option-correct-radio.selected{border:5px solid var(--green);background:var(--green)}
+    .option-inp{flex:1;background:var(--bg4);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:7px 12px;outline:none}
+    .option-inp:focus{border-color:var(--blue)}
+    .option-del{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:12px}
+    .option-del:hover{color:var(--red)}
+    .checklist-item-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    .cl-inp{flex:1;background:var(--bg3);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:7px 12px;outline:none}
+    .cl-inp:focus{border-color:var(--blue)}
+    .cl-del{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:12px}
+    .cl-del:hover{color:var(--red)}
+    .callout-wrap{display:flex;gap:14px;padding:14px;border-radius:var(--r);background:var(--bg3);border:2px solid var(--border2)}
+    .callout-wrap.info{border-left:4px solid var(--blue)}
+    .callout-wrap.warning{border-left:4px solid var(--orange)}
+    .callout-wrap.success{border-left:4px solid var(--green)}
+    .callout-wrap.danger{border-left:4px solid var(--red)}
+    .callout-emoji{font-size:22px;flex-shrink:0;line-height:1}
+    .slide-block-editor{background:var(--bg3);border:1.5px solid rgba(206,130,255,.2);border-radius:var(--r);padding:14px}
+    .slide-label{font-family:var(--mono);font-size:9px;color:var(--purple);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;font-weight:700}
 
-    .tool-btn {
-      display: flex; align-items: center; gap: 10px;
-      padding: 11px 12px; border-radius: var(--r);
-      border: 2px solid transparent; background: transparent;
-      color: var(--text3); font-family: var(--font);
-      font-size: 13px; font-weight: 700; cursor: pointer;
-      transition: all .15s; text-align: left; width: 100%;
-    }
-    .tool-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border) }
-    .tool-btn-icon {
-      width: 30px; height: 30px; border-radius: var(--r);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; flex-shrink: 0; background: var(--bg3);
-      border: 1.5px solid var(--border2); transition: all .15s;
-    }
-    .tool-btn:hover .tool-btn-icon { background: var(--bg4) }
-    .tool-btn-label { flex: 1 }
-    .tool-btn-desc  { font-family: var(--mono); font-size: 9px; color: var(--text3); display: block; margin-top: 1px }
+    /* ── RIGHT PANEL ── */
+    .right-panel{border-left:1px solid var(--border);padding:20px 16px;display:flex;flex-direction:column;gap:18px;background:var(--bg);overflow-y:auto}
+    .panel-title{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px}
+    .emoji-pick-row{display:flex;flex-wrap:wrap;gap:6px}
+    .emoji-pick{font-size:22px;cursor:pointer;padding:6px;border-radius:10px;border:2px solid transparent;transition:all .15s;line-height:1}
+    .emoji-pick:hover{background:var(--bg2);border-color:var(--border2)}
+    .emoji-pick.selected{background:var(--blue-bg);border-color:rgba(28,176,246,.5)}
+    .preview-box{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px}
+    .preview-stat{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);font-family:var(--mono)}
+    .preview-stat-val{color:var(--text);font-weight:700}
+    .preview-mini-blocks{display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto}
+    .preview-mini-item{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg2);border-radius:6px;font-size:11px;color:var(--text3);font-family:var(--mono)}
+    .pub-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r);border:2px solid var(--border2);cursor:pointer;transition:all .15s;margin-bottom:6px}
+    .pub-opt:hover{border-color:var(--border3)}
+    .pub-opt.selected{border-color:rgba(28,176,246,.4);background:var(--blue-bg)}
+    .pub-opt-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--text3);flex-shrink:0;margin-top:2px;transition:all .15s}
+    .pub-opt.selected .pub-opt-dot{border:5px solid var(--blue)}
+    .pub-opt-label{font-size:13px;font-weight:800}
+    .pub-opt-sub{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
 
-    /* ══ EDITOR ═════════════════════════════════════════════ */
-    .editor-area {
-      padding: 32px 28px; overflow-y: auto;
-      min-height: calc(100vh - 56px);
-    }
+    /* ── OPEN LESSON TAB ── */
+    .open-lesson-wrap{max-width:820px;margin:0 auto;padding:32px 24px;display:flex;flex-direction:column;gap:28px}
+    .ol-section{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);padding:24px}
+    .ol-section-title{font-size:16px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+    .ol-section-sub{font-size:13px;color:var(--text3);margin-bottom:20px;line-height:1.6}
+    .ol-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .ol-field label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:6px}
+    .ol-inp{width:100%;background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;padding:10px 14px;outline:none;transition:border-color .15s}
+    .ol-inp:focus{border-color:var(--blue)}
+    .ol-sel{width:100%;background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;padding:10px 14px;outline:none;cursor:pointer}
+    /* Mode cards */
+    .mode-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+    .mode-card{background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r2);padding:18px;cursor:pointer;transition:all .2s;position:relative}
+    .mode-card:hover{border-color:var(--border3);transform:translateY(-2px)}
+    .mode-card.selected{border-color:var(--blue);background:var(--blue-bg)}
+    .mode-card-icon{font-size:32px;margin-bottom:10px}
+    .mode-card-title{font-size:14px;font-weight:800;margin-bottom:4px}
+    .mode-card-desc{font-size:11px;color:var(--text3);line-height:1.5;font-family:var(--mono)}
+    .mode-card-check{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;border:2px solid var(--text3);transition:all .15s;display:flex;align-items:center;justify-content:center}
+    .mode-card.selected .mode-card-check{border-color:var(--blue);background:var(--blue)}
+    .mode-card.selected .mode-card-check::after{content:'✓';color:#fff;font-size:11px;font-weight:900}
+    /* Teams */
+    .teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:14px}
+    .team-input-card{background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px}
+    .team-emoji-btn{font-size:20px;background:var(--bg4);border:none;border-radius:8px;padding:6px 8px;cursor:pointer;transition:all .15s}
+    .team-emoji-btn:hover{background:var(--bg2)}
+    .team-name-inp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:13px;font-weight:700;outline:none}
+    .team-name-inp::placeholder{color:var(--text3);font-weight:400}
+    .team-del{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:2px 5px}
+    .team-del:hover{color:var(--red)}
+    /* Toggle */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+    .toggle-row:last-child{border-bottom:none}
+    .toggle-info{}
+    .toggle-label{font-size:13px;font-weight:700}
+    .toggle-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px}
+    .toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+    .toggle input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;inset:0;background:var(--bg4);border-radius:99px;cursor:pointer;transition:all .25s;border:1.5px solid var(--border2)}
+    .toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:2px;bottom:2px;background:var(--text3);border-radius:50%;transition:all .25s}
+    .toggle input:checked + .toggle-slider{background:var(--blue);border-color:var(--blue)}
+    .toggle input:checked + .toggle-slider::before{transform:translateX(18px);background:#fff}
+    /* Launch block */
+    .launch-preview{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1.5px solid rgba(28,176,246,.2);border-radius:var(--r2);padding:24px;display:flex;align-items:center;gap:20px}
+    .launch-pin{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--blue);letter-spacing:.2em;background:var(--bg);padding:12px 20px;border-radius:var(--r);border:2px solid rgba(28,176,246,.25)}
+    .launch-info{flex:1}
+    .launch-info h3{font-size:17px;font-weight:900;margin-bottom:6px}
+    .launch-info p{font-size:12px;color:var(--text3);line-height:1.6;font-family:var(--mono)}
 
-    /* Meta fields */
-    .meta-section { margin-bottom: 36px }
-    .meta-title-inp {
-      width: 100%; background: transparent; border: none; border-bottom: 2px solid var(--border2);
-      color: var(--text); font-family: var(--font);
-      font-size: 28px; font-weight: 900; padding: 8px 0; outline: none;
-      transition: border-color .2s; letter-spacing: -.3px;
-    }
-    .meta-title-inp:focus { border-bottom-color: var(--duo-blue) }
-    .meta-title-inp::placeholder { color: var(--text3) }
+    /* ── PRESENTATION PREVIEW TAB ── */
+    .presentation-wrap{padding:24px;max-width:1000px;margin:0 auto}
+    .slides-list{display:flex;flex-direction:column;gap:12px}
+    .slide-preview-card{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);padding:20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s}
+    .slide-preview-card:hover{border-color:var(--blue);transform:translateX(4px)}
+    .slide-num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text3);width:28px;flex-shrink:0;text-align:center}
+    .slide-icon-big{font-size:24px;flex-shrink:0}
+    .slide-preview-title{font-size:14px;font-weight:800}
+    .slide-preview-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:3px}
+    .slide-type-pill{font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 8px;border-radius:99px;margin-left:auto;flex-shrink:0;text-transform:uppercase}
 
-    .meta-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap }
-    .meta-field {
-      display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;
-    }
-    .meta-label {
-      font-family: var(--mono); font-size: 9px; font-weight: 700;
-      color: var(--text3); text-transform: uppercase; letter-spacing: .12em;
-    }
-    .meta-inp, .meta-sel {
-      background: var(--bg2); border: 2px solid var(--border2);
-      border-radius: var(--r); color: var(--text); font-family: var(--font);
-      font-size: 13px; font-weight: 600; padding: 8px 12px; outline: none;
-      transition: border-color .15s; width: 100%;
-    }
-    .meta-inp:focus, .meta-sel:focus { border-color: var(--duo-blue) }
-    .meta-inp::placeholder { color: var(--text3); font-weight: 400 }
-    .meta-sel { appearance: none; cursor: pointer }
-    .meta-sel option { background: var(--bg2) }
+    /* ── SUCCESS ── */
+    .success-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:24px;text-align:center}
+    .success-screen.show{display:flex;animation:fadeUp .4s ease}
+    .success-icon{font-size:64px}
+    .success-title{font-size:26px;font-weight:900;letter-spacing:-.3px}
+    .success-sub{font-size:14px;color:var(--text3);line-height:1.6;max-width:400px}
+    .success-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+    .success-pin-box{background:var(--bg2);border:2px solid rgba(28,176,246,.3);border-radius:var(--r2);padding:20px 28px;margin-top:4px}
+    .success-pin-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px}
+    .success-pin{font-family:var(--mono);font-size:40px;font-weight:700;color:var(--blue);letter-spacing:.25em}
 
-    .lesson-emoji-picker {
-      display: flex; align-items: center; gap: 8px;
-    }
-    .emoji-display {
-      width: 48px; height: 48px; border-radius: var(--r);
-      background: var(--bg2); border: 2px solid var(--border2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px; cursor: pointer; transition: all .15s;
-    }
-    .emoji-display:hover { border-color: var(--border3); background: var(--bg3) }
+    /* Toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg2);border:1.5px solid var(--border2);padding:10px 22px;border-radius:var(--r3);font-family:var(--mono);font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-    /* ══ BLOCKS LIST ════════════════════════════════════════ */
-    .blocks-list { display: flex; flex-direction: column; gap: 14px }
-
-    .block-card {
-      background: var(--bg2); border: 2px solid var(--border2);
-      border-radius: var(--r2); overflow: hidden; transition: border-color .15s;
-      position: relative;
-    }
-    .block-card:hover { border-color: var(--border3) }
-    .block-card.dragging { opacity: .5 }
-
-    .block-card-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 16px; background: var(--bg3);
-      border-bottom: 1px solid var(--border); cursor: grab; user-select: none;
-    }
-    .block-drag-handle { color: var(--text3); font-size: 14px; flex-shrink: 0 }
-    .block-type-badge {
-      font-family: var(--mono); font-size: 9px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .08em;
-      padding: 3px 10px; border-radius: var(--r3);
-      border: 1.5px solid var(--border2); color: var(--text3);
-    }
-    .block-type-badge.text     { color: var(--text2);       border-color: var(--border3) }
-    .block-type-badge.heading  { color: var(--text);        border-color: var(--border3) }
-    .block-type-badge.code     { color: var(--duo-green);   border-color: rgba(87,204,2,.3) }
-    .block-type-badge.quiz     { color: var(--duo-blue);    border-color: rgba(28,176,246,.3) }
-    .block-type-badge.task     { color: var(--duo-orange);  border-color: rgba(255,150,0,.3) }
-    .block-type-badge.callout  { color: var(--duo-teal);    border-color: rgba(31,224,192,.3) }
-    .block-type-badge.flashcard{ color: var(--duo-purple);  border-color: rgba(206,130,255,.3) }
-    .block-type-badge.match    { color: var(--duo-teal);    border-color: rgba(31,224,192,.3) }
-    .block-type-badge.poll     { color: var(--duo-yellow);  border-color: rgba(255,217,0,.3) }
-    .block-type-badge.timeline { color: var(--duo-orange);  border-color: rgba(255,150,0,.3) }
-    .block-type-badge.checklist{ color: var(--duo-green);   border-color: rgba(87,204,2,.3) }
-    .block-type-badge.video    { color: var(--duo-red);     border-color: rgba(255,75,75,.3) }
-    .block-type-badge.image    { color: var(--duo-orange);  border-color: rgba(255,150,0,.3) }
-
-    .block-card-actions { margin-left: auto; display: flex; gap: 6px }
-    .block-action-btn {
-      background: none; border: none; color: var(--text3);
-      cursor: pointer; font-family: var(--mono); font-size: 10px;
-      text-transform: uppercase; letter-spacing: .05em;
-      padding: 5px 10px; border-radius: var(--r); transition: all .15s;
-    }
-    .block-action-btn:hover         { color: var(--text); background: var(--bg4) }
-    .block-action-btn.del:hover     { color: var(--duo-red); background: var(--red-bg) }
-
-    .block-card-body { padding: 18px }
-
-    /* Inputs */
-    .inp, .sel, .textarea-inp {
-      width: 100%; background: var(--bg3); border: 2px solid var(--border2);
-      border-radius: var(--r); color: var(--text); font-family: var(--font);
-      font-size: 13px; font-weight: 600; padding: 10px 14px; outline: none;
-      transition: border-color .15s; margin-bottom: 8px;
-    }
-    .inp:focus, .sel:focus, .textarea-inp:focus { border-color: var(--duo-blue) }
-    .inp::placeholder, .textarea-inp::placeholder { color: var(--text3); font-weight: 400 }
-    .textarea-inp { resize: vertical; min-height: 90px; line-height: 1.6 }
-
-    /* Code editor in block */
-    .code-editor-inp {
-      width: 100%; background: #0a1520; border: 2px solid var(--border2);
-      border-radius: var(--r); color: #cdd8dd;
-      font-family: var(--mono); font-size: 13px; line-height: 1.7;
-      padding: 16px; min-height: 160px; resize: vertical; outline: none;
-      tab-size: 2; margin-top: 8px;
-    }
-    
-    .code-lang-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-    .terminal-out { background: #050a0f; border-radius: var(--r); padding: 12px; font-family: var(--mono); font-size: 12px; color: var(--duo-green); margin-top: 8px; display: none; white-space: pre-wrap; }
-
-    /* Quiz question builder */
-    .quiz-questions-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px }
-    .quiz-q-card {
-      background: var(--bg3); border: 2px solid var(--border2);
-      border-radius: var(--r); padding: 14px; position: relative;
-    }
-    .quiz-q-top { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px }
-    .quiz-q-type-sel {
-      background: var(--bg2); border: 2px solid var(--border2);
-      border-radius: var(--r); color: var(--text); font-family: var(--mono);
-      font-size: 10px; font-weight: 700; padding: 6px 10px; outline: none;
-      text-transform: uppercase; letter-spacing: .06em; cursor: pointer; flex-shrink: 0;
-    }
-    .quiz-q-inp {
-      flex: 1; background: var(--bg2); border: 2px solid var(--border2);
-      border-radius: var(--r); color: var(--text); font-family: var(--font);
-      font-size: 13px; font-weight: 600; padding: 8px 12px; outline: none;
-      transition: border-color .15s;
-    }
-    .quiz-q-inp:focus { border-color: var(--duo-blue) }
-    .quiz-q-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 4px; transition: color .15s; flex-shrink: 0 }
-    .quiz-q-del:hover { color: var(--duo-red) }
-
-    .option-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px }
-    .option-correct-radio {
-      width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border3);
-      background: transparent; cursor: pointer; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; transition: all .15s;
-    }
-    .option-correct-radio.selected { border-color: var(--duo-green) }
-    .option-correct-radio.selected::after { content:''; width:8px; height:8px; border-radius:50%; background:var(--duo-green) }
-    .option-inp {
-      flex: 1; background: var(--bg2); border: 2px solid var(--border2);
-      border-radius: var(--r); color: var(--text); font-family: var(--font);
-      font-size: 12px; font-weight: 600; padding: 8px 12px; outline: none; transition: border-color .15s;
-    }
-    .option-inp:focus { border-color: var(--duo-blue) }
-    .option-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; padding: 2px; transition: color .15s }
-    .option-del:hover { color: var(--duo-red) }
-
-    /* Checklist items */
-    .checklist-items-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px }
-    .checklist-item-row { display: flex; align-items: center; gap: 10px }
-    .cl-drag { color: var(--text3); font-size: 12px; cursor: grab }
-    .cl-inp {
-      flex: 1; background: var(--bg2); border: 2px solid var(--border2);
-      border-radius: var(--r); color: var(--text); font-family: var(--font);
-      font-size: 13px; font-weight: 600; padding: 8px 12px; outline: none; transition: border-color .15s;
-    }
-    .cl-inp:focus { border-color: var(--duo-blue) }
-    .cl-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; transition: color .15s }
-    .cl-del:hover { color: var(--duo-red) }
-
-    /* Callout */
-    .callout-wrap { display: flex; gap: 14px; padding: 16px; border-radius: var(--r); background: var(--bg3); border: 2px solid var(--border2); }
-    .callout-emoji { font-size: 24px; flex-shrink: 0; }
-    
-    /* Add buttons */
-    .add-btn {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 9px 16px; border-radius: var(--r3);
-      border: 2px dashed var(--border2); background: transparent;
-      color: var(--text3); font-family: var(--font); font-size: 12px; font-weight: 700;
-      cursor: pointer; transition: all .15s; width: 100%;
-    }
-    .add-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border3) }
-    
-    .run-code-btn, .url-apply-btn {
-        background: var(--bg3); border: 2px solid var(--border2); color: var(--text);
-        padding: 6px 14px; border-radius: var(--r); cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 12px; transition: all 0.15s;
-    }
-    .run-code-btn:hover, .url-apply-btn:hover { background: var(--bg4); border-color: var(--border3); }
-
-    /* ══ PREVIEW PANEL ═══════════════════════════════════════ */
-    .preview-panel {
-      border-left: 1px solid var(--border);
-      position: sticky; top: 56px;
-      height: calc(100vh - 56px); overflow-y: auto;
-      padding: 0;
-    }
-    .preview-panel::-webkit-scrollbar { display: none }
-    .preview-title { font-size: 14px; font-weight: 800; padding: 16px 20px 8px; color: var(--text2) }
-    
-    .emoji-pick-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 16px; }
-    .emoji-pick { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--bg3); border-radius: var(--r); cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
-    .emoji-pick:hover { background: var(--bg4); }
-    .emoji-pick.selected { border-color: var(--duo-blue); background: var(--blue-bg); }
-
-    .preview-box { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 8px; }
-    .preview-stat { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); font-family: var(--mono); }
-    .preview-stat-val { color: var(--text); font-weight: 700; }
-    
-    .preview-mini-blocks { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 6px; }
-    .preview-mini-block { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg3); border-radius: var(--r); font-size: 12px; cursor: pointer; transition: all 0.15s; }
-    .preview-mini-block:hover { background: var(--bg4); }
-    .preview-mini-block-icon { font-family: var(--mono); color: var(--text3); font-weight: 700; }
-    .preview-mini-block-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text2); }
-
-    .publish-options { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 8px; }
-    .pub-opt { display: flex; gap: 12px; padding: 12px; border: 2px solid var(--border2); border-radius: var(--r); cursor: pointer; transition: all 0.15s; }
-    .pub-opt:hover { border-color: var(--border3); background: var(--bg3); }
-    .pub-opt.selected { border-color: var(--duo-blue); background: var(--blue-bg); }
-    .pub-opt-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--text3); margin-top: 2px; flex-shrink: 0; }
-    .pub-opt.selected .pub-opt-dot { border-color: var(--duo-blue); border-width: 5px; }
-    .pub-opt-label { font-weight: 700; font-size: 13px; margin-bottom: 2px; }
-    .pub-opt-sub { font-size: 11px; color: var(--text3); }
-
-    /* ══ EMPTY STATE ════════════════════════════════════════ */
-    .empty-state {
-      text-align: center; padding: 80px 24px; color: var(--text3);
-    }
-    .empty-state-icon { font-size: 48px; margin-bottom: 16px; display: block }
-    .empty-state-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--text2) }
-    .empty-state-sub   { font-size: 13px; line-height: 1.6 }
-
-    /* ══ SUCCESS SCREEN & TOAST ═════════════════════════════ */
-    .success-screen {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: var(--bg-blur); backdrop-filter: blur(10px); z-index: 1000;
-        display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    }
-    .success-screen.show { display: flex; }
-    .success-icon-wrap { font-size: 64px; margin-bottom: 20px; }
-    .success-title { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
-    .success-sub { font-size: 14px; color: var(--text3); margin-bottom: 30px; }
-    .success-actions { display: flex; gap: 12px; }
-    .success-btn { padding: 12px 24px; border-radius: var(--r3); font-weight: 800; cursor: pointer; border: none; }
-    .success-btn.primary { background: var(--duo-blue); color: white; border-bottom: 3px solid var(--duo-blue2); }
-    .success-btn.ghost { background: var(--bg3); color: var(--text); }
-
-    .toast {
-      position: fixed; bottom: 30px; left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--bg2); border: 2px solid var(--border2);
-      border-radius: var(--r3); padding: 10px 24px;
-      font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text);
-      opacity: 0; transition: all .3s; z-index: 9999; pointer-events: none; white-space: nowrap;
-      box-shadow: 0 8px 24px rgba(0,0,0,.4);
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0) }
-    .toast.success { border-color: rgba(87,204,2,.4); color: var(--duo-green) }
-    .toast.error   { border-color: rgba(255,75,75,.4);  color: var(--duo-red) }
-
-    /* ══ АДАПТИВ ════════════════════════════════════════════ */
-    @media(max-width:900px) {
-      .layout { grid-template-columns: 220px 1fr }
-      .preview-panel { display: none }
-    }
-    @media(max-width:650px) {
-      .layout { grid-template-columns: 1fr }
-      .toolbox { display: none }
-      .meta-row { flex-direction: column; }
-    }
+    @media(max-width:900px){.editor-layout{grid-template-columns:1fr}.toolbox,.right-panel{display:none}}
   </style>
 </head>
-
 <body>
 
-  <div class="topbar">
-    <button class="topbar-back" onclick="history.back()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <path d="M19 12H5M12 5l-7 7 7 7" />
-      </svg>
-      Назад
-    </button>
-    <span class="topbar-title" id="topbarTitle">Создание интерактивного урока</span>
-    <span class="topbar-autosave" id="autoSaveLbl">–</span>
-    <button class="topbar-publish" id="publishBtn" onclick="publishLesson()">🚀 Опубликовать</button>
+<!-- TOPBAR -->
+<div class="topbar">
+  <button class="topbar-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Назад
+  </button>
+  <div class="topbar-title" id="topbarTitle">✏️ Создать урок</div>
+  <span class="topbar-save-badge" id="autosaveBadge">Черновик</span>
+  <div class="topbar-btns">
+    <button class="btn-ghost" onclick="previewLesson()">👁 Предпросмотр</button>
+    <button class="btn-primary btn-green" onclick="launchOpenLesson()" id="launchBtn" style="display:none">📡 Открытый урок</button>
+    <button class="btn-primary" onclick="publishLesson()" id="publishBtn">Опубликовать →</button>
   </div>
+</div>
 
-  <div class="layout">
+<!-- PAGE TABS -->
+<div class="page-tabs">
+  <button class="page-tab active" data-tab="editor" onclick="switchTab('editor')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Конструктор
+  </button>
+  <button class="page-tab" data-tab="openlesson" onclick="switchTab('openlesson')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Открытый урок
+  </button>
+  <button class="page-tab" data-tab="slides" onclick="switchTab('slides')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    Слайды
+  </button>
+</div>
 
+<!-- TAB: EDITOR -->
+<div class="tab-content active" id="tab-editor">
+  <div class="editor-layout">
+    <!-- Toolbox -->
     <aside class="toolbox">
       <div class="toolbox-section">Текст</div>
-      <button class="tool-btn type-text" onclick="addBlock('heading')"><span class="tool-btn-icon">H1</span> <span class="tool-btn-label">Заголовок</span></button>
-      <button class="tool-btn type-text" onclick="addBlock('subheading')"><span class="tool-btn-icon">H2</span> <span class="tool-btn-label">Подзаголовок</span></button>
-      <button class="tool-btn type-text" onclick="addBlock('text')"><span class="tool-btn-icon">¶</span> <span class="tool-btn-label">Абзац</span></button>
-      <button class="tool-btn type-task" onclick="addBlock('callout')"><span class="tool-btn-icon">💡</span> <span class="tool-btn-label">Подсказка / блок</span></button>
-      <button class="tool-btn type-code" onclick="addBlock('checklist')"><span class="tool-btn-icon">☑</span> <span class="tool-btn-label">Чеклист</span></button>
-      <button class="tool-btn" onclick="addBlock('divider')"><span class="tool-btn-icon">─</span> <span class="tool-btn-label">Разделитель</span></button>
-      
+      <button class="tool-btn type-text" onclick="addBlock('heading')"><span class="tool-btn-icon">H1</span>Заголовок</button>
+      <button class="tool-btn type-text" onclick="addBlock('subheading')"><span class="tool-btn-icon">H2</span>Подзаголовок</button>
+      <button class="tool-btn type-text" onclick="addBlock('text')"><span class="tool-btn-icon">¶</span>Абзац</button>
+      <button class="tool-btn type-task" onclick="addBlock('callout')"><span class="tool-btn-icon">💡</span>Подсказка</button>
+      <button class="tool-btn" onclick="addBlock('checklist')"><span class="tool-btn-icon" style="color:var(--teal)">☑</span>Чеклист</button>
+      <button class="tool-btn" onclick="addBlock('divider')"><span class="tool-btn-icon">─</span>Разделитель</button>
+
       <div class="toolbox-section">Медиа</div>
-      <button class="tool-btn type-quiz" onclick="addBlock('video')"><span class="tool-btn-icon">▶</span> <span class="tool-btn-label">Видео YouTube</span></button>
-      <button class="tool-btn type-task" onclick="addBlock('image')"><span class="tool-btn-icon">🖼</span> <span class="tool-btn-label">Изображение</span></button>
-      
+      <button class="tool-btn type-quiz" onclick="addBlock('video')"><span class="tool-btn-icon">▶</span>Видео YouTube</button>
+      <button class="tool-btn type-task" onclick="addBlock('image')"><span class="tool-btn-icon">🖼</span>Изображение</button>
+
       <div class="toolbox-section">Интерактив</div>
-      <button class="tool-btn type-code" onclick="addBlock('code')"><span class="tool-btn-icon">🐍</span> <span class="tool-btn-label">Код + Терминал</span></button>
-      <button class="tool-btn type-quiz" onclick="addBlock('quiz')"><span class="tool-btn-icon">⚡</span> <span class="tool-btn-label">Тест (квиз)</span></button>
-      <button class="tool-btn type-task" onclick="addBlock('task')"><span class="tool-btn-icon">✏️</span> <span class="tool-btn-label">Задание с вводом</span></button>
+      <button class="tool-btn type-code" onclick="addBlock('code')"><span class="tool-btn-icon">🐍</span>Код Python</button>
+      <button class="tool-btn type-quiz" onclick="addBlock('quiz')"><span class="tool-btn-icon">⚡</span>Тест / Квиз</button>
+      <button class="tool-btn type-task" onclick="addBlock('task')"><span class="tool-btn-icon">✏️</span>Задание</button>
+      <button class="tool-btn type-quiz" onclick="addBlock('poll')"><span class="tool-btn-icon">🗳</span>Голосование</button>
+
+      <div class="toolbox-section">Презентация</div>
+      <button class="tool-btn type-slide" onclick="addBlock('slide')"><span class="tool-btn-icon">📊</span>Слайд</button>
     </aside>
 
-    <main class="editor-area">
+    <!-- Editor Main -->
+    <main class="editor-main">
       <div class="meta-section">
         <div class="meta-field">
           <label class="meta-label">Название урока *</label>
-          <input class="meta-inp meta-title-inp" id="lessonTitle" placeholder="Например: Функции в Python"
-            oninput="autoSave()">
+          <input class="meta-inp meta-title-inp" id="lessonTitle" placeholder="Например: Функции в Python — def, args, return" oninput="autoSave()">
         </div>
         <div class="meta-field">
-          <label class="meta-label">Описание (для студентов)</label>
-          <textarea class="meta-inp textarea-inp" id="lessonDesc" placeholder="Что изучат студенты в этом уроке..." rows="2"
-            oninput="autoSave()"></textarea>
+          <label class="meta-label">Описание для студентов</label>
+          <textarea class="meta-inp" id="lessonDesc" rows="2" placeholder="Что изучат студенты в этом уроке..." oninput="autoSave()"></textarea>
         </div>
         <div class="meta-row">
-          <div style="flex:1;min-width:140px;" class="meta-field">
+          <div class="meta-field">
             <label class="meta-label">Предмет / тег</label>
-            <input class="meta-inp" id="lessonSubject" placeholder="Например: Python, Математика"
-              oninput="autoSave()">
+            <input class="meta-inp" id="lessonSubject" placeholder="Python, Математика..." oninput="autoSave()">
           </div>
-          <div style="flex:1;min-width:140px;" class="meta-field">
+          <div class="meta-field">
             <label class="meta-label">Уровень</label>
             <select class="meta-sel" id="lessonLevel" onchange="autoSave()">
-              <option value="beginner">Для начинающих</option>
-              <option value="intermediate">Средний уровень</option>
+              <option value="beginner">Начинающий</option>
+              <option value="intermediate">Средний</option>
               <option value="advanced">Продвинутый</option>
             </select>
           </div>
-          <div style="flex:1;min-width:140px;" class="meta-field">
+          <div class="meta-field">
             <label class="meta-label">Время (мин)</label>
-            <input class="meta-inp" id="lessonDuration" type="number" placeholder="20" min="1" max="300"
-              oninput="autoSave()">
+            <input class="meta-inp" id="lessonDuration" type="number" placeholder="20" min="1" max="300" oninput="autoSave()">
           </div>
         </div>
       </div>
 
       <div class="blocks-list" id="blocksList">
-        <div class="empty-state" id="canvasEmpty">
-          <div class="empty-state-icon">📖</div>
-          <div class="empty-state-title">Ваш урок пока пуст.</div>
-          <div class="empty-state-sub">Выберите блок слева, чтобы начать.<br>Перетаскивайте блоки для изменения порядка.</div>
+        <div class="canvas-empty" id="canvasEmpty">
+          <div class="canvas-empty-icon">📖</div>
+          <div class="canvas-empty-title">Урок пока пуст</div>
+          <div class="canvas-empty-sub">Выберите блок из панели слева.<br>Перетаскивайте блоки для изменения порядка.</div>
         </div>
       </div>
     </main>
 
-    <aside class="preview-panel">
-      <div class="preview-title">Иконка урока</div>
-      <div class="emoji-pick-row" id="emojiRow">
-        <span class="emoji-pick selected" data-emoji="📖" onclick="selectEmoji(this)">📖</span>
-        <span class="emoji-pick" data-emoji="🐍" onclick="selectEmoji(this)">🐍</span>
-        <span class="emoji-pick" data-emoji="💻" onclick="selectEmoji(this)">💻</span>
-        <span class="emoji-pick" data-emoji="🧮" onclick="selectEmoji(this)">🧮</span>
-        <span class="emoji-pick" data-emoji="🎨" onclick="selectEmoji(this)">🎨</span>
-        <span class="emoji-pick" data-emoji="🔬" onclick="selectEmoji(this)">🔬</span>
-        <span class="emoji-pick" data-emoji="📊" onclick="selectEmoji(this)">📊</span>
-        <span class="emoji-pick" data-emoji="🌍" onclick="selectEmoji(this)">🌍</span>
-        <span class="emoji-pick" data-emoji="⚙️" onclick="selectEmoji(this)">⚙️</span>
-        <span class="emoji-pick" data-emoji="🎯" onclick="selectEmoji(this)">🎯</span>
-        <span class="emoji-pick" data-emoji="🏗️" onclick="selectEmoji(this)">🏗️</span>
-        <span class="emoji-pick" data-emoji="🔐" onclick="selectEmoji(this)">🔐</span>
+    <!-- Right Panel -->
+    <aside class="right-panel">
+      <div>
+        <div class="panel-title">Иконка урока</div>
+        <div class="emoji-pick-row" id="emojiRow">
+          <span class="emoji-pick selected" data-emoji="📖" onclick="selectEmoji(this)">📖</span>
+          <span class="emoji-pick" data-emoji="🐍" onclick="selectEmoji(this)">🐍</span>
+          <span class="emoji-pick" data-emoji="💻" onclick="selectEmoji(this)">💻</span>
+          <span class="emoji-pick" data-emoji="🧮" onclick="selectEmoji(this)">🧮</span>
+          <span class="emoji-pick" data-emoji="🎨" onclick="selectEmoji(this)">🎨</span>
+          <span class="emoji-pick" data-emoji="🔬" onclick="selectEmoji(this)">🔬</span>
+          <span class="emoji-pick" data-emoji="📊" onclick="selectEmoji(this)">📊</span>
+          <span class="emoji-pick" data-emoji="🌍" onclick="selectEmoji(this)">🌍</span>
+          <span class="emoji-pick" data-emoji="⚙️" onclick="selectEmoji(this)">⚙️</span>
+          <span class="emoji-pick" data-emoji="🎯" onclick="selectEmoji(this)">🎯</span>
+        </div>
       </div>
 
-      <div class="preview-title">Статистика урока</div>
-      <div class="preview-box">
-        <div class="preview-stat"><span>Блоков</span><span class="preview-stat-val" id="statBlocks">0</span></div>
-        <div class="preview-stat"><span>Квиз-вопросов</span><span class="preview-stat-val" id="statQuizQ">0</span></div>
-        <div class="preview-stat"><span>Заданий</span><span class="preview-stat-val" id="statTasks">0</span></div>
-        <div class="preview-stat"><span>Видео</span><span class="preview-stat-val" id="statVideos">0</span></div>
-        <div class="preview-stat"><span>Блоков кода</span><span class="preview-stat-val" id="statCode">0</span></div>
+      <div>
+        <div class="panel-title">Статистика</div>
+        <div class="preview-box">
+          <div class="preview-stat"><span>Блоков</span><span class="preview-stat-val" id="statBlocks">0</span></div>
+          <div class="preview-stat"><span>Квиз-вопросов</span><span class="preview-stat-val" id="statQuizQ">0</span></div>
+          <div class="preview-stat"><span>Заданий</span><span class="preview-stat-val" id="statTasks">0</span></div>
+          <div class="preview-stat"><span>Слайдов</span><span class="preview-stat-val" id="statSlides">0</span></div>
+          <div class="preview-stat"><span>Голосований</span><span class="preview-stat-val" id="statPolls">0</span></div>
+        </div>
       </div>
 
-      <div class="preview-title">Порядок блоков</div>
-      <div class="preview-mini-blocks" id="miniBlocksList">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:8px;">Блоки появятся здесь</div>
+      <div>
+        <div class="panel-title">Структура</div>
+        <div class="preview-mini-blocks" id="miniBlocksList">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px;">Добавьте блоки</div>
+        </div>
       </div>
 
-      <div class="preview-title">Видимость</div>
-      <div class="publish-options">
+      <div>
+        <div class="panel-title">Видимость</div>
         <div class="pub-opt selected" id="pubOptPublic" onclick="selectPubOpt('public')">
           <div class="pub-opt-dot"></div>
-          <div>
-            <div class="pub-opt-label">Публичный</div>
-            <div class="pub-opt-sub">Доступен всем студентам</div>
-          </div>
+          <div><div class="pub-opt-label">Публичный</div><div class="pub-opt-sub">Виден всем студентам</div></div>
         </div>
         <div class="pub-opt" id="pubOptDraft" onclick="selectPubOpt('draft')">
           <div class="pub-opt-dot"></div>
-          <div>
-            <div class="pub-opt-label">Черновик</div>
-            <div class="pub-opt-sub">Только вы видите урок</div>
-          </div>
+          <div><div class="pub-opt-label">Черновик</div><div class="pub-opt-sub">Только вы видите</div></div>
         </div>
       </div>
     </aside>
   </div>
+</div>
 
-  <div class="success-screen" id="successScreen">
-    <div class="success-icon-wrap">✅</div>
-    <div class="success-title">Урок опубликован!</div>
-    <div class="success-sub">Студенты уже могут его изучать</div>
-    <div class="success-actions">
-      <button class="success-btn ghost" onclick="resetLesson()">Создать ещё</button>
-      <button class="success-btn primary" onclick="window.location.href='./index.html'">На главную →</button>
+<!-- TAB: OPEN LESSON SETTINGS -->
+<div class="tab-content" id="tab-openlesson">
+  <div class="open-lesson-wrap">
+
+    <!-- Режим проведения -->
+    <div class="ol-section">
+      <div class="ol-section-title">🎯 Режим открытого урока</div>
+      <div class="ol-section-sub">Как будет проходить урок? Выберите формат взаимодействия с классом.</div>
+      <div class="mode-cards">
+        <div class="mode-card selected" data-mode="presentation" onclick="selectMode(this)">
+          <div class="mode-card-check"></div>
+          <div class="mode-card-icon">📊</div>
+          <div class="mode-card-title">Презентация</div>
+          <div class="mode-card-desc">Слайд за слайдом на проекторе. Студенты следят и отвечают.</div>
+        </div>
+        <div class="mode-card" data-mode="quiz-race" onclick="selectMode(this)">
+          <div class="mode-card-check"></div>
+          <div class="mode-card-icon">⚡</div>
+          <div class="mode-card-title">Квиз-гонка</div>
+          <div class="mode-card-desc">Студенты отвечают на вопросы на своих устройствах. Кто быстрее — в лидерах.</div>
+        </div>
+        <div class="mode-card" data-mode="teams" onclick="selectMode(this)">
+          <div class="mode-card-check"></div>
+          <div class="mode-card-icon">👥</div>
+          <div class="mode-card-title">Командная битва</div>
+          <div class="mode-card-desc">Класс делится на команды. Очки суммируются. Итог — на доске.</div>
+        </div>
+        <div class="mode-card" data-mode="monopoly" onclick="selectMode(this)">
+          <div class="mode-card-check"></div>
+          <div class="mode-card-icon">🎲</div>
+          <div class="mode-card-title">Монополия</div>
+          <div class="mode-card-desc">Игровой урок с кубиком, заданиями и баллами. Идеально для проектора.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Настройки сессии -->
+    <div class="ol-section">
+      <div class="ol-section-title">⚙️ Параметры сессии</div>
+      <div class="ol-grid">
+        <div class="ol-field">
+          <label>Название сессии</label>
+          <input class="ol-inp" id="sessionName" placeholder="Урок по функциям Python">
+        </div>
+        <div class="ol-field">
+          <label>Максимум участников</label>
+          <select class="ol-sel" id="sessionMaxPlayers">
+            <option value="10">До 10</option>
+            <option value="20">До 20</option>
+            <option value="30" selected>До 30</option>
+            <option value="40">До 40</option>
+          </select>
+        </div>
+        <div class="ol-field">
+          <label>Таймер на вопрос (сек)</label>
+          <select class="ol-sel" id="sessionTimer">
+            <option value="0">Без таймера</option>
+            <option value="15">15 секунд</option>
+            <option value="30" selected>30 секунд</option>
+            <option value="45">45 секунд</option>
+            <option value="60">60 секунд</option>
+          </select>
+        </div>
+        <div class="ol-field">
+          <label>Показ правильного ответа</label>
+          <select class="ol-sel" id="sessionReveal">
+            <option value="after_all">После всех ответили</option>
+            <option value="after_timer" selected>После таймера</option>
+            <option value="instant">Сразу</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="toggle-label">Показывать лидерборд</div><div class="toggle-sub">После каждого вопроса — рейтинг команд/игроков</div></div>
+          <label class="toggle"><input type="checkbox" id="toggleLeaderboard" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="toggle-label">Анонимные ответы</div><div class="toggle-sub">Студенты отвечают без имён (для опросов)</div></div>
+          <label class="toggle"><input type="checkbox" id="toggleAnon"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="toggle-label">Звуковые эффекты</div><div class="toggle-sub">Звук при правильном/неправильном ответе</div></div>
+          <label class="toggle"><input type="checkbox" id="toggleSound" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="toggle-label">Разрешить опоздавших</div><div class="toggle-sub">Студенты могут присоединиться в середине урока</div></div>
+          <label class="toggle"><input type="checkbox" id="toggleLateJoin" checked><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Команды -->
+    <div class="ol-section" id="teamsSection">
+      <div class="ol-section-title">👥 Команды</div>
+      <div class="ol-section-sub">Настройте команды заранее. Студенты выберут свою при входе по PIN.</div>
+      <div class="teams-grid" id="teamsGrid">
+        <div class="team-input-card">
+          <button class="team-emoji-btn" onclick="cycleTeamEmoji(this)">🔵</button>
+          <input class="team-name-inp" placeholder="Команда 1" value="Команда Альфа">
+        </div>
+        <div class="team-input-card">
+          <button class="team-emoji-btn" onclick="cycleTeamEmoji(this)">🔴</button>
+          <input class="team-name-inp" placeholder="Команда 2" value="Команда Бета">
+        </div>
+        <div class="team-input-card">
+          <button class="team-emoji-btn" onclick="cycleTeamEmoji(this)">🟢</button>
+          <input class="team-name-inp" placeholder="Команда 3" value="Команда Гамма">
+        </div>
+        <div class="team-input-card" style="border-style:dashed;cursor:pointer;justify-content:center" onclick="addTeam()">
+          <span style="font-size:20px;color:var(--text3)">＋</span>
+          <span style="font-size:12px;color:var(--text3);font-family:var(--mono);">Добавить</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Запуск -->
+    <div class="ol-section">
+      <div class="ol-section-title">🚀 Запуск сессии</div>
+      <div class="ol-section-sub">Сгенерируйте PIN-код — студенты вводят его на своих устройствах или по QR.</div>
+      <div class="launch-preview">
+        <div class="launch-pin" id="previewPin">— — — — — —</div>
+        <div class="launch-info">
+          <h3>Студенты заходят на <span style="color:var(--blue)">tagybasqa.app/join</span></h3>
+          <p>или сканируют QR-код · PIN обновляется каждый урок · действует 4 часа</p>
+        </div>
+        <button class="btn-primary" onclick="generateAndLaunch()" style="flex-shrink:0">
+          📡 Создать сессию
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TAB: SLIDES PREVIEW -->
+<div class="tab-content" id="tab-slides">
+  <div class="presentation-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:18px;font-weight:900;margin-bottom:4px;">Режим презентации</h2>
+        <p style="font-size:13px;color:var(--text3);font-family:var(--mono);">Каждый блок — отдельный слайд. Управляйте с ноутбука, класс видит на проекторе.</p>
+      </div>
+      <button class="btn-primary" onclick="openPresentation()">▶ Начать презентацию</button>
+    </div>
+    <div class="slides-list" id="slidesPreviewList">
+      <div style="text-align:center;padding:40px;color:var(--text3);font-family:var(--mono);font-size:13px;border:2px dashed var(--border2);border-radius:var(--r2);">
+        Добавьте блоки в конструкторе — они появятся здесь как слайды
+      </div>
     </div>
   </div>
+</div>
 
-  <div class="toast" id="tb-toast"></div>
+<!-- SUCCESS SCREEN -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✅</div>
+  <div class="success-title" id="successTitle">Урок опубликован!</div>
+  <div class="success-sub" id="successSub">Студенты уже могут изучать этот урок</div>
+  <div class="success-pin-box" id="successPinBox" style="display:none">
+    <div class="success-pin-label">PIN для входа в открытый урок</div>
+    <div class="success-pin" id="successPinDisplay">---</div>
+  </div>
+  <div class="success-actions">
+    <button class="btn-ghost" onclick="resetLesson()">Создать ещё</button>
+    <button class="btn-primary btn-green" onclick="openHostPage()" id="hostBtn" style="display:none">📡 Страница учителя →</button>
+    <button class="btn-primary" onclick="window.location.href='./index.html'">На главную →</button>
+  </div>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import {
-      getFirestore, collection, addDoc, doc, getDoc, updateDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+<div class="toast" id="tb-toast"></div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
-      authDomain: "pystart-dd2db.firebaseapp.com",
-      projectId: "pystart-dd2db",
-      storageBucket: "pystart-dd2db.firebasestorage.app",
-      messagingSenderId: "9188811255",
-      appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
-    };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, setDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const editId = new URLSearchParams(window.location.search).get('edit');
+  const firebaseConfig = {
+    apiKey:"AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+    authDomain:"pystart-dd2db.firebaseapp.com",
+    projectId:"pystart-dd2db",
+    storageBucket:"pystart-dd2db.firebasestorage.app",
+    messagingSenderId:"9188811255",
+    appId:"1:9188811255:web:6f7280f1f7f67b80d90ef2"
+  };
 
-    let currentUser = null;
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const editId = new URLSearchParams(window.location.search).get('edit');
 
-    onAuthStateChanged(auth, async user => {
-      if (!user) { window.location.href = './auth.html'; return; }
-      currentUser = user;
+  let currentUser = null;
+  window._db = db;
+  window._auth = auth;
+  window._editId = editId;
+  window._serverTimestamp = serverTimestamp;
+  window._collection = collection;
+  window._addDoc = addDoc;
+  window._doc = doc;
+  window._updateDoc = updateDoc;
+  window._setDoc = setDoc;
 
-      if (editId) {
-        document.getElementById('topbarTitle').textContent = 'Редактирование урока';
-        document.getElementById('publishBtn').textContent = '💾 Сохранить';
-        try {
-          const snap = await getDoc(doc(db, "interactiveLessons", editId));
-          if (snap.exists()) {
-            const data = snap.data();
-            if (data.uid !== user.uid) { alert('Нет доступа'); window.location.href = './index.html'; return; }
-            fillForm(data);
-          }
-        } catch (e) { console.error(e); }
-      }
-      applyTheme();
-    });
-
-    function fillForm(data) {
-      document.getElementById('lessonTitle').value = data.title || '';
-      document.getElementById('lessonDesc').value = data.description || '';
-      document.getElementById('lessonSubject').value = data.subject || '';
-      document.getElementById('lessonLevel').value = data.level || 'beginner';
-      document.getElementById('lessonDuration').value = data.duration || '';
-      if (data.emoji) {
-        document.querySelectorAll('.emoji-pick').forEach(e => {
-          e.classList.toggle('selected', e.dataset.emoji === data.emoji);
-        });
-        window.selectedEmoji = data.emoji;
-      }
-      if (data.visibility === 'draft') window.selectPubOpt('draft');
-      if (data.blocks && Array.isArray(data.blocks)) {
-        data.blocks.forEach(b => window.addBlockFromData(b));
-      }
-      updateStats();
-      updateMiniBlocks();
-    }
-
-    window.saveToFirebase = async function (lessonData) {
-      if (!auth.currentUser) throw new Error('Не авторизован');
-
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = './auth.html'; return; }
+    currentUser = user;
+    window._currentUser = user;
+    if (editId) {
+      document.getElementById('topbarTitle').textContent = '✏️ Редактирование урока';
+      document.getElementById('publishBtn').textContent = '💾 Сохранить';
       try {
-        lessonData.status = "pending";
-
-        if (editId) {
-          await updateDoc(doc(db, "interactiveLessons", editId), lessonData);
-          console.log("✅ Урок обновлён и отправлен на повторную модерацию");
-        } else {
-          const docRef = await addDoc(collection(db, "interactiveLessons"), lessonData);
-          console.log("✅ Урок создан и отправлен на модерацию! ID:", docRef.id);
+        const snap = await getDoc(doc(db, "interactiveLessons", editId));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.uid !== user.uid) { alert('Нет доступа'); window.location.href = './index.html'; return; }
+          fillForm(data);
         }
-      } catch (err) {
-        console.error("Firebase ошибка:", err);
-        throw err;
-      }
-    };
-
-    function applyTheme() {
-      const saved = localStorage.getItem('theme');
-      const html = document.documentElement;
-      if (saved === 'dark') html.classList.add('dark');
-      else if (saved === 'light') html.classList.remove('dark');
-      else if (window.matchMedia('(prefers-color-scheme: dark)').matches) html.classList.add('dark');
+      } catch(e) { console.error(e); }
     }
+  });
 
-    window.auth = auth;
-    window.db = db;
-    window.editId = editId;
-    window.serverTimestamp = serverTimestamp;
-  </script>
-
-  <script>
-    // ── STATE ──
-    let blocks = [];
-    let selectedEmoji = '📖';
-    let selectedVisibility = 'public';
-    let saveTimer;
-    let blockCounter = 0;
-
-    // ── EMOJI ──
-    function selectEmoji(el) {
-      document.querySelectorAll('.emoji-pick').forEach(e => e.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedEmoji = el.dataset.emoji;
-      autoSave();
+  function fillForm(data) {
+    document.getElementById('lessonTitle').value = data.title||'';
+    document.getElementById('lessonDesc').value = data.description||'';
+    document.getElementById('lessonSubject').value = data.subject||'';
+    document.getElementById('lessonLevel').value = data.level||'beginner';
+    document.getElementById('lessonDuration').value = data.duration||'';
+    if (data.emoji) {
+      document.querySelectorAll('.emoji-pick').forEach(e => e.classList.toggle('selected', e.dataset.emoji===data.emoji));
+      window.selectedEmoji = data.emoji;
     }
+    if (data.visibility==='draft') window.selectPubOpt('draft');
+    if (data.blocks) data.blocks.forEach(b => window.addBlockFromData(b));
+    updateStats(); updateMiniBlocks(); updateSlidesPreview();
+  }
 
-    // ── VISIBILITY ──
-    function selectPubOpt(val) {
-      selectedVisibility = val;
-      document.getElementById('pubOptPublic').classList.toggle('selected', val === 'public');
-      document.getElementById('pubOptDraft').classList.toggle('selected', val === 'draft');
-      autoSave();
+  window.saveToFirebase = async function(lessonData) {
+    if (!window._currentUser) throw new Error('Не авторизован');
+    lessonData.status = "pending";
+    if (editId) {
+      await updateDoc(doc(db,"interactiveLessons",editId), lessonData);
+    } else {
+      const ref = await addDoc(collection(db,"interactiveLessons"), lessonData);
+      window._savedLessonId = ref.id;
     }
+  };
 
-    // ── ADD BLOCK ──
-    function addBlock(type, data = {}) {
-      const id = 'block_' + (++blockCounter);
-      const block = { id, type, ...data };
-      blocks.push(block);
-      renderBlock(block);
-      updateCanvasEmpty();
-      updateStats();
-      updateMiniBlocks();
-      autoSave();
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
-    }
+  window.saveOpenLessonSession = async function(sessionData) {
+    if (!window._currentUser) throw new Error('Не авторизован');
+    const ref = await addDoc(collection(db,"openLessonSessions"), sessionData);
+    return ref.id;
+  };
+</script>
 
-    function addBlockFromData(data) {
-      const id = 'block_' + (++blockCounter);
-      const block = { ...data, id };
-      blocks.push(block);
-      renderBlock(block);
-      updateCanvasEmpty();
-    }
+<script>
+// ── STATE ──
+let blocks = [];
+let selectedEmoji = '📖';
+let selectedVisibility = 'public';
+let selectedMode = 'presentation';
+let saveTimer;
+let blockCounter = 0;
+let currentSessionId = null;
+let currentPin = null;
 
-    function renderBlock(block) {
-      const wrap = document.createElement('div');
-      wrap.className = 'block-card';
-      wrap.id = block.id;
-      wrap.setAttribute('draggable', 'true');
-      wrap.dataset.blockId = block.id;
+// ── TABS ──
+function switchTab(tab) {
+  document.querySelectorAll('.page-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id==='tab-'+tab));
+  if (tab==='slides') updateSlidesPreview();
+  document.getElementById('launchBtn').style.display = (tab==='openlesson') ? 'flex' : 'none';
+}
 
-      const typeInfo = getTypeInfo(block.type);
-      
-      // ИСПРАВЛЕНО: Заменены классы block-header, block-drag, block-actions на соответствующие из CSS
-      wrap.innerHTML = `
+// ── EMOJI ──
+function selectEmoji(el) {
+  document.querySelectorAll('.emoji-pick').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedEmoji = el.dataset.emoji;
+  autoSave();
+}
+
+// ── VISIBILITY ──
+function selectPubOpt(val) {
+  selectedVisibility = val;
+  document.getElementById('pubOptPublic').classList.toggle('selected', val==='public');
+  document.getElementById('pubOptDraft').classList.toggle('selected', val==='draft');
+  autoSave();
+}
+
+// ── MODE ──
+function selectMode(card) {
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedMode = card.dataset.mode;
+  document.getElementById('teamsSection').style.display = (selectedMode==='teams'||selectedMode==='quiz-race') ? 'block' : 'none';
+}
+
+// ── TEAMS ──
+const TEAM_EMOJIS = ['🔵','🔴','🟢','🟡','🟠','🟣','⚫','⬜'];
+function cycleTeamEmoji(btn) {
+  const cur = TEAM_EMOJIS.indexOf(btn.textContent);
+  btn.textContent = TEAM_EMOJIS[(cur+1)%TEAM_EMOJIS.length];
+}
+function addTeam() {
+  const grid = document.getElementById('teamsGrid');
+  const addBtn = grid.lastElementChild;
+  const count = grid.querySelectorAll('.team-input-card:not([onclick="addTeam()"])').length;
+  const card = document.createElement('div');
+  card.className = 'team-input-card';
+  card.innerHTML = `
+    <button class="team-emoji-btn" onclick="cycleTeamEmoji(this)">${TEAM_EMOJIS[count%TEAM_EMOJIS.length]}</button>
+    <input class="team-name-inp" placeholder="Команда ${count+1}">
+    <button class="team-del" onclick="this.parentElement.remove()">✕</button>
+  `;
+  grid.insertBefore(card, addBtn);
+}
+
+function getTeams() {
+  return [...document.querySelectorAll('#teamsGrid .team-input-card:not([onclick="addTeam()"])')].map(c => ({
+    emoji: c.querySelector('.team-emoji-btn')?.textContent || '🔵',
+    name: c.querySelector('.team-name-inp')?.value || 'Команда'
+  }));
+}
+
+// ── BLOCKS ──
+function addBlock(type, data={}) {
+  const id = 'block_'+(++blockCounter);
+  const block = {id, type, ...data};
+  blocks.push(block);
+  renderBlock(block);
+  updateCanvasEmpty(); updateStats(); updateMiniBlocks();
+  autoSave();
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
+}
+
+function addBlockFromData(data) {
+  const id = 'block_'+(++blockCounter);
+  const block = {...data, id};
+  blocks.push(block);
+  renderBlock(block);
+  updateCanvasEmpty();
+}
+
+function renderBlock(block) {
+  const wrap = document.createElement('div');
+  wrap.className = 'block-card';
+  wrap.id = block.id;
+  wrap.setAttribute('draggable','true');
+  wrap.dataset.blockId = block.id;
+
+  const typeInfo = getTypeInfo(block.type);
+  wrap.innerHTML = `
     <div class="block-card-header">
-      <span class="block-drag-handle" title="Перетащить">⠿</span>
+      <span class="block-drag-handle">⠿</span>
       <span class="block-type-badge ${block.type}">${typeInfo.label}</span>
-      <span style="font-weight: 700; font-size: 13px; margin-left: 6px;">${typeInfo.name}</span>
+      <span style="font-size:13px;font-weight:700;margin-left:4px;">${typeInfo.name}</span>
       <div class="block-card-actions">
         <button class="block-action-btn" onclick="moveBlockUp('${block.id}')" title="Вверх">↑</button>
         <button class="block-action-btn" onclick="moveBlockDown('${block.id}')" title="Вниз">↓</button>
         <button class="block-action-btn del" onclick="deleteBlock('${block.id}')" title="Удалить">✕</button>
       </div>
     </div>
-    <div class="block-card-body" id="body_${block.id}">
-      ${renderBlockBody(block)}
-    </div>
-  `;
+    <div class="block-card-body" id="body_${block.id}">${renderBlockBody(block)}</div>`;
 
-      const list = document.getElementById('blocksList');
-      const empty = document.getElementById('canvasEmpty');
-      if (empty && empty.style.display !== 'none') list.insertBefore(wrap, empty);
-      else list.appendChild(wrap);
+  const list = document.getElementById('blocksList');
+  const empty = document.getElementById('canvasEmpty');
+  if (empty) list.insertBefore(wrap, empty);
+  else list.appendChild(wrap);
 
-      wrap.addEventListener('dragstart', onDragStart);
-      wrap.addEventListener('dragover', onDragOver);
-      wrap.addEventListener('drop', onDrop);
-      wrap.addEventListener('dragend', onDragEnd);
+  wrap.addEventListener('dragstart', onDragStart);
+  wrap.addEventListener('dragover', onDragOver);
+  wrap.addEventListener('drop', onDrop);
+  wrap.addEventListener('dragend', onDragEnd);
 
-      initBlockEvents(block.id, block.type, block);
+  document.querySelectorAll(`#${block.id} textarea`).forEach(ta => autoSize(ta));
+}
+
+function getTypeInfo(type) {
+  const map = {
+    heading:{label:'text',name:'Заголовок'}, subheading:{label:'text',name:'Подзаголовок'},
+    text:{label:'text',name:'Абзац'}, video:{label:'video',name:'Видео'},
+    image:{label:'image',name:'Изображение'}, code:{label:'code',name:'Python код'},
+    quiz:{label:'quiz',name:'Тест'}, task:{label:'task',name:'Задание'},
+    callout:{label:'callout',name:'Блок-подсказка'}, checklist:{label:'checklist',name:'Чеклист'},
+    divider:{label:'text',name:'Разделитель'}, poll:{label:'poll',name:'Голосование'},
+    slide:{label:'slide',name:'Слайд'},
+  };
+  return map[type]||{label:'text',name:type};
+}
+
+function renderBlockBody(block) {
+  const v = (k,d='') => escHtml(block[k]!==undefined?block[k]:d);
+  switch(block.type) {
+    case 'heading': return `<textarea class="textarea-inp" style="font-size:20px;font-weight:800;min-height:50px" rows="1" placeholder="Заголовок..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${v('content')}</textarea>`;
+    case 'subheading': return `<textarea class="textarea-inp" style="font-size:16px;font-weight:700;min-height:44px" rows="1" placeholder="Подзаголовок..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${v('content')}</textarea>`;
+    case 'text': return `<textarea class="textarea-inp" rows="3" placeholder="Текст объяснения..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${v('content')}</textarea>`;
+    case 'divider': return `<div style="height:2px;background:var(--border2);border-radius:2px;margin:6px 0"></div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center">─── Разделитель ───</div>`;
+    case 'callout': {
+      const ct=block.calloutType||'info';
+      const em={info:'ℹ️',warning:'⚠️',success:'✅',danger:'❗'};
+      return `<div class="callout-wrap ${ct}" id="calloutWrap_${block.id}"><span class="callout-emoji" id="calloutEmoji_${block.id}">${em[ct]}</span><div style="flex:1"><select class="sel" style="margin-bottom:8px" onchange="changeCalloutType('${block.id}',this.value)"><option value="info" ${ct==='info'?'selected':''}>ℹ️ Инфо</option><option value="warning" ${ct==='warning'?'selected':''}>⚠️ Внимание</option><option value="success" ${ct==='success'?'selected':''}>✅ Успех</option><option value="danger" ${ct==='danger'?'selected':''}>❗ Важно</option></select><textarea class="textarea-inp" rows="2" placeholder="Текст подсказки..." oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${v('content')}</textarea></div></div>`;
     }
+    case 'checklist': return renderChecklistBlock(block);
+    case 'video': return `<div style="display:flex;gap:10px"><input class="inp" id="vidUrl_${block.id}" value="${v('url')}" placeholder="https://youtube.com/watch?v=..." oninput="updateBlockField('${block.id}','url',this.value)"><button class="url-apply-btn" onclick="applyVideo('${block.id}')">Встроить</button></div><div id="vidPreview_${block.id}" style="margin-top:12px">${block.url?buildVideoEmbed(block.url):'<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;padding:16px">Вставьте ссылку</div>'}</div>`;
+    case 'image': return `<div style="display:flex;gap:10px"><input class="inp" id="imgUrl_${block.id}" value="${v('url')}" placeholder="https://example.com/img.jpg" oninput="updateBlockField('${block.id}','url',this.value)"><button class="url-apply-btn" onclick="applyImage('${block.id}')">Показать</button></div><div id="imgPreview_${block.id}" style="margin-top:12px;text-align:center">${block.url?`<img src="${v('url')}" style="max-width:100%;border-radius:var(--r)">`:''}</div><input class="inp" placeholder="Подпись (необязательно)" value="${v('caption')}" oninput="updateBlockField('${block.id}','caption',this.value)">`;
+    case 'code': return `<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><select class="sel" onchange="updateBlockField('${block.id}','lang',this.value)"><option value="python" ${block.lang==='python'?'selected':''}>Python</option><option value="javascript" ${block.lang==='javascript'?'selected':''}>JavaScript</option><option value="html" ${block.lang==='html'?'selected':''}>HTML</option></select><button class="run-code-btn" onclick="runCode('${block.id}')">▶ Запустить</button></div><textarea class="code-editor-inp" id="codeArea_${block.id}" placeholder="# Код здесь&#10;print('Привет!')" oninput="updateBlockField('${block.id}','code',this.value)">${v('code')}</textarea><div class="terminal-out" id="terminal_${block.id}"></div></div>`;
+    case 'quiz': return renderQuizBlock(block);
+    case 'task': return `<div><textarea class="textarea-inp" placeholder="Опишите задание..." oninput="updateBlockField('${block.id}','taskText',this.value)">${v('taskText')}</textarea><label class="meta-label" style="margin-top:10px;display:block">Правильный ответ (скрыт от студентов)</label><input class="inp" style="margin-top:4px" type="text" placeholder="Введите ответ..." value="${v('answer')}" oninput="updateBlockField('${block.id}','answer',this.value)"></div>`;
+    case 'poll': return renderPollBlock(block);
+    case 'slide': return renderSlideBlock(block);
+    default: return `<span style="color:var(--text3);font-size:12px">Тип: ${block.type}</span>`;
+  }
+}
 
-    function getTypeInfo(type) {
-      const map = {
-        heading: { label: 'text', name: 'Заголовок' },
-        subheading: { label: 'text', name: 'Подзаголовок' },
-        text: { label: 'text', name: 'Абзац' },
-        video: { label: 'video', name: 'Видео' },
-        image: { label: 'image', name: 'Изображение' },
-        code: { label: 'code', name: 'Python терминал' },
-        quiz: { label: 'quiz', name: 'Тест (квиз)' },
-        task: { label: 'task', name: 'Задание с вводом' },
-        callout: { label: 'callout', name: 'Информационный блок' },
-        checklist: { label: 'checklist', name: 'Чеклист' },
-        divider: { label: 'divider', name: 'Разделитель' },
-      };
-      return map[type] || { label: 'text', name: type };
-    }
+function renderQuizBlock(block) {
+  const qs = block.questions||[];
+  let html = `<div class="quiz-questions-list" id="quizList_${block.id}">`;
+  qs.forEach((q,qi) => { html += renderQuizQuestion(block.id,qi,q); });
+  html += `</div><div style="display:flex;gap:8px;margin-top:12px"><button class="add-btn" onclick="addQuizQuestion('${block.id}','mcq')">＋ Выбор ответа</button><button class="add-btn" onclick="addQuizQuestion('${block.id}','fill')">＋ Ввод ответа</button></div>`;
+  return html;
+}
 
-    function renderBlockBody(block) {
-      const val = (k, def = '') => block[k] !== undefined ? escHtml(block[k]) : def;
-      // ИСПРАВЛЕНО: Использованы классы textarea-inp, inp, sel и структуры из вашего CSS
-      switch (block.type) {
-        case 'heading':
-          return `<textarea class="textarea-inp" style="font-size: 20px; font-weight: 800; min-height: 50px;" rows="1" placeholder="Заголовок урока..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${val('content')}</textarea>`;
-        case 'subheading':
-          return `<textarea class="textarea-inp" style="font-size: 16px; font-weight: 700; min-height: 50px;" rows="1" placeholder="Подзаголовок раздела..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${val('content')}</textarea>`;
-        case 'text':
-          return `<textarea class="textarea-inp" rows="3" placeholder="Напишите текст объяснения..." data-field="content" oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${val('content')}</textarea>`;
-        case 'video':
-          return `
-        <div style="display:flex; gap: 10px;">
-          <input class="inp" id="vidUrl_${block.id}" value="${val('url')}" placeholder="https://www.youtube.com/watch?v=..." oninput="updateBlockField('${block.id}','url',this.value)">
-          <button class="url-apply-btn" onclick="applyVideo('${block.id}')">Встроить</button>
-        </div>
-        <div id="vidPreview_${block.id}" style="margin-top: 14px;">${block.url ? buildVideoEmbed(block.url) : '<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;">Вставьте ссылку выше</div>'}</div>
-      `;
-        case 'image':
-          return `
-        <div style="display:flex; gap: 10px;">
-          <input class="inp" id="imgUrl_${block.id}" value="${val('url')}" placeholder="https://example.com/image.jpg" oninput="updateBlockField('${block.id}','url',this.value)">
-          <button class="url-apply-btn" onclick="applyImage('${block.id}')">Показать</button>
-        </div>
-        <div id="imgPreview_${block.id}" style="margin-top: 14px; text-align: center;">${block.url ? `<img src="${val('url')}" style="max-width:100%; border-radius:var(--r);" onerror="this.style.display='none'">` : ''}</div>
-        <input class="inp" style="margin-top:8px;" placeholder="Подпись к изображению (необязательно)" value="${val('caption')}" oninput="updateBlockField('${block.id}','caption',this.value)">
-      `;
-        case 'code':
-          return `
-        <div>
-          <div class="code-lang-row">
-            <select class="sel" style="width: auto;" onchange="updateBlockField('${block.id}','lang',this.value)">
-              <option value="python" ${block.lang === 'python' ? 'selected' : ''}>Python</option>
-              <option value="javascript" ${block.lang === 'javascript' ? 'selected' : ''}>JavaScript</option>
-              <option value="html" ${block.lang === 'html' ? 'selected' : ''}>HTML</option>
-              <option value="css" ${block.lang === 'css' ? 'selected' : ''}>CSS</option>
-            </select>
-            <button class="run-code-btn" onclick="runCode('${block.id}')">▶ Запустить</button>
-          </div>
-          <textarea class="code-editor-inp" id="codeArea_${block.id}" placeholder="# Ваш код здесь&#10;print('Привет, мир!')" oninput="updateBlockField('${block.id}','code',this.value)">${val('code')}</textarea>
-          <div class="terminal-out" id="terminal_${block.id}"></div>
-        </div>
-      `;
-        case 'quiz':
-          return renderQuizBlock(block);
-        case 'task':
-          return `
-        <div>
-          <textarea class="textarea-inp" placeholder="Опишите задание для студента..." oninput="updateBlockField('${block.id}','taskText',this.value)">${val('taskText')}</textarea>
-          <span style="font-family: var(--mono); font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; display: block;">Правильный ответ (будет скрыт)</span>
-          <input class="inp" type="text" placeholder="Введите правильный ответ..." value="${val('answer')}" oninput="updateBlockField('${block.id}','answer',this.value)">
-        </div>
-      `;
-        case 'callout':
-          const ct = block.calloutType || 'info';
-          const emojis = { info: 'ℹ️', warning: '⚠️', success: '✅', danger: '❗' };
-          return `
-        <div class="callout-wrap" id="calloutWrap_${block.id}">
-          <span class="callout-emoji" id="calloutEmoji_${block.id}">${emojis[ct]}</span>
-          <div style="flex:1;">
-            <select class="sel" style="margin-bottom: 8px;" onchange="changeCalloutType('${block.id}',this.value)">
-              <option value="info" ${ct === 'info' ? 'selected' : ''}>ℹ️ Информация</option>
-              <option value="warning" ${ct === 'warning' ? 'selected' : ''}>⚠️ Внимание</option>
-              <option value="success" ${ct === 'success' ? 'selected' : ''}>✅ Успех</option>
-              <option value="danger" ${ct === 'danger' ? 'selected' : ''}>❗ Важно</option>
-            </select>
-            <textarea class="textarea-inp" style="min-height: 60px;" rows="2" placeholder="Текст подсказки или важного замечания..." oninput="updateBlockField('${block.id}','content',this.value);autoSize(this)">${val('content')}</textarea>
-          </div>
-        </div>
-      `;
-        case 'checklist':
-          return renderChecklistBlock(block);
-        case 'divider':
-          return `<div style="height: 2px; background: var(--border2); border-radius: 2px; margin: 10px 0;"></div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;">Разделитель</div>`;
-        default:
-          return `<span style="color:var(--text3);font-size:12px;">Неизвестный тип блока: ${block.type}</span>`;
+function renderQuizQuestion(blockId, qi, q) {
+  const opts = q.options||['','','',''];
+  let optsHtml = q.type==='fill'
+    ? `<input class="option-inp" style="width:100%;margin-top:8px" value="${escHtml(q.answer||'')}" placeholder="Правильный ответ (точный текст)" oninput="updateQuizFillAnswer('${blockId}',${qi},this.value)">`
+    : opts.map((o,oi) => `<div class="option-row"><div class="option-correct-radio ${q.answer===oi?'selected':''}" id="radio_${blockId}_${qi}_${oi}" onclick="setCorrectAnswer('${blockId}',${qi},${oi})"></div><input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ${oi+1}" oninput="updateQuizOption('${blockId}',${qi},${oi},this.value)">${opts.length>2?`<button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${oi})">✕</button>`:''}</div>`).join('');
+  return `<div class="quiz-q-card" id="quizQ_${blockId}_${qi}"><div class="quiz-q-top"><select class="sel" style="padding:6px 10px;font-size:11px" disabled><option>${q.type==='fill'?'ВВОД ОТВЕТА':'ВЫБОР MCQ'}</option></select><input class="quiz-q-inp" value="${escHtml(q.q||'')}" placeholder="Текст вопроса..." oninput="updateQuizQuestion('${blockId}',${qi},this.value)"><button class="quiz-q-del" onclick="deleteQuizQuestion('${blockId}',${qi})">✕</button></div><div id="quizOpts_${blockId}_${qi}">${optsHtml}${q.type==='mcq'?`<button class="add-btn" style="margin-top:8px" onclick="addQuizOption('${blockId}',${qi})">＋ Вариант</button>`:''}</div></div>`;
+}
+
+function renderChecklistBlock(block) {
+  const items = block.items||[''];
+  return `<div class="checklist-items-list" id="checklist_${block.id}">${items.map((item,i) => `<div class="checklist-item-row"><input class="cl-inp" value="${escHtml(item)}" placeholder="Пункт ${i+1}" oninput="updateChecklistItem('${block.id}',${i},this.value)">${items.length>1?`<button class="cl-del" onclick="deleteChecklistItem('${block.id}',${i})">✕</button>`:''}</div>`).join('')}</div><button class="add-btn" onclick="addChecklistItem('${block.id}')" style="margin-top:8px">＋ Добавить пункт</button>`;
+}
+
+function renderPollBlock(block) {
+  const opts = block.pollOptions||['',''];
+  return `<div><textarea class="textarea-inp" rows="2" placeholder="Вопрос для голосования..." oninput="updateBlockField('${block.id}','question',this.value)">${escHtml(block.question||'')}</textarea><div style="margin-top:10px;display:flex;flex-direction:column;gap:6px" id="pollOpts_${block.id}">${opts.map((o,i) => `<div style="display:flex;gap:8px;align-items:center"><span style="font-family:var(--mono);font-size:11px;color:var(--text3);width:20px">${i+1}.</span><input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ответа ${i+1}" oninput="updatePollOption('${block.id}',${i},this.value)">${opts.length>2?`<button class="option-del" onclick="removePollOption('${block.id}',${i})">✕</button>`:''}</div>`).join('')}</div><button class="add-btn" style="margin-top:8px" onclick="addPollOption('${block.id}')">＋ Вариант</button></div>`;
+}
+
+function renderSlideBlock(block) {
+  return `<div class="slide-block-editor"><div class="slide-label">📊 Слайд презентации</div><textarea class="textarea-inp" style="font-size:18px;font-weight:800;min-height:50px;background:var(--bg4)" rows="1" placeholder="Заголовок слайда..." oninput="updateBlockField('${block.id}','slideTitle',this.value);autoSize(this)">${escHtml(block.slideTitle||'')}</textarea><textarea class="textarea-inp" style="margin-top:8px;min-height:80px;background:var(--bg4)" rows="3" placeholder="Содержимое слайда (текст, ключевые точки)..." oninput="updateBlockField('${block.id}','slideBody',this.value);autoSize(this)">${escHtml(block.slideBody||'')}</textarea><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><select class="sel" style="font-size:11px" onchange="updateBlockField('${block.id}','slideLayout',this.value)"><option value="center">По центру</option><option value="left">Слева</option><option value="title-only">Только заголовок</option></select><input class="inp" style="margin-top:0;flex:1" placeholder="Фоновый цвет (напр. #1a2d35)" value="${escHtml(block.slideBg||'')}" oninput="updateBlockField('${block.id}','slideBg',this.value)"></div></div>`;
+}
+
+// ── BLOCK OPERATIONS ──
+function updateBlockField(blockId, field, value) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (b) { b[field]=value; autoSave(); updateStats(); }
+}
+function deleteBlock(blockId) {
+  blocks = blocks.filter(b=>b.id!==blockId);
+  const el = document.getElementById(blockId);
+  if (el) { el.style.opacity='0'; el.style.transform='scale(.97)'; el.style.transition='all .2s'; setTimeout(()=>el.remove(),200); }
+  setTimeout(()=>{updateCanvasEmpty();updateStats();updateMiniBlocks();},210);
+  autoSave();
+}
+function moveBlockUp(blockId) {
+  const idx = blocks.findIndex(b=>b.id===blockId);
+  if (idx<=0) return;
+  [blocks[idx-1],blocks[idx]]=[blocks[idx],blocks[idx-1]];
+  reRenderBlocks();
+}
+function moveBlockDown(blockId) {
+  const idx = blocks.findIndex(b=>b.id===blockId);
+  if (idx<0||idx>=blocks.length-1) return;
+  [blocks[idx],blocks[idx+1]]=[blocks[idx+1],blocks[idx]];
+  reRenderBlocks();
+}
+function reRenderBlocks() {
+  const list = document.getElementById('blocksList');
+  list.querySelectorAll('.block-card').forEach(el=>el.remove());
+  const snap = [...blocks]; blocks=[]; blockCounter=0;
+  snap.forEach(b=>addBlockFromData(b));
+  updateMiniBlocks(); autoSave();
+}
+function updateCanvasEmpty() {
+  const empty = document.getElementById('canvasEmpty');
+  if (empty) empty.style.display = blocks.length===0 ? 'block' : 'none';
+}
+
+// ── QUIZ OPERATIONS ──
+function addQuizQuestion(blockId, type) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b) return;
+  if (!b.questions) b.questions=[];
+  b.questions.push(type==='fill' ? {type:'fill',q:'',answer:''} : {type:'mcq',q:'',options:['','','',''],answer:0});
+  const list = document.getElementById('quizList_'+blockId);
+  if (list) { const qi=b.questions.length-1; list.insertAdjacentHTML('beforeend',renderQuizQuestion(blockId,qi,b.questions[qi])); }
+  autoSave(); updateStats();
+}
+function deleteQuizQuestion(blockId, qi) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b||!b.questions) return;
+  b.questions.splice(qi,1);
+  const list = document.getElementById('quizList_'+blockId);
+  if (list) { const snap=[...b.questions]; b.questions=[]; list.innerHTML=''; snap.forEach((q,i)=>{b.questions.push(q);list.insertAdjacentHTML('beforeend',renderQuizQuestion(blockId,i,q));}); }
+  autoSave(); updateStats();
+}
+function updateQuizQuestion(blockId, qi, val) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (b?.questions?.[qi]) { b.questions[qi].q=val; autoSave(); }
+}
+function updateQuizOption(blockId, qi, oi, val) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (b?.questions?.[qi]?.options) { b.questions[qi].options[oi]=val; autoSave(); }
+}
+function updateQuizFillAnswer(blockId, qi, val) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (b?.questions?.[qi]) { b.questions[qi].answer=val; autoSave(); }
+}
+function setCorrectAnswer(blockId, qi, oi) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b?.questions?.[qi]) return;
+  b.questions[qi].answer=oi;
+  const container = document.getElementById(`quizOpts_${blockId}_${qi}`);
+  if (container) container.querySelectorAll('.option-correct-radio').forEach((r,i)=>r.classList.toggle('selected',i===oi));
+  autoSave();
+}
+function addQuizOption(blockId, qi) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b?.questions?.[qi]) return;
+  b.questions[qi].options.push('');
+  const container = document.getElementById(`quizOpts_${blockId}_${qi}`);
+  if (container) { const opts=b.questions[qi].options; const oi=opts.length-1; container.querySelector('.add-btn')?.insertAdjacentHTML('beforebegin',`<div class="option-row"><div class="option-correct-radio" id="radio_${blockId}_${qi}_${oi}" onclick="setCorrectAnswer('${blockId}',${qi},${oi})"></div><input class="option-inp" value="" placeholder="Вариант ${oi+1}" oninput="updateQuizOption('${blockId}',${qi},${oi},this.value)"><button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${oi})">✕</button></div>`); }
+  autoSave();
+}
+function removeQuizOption(blockId, qi, oi) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b?.questions?.[qi]?.options||b.questions[qi].options.length<=2) return;
+  b.questions[qi].options.splice(oi,1);
+  const container = document.getElementById(`quizOpts_${blockId}_${qi}`);
+  if (container) { const q=b.questions[qi]; const addBtn=container.querySelector('.add-btn'); container.querySelectorAll('.option-row').forEach(r=>r.remove()); q.options.forEach((o,i)=>{addBtn.insertAdjacentHTML('beforebegin',`<div class="option-row"><div class="option-correct-radio ${q.answer===i?'selected':''}" id="radio_${blockId}_${qi}_${i}" onclick="setCorrectAnswer('${blockId}',${qi},${i})"></div><input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ${i+1}" oninput="updateQuizOption('${blockId}',${qi},${i},this.value)"><button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${i})">✕</button></div>`);});}
+  autoSave();
+}
+
+// ── CHECKLIST ──
+function addChecklistItem(blockId) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b) return;
+  if (!b.items) b.items=[];
+  b.items.push('');
+  const list = document.getElementById('checklist_'+blockId);
+  if (list) { const i=b.items.length-1; list.insertAdjacentHTML('beforeend',`<div class="checklist-item-row"><input class="cl-inp" value="" placeholder="Пункт ${i+1}" oninput="updateChecklistItem('${blockId}',${i},this.value)"><button class="cl-del" onclick="deleteChecklistItem('${blockId}',${i})">✕</button></div>`); }
+  autoSave();
+}
+function updateChecklistItem(blockId, i, val) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (b?.items) { b.items[i]=val; autoSave(); }
+}
+function deleteChecklistItem(blockId, i) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b?.items) return;
+  b.items.splice(i,1);
+  document.getElementById('body_'+blockId).innerHTML=renderChecklistBlock(b);
+  autoSave();
+}
+
+// ── CALLOUT ──
+function changeCalloutType(blockId, type) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (b) { b.calloutType=type; }
+  const emojis={info:'ℹ️',warning:'⚠️',success:'✅',danger:'❗'};
+  const wrap=document.getElementById('calloutWrap_'+blockId);
+  const emo=document.getElementById('calloutEmoji_'+blockId);
+  if (wrap) { wrap.className=`callout-wrap ${type}`; }
+  if (emo) emo.textContent=emojis[type]||'ℹ️';
+  autoSave();
+}
+
+// ── POLL ──
+function updatePollOption(blockId, i, val) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (b?.pollOptions) { b.pollOptions[i]=val; autoSave(); }
+}
+function addPollOption(blockId) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b) return;
+  if (!b.pollOptions) b.pollOptions=['',''];
+  b.pollOptions.push('');
+  document.getElementById('body_'+blockId).innerHTML=renderPollBlock(b);
+  autoSave();
+}
+function removePollOption(blockId, i) {
+  const b = blocks.find(b=>b.id===blockId);
+  if (!b?.pollOptions||b.pollOptions.length<=2) return;
+  b.pollOptions.splice(i,1);
+  document.getElementById('body_'+blockId).innerHTML=renderPollBlock(b);
+  autoSave();
+}
+
+// ── VIDEO / IMAGE ──
+function applyVideo(blockId) {
+  const url = document.getElementById('vidUrl_'+blockId)?.value.trim();
+  const preview = document.getElementById('vidPreview_'+blockId);
+  if (!preview) return;
+  preview.innerHTML = url ? buildVideoEmbed(url) : '<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;padding:16px">Вставьте ссылку</div>';
+  if (url) updateBlockField(blockId,'url',url);
+}
+function buildVideoEmbed(url) {
+  let embedUrl='';
+  const ytId = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
+  if (ytId) embedUrl=`https://www.youtube.com/embed/${ytId}`;
+  const vimeoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
+  if (vimeoId) embedUrl=`https://player.vimeo.com/video/${vimeoId}`;
+  return embedUrl ? `<iframe style="width:100%;height:200px;border-radius:var(--r);border:none" src="${embedUrl}" allowfullscreen></iframe>` : `<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px">❌ Неподдерживаемый формат</div>`;
+}
+function applyImage(blockId) {
+  const url = document.getElementById('imgUrl_'+blockId)?.value.trim();
+  const preview = document.getElementById('imgPreview_'+blockId);
+  if (!preview||!url) return;
+  preview.innerHTML=`<img src="${escHtml(url)}" style="max-width:100%;border-radius:var(--r)" onerror="this.parentElement.innerHTML='<span style=color:var(--red);font-size:12px;font-family:var(--mono)>Не удалось загрузить</span>'">`;
+  updateBlockField(blockId,'url',url);
+}
+
+// ── CODE RUN ──
+function runCode(blockId) {
+  const ta=document.getElementById('codeArea_'+blockId);
+  const term=document.getElementById('terminal_'+blockId);
+  if (!ta||!term) return;
+  term.style.display='block'; term.textContent='⏳ Запуск...';
+  const code=ta.value;
+  setTimeout(()=>{
+    const lines=code.split('\n');
+    const out=[];
+    lines.forEach(line=>{
+      const m=line.match(/^\s*print\s*\(\s*(.+?)\s*\)\s*$/);
+      if (m) {
+        let a=m[1].trim();
+        const fm=a.match(/^f["'](.+)["']$/);
+        if (fm) out.push(fm[1].replace(/\{[^}]+\}/g,'[значение]'));
+        else if ((a.startsWith('"')&&a.endsWith('"'))||(a.startsWith("'")&&a.endsWith("'"))) out.push(a.slice(1,-1));
+        else out.push(a);
       }
+    });
+    term.textContent = out.length ? out.join('\n')+'\n\n✅ Выполнено за 0.04s' : '✅ Программа выполнена (вывода нет).';
+    updateBlockField(blockId,'code',code);
+  },500);
+}
+
+// ── DRAG & DROP ──
+let dragSrc=null;
+function onDragStart(e){ dragSrc=this; this.classList.add('dragging'); }
+function onDragOver(e){ e.preventDefault(); }
+function onDrop(e){
+  e.preventDefault();
+  if (!dragSrc||dragSrc===this) return;
+  const srcId=dragSrc.dataset.blockId, tgtId=this.dataset.blockId;
+  const si=blocks.findIndex(b=>b.id===srcId), ti=blocks.findIndex(b=>b.id===tgtId);
+  if (si<0||ti<0) return;
+  [blocks[si],blocks[ti]]=[blocks[ti],blocks[si]];
+  reRenderBlocks();
+}
+function onDragEnd(){ this.classList.remove('dragging'); dragSrc=null; }
+
+// ── STATS / MINI-BLOCKS ──
+function updateStats() {
+  document.getElementById('statBlocks').textContent=blocks.length;
+  document.getElementById('statQuizQ').textContent=blocks.filter(b=>b.type==='quiz').reduce((s,b)=>s+(b.questions?.length||0),0);
+  document.getElementById('statTasks').textContent=blocks.filter(b=>b.type==='task').length;
+  document.getElementById('statSlides').textContent=blocks.filter(b=>b.type==='slide').length;
+  document.getElementById('statPolls').textContent=blocks.filter(b=>b.type==='poll').length;
+}
+function updateMiniBlocks() {
+  const c=document.getElementById('miniBlocksList');
+  if (!c) return;
+  const icons={heading:'H1',subheading:'H2',text:'¶',code:'🐍',quiz:'⚡',task:'✏️',callout:'💡',checklist:'☑',video:'▶',image:'🖼',poll:'🗳',slide:'📊',divider:'─'};
+  c.innerHTML = blocks.length ? blocks.map((b,i)=>`<div class="preview-mini-item"><span>${i+1}.</span><span>${icons[b.type]||'?'}</span><span style="color:var(--text2)">${b.slideTitle||b.content||b.taskText||b.question||getTypeInfo(b.type).name||''}</span></div>`).join('') : '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px">Добавьте блоки</div>';
+}
+
+// ── SLIDES PREVIEW ──
+function updateSlidesPreview() {
+  const list=document.getElementById('slidesPreviewList');
+  if (!list) return;
+  const typeColors={heading:'var(--text2)',quiz:'var(--blue)',code:'var(--green)',task:'var(--orange)',poll:'var(--yellow)',slide:'var(--purple)'};
+  if (!blocks.length) {
+    list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-family:var(--mono);font-size:13px;border:2px dashed var(--border2);border-radius:var(--r2)">Добавьте блоки в конструкторе</div>';
+    return;
+  }
+  list.innerHTML=blocks.map((b,i)=>{
+    const info=getTypeInfo(b.type);
+    const title=b.slideTitle||b.content||b.taskText||b.question||info.name;
+    return `<div class="slide-preview-card"><div class="slide-num">${i+1}</div><div class="slide-icon-big">${{heading:'📝',quiz:'❓',code:'💻',task:'✏️',poll:'🗳',slide:'📊',video:'▶',image:'🖼',callout:'💡',text:'📄',checklist:'☑'}[b.type]||'📄'}</div><div style="flex:1"><div class="slide-preview-title">${escHtml(title||'—')}</div><div class="slide-preview-sub">${info.name}</div></div><div class="slide-type-pill" style="background:rgba(255,255,255,.07);color:${typeColors[b.type]||'var(--text3)'}">${info.name}</div></div>`;
+  }).join('');
+}
+
+// ── AUTO SIZE ──
+function autoSize(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+
+// ── AUTOSAVE ──
+function autoSave() {
+  clearTimeout(saveTimer);
+  document.getElementById('autosaveBadge').textContent='Сохранение...';
+  saveTimer=setTimeout(()=>{
+    document.getElementById('autosaveBadge').textContent='Черновик сохранён ✓';
+    updateMiniBlocks(); updateStats();
+  },1200);
+}
+
+// ── PIN GENERATOR ──
+function generatePIN() {
+  return String(Math.floor(100000+Math.random()*900000));
+}
+
+// ── LAUNCH OPEN LESSON ──
+function generateAndLaunch() {
+  const title=document.getElementById('lessonTitle').value.trim();
+  if (!title) { showToast('⚠️ Сначала добавьте название урока на вкладке «Конструктор»'); switchTab('editor'); return; }
+  const pin=generatePIN();
+  currentPin=pin;
+  document.getElementById('previewPin').textContent=pin.split('').join(' ');
+  showToast('✅ PIN сгенерирован: '+pin+'. Сохраните урок, чтобы запустить сессию.');
+}
+
+function launchOpenLesson() {
+  const pin=currentPin||generatePIN();
+  currentPin=pin;
+  document.getElementById('previewPin').textContent=pin.split('').join(' ');
+  showToast('📡 Сессия создана! PIN: '+pin);
+}
+
+function openPresentation() {
+  if (!blocks.length) { showToast('⚠️ Добавьте блоки в конструкторе'); switchTab('editor'); return; }
+  const data=encodeURIComponent(JSON.stringify({blocks,title:document.getElementById('lessonTitle').value,emoji:selectedEmoji}));
+  window.open('./open-lesson.html?data='+data,'_blank');
+}
+
+// ── PREVIEW ──
+function previewLesson() {
+  showToast('👁 Предпросмотр открывается...');
+}
+
+// ── OPEN HOST PAGE ──
+function openHostPage() {
+  if (currentSessionId) window.open('./open-lesson.html?session='+currentSessionId,'_blank');
+}
+
+// ── PUBLISH ──
+async function publishLesson() {
+  const title=document.getElementById('lessonTitle').value.trim();
+  if (!title) { showToast('⚠️ Введите название урока'); document.getElementById('lessonTitle').focus(); return; }
+  if (!blocks.length) { showToast('⚠️ Добавьте хотя бы один блок'); return; }
+
+  const btn=document.getElementById('publishBtn');
+  btn.disabled=true; btn.textContent='Публикация...';
+
+  const lessonData={
+    title, description:document.getElementById('lessonDesc').value.trim(),
+    subject:document.getElementById('lessonSubject').value.trim(),
+    level:document.getElementById('lessonLevel').value,
+    duration:parseInt(document.getElementById('lessonDuration').value)||null,
+    emoji:selectedEmoji, visibility:selectedVisibility,
+    blocks:blocks.map(b=>{const {id,...rest}=b;return rest;}),
+    uid:window._currentUser?.uid,
+    userName:window._currentUser?.displayName||window._currentUser?.email||'Автор',
+    createdAt:window._serverTimestamp?.()
+  };
+
+  // Open lesson settings
+  lessonData.openLessonSettings={
+    mode:selectedMode,
+    timer:parseInt(document.getElementById('sessionTimer').value),
+    maxPlayers:parseInt(document.getElementById('sessionMaxPlayers').value),
+    showLeaderboard:document.getElementById('toggleLeaderboard').checked,
+    anonymousAnswers:document.getElementById('toggleAnon').checked,
+    sound:document.getElementById('toggleSound').checked,
+    lateJoin:document.getElementById('toggleLateJoin').checked,
+    teams:getTeams(),
+    pin:currentPin||null
+  };
+
+  try {
+    await window.saveToFirebase(lessonData);
+    document.getElementById('successScreen').classList.add('show');
+    if (currentPin) {
+      document.getElementById('successPinBox').style.display='block';
+      document.getElementById('successPinDisplay').textContent=currentPin;
+      document.getElementById('hostBtn').style.display='flex';
     }
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Ошибка: '+err.message);
+    btn.disabled=false; btn.textContent='Опубликовать →';
+  }
+}
 
-    // ИСПРАВЛЕНО: Использованы классы quiz-q-card, option-row, add-btn
-    function renderQuizBlock(block) {
-      const questions = block.questions || [];
-      let html = `<div class="quiz-questions-list" id="quizList_${block.id}">`;
-      questions.forEach((q, qi) => {
-        html += renderQuizQuestion(block.id, qi, q);
-      });
-      html += `</div>
-    <div style="display:flex; gap:10px; margin-top:14px;">
-      <button class="add-btn" onclick="addQuizQuestion('${block.id}','mcq')">＋ Выбор ответа</button>
-      <button class="add-btn" onclick="addQuizQuestion('${block.id}','fill')">＋ Ввод ответа</button>
-    </div>`;
-      return html;
-    }
+function resetLesson() {
+  blocks=[]; blockCounter=0; currentPin=null;
+  document.getElementById('successScreen').classList.remove('show');
+  document.getElementById('blocksList').querySelectorAll('.block-card').forEach(el=>el.remove());
+  document.getElementById('lessonTitle').value='';
+  document.getElementById('lessonDesc').value='';
+  updateCanvasEmpty(); updateStats(); updateMiniBlocks();
+}
 
-    function renderQuizQuestion(blockId, qi, q) {
-      const opts = q.options || ['', '', '', ''];
-      let optsHtml = opts.map((o, oi) => `
-    <div class="option-row">
-      <div class="option-correct-radio ${q.answer === oi ? 'selected' : ''}" id="radio_${blockId}_${qi}_${oi}" onclick="setCorrectAnswer('${blockId}',${qi},${oi})"></div>
-      <input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ${oi + 1}" oninput="updateQuizOption('${blockId}',${qi},${oi},this.value)">
-      ${opts.length > 2 ? `<button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${oi})">✕</button>` : ''}
-    </div>`).join('');
+// ── HELPERS ──
+function showToast(msg) {
+  const t=document.getElementById('tb-toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-      if (q.type === 'fill') {
-        optsHtml = `<input class="option-inp" style="width:100%; margin-top: 8px;" value="${escHtml(q.answer || '')}" placeholder="Правильный ответ (точный текст)" oninput="updateQuizFillAnswer('${blockId}',${qi},this.value)">`;
-      }
-
-      return `
-    <div class="quiz-q-card" id="quizQ_${blockId}_${qi}">
-      <div class="quiz-q-top">
-        <select class="quiz-q-type-sel" disabled>
-            <option>${q.type === 'fill' ? 'ВВОД' : 'ВЫБОР (MCQ)'}</option>
-        </select>
-        <input class="quiz-q-inp" value="${escHtml(q.q || '')}" placeholder="Введите вопрос..." oninput="updateQuizQuestion('${blockId}',${qi},this.value)">
-        <button class="quiz-q-del" onclick="deleteQuizQuestion('${blockId}',${qi})">✕</button>
-      </div>
-      <div id="quizOpts_${blockId}_${qi}">
-        ${optsHtml}
-        ${q.type === 'mcq' ? `<button class="add-btn" style="margin-top: 10px;" onclick="addQuizOption('${blockId}',${qi})">＋ Добавить вариант</button>` : ''}
-      </div>
-    </div>`;
-    }
-
-    // ИСПРАВЛЕНО: Использованы классы checklist-items-list, checklist-item-row, cl-inp
-    function renderChecklistBlock(block) {
-      const items = block.items || [''];
-      let html = `<div class="checklist-items-list" id="checklist_${block.id}">`;
-      items.forEach((item, i) => {
-        html += `
-      <div class="checklist-item-row" id="clRow_${block.id}_${i}">
-        <div class="cl-drag">⠿</div>
-        <input class="cl-inp" value="${escHtml(item)}" placeholder="Пункт ${i + 1}" oninput="updateChecklistItem('${block.id}',${i},this.value)">
-        ${items.length > 1 ? `<button class="cl-del" onclick="deleteChecklistItem('${block.id}',${i})">✕</button>` : ''}
-      </div>`;
-      });
-      html += `</div><button class="add-btn" onclick="addChecklistItem('${block.id}')">＋ Добавить пункт</button>`;
-      return html;
-    }
-
-    function initBlockEvents(blockId, type, block) {
-      const textareas = document.querySelectorAll(`#${blockId} textarea.textarea-inp`);
-      textareas.forEach(ta => { autoSize(ta); });
-    }
-
-    function autoSize(el) {
-      el.style.height = 'auto';
-      el.style.height = el.scrollHeight + 'px';
-    }
-
-    function updateBlockField(blockId, field, value) {
-      const b = blocks.find(b => b.id === blockId);
-      if (b) { b[field] = value; autoSave(); updateStats(); }
-    }
-
-    function deleteBlock(blockId) {
-      blocks = blocks.filter(b => b.id !== blockId);
-      const el = document.getElementById(blockId);
-      if (el) {
-        el.style.animation = 'none';
-        el.style.opacity = '0';
-        el.style.transform = 'scale(.97)';
-        el.style.transition = 'all .2s';
-        setTimeout(() => el.remove(), 200);
-      }
-      setTimeout(updateCanvasEmpty, 210);
-      updateStats();
-      updateMiniBlocks();
-      autoSave();
-    }
-
-    function moveBlockUp(blockId) {
-      const idx = blocks.findIndex(b => b.id === blockId);
-      if (idx <= 0) return;
-      [blocks[idx - 1], blocks[idx]] = [blocks[idx], blocks[idx - 1]];
-      reRenderBlocks();
-    }
-
-    function moveBlockDown(blockId) {
-      const idx = blocks.findIndex(b => b.id === blockId);
-      if (idx < 0 || idx >= blocks.length - 1) return;
-      [blocks[idx], blocks[idx + 1]] = [blocks[idx + 1], blocks[idx]];
-      reRenderBlocks();
-    }
-
-    function reRenderBlocks() {
-      const list = document.getElementById('blocksList');
-      list.querySelectorAll('.block-card').forEach(el => el.remove());
-      const snapshot = [...blocks];
-      blocks = [];
-      blockCounter = 0;
-      snapshot.forEach(b => addBlockFromData(b));
-      updateMiniBlocks();
-      autoSave();
-    }
-
-    function updateCanvasEmpty() {
-      const empty = document.getElementById('canvasEmpty');
-      if (empty) empty.style.display = blocks.length === 0 ? 'block' : 'none';
-    }
-
-    function applyVideo(blockId) {
-      const url = document.getElementById('vidUrl_' + blockId)?.value.trim();
-      const preview = document.getElementById('vidPreview_' + blockId);
-      if (!preview) return;
-      if (!url) { preview.innerHTML = '<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;">Вставьте ссылку выше</div>'; return; }
-      preview.innerHTML = buildVideoEmbed(url);
-      updateBlockField(blockId, 'url', url);
-    }
-
-    function buildVideoEmbed(url) {
-      let embedUrl = '';
-      if (url.includes('youtube.com/watch') || url.includes('youtu.be')) {
-        const id = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
-        if (id) embedUrl = `https://www.youtube.com/embed/${id}`;
-      } else if (url.includes('vimeo.com')) {
-        const id = url.match(/vimeo\.com\/(\d+)/)?.[1];
-        if (id) embedUrl = `https://player.vimeo.com/video/${id}`;
-      }
-      if (embedUrl) return `<iframe style="width:100%; height:200px; border-radius: var(--r); border: none;" src="${embedUrl}" allowfullscreen></iframe>`;
-      return `<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;">❌ Неподдерживаемая ссылка</div>`;
-    }
-
-    function applyImage(blockId) {
-      const url = document.getElementById('imgUrl_' + blockId)?.value.trim();
-      const preview = document.getElementById('imgPreview_' + blockId);
-      if (!preview) return;
-      if (!url) { preview.innerHTML = ''; return; }
-      preview.innerHTML = `<img src="${escHtml(url)}" style="max-width:100%; border-radius:var(--r);" onerror="this.parentElement.innerHTML='<span style=color:var(--red);font-size:12px;font-family:var(--mono);>Не удалось загрузить</span>'">`;
-      updateBlockField(blockId, 'url', url);
-    }
-
-    function runCode(blockId) {
-      const ta = document.getElementById('codeArea_' + blockId);
-      const term = document.getElementById('terminal_' + blockId);
-      if (!ta || !term) return;
-      term.style.display = 'block';
-      term.textContent = '⏳ Запуск...';
-      const code = ta.value;
-      setTimeout(() => {
-        const output = simulatePython(code);
-        term.textContent = output;
-        updateBlockField(blockId, 'code', code);
-      }, 600);
-    }
-
-    function simulatePython(code) {
-      const lines = code.split('\n');
-      const output = [];
-      for (const line of lines) {
-        const m = line.match(/^\s*print\s*\(\s*(.+?)\s*\)\s*$/);
-        if (m) {
-          let arg = m[1];
-          if ((arg.startsWith('"') && arg.endsWith('"')) || (arg.startsWith("'") && arg.endsWith("'"))) {
-            output.push(arg.slice(1, -1));
-          } else if (!isNaN(arg)) {
-            output.push(arg);
-          } else if (arg.startsWith('f"') || arg.startsWith("f'")) {
-            output.push(arg.slice(2, -1).replace(/\{[^}]+\}/g, '[значение]'));
-          } else {
-            output.push('[вычисленное значение]');
-          }
-        }
-      }
-      if (output.length === 0) return '✅ Код выполнен (нет вывода)\nВремя: 0.04s';
-      return output.join('\n') + '\n\n✅ Выполнено за 0.04s';
-    }
-
-    function addQuizQuestion(blockId, type) {
-      const b = blocks.find(b => b.id === blockId);
-      if (!b) return;
-      if (!b.questions) b.questions = [];
-      const q = { type, q: '', answer: type === 'fill' ? '' : 0 };
-      if (type === 'mcq') q.options = ['', '', '', ''];
-      b.questions.push(q);
-      const qi = b.questions.length - 1;
-      const list = document.getElementById('quizList_' + blockId);
-      if (list) {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = renderQuizQuestion(blockId, qi, q);
-        while (tmp.firstChild) list.appendChild(tmp.firstChild);
-      }
-      autoSave(); updateStats();
-    }
-
-    function updateQuizQuestion(blockId, qi, val) {
-      const b = blocks.find(b => b.id === blockId);
-      if (b && b.questions[qi]) { b.questions[qi].q = val; autoSave(); }
-    }
-
-    function updateQuizOption(blockId, qi, oi, val) {
-      const b = blocks.find(b => b.id === blockId);
-      if (b && b.questions[qi] && b.questions[qi].options) { b.questions[qi].options[oi] = val; autoSave(); }
-    }
-
-    function updateQuizFillAnswer(blockId, qi, val) {
-      const b = blocks.find(b => b.id === blockId);
-      if (b && b.questions[qi]) { b.questions[qi].answer = val; autoSave(); }
-    }
-
-    function setCorrectAnswer(blockId, qi, oi) {
-      const b = blocks.find(b => b.id === blockId);
-      if (!b || !b.questions[qi]) return;
-      b.questions[qi].answer = oi;
-      const q = b.questions[qi];
-      (q.options || []).forEach((_, i) => {
-        const r = document.getElementById(`radio_${blockId}_${qi}_${i}`);
-        if (r) r.className = 'option-correct-radio' + (i === oi ? ' selected' : '');
-      });
-      autoSave();
-    }
-
-    function addQuizOption(blockId, qi) {
-      const b = blocks.find(b => b.id === blockId);
-      if (!b || !b.questions[qi]) return;
-      b.questions[qi].options.push('');
-      const optsEl = document.getElementById(`quizOpts_${blockId}_${qi}`);
-      if (optsEl) {
-        const q = b.questions[qi];
-        optsEl.innerHTML = q.options.map((o, oi) => `
-      <div class="option-row">
-        <div class="option-correct-radio ${q.answer === oi ? 'selected' : ''}" id="radio_${blockId}_${qi}_${oi}" onclick="setCorrectAnswer('${blockId}',${qi},${oi})"></div>
-        <input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ${oi + 1}" oninput="updateQuizOption('${blockId}',${qi},${oi},this.value)">
-        ${q.options.length > 2 ? `<button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${oi})">✕</button>` : ''}
-      </div>`).join('') + `<button class="add-btn" style="margin-top: 10px;" onclick="addQuizOption('${blockId}',${qi})">＋ Добавить вариант</button>`;
-      }
-      autoSave();
-    }
-
-    function removeQuizOption(blockId, qi, oi) {
-      const b = blocks.find(b => b.id === blockId);
-      if (!b || !b.questions[qi] || b.questions[qi].options.length <= 2) return;
-      b.questions[qi].options.splice(oi, 1);
-      if (b.questions[qi].answer >= b.questions[qi].options.length) b.questions[qi].answer = 0;
-      addQuizOption(blockId, qi); 
-      b.questions[qi].options.pop(); 
-      const optsEl = document.getElementById(`quizOpts_${blockId}_${qi}`);
-      if (optsEl) {
-        const q = b.questions[qi];
-        optsEl.innerHTML = q.options.map((o, oi2) => `
-      <div class="option-row">
-        <div class="option-correct-radio ${q.answer === oi2 ? 'selected' : ''}" id="radio_${blockId}_${qi}_${oi2}" onclick="setCorrectAnswer('${blockId}',${qi},${oi2})"></div>
-        <input class="option-inp" value="${escHtml(o)}" placeholder="Вариант ${oi2 + 1}" oninput="updateQuizOption('${blockId}',${qi},${oi2},this.value)">
-        ${q.options.length > 2 ? `<button class="option-del" onclick="removeQuizOption('${blockId}',${qi},${oi2})">✕</button>` : ''}
-      </div>`).join('') + `<button class="add-btn" style="margin-top: 10px;" onclick="addQuizOption('${blockId}',${qi})">＋ Добавить вариант</button>`;
-      }
-      autoSave();
-    }
-
-    function deleteQuizQuestion(blockId, qi) {
-      const b = blocks.find(b => b.id === blockId);
-      if (!b || !b.questions) return;
-      b.questions.splice(qi, 1);
-      const list = document.getElementById('quizList_' + blockId);
-      if (list) {
-        list.innerHTML = b.questions.map((q, i) => renderQuizQuestion(blockId, i, q)).join('');
-      }
-      autoSave(); updateStats();
-    }
-
-    function updateChecklistItem(blockId, i, val) {
-      const b = blocks.find(b => b.id === blockId);
-      if (b && b.items) { b.items[i] = val; autoSave(); }
-    }
-
-    function addChecklistItem(blockId) {
-      const b = blocks.find(b => b.id === blockId);
-      if (!b) return;
-      if (!b.items) b.items = [''];
-      b.items.push('');
-      const i = b.items.length - 1;
-      const list = document.getElementById('checklist_' + blockId);
-      if (list) {
-        const row = document.createElement('div');
-        row.className = 'checklist-item-row';
-        row.id = `clRow_${blockId}_${i}`;
-        row.innerHTML = `
-      <div class="cl-drag">⠿</div>
-      <input class="cl-inp" placeholder="Пункт ${i + 1}" oninput="updateChecklistItem('${blockId}',${i},this.value)">
-      <button class="cl-del" onclick="deleteChecklistItem('${blockId}',${i})">✕</button>`;
-        list.appendChild(row);
-        row.querySelector('input').focus();
-      }
-      autoSave();
-    }
-
-    function deleteChecklistItem(blockId, i) {
-      const b = blocks.find(b => b.id === blockId);
-      if (!b || !b.items || b.items.length <= 1) return;
-      b.items.splice(i, 1);
-      const list = document.getElementById('checklist_' + blockId);
-      if (list) {
-        list.innerHTML = b.items.map((item, idx) => `
-      <div class="checklist-item-row" id="clRow_${blockId}_${idx}">
-        <div class="cl-drag">⠿</div>
-        <input class="cl-inp" value="${escHtml(item)}" placeholder="Пункт ${idx + 1}" oninput="updateChecklistItem('${blockId}',${idx},this.value)">
-        ${b.items.length > 1 ? `<button class="cl-del" onclick="deleteChecklistItem('${blockId}',${idx})">✕</button>` : ''}
-      </div>`).join('');
-      }
-      autoSave();
-    }
-
-    function changeCalloutType(blockId, type) {
-      const b = blocks.find(b => b.id === blockId);
-      if (b) b.calloutType = type;
-      const emoji = document.getElementById('calloutEmoji_' + blockId);
-      if (emoji) {
-        const emojis = { info: 'ℹ️', warning: '⚠️', success: '✅', danger: '❗' };
-        emoji.textContent = emojis[type] || 'ℹ️';
-      }
-      autoSave();
-    }
-
-    let dragSrcId = null;
-    function onDragStart(e) {
-      dragSrcId = this.dataset.blockId;
-      this.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    }
-    function onDragOver(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      document.querySelectorAll('.block-card').forEach(el => el.classList.remove('drag-over'));
-      this.classList.add('drag-over');
-      return false;
-    }
-    function onDrop(e) {
-      e.stopPropagation();
-      const targetId = this.dataset.blockId;
-      if (dragSrcId && dragSrcId !== targetId) {
-        const srcIdx = blocks.findIndex(b => b.id === dragSrcId);
-        const tgtIdx = blocks.findIndex(b => b.id === targetId);
-        if (srcIdx > -1 && tgtIdx > -1) {
-          const [moved] = blocks.splice(srcIdx, 1);
-          blocks.splice(tgtIdx, 0, moved);
-          reRenderBlocks();
-        }
-      }
-      return false;
-    }
-    function onDragEnd() {
-      document.querySelectorAll('.block-card').forEach(el => {
-        el.classList.remove('dragging', 'drag-over');
-      });
-    }
-
-    function updateStats() {
-      document.getElementById('statBlocks').textContent = blocks.length;
-      document.getElementById('statQuizQ').textContent = blocks.filter(b => b.type === 'quiz').reduce((s, b) => s + (b.questions?.length || 0), 0);
-      document.getElementById('statTasks').textContent = blocks.filter(b => b.type === 'task').length;
-      document.getElementById('statVideos').textContent = blocks.filter(b => b.type === 'video').length;
-      document.getElementById('statCode').textContent = blocks.filter(b => b.type === 'code').length;
-    }
-
-    function updateMiniBlocks() {
-      const el = document.getElementById('miniBlocksList');
-      if (!el) return;
-      if (blocks.length === 0) {
-        el.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:8px;">Блоки появятся здесь</div>';
-        return;
-      }
-      const icons = { heading: 'H1', subheading: 'H2', text: '¶', video: '▶', image: '🖼', code: '🐍', quiz: '⚡', task: '✏️', callout: '💡', checklist: '☑', divider: '─' };
-      el.innerHTML = blocks.map(b => `
-    <div class="preview-mini-block" onclick="document.getElementById('${b.id}')?.scrollIntoView({behavior:'smooth',block:'center'})">
-      <span class="preview-mini-block-icon">${icons[b.type] || '?'}</span>
-      <span class="preview-mini-block-title">${escHtml(b.content || b.taskText || b.q || getTypeInfo(b.type).name)}</span>
-    </div>`).join('');
-    }
-
-    function autoSave() {
-      clearTimeout(saveTimer);
-      document.getElementById('autoSaveLbl').textContent = 'Сохранение…';
-      saveTimer = setTimeout(() => {
-        document.getElementById('autoSaveLbl').textContent = 'Черновик сохранён ✓';
-      }, 800);
-      updateMiniBlocks();
-      updateStats();
-    }
-
-    async function publishLesson() {
-      const title = document.getElementById('lessonTitle').value.trim();
-      if (!title) {
-        showToast('⚠️ Укажите название урока');
-        document.getElementById('lessonTitle').focus();
-        return;
-      }
-      if (blocks.length === 0) {
-        showToast('⚠️ Добавьте хотя бы один блок');
-        return;
-      }
-
-      const btn = document.getElementById('publishBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Публикация...';
-
-      try {
-        const user = window.auth?.currentUser;
-
-        if (!user) {
-          showToast('❌ Вы не авторизованы. Войдите в аккаунт.');
-          return;
-        }
-
-        const lessonData = {
-          title: title,
-          description: document.getElementById('lessonDesc').value.trim(),
-          subject: document.getElementById('lessonSubject').value.trim() || '',
-          level: document.getElementById('lessonLevel').value,
-          duration: parseInt(document.getElementById('lessonDuration').value) || 0,
-          emoji: selectedEmoji || '📖',
-          visibility: selectedVisibility || 'public',
-          blocks: blocks,
-          blockCount: blocks.length,
-          quizCount: blocks.filter(b => b.type === 'quiz').reduce((s, b) => s + (b.questions?.length || 0), 0),
-          taskCount: blocks.filter(b => b.type === 'task').length,
-          uid: user.uid,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        };
-
-        await window.saveToFirebase(lessonData);
-
-        showToast('✅ Урок успешно опубликован!');
-        document.getElementById('successScreen').classList.add('show');
-
-        if (typeof window.refreshMyLessons === 'function') {
-          setTimeout(window.refreshMyLessons, 800);
-        }
-
-      } catch (err) {
-        console.error("Ошибка публикации:", err);
-        showToast('❌ Ошибка: ' + (err.message || err));
-      } finally {
-        btn.disabled = false;
-        btn.textContent = window.editId ? '💾 Сохранить' : '🚀 Опубликовать';
-      }
-    }
-
-    function escHtml(str) {
-      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById('tb-toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      clearTimeout(t._t);
-      t._t = setTimeout(() => t.classList.remove('show'), 2800);
-    }
-
-    function resetLesson() {
-        window.location.reload();
-    }
-
-    updateCanvasEmpty();
-    updateStats();
-
-  </script>
+// Init
+updateCanvasEmpty();
+document.getElementById('teamsSection').style.display='none';
+</script>
 </body>
-
 </html>

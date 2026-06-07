@@ -31,7 +31,7 @@ let _user = null;
 let _allMyQuizzes = [];
 let _quizFilterTag = 'all';
 let _quizSearch = '';
-let _selectedModel = 'gemini-2.5-flash';
+let _selectedModel = 'AI flash';
 let _currentAIQuiz = null;
 
 // ══════════════════════════════════════════════════════
@@ -392,7 +392,7 @@ function renderMyQuizzesGrid() {
     const count = quiz.questions?.length || 0;
     const isPub = quiz.visibility === 'public';
     const isAI  = quiz.generatedByAI === true;
-    const modelLabel = quiz.aiModel ? quiz.aiModel.replace('gemini-2.5-','') : '';
+    const modelLabel = quiz.aiModel ? quiz.aiModel.replace('AI','') : '';
     const created = timeAgo(quiz.createdAt);
 
     return `
@@ -805,7 +805,7 @@ window.generateQuizWithAI = async function() {
   const diffLabel = { beginner:'для начинающих', intermediate:'средняя', advanced:'продвинутая' }[diff];
 
   closeAIQuizModal();
-  showToast(`🤖 ${_selectedModel.replace('gemini-2.5-','')} генерирует квиз...`);
+  showToast(`🤖 ${_selectedModel.replace('AI','')} генерирует квиз...`);
 
   const prompt = `Создай образовательный квиз на русском языке по теме: "${topic}".
 Количество вопросов: ${countQ}. Сложность: ${diffLabel}.
