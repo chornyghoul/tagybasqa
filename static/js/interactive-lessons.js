@@ -1,21 +1,3 @@
-/**
- * TAGYBASQA — interactive-lessons.js
- *
- * Полноценный раздел "Интерактивные уроки" для изучения казахского языка.
- *
- * Архитектура модуля:
- *  — Каталог уроков с уровнями (A1 → C1)
- *  — 6 типов упражнений: flashcard, matching, fill-blank, listening, sentence-builder, quiz
- *  — Система XP, стриков и прогресса
- *  — AI-генерация уроков через Claude API
- *  — Полная анимация и gamification
- *
- * Подключение в index.html:
- *   <script type="module" src="./static/js/interactive-lessons.js"></script>
- *
- * В lesson.js замените import "./lecture-player.js" на import "./interactive-lessons.js"
- * (или добавьте рядом).
- */
 
 // ─── Константы ────────────────────────────────────────────────────────────────
 const CONTAINER_SEL = '#view-story .lesson-container';

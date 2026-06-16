@@ -1,215 +1,593 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="kk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Создать квиз — Tagybasqa</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #ffffff; --bg2: #f8f8f8; --bg3: #f0f0f0; --bg4: #e8e8e8;
-      --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.12); --border3: rgba(0,0,0,0.22);
-      --text: #1a1a1a; --text2: #555555; --text3: #888888;
-      --green: #16a34a; --red: #dc2626; --red-bg: rgba(220,38,38,0.08);
-      --gold: #f59e0b; --accent-dim: rgba(0,0,0,0.04);
-      --r: 3px; --r2: 5px;
-      --font: 'Onest', sans-serif; --mono: 'DM Mono', monospace;
-    }
-    :root.dark {
-      --bg: #0a0a0a; --bg2: #121212; --bg3: #1a1a1a; --bg4: #222222;
-      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.15); --border3: rgba(255,255,255,0.28);
-      --text: #f4f4f4; --text2: #c8c8c8; --text3: #a0a0a0;
-      --accent-dim: rgba(255,255,255,0.06);
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tagybasqa — Жасау</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Onest:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#131f24;--bg2:#1a2d35;--bg3:#1f3540;--bg4:#243d4a;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);--border3:rgba(255,255,255,.22);
+  --text:#fff;--text2:#cdd8dd;--text3:#7a9aaa;
+  --duo-blue:#1cb0f6;--duo-blue2:#0e86c0;
+  --duo-green:#57cc02;--duo-green2:#3a8c01;
+  --duo-orange:#ff9600;--duo-red:#ff4b4b;
+  --duo-purple:#ce82ff;--duo-yellow:#ffd900;--duo-teal:#1fe0c0;
+  --red:#ff4b4b;--green:#57cc02;--gold:#ffd900;
+  --r:12px;--r2:16px;--r3:99px;
+  --font:'Onest',sans-serif;--mono:'DM Mono',monospace;
+  --bg-blur:rgba(19,31,36,.94);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-    /* HEADER */
-    .qb-header{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:60px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
-    .qb-back{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text3);text-decoration:none;cursor:pointer;background:none;border:none;transition:color .15s}
-    .qb-back:hover{color:var(--text)}
-    .qb-title-area{display:flex;flex-direction:column;align-items:center;gap:2px}
-    .qb-quiz-title-input{background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:16px;font-weight:700;text-align:center;outline:none;width:340px;padding:4px 8px;border-bottom:1px solid transparent;transition:border-color .15s}
-    .qb-quiz-title-input:focus{border-bottom-color:var(--border3)}
-    .qb-quiz-title-input::placeholder{color:var(--text3);font-weight:400}
-    .qb-status{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
-    .qb-actions{display:flex;gap:8px}
-    .btn{padding:8px 18px;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:none;letter-spacing:.03em}
-    .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text2)}
-    .btn-outline:hover{border-color:var(--border3);color:var(--text)}
-    .btn-solid{background:var(--text);color:var(--bg)}
-    .btn-solid:hover{opacity:.85}
-    .btn-green{background:var(--green);color:#fff}
-    .btn-green:hover{opacity:.85}
-    .btn-red{background:transparent;border:1px solid var(--red);color:var(--red)}
-    .btn-red:hover{background:var(--red-bg)}
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;align-items:center;gap:16px;padding:0 24px;height:58px;
+  background:var(--bg-blur);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;flex-shrink:0;
+}
+.topbar-back{
+  display:flex;align-items:center;gap:6px;color:var(--text3);
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  cursor:pointer;background:none;border:none;transition:color .15s;padding:6px 0;
+}
+.topbar-back:hover{color:var(--text2)}
+.topbar-back svg{width:14px;height:14px}
+.topbar-divider{width:1px;height:28px;background:var(--border2)}
 
-    /* LAYOUT */
-    .qb-layout{display:grid;grid-template-columns:260px 1fr 320px;min-height:calc(100vh - 60px)}
+/* Mode toggle */
+.mode-toggle{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r3);padding:3px;gap:2px}
+.mode-btn{
+  padding:7px 18px;border-radius:99px;font-family:var(--font);font-size:12px;font-weight:800;
+  cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all .18s;
+  letter-spacing:.02em;
+}
+.mode-btn.active{background:var(--duo-blue);color:#fff;box-shadow:0 2px 8px rgba(28,176,246,.3)}
+.mode-btn:hover:not(.active){color:var(--text2)}
 
-    /* LEFT — вопросы список */
-    .qb-questions-panel{border-right:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 60px);position:sticky;top:60px;overflow:hidden}
-    .qb-questions-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .qb-questions-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em}
-    .qb-add-q-btn{width:28px;height:28px;background:var(--text);color:var(--bg);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
-    .qb-add-q-btn:hover{opacity:.8}
-    .qb-q-list{flex:1;overflow-y:auto;padding:8px}
-    .qb-q-list::-webkit-scrollbar{width:3px}
-    .qb-q-list::-webkit-scrollbar-thumb{background:var(--border3)}
-    .qb-q-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border:1px solid transparent;transition:all .15s;position:relative;margin-bottom:3px;border-radius:var(--r)}
-    .qb-q-item:hover{background:var(--bg2);border-color:var(--border)}
-    .qb-q-item.active{background:var(--bg2);border-color:var(--border2)}
-    .qb-q-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--text)}
-    .qb-q-num{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:20px}
-    .qb-q-preview{flex:1;font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .qb-q-delete{opacity:0;background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:2px;transition:opacity .15s}
-    .qb-q-item:hover .qb-q-delete{opacity:1}
+/* Title input */
+.topbar-title-wrap{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
+.title-inp{
+  background:transparent;border:none;color:var(--text);font-family:var(--font);
+  font-size:16px;font-weight:700;text-align:center;outline:none;width:100%;max-width:400px;
+  padding:4px 8px;border-bottom:1.5px solid transparent;transition:border-color .15s;
+}
+.title-inp:focus{border-bottom-color:var(--border3)}
+.title-inp::placeholder{color:var(--text3);font-weight:400}
+.save-status{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
 
-    /* CENTER — редактор */
-    .qb-editor{padding:32px;overflow-y:auto;background:var(--bg2)}
-    .qb-editor-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:12px;text-align:center}
-    .qb-editor-empty-icon{font-size:48px;opacity:.3}
-    .qb-editor-empty-title{font-family:var(--mono);font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
+/* Action buttons */
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.tb-btn{
+  padding:8px 18px;border-radius:var(--r3);font-family:var(--font);font-size:12px;font-weight:800;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.tb-btn-ghost{background:transparent;border:1.5px solid var(--border2);color:var(--text2)}
+.tb-btn-ghost:hover{border-color:var(--border3);color:var(--text)}
+.tb-btn-blue{background:var(--duo-blue);border:none;color:#fff;box-shadow:0 2px 8px rgba(28,176,246,.25)}
+.tb-btn-blue:hover{background:var(--duo-blue2)}
+.tb-btn-green{background:var(--duo-green);border:none;color:#fff;box-shadow:0 2px 8px rgba(87,204,2,.2)}
+.tb-btn-green:hover{background:var(--duo-green2)}
 
-    .q-editor-card{background:var(--bg);border:1px solid var(--border);padding:28px;margin-bottom:24px}
-    .q-type-row{display:flex;gap:6px;margin-bottom:24px}
-    .q-type-btn{padding:6px 14px;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:var(--mono);font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;transition:all .15s}
-    .q-type-btn.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-    .q-type-btn:hover:not(.active){border-color:var(--border3);color:var(--text2)}
+/* ── QUIZ EDITOR LAYOUT ── */
+#quizEditor{display:flex;flex:1;overflow:hidden}
 
-    .q-text-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:18px;font-weight:600;padding:10px 0;outline:none;transition:border-color .15s;resize:none;line-height:1.4;min-height:72px}
-    .q-text-input:focus{border-bottom-color:var(--border3)}
-    .q-text-input::placeholder{color:var(--text3);font-weight:400}
+/* Left panel — questions list */
+.q-panel{
+  width:252px;flex-shrink:0;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;background:var(--bg);
+}
+.q-panel-head{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.q-panel-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em}
+.q-add-btn{
+  width:28px;height:28px;background:var(--duo-blue);border:none;border-radius:8px;
+  color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.15s;
+}
+.q-add-btn:hover{background:var(--duo-blue2);transform:scale(1.05)}
+.q-list{flex:1;overflow-y:auto;padding:8px}
+.q-list::-webkit-scrollbar{width:3px}
+.q-list::-webkit-scrollbar-thumb{background:var(--border3);border-radius:99px}
+.q-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;
+  border:1px solid transparent;border-radius:var(--r);transition:all .15s;margin-bottom:3px;position:relative;
+}
+.q-item:hover{background:var(--bg2);border-color:var(--border)}
+.q-item.active{background:var(--bg3);border-color:var(--duo-blue)}
+.q-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);height:60%;width:3px;background:var(--duo-blue);border-radius:0 3px 3px 0}
+.q-item-num{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:22px}
+.q-item-preview{flex:1;font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-item-del{opacity:0;background:none;border:none;color:var(--duo-red);cursor:pointer;font-size:16px;padding:2px 3px;transition:.15s;flex-shrink:0}
+.q-item:hover .q-item-del{opacity:1}
 
-    .q-media-row{display:flex;gap:8px;margin:16px 0}
-    .q-media-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:transparent;border:1px dashed var(--border2);color:var(--text3);font-family:var(--mono);font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:.07em;transition:all .15s}
-    .q-media-btn:hover{border-color:var(--border3);color:var(--text2)}
-    .q-img-preview{max-height:180px;width:100%;object-fit:cover;margin-bottom:12px;display:none}
+/* Center — editor */
+.q-editor-area{flex:1;overflow-y:auto;background:var(--bg2);padding:28px 32px}
+.q-editor-area::-webkit-scrollbar{width:4px}
+.q-editor-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+.q-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:12px;text-align:center}
+.q-empty-icon{font-size:52px;opacity:.25}
+.q-empty-label{font-family:var(--mono);font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
 
-    .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-    .option-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);transition:all .15s;cursor:pointer;position:relative}
-    .option-item.correct{background:rgba(22,163,74,.06);border-color:var(--green)}
-    .option-item.correct .opt-radio{background:var(--green);border-color:var(--green)}
-    .opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;display:flex;align-items:center;justify-content:center}
-    .opt-radio.checked::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%;display:block}
-    .opt-letter{width:24px;height:24px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0}
-    .option-item.correct .opt-letter{background:var(--green);border-color:var(--green);color:#fff}
-    .opt-input{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:13px;outline:none}
-    .opt-input::placeholder{color:var(--text3)}
-    .opt-delete{opacity:0;background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:2px;transition:opacity .15s;flex-shrink:0}
-    .option-item:hover .opt-delete{opacity:1}
-    .add-option-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;background:transparent;border:1px dashed var(--border2);color:var(--text3);font-family:var(--mono);font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:.07em;transition:all .15s;margin-top:10px}
-    .add-option-btn:hover{border-color:var(--border3);color:var(--text2)}
+.q-card{background:var(--bg);border:1px solid var(--border2);border-radius:var(--r2);padding:24px;margin-bottom:20px}
+.q-type-row{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap}
+.q-type-btn{
+  padding:6px 14px;background:transparent;border:1px solid var(--border2);
+  color:var(--text3);font-family:var(--mono);font-size:10px;cursor:pointer;
+  text-transform:uppercase;letter-spacing:.08em;transition:all .15s;border-radius:var(--r3);
+}
+.q-type-btn:hover:not(.active){border-color:var(--border3);color:var(--text2)}
+.q-type-btn.active{background:var(--duo-blue);border-color:var(--duo-blue);color:#fff}
 
-    /* TRUE/FALSE */
-    .tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-    .tf-btn{padding:20px;background:var(--bg2);border:1px solid var(--border);font-size:16px;font-weight:700;cursor:pointer;transition:all .15s}
-    .tf-btn.correct{background:rgba(22,163,74,.08);border-color:var(--green);color:var(--green)}
-    .tf-btn:hover:not(.correct){background:var(--bg3)}
+.q-text-inp{
+  width:100%;background:transparent;border:none;border-bottom:1px solid var(--border2);
+  color:var(--text);font-family:var(--font);font-size:18px;font-weight:600;padding:10px 0;
+  outline:none;transition:border-color .15s;resize:none;line-height:1.45;min-height:70px;
+}
+.q-text-inp:focus{border-bottom-color:var(--duo-blue)}
+.q-text-inp::placeholder{color:var(--text3);font-weight:400}
 
-    /* RIGHT — настройки */
-    .qb-settings-panel{border-left:1px solid var(--border);height:calc(100vh - 60px);position:sticky;top:60px;overflow-y:auto;padding:20px}
-    .qb-settings-panel::-webkit-scrollbar{width:3px}
-    .qb-settings-panel::-webkit-scrollbar-thumb{background:var(--border3)}
-    .settings-section{margin-bottom:24px}
-    .settings-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;display:block}
-    .settings-input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;transition:border-color .15s;margin-bottom:8px}
-    .settings-input:focus{border-color:var(--border3)}
-    .settings-select{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;cursor:pointer;appearance:none;margin-bottom:8px}
-    .time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-    .time-opt{padding:8px 4px;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:var(--mono);font-size:11px;cursor:pointer;text-align:center;transition:all .15s}
-    .time-opt.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-    .time-opt:hover:not(.active){border-color:var(--border3);color:var(--text2)}
-    .points-row{display:flex;align-items:center;gap:10px}
-    .points-input{width:80px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:16px;font-weight:700;padding:8px 12px;outline:none;text-align:center;transition:border-color .15s}
-    .points-input:focus{border-color:var(--border3)}
-    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
-    .toggle-label{font-size:13px;color:var(--text2)}
-    .toggle{position:relative;width:36px;height:20px;cursor:pointer}
-    .toggle input{opacity:0;width:0;height:0;position:absolute}
-    .toggle-track{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border2);transition:all .2s}
-    .toggle input:checked~.toggle-track{background:var(--green);border-color:var(--green)}
-    .toggle-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:var(--text3);transition:transform .2s}
-    .toggle input:checked~.toggle-thumb{transform:translateX(16px);background:#fff}
+.q-media-row{display:flex;gap:8px;margin:14px 0}
+.q-media-btn{
+  display:flex;align-items:center;gap:6px;padding:6px 12px;background:transparent;
+  border:1px dashed var(--border2);color:var(--text3);font-family:var(--mono);font-size:10px;
+  cursor:pointer;text-transform:uppercase;letter-spacing:.07em;transition:all .15s;border-radius:var(--r);
+}
+.q-media-btn:hover{border-color:var(--border3);color:var(--text2)}
+.q-img-preview{max-height:160px;width:100%;object-fit:cover;margin-bottom:10px;border-radius:var(--r);display:none}
 
-    /* BOTTOM PROGRESS */
-    .qb-footer{position:fixed;bottom:0;left:0;right:0;height:48px;background:var(--bg);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:4px;z-index:50}
-    .qb-dot{width:6px;height:6px;background:var(--border2);border-radius:50%;cursor:pointer;transition:all .15s}
-    .qb-dot.active{background:var(--text);transform:scale(1.4)}
+/* Options */
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+.opt-item{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);
+  transition:all .15s;cursor:pointer;position:relative;
+}
+.opt-item.correct{background:rgba(87,204,2,.07);border-color:var(--duo-green)}
+.opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;transition:.15s;display:flex;align-items:center;justify-content:center}
+.opt-item.correct .opt-radio{background:var(--duo-green);border-color:var(--duo-green)}
+.opt-radio.checked::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%;display:block}
+.opt-letter{
+  width:24px;height:24px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;
+}
+.opt-item.correct .opt-letter{background:var(--duo-green);border-color:var(--duo-green);color:#fff}
+.opt-inp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:13px;outline:none}
+.opt-inp::placeholder{color:var(--text3)}
+.opt-del{opacity:0;background:none;border:none;color:var(--duo-red);cursor:pointer;font-size:14px;padding:2px;transition:.15s;flex-shrink:0}
+.opt-item:hover .opt-del{opacity:1}
+.add-opt-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;margin-top:9px;
+  background:transparent;border:1.5px dashed var(--border2);color:var(--text3);
+  font-family:var(--mono);font-size:10px;cursor:pointer;text-transform:uppercase;
+  letter-spacing:.07em;transition:all .15s;border-radius:var(--r);
+}
+.add-opt-btn:hover{border-color:var(--duo-blue);color:var(--duo-blue)}
 
-    /* TOAST */
-    #qb-toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 24px;font-family:var(--mono);font-size:12px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
-    #qb-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.tf-btn{
+  padding:20px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);
+  font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;color:var(--text2);
+}
+.tf-btn.correct{background:rgba(87,204,2,.07);border-color:var(--duo-green);color:var(--duo-green)}
+.tf-btn:hover:not(.correct){background:var(--bg3)}
 
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .fade-up{animation:fadeUp .2s ease forwards}
+/* Right panel — settings */
+.q-settings-panel{
+  width:280px;flex-shrink:0;border-left:1px solid var(--border);padding:20px 16px;
+  overflow-y:auto;background:var(--bg);
+}
+.q-settings-panel::-webkit-scrollbar{width:3px}
+.q-settings-panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+.stg-section{margin-bottom:22px}
+.stg-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;display:block}
+.stg-inp{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);
+  color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;
+  transition:border-color .15s;margin-bottom:8px;
+}
+.stg-inp:focus{border-color:var(--duo-blue)}
+.stg-sel{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);
+  color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;
+  outline:none;cursor:pointer;appearance:none;margin-bottom:8px;
+}
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.time-opt{
+  padding:8px 4px;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text3);
+  font-family:var(--mono);font-size:11px;cursor:pointer;text-align:center;transition:.15s;border-radius:var(--r);
+}
+.time-opt.active{background:var(--duo-blue);border-color:var(--duo-blue);color:#fff}
+.time-opt:hover:not(.active){border-color:var(--border3);color:var(--text2)}
+.pts-row{display:flex;align-items:center;gap:10px}
+.pts-inp{
+  width:80px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);
+  color:var(--text);font-family:var(--mono);font-size:16px;font-weight:700;padding:8px 12px;
+  outline:none;text-align:center;transition:border-color .15s;
+}
+.pts-inp:focus{border-color:var(--duo-blue)}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.tog-label{font-size:13px;color:var(--text2)}
+.tog{position:relative;width:38px;height:22px;cursor:pointer}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-track{position:absolute;inset:0;background:var(--bg4);border:1.5px solid var(--border2);border-radius:99px;transition:.2s}
+.tog input:checked~.tog-track{background:var(--duo-blue);border-color:var(--duo-blue)}
+.tog-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--text3);border-radius:50%;transition:transform .2s}
+.tog input:checked~.tog-thumb{transform:translateX(16px);background:#fff}
 
-    @media(max-width:900px){
-      .qb-layout{grid-template-columns:1fr}
-      .qb-questions-panel{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--border)}
-      .qb-q-list{max-height:150px}
-      .qb-settings-panel{position:relative;height:auto;border-left:none;border-top:1px solid var(--border)}
-    }
-  </style>
+/* Danger */
+.btn-danger{
+  width:100%;padding:10px;border-radius:var(--r);border:1.5px solid rgba(255,75,75,.3);
+  background:rgba(255,75,75,.07);color:var(--duo-red);font-family:var(--font);
+  font-size:12px;font-weight:700;cursor:pointer;transition:.15s;
+}
+.btn-danger:hover{background:rgba(255,75,75,.14)}
+
+/* Footer dots */
+.q-footer{
+  position:fixed;bottom:0;left:0;right:0;height:44px;
+  background:var(--bg-blur);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;gap:4px;z-index:50;
+}
+.q-dot{width:7px;height:7px;background:var(--border2);border-radius:50%;cursor:pointer;transition:.15s}
+.q-dot.active{background:var(--duo-blue);transform:scale(1.5)}
+.q-dot:hover:not(.active){background:var(--border3)}
+
+/* ════════════════════════════════════════════════
+   COURSE BUILDER
+════════════════════════════════════════════════ */
+#courseBuilder{display:none;flex:1;overflow:hidden}
+#boardGames{display:none;flex:1;overflow:hidden;min-height:0}
+.cb-layout{display:flex;flex:1;height:100%}
+
+/* Left sidebar — meta */
+.cb-sidebar{
+  width:280px;flex-shrink:0;border-right:1px solid var(--border);
+  padding:20px 16px;overflow-y:auto;background:var(--bg);
+}
+.cb-sidebar::-webkit-scrollbar{width:3px}
+.cb-sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* Main — modules */
+.cb-main{flex:1;overflow-y:auto;padding:24px 32px;background:var(--bg2)}
+.cb-main::-webkit-scrollbar{width:4px}
+.cb-main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* Right sidebar — stats */
+.cb-right{
+  width:240px;flex-shrink:0;border-left:1px solid var(--border);
+  padding:20px 16px;overflow-y:auto;background:var(--bg);
+}
+
+/* Fields */
+.cb-field{margin-bottom:16px}
+.cb-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:7px}
+.cb-inp{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);
+  color:var(--text);font-family:var(--font);font-size:13px;padding:10px 13px;outline:none;
+  transition:border-color .15s;
+}
+.cb-inp:focus{border-color:var(--duo-blue)}
+.cb-inp::placeholder{color:var(--text3)}
+textarea.cb-inp{resize:vertical;min-height:72px;line-height:1.55}
+.cb-sel{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);
+  color:var(--text);font-family:var(--font);font-size:13px;padding:10px 13px;
+  outline:none;cursor:pointer;appearance:none;
+}
+.cb-sel:focus{border-color:var(--duo-blue)}
+
+/* Cover swatches */
+.cb-cover-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.cb-swatch{
+  width:40px;height:40px;border-radius:var(--r);cursor:pointer;
+  border:2.5px solid transparent;transition:.15s;flex-shrink:0;
+}
+.cb-swatch:hover{transform:scale(1.08)}
+.cb-swatch.active{border-color:var(--duo-blue);box-shadow:0 0 0 2px rgba(28,176,246,.3)}
+
+/* Modules */
+.cb-modules-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.cb-module{
+  background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--r2);
+  overflow:hidden;transition:border-color .15s;
+}
+.cb-module:hover{border-color:var(--border3)}
+.cb-module.open{border-color:var(--duo-blue)}
+.cb-mod-head{
+  display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;user-select:none;
+}
+.cb-mod-drag{color:var(--text3);font-size:14px;cursor:grab;flex-shrink:0;letter-spacing:-2px}
+.cb-mod-num{
+  width:26px;height:26px;border-radius:8px;background:var(--duo-blue);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.cb-module.open .cb-mod-num{background:var(--duo-blue2)}
+.cb-mod-title-inp{
+  flex:1;background:transparent;border:none;color:var(--text);
+  font-family:var(--font);font-size:14px;font-weight:700;outline:none;
+}
+.cb-mod-title-inp::placeholder{color:var(--text3);font-weight:400}
+.cb-mod-chevron{color:var(--text3);font-size:13px;transition:transform .2s;flex-shrink:0}
+.cb-module.open .cb-mod-chevron{transform:rotate(180deg)}
+.cb-mod-del{
+  background:none;border:none;color:var(--duo-red);cursor:pointer;font-size:17px;
+  padding:2px 4px;opacity:0;transition:.15s;flex-shrink:0;
+}
+.cb-mod-head:hover .cb-mod-del{opacity:1}
+.cb-mod-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.cb-module.open .cb-mod-body{display:block}
+.cb-mod-desc{
+  width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);
+  color:var(--text2);font-family:var(--font);font-size:13px;padding:9px 12px;
+  outline:none;resize:vertical;min-height:52px;margin-top:12px;line-height:1.5;
+  transition:border-color .15s;
+}
+.cb-mod-desc:focus{border-color:var(--duo-blue)}
+.cb-mod-desc::placeholder{color:var(--text3)}
+
+/* Quiz refs in module */
+.cb-quiz-section{margin-top:14px}
+.cb-quiz-section-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:block}
+.cb-quiz-rows{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.cb-quiz-row{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r);
+}
+.cb-quiz-icon{font-size:14px;flex-shrink:0}
+.cb-quiz-title{flex:1;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text2)}
+.cb-quiz-cnt{font-family:var(--mono);font-size:10px;color:var(--text3);flex-shrink:0}
+.cb-quiz-del{background:none;border:none;color:var(--duo-red);cursor:pointer;font-size:15px;padding:2px;opacity:0;transition:.15s;flex-shrink:0}
+.cb-quiz-row:hover .cb-quiz-del{opacity:1}
+.cb-add-quiz{
+  display:flex;align-items:center;gap:7px;padding:8px 12px;width:100%;
+  background:transparent;border:1.5px dashed var(--border2);border-radius:var(--r);
+  color:var(--text3);font-family:var(--mono);font-size:10px;cursor:pointer;
+  text-transform:uppercase;letter-spacing:.07em;transition:all .15s;
+}
+.cb-add-quiz:hover{border-color:var(--duo-blue);color:var(--duo-blue)}
+
+/* Add module button */
+.cb-add-module{
+  display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;
+  background:transparent;border:2px dashed var(--border2);border-radius:var(--r2);
+  color:var(--text3);font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .15s;width:100%;
+}
+.cb-add-module:hover{border-color:var(--duo-blue);color:var(--duo-blue);background:rgba(28,176,246,.03)}
+.cb-add-module svg{width:16px;height:16px;flex-shrink:0}
+
+/* Right sidebar stats */
+.cb-stat-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px;margin-bottom:10px;text-align:center;
+}
+.cb-stat-val{font-size:28px;font-weight:900;font-family:var(--mono);color:var(--duo-blue);line-height:1}
+.cb-stat-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+.cb-tip{
+  background:rgba(28,176,246,.07);border:1px solid rgba(28,176,246,.14);
+  border-radius:var(--r);padding:12px;font-size:12px;color:var(--text3);line-height:1.6;
+  margin-top:12px;
+}
+.cb-tip b{color:var(--duo-blue)}
+
+/* Section heading inside cb */
+.cb-section-head{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+}
+.cb-section-title{font-size:15px;font-weight:800}
+.cb-section-count{
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+  background:var(--bg3);border:1px solid var(--border2);border-radius:99px;padding:3px 9px;
+}
+
+/* ── QUIZ PICKER MODAL ── */
+.qpick-ov{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);
+  z-index:200;align-items:center;justify-content:center;
+}
+.qpick-ov.open{display:flex}
+.qpick-modal{
+  background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);
+  width:min(520px,95vw);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,.6);
+}
+.qpick-head{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.qpick-title{font-size:15px;font-weight:800}
+.qpick-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:4px;transition:.15s}
+.qpick-close:hover{color:var(--text)}
+.qpick-search-wrap{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.qpick-search{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);
+  color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;
+  transition:border-color .15s;
+}
+.qpick-search:focus{border-color:var(--duo-blue)}
+.qpick-list{overflow-y:auto;flex:1;padding:8px}
+.qpick-list::-webkit-scrollbar{width:3px}
+.qpick-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+.qpick-item{
+  display:flex;align-items:center;gap:12px;padding:11px 13px;
+  border:1.5px solid transparent;border-radius:var(--r);cursor:pointer;transition:.15s;margin-bottom:4px;
+}
+.qpick-item:hover{background:var(--bg3);border-color:var(--border)}
+.qpick-item.sel{background:rgba(28,176,246,.08);border-color:var(--duo-blue)}
+.qpick-cover{width:40px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0}
+.qpick-name{font-size:13px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpick-qcount{font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0}
+.qpick-check{color:var(--duo-green);font-size:18px;flex-shrink:0}
+.qpick-empty{padding:32px;text-align:center;color:var(--text3);font-family:var(--mono);font-size:12px}
+.qpick-foot{
+  padding:12px 16px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;
+}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:64px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--duo-green);color:#000;font-weight:900;font-family:var(--mono);font-size:12px;
+  padding:10px 24px;border-radius:var(--r3);z-index:9999;
+  opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;
+  box-shadow:0 6px 20px rgba(87,204,2,.3);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:var(--duo-red);color:#fff;box-shadow:0 6px 20px rgba(255,75,75,.3)}
+
+/* ── Board Game sidebar list ── */
+.bg-game-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;transition:all .15s;margin-bottom:3px}
+.bg-game-item:hover{background:var(--bg2);border-color:var(--border)}
+.bg-game-item.active{background:var(--bg3);border-color:var(--duo-blue)}
+.bg-game-emoji{font-size:20px;flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.bg-game-name{font-size:12px;font-weight:700;color:var(--text2);line-height:1.3}
+.bg-game-cat{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:1px}
+
+/* ── Board game category divider ── */
+.bg-cat-divider{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:8px 12px 4px;margin-top:6px}
+
+/* ── Board game detail ── */
+.bg-detail-header{margin-bottom:22px}
+.bg-detail-title{font-size:22px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.bg-detail-meta{font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;gap:14px;flex-wrap:wrap}
+.bg-detail-desc{font-size:14px;color:var(--text2);line-height:1.7;margin:16px 0;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:16px 18px}
+.bg-rules-section{margin-bottom:20px}
+.bg-rules-title{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.bg-rule-item{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border)}
+.bg-rule-item:last-child{border-bottom:none}
+.bg-rule-num{font-family:var(--mono);font-size:10px;color:var(--duo-blue);min-width:18px;font-weight:700;margin-top:1px}
+.bg-rule-text{font-size:13px;color:var(--text2);line-height:1.5}
+
+/* ── Board game gen form ── */
+.bg-gen-panel{background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--r2);padding:20px;margin-top:24px}
+.bg-gen-title{font-family:var(--mono);font-size:11px;color:var(--duo-blue);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;font-weight:700}
+.bg-gen-row{display:flex;gap:10px;margin-bottom:12px}
+.bg-gen-inp{flex:1;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;transition:border-color .15s}
+.bg-gen-inp:focus{border-color:var(--duo-blue)}
+.bg-gen-inp::placeholder{color:var(--text3)}
+.bg-gen-sel{background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;cursor:pointer;appearance:none}
+.bg-gen-btn{padding:10px 22px;background:linear-gradient(135deg,#7c3aed,#4c1d95);border:none;border-radius:var(--r3);color:#fff;font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:filter .15s;white-space:nowrap}
+.bg-gen-btn:hover{filter:brightness(1.15)}
+.bg-gen-btn:disabled{opacity:.4;cursor:default}
+
+/* ── Board game tab buttons ── */
+.bg-tab-btn{padding:7px 18px;border-radius:99px;font-family:var(--font);font-size:12px;font-weight:800;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all .18s}
+.bg-tab-btn.active{background:var(--duo-blue);color:#fff;box-shadow:0 2px 8px rgba(28,176,246,.3)}
+.bg-tab-btn:hover:not(.active){color:var(--text2)}
+
+/* ── Manual question row ── */
+.bg-manual-row{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;position:relative}
+.bg-manual-row:focus-within{border-color:var(--duo-blue)}
+.bg-manual-inp{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;outline:none;transition:border-color .15s;resize:none;line-height:1.5}
+.bg-manual-inp:focus{border-color:var(--duo-blue)}
+.bg-manual-inp::placeholder{color:var(--text3)}
+.bg-manual-del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--duo-red);cursor:pointer;font-size:18px;opacity:0;transition:.15s;line-height:1}
+.bg-manual-row:hover .bg-manual-del{opacity:1}
+.bg-manual-num{font-family:var(--mono);font-size:10px;color:var(--text3);font-weight:700;margin-bottom:2px}
+.bg-q-card{display:flex;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);margin-bottom:7px;align-items:flex-start}
+.bg-q-idx{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:22px;margin-top:2px;font-weight:700}
+.bg-q-body{flex:1}
+.bg-q-q{font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.45}
+.bg-q-ans{font-size:12px;color:var(--text2);margin-bottom:4px}
+.bg-q-hint{font-size:11px;color:var(--text3);padding:5px 10px;background:rgba(255,255,255,.04);border-radius:6px;line-height:1.5;margin-top:4px}
+.bg-ans-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px}
+.bg-ans-true{background:rgba(87,204,2,.15);color:#57cc02;border:1px solid rgba(87,204,2,.3)}
+.bg-ans-false{background:rgba(255,75,75,.12);color:#ff4b4b;border:1px solid rgba(255,75,75,.3)}
+.bg-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.1);border-top-color:#7c3aed;border-radius:50%;animation:bgSpin .7s linear infinite;margin:0 auto}
+@keyframes bgSpin{to{transform:rotate(360deg)}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .22s ease forwards}
+</style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="qb-header">
-  <button class="qb-back" onclick="goBack()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
-    Назад
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <button class="topbar-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    Артқа
   </button>
-  <div class="qb-title-area">
-    <input class="qb-quiz-title-input" id="quizTitleInput" type="text" placeholder="Название квиза..." maxlength="80">
-    <span class="qb-status" id="saveStatus">Не сохранено</span>
+  <div class="topbar-divider"></div>
+
+  <!-- Mode toggle -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="modeQuizBtn" onclick="setMode('quiz')">📝 Квиз</button>
+    <button class="mode-btn" id="modeCourseBtn" onclick="setMode('course')">📚 Курс</button>
+    <button class="mode-btn" id="modeBoardBtn" onclick="setMode('board')">🎲 Ойындар</button>
   </div>
-  <div class="qb-actions">
-    <button class="btn btn-outline" onclick="previewQuiz()">Превью</button>
-    <button class="btn btn-outline" id="publishBtn" onclick="togglePublish()">Опубликовать</button>
-    <button class="btn btn-solid" onclick="saveQuiz()">Сохранить</button>
+
+  <!-- Title -->
+  <div class="topbar-title-wrap">
+    <input class="title-inp" id="titleInp" placeholder="Атауы..." maxlength="80">
+    <span class="save-status" id="saveStatus">Сақталмаған</span>
+  </div>
+
+  <!-- Quiz actions -->
+  <div class="topbar-actions" id="quizActions">
+    <button class="tb-btn tb-btn-ghost" onclick="previewQuiz()">Алдын ала қарау</button>
+    <button class="tb-btn tb-btn-ghost" id="publishBtn" onclick="togglePublish()">Жариялау</button>
+    <button class="tb-btn tb-btn-blue" onclick="saveQuiz()">Сақтау</button>
+  </div>
+
+  <!-- Course actions -->
+  <div class="topbar-actions" id="courseActions" style="display:none">
+    <button class="tb-btn tb-btn-ghost" id="coursePubBtn" onclick="toggleCoursePublish()">Жариялау</button>
+    <button class="tb-btn tb-btn-green" onclick="saveCourse()">💾 Курс сақтау</button>
+  </div>
+
+  <!-- Board actions -->
+  <div class="topbar-actions" id="boardActions" style="display:none">
+    <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">Ойынды таңдап, сұрақтар жасаңыз</span>
   </div>
 </header>
 
-<!-- LAYOUT -->
-<div class="qb-layout">
+<!-- ══════════════════════════════════════════════
+     QUIZ EDITOR
+══════════════════════════════════════════════ -->
+<div id="quizEditor" style="display:flex;flex:1;overflow:hidden">
 
-  <!-- LEFT: список вопросов -->
-  <aside class="qb-questions-panel">
-    <div class="qb-questions-header">
-      <span class="qb-questions-label" id="qCountLabel">0 вопросов</span>
-      <button class="qb-add-q-btn" onclick="addQuestion()" title="Добавить вопрос">+</button>
+  <!-- Left: questions -->
+  <aside class="q-panel">
+    <div class="q-panel-head">
+      <span class="q-panel-label" id="qCountLbl">0 сұрақ</span>
+      <button class="q-add-btn" onclick="addQuestion()" title="Сұрақ қосу">+</button>
     </div>
-    <div class="qb-q-list" id="questionList"></div>
+    <div class="q-list" id="qList"></div>
   </aside>
 
-  <!-- CENTER: редактор вопроса -->
-  <main class="qb-editor" id="questionEditor">
-    <div class="qb-editor-empty" id="editorEmpty">
-      <div class="qb-editor-empty-icon">✏️</div>
-      <div class="qb-editor-empty-title">Добавьте первый вопрос</div>
-      <button class="btn btn-solid" style="margin-top:12px;" onclick="addQuestion()">+ Добавить вопрос</button>
+  <!-- Center: editor -->
+  <main class="q-editor-area" id="qEditorArea">
+    <div class="q-empty" id="qEmpty">
+      <div class="q-empty-icon">✏️</div>
+      <div class="q-empty-label">Бірінші сұрақ қосыңыз</div>
+      <button class="tb-btn tb-btn-blue" style="margin-top:14px" onclick="addQuestion()">+ Сұрақ қосу</button>
     </div>
   </main>
 
-  <!-- RIGHT: настройки -->
-  <aside class="qb-settings-panel">
-    <div class="settings-section">
-      <span class="settings-label">Настройки квиза</span>
-      <input class="settings-input" id="categoryInput" placeholder="Категория" maxlength="30">
-      <select class="settings-select" id="visibilitySelect">
-        <option value="draft">Черновик</option>
-        <option value="public">Публичный</option>
+  <!-- Right: settings -->
+  <aside class="q-settings-panel">
+    <div class="stg-section">
+      <span class="stg-label">Квиз баптаулары</span>
+      <input class="stg-inp" id="categoryInp" placeholder="Санат" maxlength="30">
+      <select class="stg-sel" id="visibilityInp">
+        <option value="draft">○ Жоба</option>
+        <option value="public">● Жалпыға ашық</option>
       </select>
     </div>
 
-    <div class="settings-section" id="questionSettings" style="display:none;">
-      <span class="settings-label">Настройки вопроса</span>
-      <div style="margin-bottom:14px;">
-        <div class="settings-label" style="margin-bottom:8px;">Время (сек)</div>
+    <div class="stg-section" id="qSettings" style="display:none">
+      <span class="stg-label">Сұрақ баптаулары</span>
+      <div style="margin-bottom:14px">
+        <div class="stg-label" style="margin-bottom:8px">Уақыт (сек)</div>
         <div class="time-grid" id="timeGrid">
           <button class="time-opt" data-t="5">5</button>
           <button class="time-opt" data-t="10">10</button>
@@ -219,490 +597,1217 @@
           <button class="time-opt" data-t="60">60</button>
         </div>
       </div>
-      <div style="margin-bottom:14px;">
-        <div class="settings-label" style="margin-bottom:8px;">Очки</div>
-        <div class="points-row">
-          <input class="points-input" id="pointsInput" type="number" value="100" min="0" max="9999">
-          <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">за правильный ответ</span>
+      <div style="margin-bottom:14px">
+        <div class="stg-label" style="margin-bottom:8px">Ұпай</div>
+        <div class="pts-row">
+          <input class="pts-inp" id="ptsInp" type="number" value="100" min="0" max="9999">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">дұрыс жауапқа</span>
         </div>
       </div>
-      <div class="toggle-row">
-        <span class="toggle-label">Обязательный вопрос</span>
-        <label class="toggle">
-          <input type="checkbox" id="requiredToggle">
-          <span class="toggle-track"></span>
-          <span class="toggle-thumb"></span>
-        </label>
+      <div class="tog-row">
+        <span class="tog-label">Міндетті сұрақ</span>
+        <label class="tog"><input type="checkbox" id="reqTog"><span class="tog-track"></span><span class="tog-thumb"></span></label>
       </div>
-      <div class="toggle-row">
-        <span class="toggle-label">Перемешать варианты</span>
-        <label class="toggle">
-          <input type="checkbox" id="shuffleToggle">
-          <span class="toggle-track"></span>
-          <span class="toggle-thumb"></span>
-        </label>
+      <div class="tog-row">
+        <span class="tog-label">Жауаптарды араластыру</span>
+        <label class="tog"><input type="checkbox" id="shuffTog"><span class="tog-track"></span><span class="tog-thumb"></span></label>
       </div>
     </div>
 
-    <div class="settings-section">
-      <span class="settings-label">Обложка квиза</span>
-      <input class="settings-input" id="coverInput" placeholder="URL обложки (необязательно)">
+    <div class="stg-section">
+      <span class="stg-label">Мұқаба</span>
+      <input class="stg-inp" id="coverInp" placeholder="Сурет URL (міндетті емес)">
     </div>
 
-    <div class="settings-section">
-      <button class="btn btn-red" style="width:100%;" id="deleteQuizBtn" onclick="confirmDeleteQuiz()" style="display:none;">Удалить квиз</button>
+    <div class="stg-section">
+      <button class="btn-danger" id="delQuizBtn" style="display:none" onclick="confirmDeleteQuiz()">🗑 Квизді жою</button>
     </div>
   </aside>
-
 </div>
 
-<!-- BOTTOM DOTS -->
-<div class="qb-footer" id="qbFooter"></div>
-<div id="qb-toast"></div>
+<!-- ══════════════════════════════════════════════
+     COURSE BUILDER
+══════════════════════════════════════════════ -->
+<div id="courseBuilder" style="display:none;flex:1;overflow:hidden">
+  <div class="cb-layout">
+
+    <!-- Left sidebar: course meta -->
+    <aside class="cb-sidebar">
+      <div class="cb-field">
+        <label class="cb-label">Санат</label>
+        <input class="cb-inp" id="cbCategory" placeholder="Python, Математика..." maxlength="30">
+      </div>
+      <div class="cb-field">
+        <label class="cb-label">Деңгей</label>
+        <select class="cb-sel" id="cbLevel">
+          <option value="beginner">🟢 Бастауыш</option>
+          <option value="intermediate">🟡 Орта</option>
+          <option value="advanced">🔴 Жоғары</option>
+        </select>
+      </div>
+      <div class="cb-field">
+        <label class="cb-label">Сипаттама</label>
+        <textarea class="cb-inp" id="cbDesc" placeholder="Курс туралы қысқаша..."></textarea>
+      </div>
+      <div class="cb-field">
+        <label class="cb-label">Жариялау</label>
+        <select class="cb-sel" id="cbVis">
+          <option value="draft">○ Жоба</option>
+          <option value="public">● Жалпыға ашық</option>
+        </select>
+      </div>
+      <div class="cb-field">
+        <label class="cb-label">Мұқаба түсі</label>
+        <div class="cb-cover-grid" id="cbSwatches"></div>
+      </div>
+
+      <!-- Preview card -->
+      <div style="margin-top:20px">
+        <div class="cb-label">Алдын ала қарау</div>
+        <div id="cbPreviewCard" style="border-radius:var(--r2);overflow:hidden;border:1px solid var(--border2)">
+          <div id="cbPreviewCover" style="height:80px;display:flex;align-items:center;justify-content:center">
+            <span style="font-size:28px">📚</span>
+          </div>
+          <div style="padding:12px;background:var(--bg2)">
+            <div id="cbPreviewTitle" style="font-size:13px;font-weight:800;margin-bottom:4px;color:var(--text)">Курс атауы</div>
+            <div id="cbPreviewMeta" style="font-family:var(--mono);font-size:10px;color:var(--text3)">0 модуль · 0 квиз</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main: modules -->
+    <main class="cb-main">
+      <div class="cb-section-head">
+        <div class="cb-section-title">📦 Модульдер</div>
+        <span class="cb-section-count" id="cbModCount">0</span>
+      </div>
+      <div class="cb-modules-wrap" id="cbModsList"></div>
+      <button class="cb-add-module" onclick="addModule()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Модуль қосу
+      </button>
+    </main>
+
+    <!-- Right: stats & tips -->
+    <aside class="cb-right">
+      <div class="cb-label">Статистика</div>
+      <div class="cb-stat-card">
+        <div class="cb-stat-val" id="cbStatMods">0</div>
+        <div class="cb-stat-lbl">Модуль</div>
+      </div>
+      <div class="cb-stat-card">
+        <div class="cb-stat-val" id="cbStatQuizzes">0</div>
+        <div class="cb-stat-lbl">Квиз</div>
+      </div>
+      <div class="cb-stat-card">
+        <div class="cb-stat-val" id="cbStatQCount">0</div>
+        <div class="cb-stat-lbl">Сұрақ</div>
+      </div>
+      <div class="cb-tip">
+        <b>Кеңес:</b> Қатысты квиздерді бір модульге топтастырыңыз. Оқушылар курсты ретпен өтеді.
+      </div>
+      <div style="margin-top:16px">
+        <button class="btn-danger" id="delCourseBtn" style="display:none;width:100%" onclick="confirmDeleteCourse()">🗑 Курсты жою</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BOARD GAMES
+══════════════════════════════════════════════ -->
+<div id="boardGames" style="display:none;flex:1;overflow:hidden;min-height:0">
+  <div style="display:flex;height:100%">
+
+    <!-- Left: game list -->
+    <aside style="width:260px;flex-shrink:0;border-right:1px solid var(--border);background:var(--bg);overflow-y:auto;padding:12px 8px">
+      <div style="padding:6px 10px 12px;font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em">6 ойын</div>
+      <div id="bgGameList"></div>
+    </aside>
+
+    <!-- Center: game detail + generator -->
+    <main style="flex:1;overflow-y:auto;background:var(--bg2);padding:28px 32px" id="bgMain">
+      <div id="bgWelcome" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:14px;text-align:center">
+        <div style="font-size:52px;opacity:.25">🎲</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Сол жақтан ойын таңдаңыз</div>
+      </div>
+      <div id="bgDetail" style="display:none"></div>
+    </main>
+
+    <!-- Right: tips -->
+    <aside style="width:220px;flex-shrink:0;border-left:1px solid var(--border);background:var(--bg);padding:20px 16px;overflow-y:auto">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px">Кеңестер</div>
+      <div id="bgTips" style="font-size:12px;color:var(--text3);line-height:1.65">Ойын таңдасаңыз кеңестер шығады.</div>
+    </aside>
+  </div>
+</div>
+
+<!-- Footer dots (quiz only) -->
+<div class="q-footer" id="qFooter"></div>
+
+<!-- ── QUIZ PICKER MODAL ── -->
+<div class="qpick-ov" id="qpickOv">
+  <div class="qpick-modal">
+    <div class="qpick-head">
+      <span class="qpick-title">Квиз таңдаңыз</span>
+      <button class="qpick-close" onclick="closeQPick()">✕</button>
+    </div>
+    <div class="qpick-search-wrap">
+      <input class="qpick-search" type="text" placeholder="Іздеу..." id="qpickSearchInp" oninput="filterQPick(this.value)">
+    </div>
+    <div class="qpick-list" id="qpickList"></div>
+    <div class="qpick-foot">
+      <button class="tb-btn tb-btn-ghost" onclick="closeQPick()">Болдырмау</button>
+      <button class="tb-btn tb-btn-blue" onclick="confirmQPick()">Қосу</button>
+    </div>
+  </div>
+</div>
 
 <!-- hidden file input -->
-<input type="file" id="qImageInput" accept="image/*" style="display:none;">
+<input type="file" id="qImgInp" accept="image/*" style="display:none">
+<div id="toast"></div>
 
 <script type="module">
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, addDoc, updateDoc, deleteDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+  getFirestore, doc, getDoc, addDoc, updateDoc, deleteDoc,
+  collection, query, where, getDocs, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
-  authDomain: "pystart-dd2db.firebaseapp.com",
-  projectId: "pystart-dd2db",
-  storageBucket: "pystart-dd2db.firebasestorage.app",
-  messagingSenderId: "9188811255",
-  appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+const FB = {
+  apiKey:"AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+  authDomain:"pystart-dd2db.firebaseapp.com",
+  projectId:"pystart-dd2db",
+  storageBucket:"pystart-dd2db.firebasestorage.app",
+  messagingSenderId:"9188811255",
+  appId:"1:9188811255:web:6f7280f1f7f67b80d90ef2"
 };
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-const auth = getAuth(app);
+const app     = !getApps().length ? initializeApp(FB) : getApp();
+const db      = getFirestore(app);
+const auth    = getAuth(app);
 const storage = getStorage(app);
 
-// ── State ──
-let questions = [];
-let activeIdx = -1;
-let currentUser = null;
-let editingQuizId = null;
-let isPublic = false;
-let isSaving = false;
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+let questions    = [];
+let activeIdx    = -1;
+let currentUser  = null;
+let editQuizId   = null;
+let editCourseId = null;
+let isQuizPublic = false;
+let isSaving     = false;
+let allUserQuizzes = [];
 
-// Apply theme
-const saved = localStorage.getItem('theme');
-if (saved === 'dark') document.documentElement.classList.add('dark');
-else if (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark');
+// Course state
+let courseModules   = [];   // [{title,desc,quizRefs:[{id,title,questionCount}],_open}]
+let isCoursePublic  = false;
+let selectedCoverIdx = 0;
 
-// ── Auth check ──
+const COVERS = [
+  'linear-gradient(135deg,#1a2634,#2563eb)',
+  'linear-gradient(135deg,#4c1d95,#7c3aed)',
+  'linear-gradient(135deg,#7c1d44,#ec4899)',
+  'linear-gradient(135deg,#064e3b,#059669)',
+  'linear-gradient(135deg,#78350f,#d97706)',
+  'linear-gradient(135deg,#1e3a5f,#0891b2)',
+  'linear-gradient(135deg,#111827,#374151)',
+  'linear-gradient(135deg,#3b0764,#9333ea)',
+];
+
+// ── Auth ──────────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href = './auth.html'; return; }
   currentUser = user;
+  const p = new URLSearchParams(location.search);
+  editQuizId   = p.get('edit') || null;
+  editCourseId = p.get('editCourse') || null;
+  const mode   = p.get('mode') || null;
 
-  const params = new URLSearchParams(location.search);
-  editingQuizId = params.get('edit') || null;
-
-  if (editingQuizId) {
-    await loadExistingQuiz(editingQuizId);
+  if (editCourseId || mode === 'course') {
+    setMode('course');
+    if (editCourseId) await loadCourse(editCourseId);
+  } else if (editQuizId) {
+    await loadQuiz(editQuizId);
+    document.getElementById('delQuizBtn').style.display = 'block';
   } else {
-    // prefill from AI data if present
-    const aiData = sessionStorage.getItem('aiQuizDraft');
-    if (aiData) {
+    // prefill from AI draft
+    const ai = sessionStorage.getItem('aiQuizDraft');
+    if (ai) {
       try {
-        const quiz = JSON.parse(aiData);
-        document.getElementById('quizTitleInput').value = quiz.title || '';
-        document.getElementById('categoryInput').value = quiz.category || '';
-        if (quiz.questions) {
-          quiz.questions.forEach(q => {
-            questions.push({
-              type: 'multiple',
-              text: q.question || '',
-              options: q.options.map((o, i) => ({ text: o, correct: i === q.correctIndex })),
-              timeLimit: 20,
-              points: 100,
-              required: false,
-              shuffle: false,
-              imageUrl: ''
-            });
+        const q = JSON.parse(ai);
+        document.getElementById('titleInp').value = q.title || '';
+        document.getElementById('categoryInp').value = q.category || '';
+        (q.questions||[]).forEach(qd => {
+          questions.push({
+            type:'multiple', text:qd.question||'',
+            options:(qd.options||[]).map((o,i)=>({text:o,correct:i===(qd.correctIndex||0)})),
+            timeLimit:20,points:100,required:false,shuffle:false,imageUrl:''
           });
-        }
+        });
         sessionStorage.removeItem('aiQuizDraft');
-        if (questions.length) { renderQuestionList(); selectQuestion(0); }
+        if (questions.length) { renderQList(); selectQ(0); }
       } catch(e) {}
     }
   }
-  document.getElementById('deleteQuizBtn').style.display = editingQuizId ? 'block' : 'none';
 });
 
-async function loadExistingQuiz(id) {
-  try {
-    const snap = await getDoc(doc(db, 'quizzes', id));
-    if (!snap.exists()) { showToast('Квиз не найден'); return; }
-    const data = snap.data();
-    document.getElementById('quizTitleInput').value = data.title || '';
-    document.getElementById('categoryInput').value = data.category || '';
-    document.getElementById('coverInput').value = data.cover || '';
-    isPublic = data.visibility === 'public';
-    document.getElementById('visibilitySelect').value = data.visibility || 'draft';
-    document.getElementById('publishBtn').textContent = isPublic ? 'Снять с публикации' : 'Опубликовать';
-    questions = (data.questions || []).map(q => ({
-      type: q.type || 'multiple',
-      text: q.question || q.text || '',
-      options: (q.options || []).map((o, i) => ({
-        text: typeof o === 'string' ? o : o.text,
-        correct: typeof o === 'object' ? o.correct : i === (q.correctIndex || 0)
-      })),
-      timeLimit: q.timeLimit || 20,
-      points: q.points || 100,
-      required: q.required || false,
-      shuffle: q.shuffle || false,
-      imageUrl: q.imageUrl || ''
-    }));
-    if (questions.length) { renderQuestionList(); selectQuestion(0); }
-    document.getElementById('saveStatus').textContent = 'Загружено';
-  } catch(e) { console.error(e); showToast('Ошибка загрузки квиза'); }
-}
+// ══════════════════════════════════════════════
+//  MODE SWITCH
+// ══════════════════════════════════════════════
+window.setMode = function(mode) {
+  const isCourse = mode === 'course';
+  const isBoard  = mode === 'board';
+  const isQuiz   = mode === 'quiz';
+  document.getElementById('modeQuizBtn').classList.toggle('active', isQuiz);
+  document.getElementById('modeCourseBtn').classList.toggle('active', isCourse);
+  document.getElementById('modeBoardBtn').classList.toggle('active', isBoard);
+  document.getElementById('quizActions').style.display   = isQuiz   ? ''     : 'none';
+  document.getElementById('courseActions').style.display = isCourse ? ''     : 'none';
+  document.getElementById('boardActions').style.display  = isBoard  ? ''     : 'none';
+  document.getElementById('quizEditor').style.display    = isQuiz   ? 'flex' : 'none';
+  document.getElementById('courseBuilder').style.display = isCourse ? 'flex' : 'none';
+  document.getElementById('boardGames').style.display    = isBoard  ? 'flex' : 'none';
+  document.getElementById('qFooter').style.display       = isQuiz   ? ''     : 'none';
+  if (isCourse) {
+    renderSwatches();
+    renderModules();
+    loadUserQuizzes();
+  }
+  if (isBoard) {
+    initBoardGamesPanel();
+  }
+};
 
-// ── Questions ──
+// ══════════════════════════════════════════════
+//  QUIZ EDITOR
+// ══════════════════════════════════════════════
 window.addQuestion = function() {
   questions.push({
-    type: 'multiple',
-    text: '',
-    options: [
-      { text: '', correct: true },
-      { text: '', correct: false },
-      { text: '', correct: false },
-      { text: '', correct: false }
-    ],
-    timeLimit: 20,
-    points: 100,
-    required: false,
-    shuffle: false,
-    imageUrl: ''
+    type:'multiple', text:'',
+    options:[{text:'',correct:true},{text:'',correct:false},{text:'',correct:false},{text:'',correct:false}],
+    timeLimit:20, points:100, required:false, shuffle:false, imageUrl:''
   });
-  renderQuestionList();
-  selectQuestion(questions.length - 1);
+  renderQList();
+  selectQ(questions.length - 1);
 };
 
-function renderQuestionList() {
-  const list = document.getElementById('questionList');
+function renderQList() {
+  const list = document.getElementById('qList');
   list.innerHTML = '';
-  questions.forEach((q, i) => {
-    const item = document.createElement('div');
-    item.className = 'qb-q-item' + (i === activeIdx ? ' active' : '');
-    item.innerHTML = `
-      <span class="qb-q-num">${String(i+1).padStart(2,'0')}</span>
-      <span class="qb-q-preview">${q.text || 'Вопрос ' + (i+1)}</span>
-      <button class="qb-q-delete" onclick="deleteQuestion(${i},event)" title="Удалить">×</button>`;
-    item.addEventListener('click', () => selectQuestion(i));
-    list.appendChild(item);
+  questions.forEach((q,i) => {
+    const d = document.createElement('div');
+    d.className = 'q-item' + (i===activeIdx?' active':'');
+    d.innerHTML = `
+      <span class="q-item-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="q-item-preview">${q.text||'Сұрақ '+(i+1)}</span>
+      <button class="q-item-del" onclick="delQ(${i},event)">×</button>`;
+    d.addEventListener('click', () => selectQ(i));
+    list.appendChild(d);
   });
-  document.getElementById('qCountLabel').textContent = `${questions.length} вопрос${questions.length===1?'':questions.length<5?'а':'ов'}`;
-  renderFooterDots();
+  const n = questions.length;
+  document.getElementById('qCountLbl').textContent = n + ' сұрақ';
+  renderDots();
 }
 
-window.deleteQuestion = function(idx, e) {
+window.delQ = function(i,e) {
   e.stopPropagation();
-  if (!confirm('Удалить этот вопрос?')) return;
-  questions.splice(idx, 1);
-  if (activeIdx >= questions.length) activeIdx = questions.length - 1;
-  renderQuestionList();
-  if (questions.length > 0) selectQuestion(activeIdx); else showEmptyEditor();
+  if (!confirm('Сұрақты жою?')) return;
+  questions.splice(i,1);
+  if (activeIdx >= questions.length) activeIdx = questions.length-1;
+  renderQList();
+  if (questions.length) selectQ(activeIdx); else showEmptyQ();
 };
 
-function showEmptyEditor() {
+function showEmptyQ() {
   activeIdx = -1;
-  document.getElementById('questionEditor').innerHTML = `
-    <div class="qb-editor-empty" id="editorEmpty">
-      <div class="qb-editor-empty-icon">✏️</div>
-      <div class="qb-editor-empty-title">Добавьте первый вопрос</div>
-      <button class="btn btn-solid" style="margin-top:12px;" onclick="addQuestion()">+ Добавить вопрос</button>
-    </div>`;
-  document.getElementById('questionSettings').style.display = 'none';
+  document.getElementById('qEditorArea').innerHTML = `
+    <div class="q-empty"><div class="q-empty-icon">✏️</div><div class="q-empty-label">Бірінші сұрақ қосыңыз</div>
+    <button class="tb-btn tb-btn-blue" style="margin-top:14px" onclick="addQuestion()">+ Сұрақ қосу</button></div>`;
+  document.getElementById('qSettings').style.display = 'none';
 }
 
-function selectQuestion(idx) {
-  saveCurrentQuestion();
-  activeIdx = idx;
-  renderQuestionList();
-  renderQuestionEditor(questions[idx]);
-  renderSettingsPanel(questions[idx]);
-  document.getElementById('questionSettings').style.display = 'block';
+function selectQ(i) {
+  saveCurrentQ();
+  activeIdx = i;
+  renderQList();
+  renderQEditor(questions[i]);
+  renderQSettings(questions[i]);
+  document.getElementById('qSettings').style.display = 'block';
 }
 
-function saveCurrentQuestion() {
+function saveCurrentQ() {
   if (activeIdx < 0 || activeIdx >= questions.length) return;
   const q = questions[activeIdx];
-  const textEl = document.getElementById('qTextInput');
-  if (textEl) q.text = textEl.value;
-  if (q.type === 'multiple') {
-    document.querySelectorAll('.opt-input').forEach((inp, i) => {
-      if (q.options[i]) q.options[i].text = inp.value;
-    });
+  const ti = document.getElementById('qTextInp');
+  if (ti) q.text = ti.value;
+  if (q.type === 'multiple' || q.type === 'multi_select') {
+    document.querySelectorAll('.opt-inp').forEach((inp,i) => { if(q.options[i]) q.options[i].text = inp.value; });
   }
 }
 
-function renderQuestionEditor(q) {
-  const editor = document.getElementById('questionEditor');
-  const typeMap = { multiple: 'Один ответ', multi_select: 'Несколько ответов', true_false: 'Верно/Неверно', open: 'Открытый ответ' };
-
-  editor.innerHTML = `
-    <div class="q-editor-card fade-up">
+function renderQEditor(q) {
+  const area = document.getElementById('qEditorArea');
+  const typeLabels = {multiple:'Бір жауап',multi_select:'Бірнеше жауап',true_false:'Дұрыс/Бұрыс',open:'Ашық жауап'};
+  area.innerHTML = `
+    <div class="q-card fu">
       <div class="q-type-row">
-        ${Object.entries(typeMap).map(([v,l]) => `
-          <button class="q-type-btn${q.type===v?' active':''}" onclick="setQType('${v}')">${l}</button>`).join('')}
+        ${Object.entries(typeLabels).map(([v,l])=>`<button class="q-type-btn${q.type===v?' active':''}" onclick="setQType('${v}')">${l}</button>`).join('')}
       </div>
-      ${q.imageUrl ? `<img id="qImagePreview" class="q-img-preview" src="${q.imageUrl}" style="display:block;">` : `<img id="qImagePreview" class="q-img-preview">`}
+      ${q.imageUrl?`<img id="qImgPrev" class="q-img-preview" src="${q.imageUrl}" style="display:block">`:`<img id="qImgPrev" class="q-img-preview">`}
       <div class="q-media-row">
-        <button class="q-media-btn" onclick="document.getElementById('qImageInput').click()">
+        <button class="q-media-btn" onclick="document.getElementById('qImgInp').click()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Фото
+          Сурет
         </button>
-        ${q.imageUrl ? `<button class="q-media-btn" onclick="removeQImage()" style="color:var(--red);">× Удалить фото</button>` : ''}
+        ${q.imageUrl?`<button class="q-media-btn" onclick="removeQImg()" style="color:var(--duo-red)">× Жою</button>`:''}
       </div>
-      <textarea class="q-text-input" id="qTextInput" placeholder="Введите вопрос..." maxlength="300">${q.text}</textarea>
+      <textarea class="q-text-inp" id="qTextInp" placeholder="Сұрақ мәтінін енгізіңіз..." maxlength="300">${q.text}</textarea>
       <div id="answerArea"></div>
     </div>`;
-
   renderAnswerArea(q);
-
-  document.getElementById('qTextInput').addEventListener('input', e => {
+  document.getElementById('qTextInp').addEventListener('input', e => {
     if (questions[activeIdx]) questions[activeIdx].text = e.target.value;
-    renderQuestionList();
+    renderQList();
   });
-
-  document.getElementById('qImageInput').onchange = async (e) => {
+  document.getElementById('qImgInp').onchange = async e => {
     const file = e.target.files[0];
     if (!file || !currentUser) return;
-    showToast('Загрузка изображения...');
+    showToast('Жүктелуде...');
     try {
-      const fileRef = ref(storage, `quiz-images/${currentUser.uid}_${Date.now()}`);
-      await uploadBytes(fileRef, file);
-      const url = await getDownloadURL(fileRef);
+      const r = ref(storage, `quiz-images/${currentUser.uid}_${Date.now()}`);
+      await uploadBytes(r, file);
+      const url = await getDownloadURL(r);
       questions[activeIdx].imageUrl = url;
-      const preview = document.getElementById('qImagePreview');
-      if (preview) { preview.src = url; preview.style.display = 'block'; }
-      showToast('Изображение загружено');
-    } catch(err) { showToast('Ошибка загрузки'); }
-    e.target.value = '';
+      const pr = document.getElementById('qImgPrev');
+      if (pr) { pr.src=url; pr.style.display='block'; }
+      showToast('✓ Сурет жүктелді');
+    } catch { showToast('❌ Жүктеу қатесі', true); }
+    e.target.value='';
   };
 }
 
-window.removeQImage = function() {
-  questions[activeIdx].imageUrl = '';
-  renderQuestionEditor(questions[activeIdx]);
+window.removeQImg = function() {
+  questions[activeIdx].imageUrl='';
+  renderQEditor(questions[activeIdx]);
 };
 
 function renderAnswerArea(q) {
   const area = document.getElementById('answerArea');
   if (!area) return;
-
   if (q.type === 'true_false') {
-    area.innerHTML = `<div class="tf-grid">
-      <button class="tf-btn${q.options[0]?.correct?' correct':''}" onclick="setTF(0)">✓ Верно</button>
-      <button class="tf-btn${q.options[1]?.correct?' correct':''}" onclick="setTF(1)">✗ Неверно</button>
+    if (!q.options.length) q.options=[{text:'Дұрыс',correct:true},{text:'Бұрыс',correct:false}];
+    area.innerHTML=`<div class="tf-grid">
+      <button class="tf-btn${q.options[0]?.correct?' correct':''}" onclick="setTF(0)">✓ Дұрыс</button>
+      <button class="tf-btn${q.options[1]?.correct?' correct':''}" onclick="setTF(1)">✗ Бұрыс</button>
     </div>`;
-    if (!q.options.length) q.options = [{text:'Верно',correct:true},{text:'Неверно',correct:false}];
     return;
   }
-
   if (q.type === 'open') {
-    area.innerHTML = `<div style="margin-top:20px;padding:16px;background:var(--bg2);border:1px dashed var(--border2);font-family:var(--mono);font-size:11px;color:var(--text3);">
-      Открытый ответ — студент введёт текст вручную. Оценивается вручную.
-    </div>`;
+    area.innerHTML=`<div style="margin-top:18px;padding:16px;background:var(--bg2);border:1.5px dashed var(--border2);border-radius:var(--r);font-family:var(--mono);font-size:11px;color:var(--text3)">Ашық жауап — оқушы мәтін енгізеді. Қолмен бағаланады.</div>`;
     return;
   }
-
-  const multiSelect = q.type === 'multi_select';
-  const letters = ['A','B','C','D','E','F'];
-  area.innerHTML = `
-    <div class="options-grid" id="optionsGrid">
-      ${q.options.map((opt,i) => `
-        <div class="option-item${opt.correct?' correct':''}" id="optItem${i}">
+  const letters='ABCDEF';
+  area.innerHTML=`
+    <div class="opts-grid" id="optsGrid">
+      ${q.options.map((opt,i)=>`
+        <div class="opt-item${opt.correct?' correct':''}" id="optItem${i}">
           <div class="opt-radio${opt.correct?' checked':''}" onclick="toggleCorrect(${i})"></div>
           <div class="opt-letter">${letters[i]||i+1}</div>
-          <input class="opt-input" data-idx="${i}" placeholder="Вариант ${i+1}" value="${escHtml(opt.text)}">
-          <button class="opt-delete" onclick="deleteOption(${i})">×</button>
+          <input class="opt-inp" data-idx="${i}" placeholder="Вариант ${i+1}" value="${eH(opt.text)}">
+          <button class="opt-del" onclick="delOpt(${i})">×</button>
         </div>`).join('')}
     </div>
-    ${q.options.length < 6 ? `<button class="add-option-btn" onclick="addOption()">+ Добавить вариант</button>` : ''}`;
-
-  document.querySelectorAll('.opt-input').forEach(inp => {
+    ${q.options.length<6?`<button class="add-opt-btn" onclick="addOpt()">+ Вариант қосу</button>`:''}`;
+  document.querySelectorAll('.opt-inp').forEach(inp => {
     inp.addEventListener('input', e => {
-      const idx = parseInt(e.target.dataset.idx);
-      if (questions[activeIdx]?.options[idx]) questions[activeIdx].options[idx].text = e.target.value;
+      const idx=parseInt(e.target.dataset.idx);
+      if (questions[activeIdx]?.options[idx]) questions[activeIdx].options[idx].text=e.target.value;
     });
   });
 }
 
-window.setQType = function(type) {
+window.setQType = function(t) {
   if (!questions[activeIdx]) return;
-  const q = questions[activeIdx];
-  q.type = type;
-  if (type === 'true_false') q.options = [{text:'Верно',correct:true},{text:'Неверно',correct:false}];
-  else if (type === 'multiple' && (!q.options.length || q.type !== 'multiple')) {
-    q.options = [{text:'',correct:true},{text:'',correct:false},{text:'',correct:false},{text:'',correct:false}];
-  }
-  renderQuestionEditor(q);
+  const q=questions[activeIdx]; q.type=t;
+  if (t==='true_false') q.options=[{text:'Дұрыс',correct:true},{text:'Бұрыс',correct:false}];
+  else if (t==='multiple'&&(!q.options.length||q.options.length<2)) q.options=[{text:'',correct:true},{text:'',correct:false},{text:'',correct:false},{text:'',correct:false}];
+  renderQEditor(q);
 };
-
-window.toggleCorrect = function(optIdx) {
-  const q = questions[activeIdx];
-  if (!q) return;
-  if (q.type === 'multi_select') {
-    q.options[optIdx].correct = !q.options[optIdx].correct;
-  } else {
-    q.options.forEach((o,i) => o.correct = i === optIdx);
-  }
+window.toggleCorrect = function(oi) {
+  const q=questions[activeIdx]; if(!q) return;
+  if (q.type==='multi_select') q.options[oi].correct=!q.options[oi].correct;
+  else q.options.forEach((o,i)=>o.correct=i===oi);
+  renderAnswerArea(q);
+};
+window.setTF = function(i) {
+  const q=questions[activeIdx]; if(!q) return;
+  q.options=[{text:'Дұрыс',correct:i===0},{text:'Бұрыс',correct:i===1}];
+  renderAnswerArea(q);
+};
+window.addOpt = function() {
+  const q=questions[activeIdx]; if(!q||q.options.length>=6) return;
+  q.options.push({text:'',correct:false}); renderAnswerArea(q);
+};
+window.delOpt = function(i) {
+  const q=questions[activeIdx]; if(!q||q.options.length<=2){showToast('Минимум 2 вариант');return;}
+  q.options.splice(i,1); if(!q.options.some(o=>o.correct)) q.options[0].correct=true;
   renderAnswerArea(q);
 };
 
-window.setTF = function(idx) {
-  const q = questions[activeIdx];
-  if (!q) return;
-  q.options = [{text:'Верно',correct:idx===0},{text:'Неверно',correct:idx===1}];
-  renderAnswerArea(q);
-};
-
-window.addOption = function() {
-  const q = questions[activeIdx];
-  if (!q || q.options.length >= 6) return;
-  q.options.push({text:'',correct:false});
-  renderAnswerArea(q);
-};
-
-window.deleteOption = function(idx) {
-  const q = questions[activeIdx];
-  if (!q || q.options.length <= 2) { showToast('Минимум 2 варианта'); return; }
-  q.options.splice(idx, 1);
-  if (!q.options.some(o => o.correct)) q.options[0].correct = true;
-  renderAnswerArea(q);
-};
-
-function renderSettingsPanel(q) {
-  document.querySelectorAll('.time-opt').forEach(btn => {
-    btn.classList.toggle('active', parseInt(btn.dataset.t) === q.timeLimit);
-    btn.onclick = () => {
-      if (questions[activeIdx]) questions[activeIdx].timeLimit = parseInt(btn.dataset.t);
-      renderSettingsPanel(questions[activeIdx]);
-    };
+function renderQSettings(q) {
+  document.querySelectorAll('.time-opt').forEach(b=>{
+    b.classList.toggle('active',parseInt(b.dataset.t)===q.timeLimit);
+    b.onclick=()=>{ if(questions[activeIdx]) questions[activeIdx].timeLimit=parseInt(b.dataset.t); renderQSettings(questions[activeIdx]); };
   });
-  document.getElementById('pointsInput').value = q.points || 100;
-  document.getElementById('pointsInput').oninput = e => { if(questions[activeIdx]) questions[activeIdx].points = parseInt(e.target.value)||0; };
-  document.getElementById('requiredToggle').checked = q.required || false;
-  document.getElementById('requiredToggle').onchange = e => { if(questions[activeIdx]) questions[activeIdx].required = e.target.checked; };
-  document.getElementById('shuffleToggle').checked = q.shuffle || false;
-  document.getElementById('shuffleToggle').onchange = e => { if(questions[activeIdx]) questions[activeIdx].shuffle = e.target.checked; };
+  const pi=document.getElementById('ptsInp'); pi.value=q.points||100;
+  pi.oninput=e=>{ if(questions[activeIdx]) questions[activeIdx].points=parseInt(e.target.value)||0; };
+  const ri=document.getElementById('reqTog'); ri.checked=q.required||false;
+  ri.onchange=e=>{ if(questions[activeIdx]) questions[activeIdx].required=e.target.checked; };
+  const si=document.getElementById('shuffTog'); si.checked=q.shuffle||false;
+  si.onchange=e=>{ if(questions[activeIdx]) questions[activeIdx].shuffle=e.target.checked; };
 }
 
-function renderFooterDots() {
-  const footer = document.getElementById('qbFooter');
-  footer.innerHTML = questions.map((_, i) => `<div class="qb-dot${i===activeIdx?' active':''}" onclick="selectQuestion(${i})"></div>`).join('');
+function renderDots() {
+  const f=document.getElementById('qFooter');
+  f.innerHTML=questions.map((_,i)=>`<div class="q-dot${i===activeIdx?' active':''}" onclick="selectQ(${i})"></div>`).join('');
 }
 
-// ── Save ──
+// ── Save Quiz ─────────────────────────────────
 window.saveQuiz = async function() {
   if (isSaving) return;
-  saveCurrentQuestion();
-
-  const title = document.getElementById('quizTitleInput').value.trim();
-  if (!title) { showToast('Введите название квиза'); return; }
-  if (!questions.length) { showToast('Добавьте хотя бы один вопрос'); return; }
-
-  const hasNoCorrect = questions.some(q =>
-    (q.type === 'multiple' || q.type === 'multi_select' || q.type === 'true_false') &&
-    !q.options.some(o => o.correct)
-  );
-  if (hasNoCorrect) { showToast('Отметьте правильный ответ для всех вопросов'); return; }
-
-  isSaving = true;
-  document.getElementById('saveStatus').textContent = 'Сохранение...';
-
-  const data = {
-    title,
-    category: document.getElementById('categoryInput').value.trim() || 'Квиз',
-    cover: document.getElementById('coverInput').value.trim() || '',
-    visibility: document.getElementById('visibilitySelect').value,
-    uid: currentUser.uid,
-    updatedAt: serverTimestamp(),
-    questions: questions.map(q => ({
-      type: q.type,
-      text: q.text,
-      question: q.text,
-      options: q.options,
-      timeLimit: q.timeLimit,
-      points: q.points,
-      required: q.required,
-      shuffle: q.shuffle,
-      imageUrl: q.imageUrl || '',
-      correctIndex: q.options.findIndex(o => o.correct)
+  saveCurrentQ();
+  const title=document.getElementById('titleInp').value.trim();
+  if (!title){showToast('Атауын енгізіңіз');return;}
+  if (!questions.length){showToast('Кем дегенде бір сұрақ қосыңыз');return;}
+  const bad=questions.some(q=>(q.type==='multiple'||q.type==='multi_select'||q.type==='true_false')&&!q.options.some(o=>o.correct));
+  if (bad){showToast('Барлық сұрақта дұрыс жауапты белгілеңіз');return;}
+  isSaving=true; document.getElementById('saveStatus').textContent='Сақталуда...';
+  const data={
+    title, category:document.getElementById('categoryInp').value.trim()||'Квиз',
+    cover:document.getElementById('coverInp').value.trim()||'',
+    visibility:document.getElementById('visibilityInp').value,
+    uid:currentUser.uid, updatedAt:serverTimestamp(),
+    questions:questions.map(q=>({
+      type:q.type,text:q.text,question:q.text,options:q.options,
+      timeLimit:q.timeLimit,points:q.points,required:q.required,
+      shuffle:q.shuffle,imageUrl:q.imageUrl||'',
+      correctIndex:q.options.findIndex(o=>o.correct)
     }))
   };
-
   try {
-    if (editingQuizId) {
-      await updateDoc(doc(db, 'quizzes', editingQuizId), data);
-      showToast('✓ Квиз обновлён');
-    } else {
-      data.createdAt = serverTimestamp();
-      const ref = await addDoc(collection(db, 'quizzes'), data);
-      editingQuizId = ref.id;
-      history.replaceState(null, '', `?edit=${editingQuizId}`);
-      showToast('✓ Квиз сохранён');
-    }
-    document.getElementById('saveStatus').textContent = 'Сохранено';
-    document.getElementById('deleteQuizBtn').style.display = 'block';
-  } catch(e) {
-    console.error(e);
-    showToast('❌ Ошибка сохранения');
-    document.getElementById('saveStatus').textContent = 'Ошибка';
-  }
-  isSaving = false;
+    if (editQuizId) { await updateDoc(doc(db,'quizzes',editQuizId),data); showToast('✓ Квиз жаңартылды'); }
+    else { data.createdAt=serverTimestamp(); const r=await addDoc(collection(db,'quizzes'),data); editQuizId=r.id; history.replaceState(null,'',`?edit=${editQuizId}`); showToast('✓ Квиз сақталды'); }
+    document.getElementById('saveStatus').textContent='Сақталды';
+    document.getElementById('delQuizBtn').style.display='block';
+  } catch(e){ showToast('❌ Сақтау қатесі',true); document.getElementById('saveStatus').textContent='Қате'; }
+  isSaving=false;
 };
 
 window.togglePublish = async function() {
-  saveCurrentQuestion();
-  const title = document.getElementById('quizTitleInput').value.trim();
-  if (!title) { showToast('Сначала введите название'); return; }
-  isPublic = !isPublic;
-  document.getElementById('visibilitySelect').value = isPublic ? 'public' : 'draft';
-  document.getElementById('publishBtn').textContent = isPublic ? 'Снять с публикации' : 'Опубликовать';
+  saveCurrentQ();
+  if (!document.getElementById('titleInp').value.trim()){showToast('Алдымен атауын енгізіңіз');return;}
+  isQuizPublic=!isQuizPublic;
+  document.getElementById('visibilityInp').value=isQuizPublic?'public':'draft';
+  document.getElementById('publishBtn').textContent=isQuizPublic?'Жалпыға ашық ✓':'Жариялау';
   await saveQuiz();
 };
 
 window.previewQuiz = function() {
-  saveCurrentQuestion();
-  if (!questions.length) { showToast('Нет вопросов для превью'); return; }
-  if (!editingQuizId) { showToast('Сначала сохраните квиз'); saveQuiz(); return; }
-  window.open(`./quiz-play.html?quiz=${editingQuizId}&preview=1`, '_blank');
+  saveCurrentQ();
+  if (!questions.length){showToast('Сұрақтар жоқ');return;}
+  if (!editQuizId){showToast('Алдымен сақтаңыз'); saveQuiz(); return;}
+  window.open(`./quiz-play.html?quiz=${editQuizId}&preview=1`,'_blank');
 };
 
 window.confirmDeleteQuiz = async function() {
-  if (!editingQuizId) return;
-  if (!confirm('Удалить этот квиз навсегда?')) return;
-  try {
-    await deleteDoc(doc(db, 'quizzes', editingQuizId));
-    showToast('Квиз удалён');
-    setTimeout(() => window.location.href = './index.html', 800);
-  } catch(e) { showToast('Ошибка удаления'); }
+  if (!editQuizId||!confirm('Квизді мәңгілік жою?')) return;
+  try { await deleteDoc(doc(db,'quizzes',editQuizId)); showToast('Квиз жойылды'); setTimeout(()=>window.location.href='./index.html',800); }
+  catch(e){ showToast('❌ Жою қатесі',true); }
 };
 
-window.goBack = function() { history.back() || (window.location.href = './index.html'); };
-
-function showToast(msg) {
-  const t = document.getElementById('qb-toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove('show'), 2500);
+async function loadQuiz(id) {
+  try {
+    const snap=await getDoc(doc(db,'quizzes',id));
+    if (!snap.exists()){showToast('Квиз табылмады');return;}
+    const d=snap.data();
+    document.getElementById('titleInp').value=d.title||'';
+    document.getElementById('categoryInp').value=d.category||'';
+    document.getElementById('coverInp').value=d.cover||'';
+    document.getElementById('visibilityInp').value=d.visibility||'draft';
+    isQuizPublic=d.visibility==='public';
+    document.getElementById('publishBtn').textContent=isQuizPublic?'Жалпыға ашық ✓':'Жариялау';
+    questions=(d.questions||[]).map(q=>({
+      type:q.type||'multiple',text:q.question||q.text||'',
+      options:(q.options||[]).map((o,i)=>({text:typeof o==='string'?o:o.text,correct:typeof o==='object'?o.correct:i===(q.correctIndex||0)})),
+      timeLimit:q.timeLimit||20,points:q.points||100,required:q.required||false,shuffle:q.shuffle||false,imageUrl:q.imageUrl||''
+    }));
+    if (questions.length){renderQList();selectQ(0);}
+    document.getElementById('saveStatus').textContent='Жүктелді';
+  } catch(e){showToast('❌ Жүктеу қатесі',true);}
 }
 
-function escHtml(s) { return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// ══════════════════════════════════════════════
+//  COURSE BUILDER
+// ══════════════════════════════════════════════
+function renderSwatches() {
+  const c=document.getElementById('cbSwatches'); if(!c) return;
+  c.innerHTML=COVERS.map((g,i)=>
+    `<div class="cb-swatch${i===selectedCoverIdx?' active':''}" style="background:${g}" onclick="selectCover(${i})"></div>`
+  ).join('');
+  updateCoverPreview();
+}
+window.selectCover = function(i) {
+  selectedCoverIdx=i; renderSwatches();
+};
+function updateCoverPreview() {
+  const pc=document.getElementById('cbPreviewCover');
+  const pt=document.getElementById('cbPreviewTitle');
+  const pm=document.getElementById('cbPreviewMeta');
+  if (!pc) return;
+  pc.style.background=COVERS[selectedCoverIdx];
+  if (pt) pt.textContent=document.getElementById('titleInp')?.value||'Курс атауы';
+  if (pm) {
+    const mods=courseModules.length;
+    const quizzes=courseModules.reduce((s,m)=>s+(m.quizRefs?.length||0),0);
+    pm.textContent=`${mods} модуль · ${quizzes} квиз`;
+  }
+}
 
-// Auto-save on title change
-document.getElementById('quizTitleInput').addEventListener('input', () => {
-  document.getElementById('saveStatus').textContent = 'Не сохранено';
+window.addModule = function() {
+  courseModules.push({title:'',desc:'',quizRefs:[],_open:true});
+  renderModules();
+};
+
+function renderModules() {
+  const list=document.getElementById('cbModsList');
+  const cnt=document.getElementById('cbModCount');
+  const mStat=document.getElementById('cbStatMods');
+  const qStat=document.getElementById('cbStatQuizzes');
+  const qqStat=document.getElementById('cbStatQCount');
+  if (!list) return;
+  cnt&&(cnt.textContent=courseModules.length);
+  mStat&&(mStat.textContent=courseModules.length);
+  const totalQ=courseModules.reduce((s,m)=>s+(m.quizRefs?.length||0),0);
+  qStat&&(qStat.textContent=totalQ);
+  // question count would need full quiz data — estimate
+  qqStat&&(qqStat.textContent='—');
+  updateCoverPreview();
+
+  list.innerHTML=courseModules.map((mod,mi)=>`
+    <div class="cb-module${mod._open?' open':''}" id="cbmod${mi}">
+      <div class="cb-mod-head" onclick="toggleMod(${mi})">
+        <span class="cb-mod-drag">⋮⋮</span>
+        <div class="cb-mod-num">${mi+1}</div>
+        <input class="cb-mod-title-inp" placeholder="Модуль атауы..."
+          value="${eH(mod.title)}"
+          onclick="event.stopPropagation()"
+          oninput="courseModules[${mi}].title=this.value;updateCoverPreview()">
+        <span class="cb-mod-chevron">▾</span>
+        <button class="cb-mod-del" onclick="event.stopPropagation();delMod(${mi})" title="Жою">×</button>
+      </div>
+      <div class="cb-mod-body">
+        <textarea class="cb-mod-desc" placeholder="Модуль сипаттамасы (міндетті емес)..."
+          oninput="courseModules[${mi}].desc=this.value">${eH(mod.desc||'')}</textarea>
+        <div class="cb-quiz-section">
+          <span class="cb-quiz-section-lbl">Квиздер / Тапсырмалар</span>
+          <div class="cb-quiz-rows">
+            ${(mod.quizRefs||[]).map((q,qi)=>`
+              <div class="cb-quiz-row">
+                <span class="cb-quiz-icon">📝</span>
+                <span class="cb-quiz-title">${eH(q.title)}</span>
+                <span class="cb-quiz-cnt">${q.questionCount||0} сұрақ</span>
+                <button class="cb-quiz-del" onclick="delQuizFromMod(${mi},${qi})">×</button>
+              </div>`).join('')}
+          </div>
+          <button class="cb-add-quiz" onclick="openQPick(${mi})">+ Квиз қосу</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+window.toggleMod = function(mi) {
+  courseModules[mi]._open=!courseModules[mi]._open; renderModules();
+};
+window.delMod = function(mi) {
+  if (!confirm('Модульді жою?')) return;
+  courseModules.splice(mi,1); renderModules();
+};
+window.delQuizFromMod = function(mi,qi) {
+  courseModules[mi].quizRefs.splice(qi,1); renderModules();
+};
+
+// ── Quiz Picker ───────────────────────────────
+async function loadUserQuizzes() {
+  if (!currentUser||allUserQuizzes.length) return;
+  try {
+    const snap=await getDocs(query(collection(db,'quizzes'),where('uid','==',currentUser.uid)));
+    allUserQuizzes=snap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e){}
+}
+
+let qpickTargetMod=-1, qpickSel=null, _qpickData=null;
+
+window.openQPick = function(mi) {
+  qpickTargetMod=mi; qpickSel=null; _qpickData=null;
+  document.getElementById('qpickSearchInp').value='';
+  renderQPickList('');
+  document.getElementById('qpickOv').classList.add('open');
+};
+window.closeQPick = function() {
+  document.getElementById('qpickOv').classList.remove('open');
+};
+window.filterQPick = function(q) { renderQPickList(q); };
+
+function renderQPickList(search) {
+  const list=document.getElementById('qpickList');
+  const existing=(courseModules[qpickTargetMod]?.quizRefs||[]).map(r=>r.id);
+  let items=allUserQuizzes.filter(q=>!existing.includes(q.id));
+  if (search) items=items.filter(q=>(q.title||'').toLowerCase().includes(search.toLowerCase()));
+  if (!items.length) {
+    list.innerHTML=`<div class="qpick-empty">${allUserQuizzes.length?'Ештеңе табылмады':'Квиздер жоқ. Алдымен квиз жасаңыз.'}</div>`;
+    return;
+  }
+  list.innerHTML=items.map(q=>{
+    const letter=(q.title||'К').charAt(0).toUpperCase();
+    const grad=COVERS[letter.charCodeAt(0)%COVERS.length];
+    const cover=q.cover?.startsWith('http')
+      ?`<img src="${q.cover}" style="width:100%;height:100%;object-fit:cover">`
+      :`<div style="width:100%;height:100%;background:${grad};display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:900">${letter}</div>`;
+    const isSel=qpickSel===q.id;
+    return `<div class="qpick-item${isSel?' sel':''}" onclick="selectQPick('${q.id}','${eH(q.title||'')}',${q.questions?.length||0})">
+      <div class="qpick-cover">${cover}</div>
+      <div style="flex:1;min-width:0">
+        <div class="qpick-name">${eH(q.title||'Атаусыз')}</div>
+        <div class="qpick-qcount">${q.questions?.length||0} сұрақ</div>
+      </div>
+      ${isSel?'<span class="qpick-check">✓</span>':''}
+    </div>`;
+  }).join('');
+}
+
+window.selectQPick = function(id,title,qCount) {
+  qpickSel=id; _qpickData={id,title,questionCount:qCount};
+  renderQPickList(document.getElementById('qpickSearchInp').value);
+};
+window.confirmQPick = function() {
+  if (!qpickSel){showToast('Квиз таңдаңыз');return;}
+  courseModules[qpickTargetMod]._open=true;
+  courseModules[qpickTargetMod].quizRefs.push(_qpickData);
+  closeQPick(); renderModules();
+};
+
+// ── Save Course ───────────────────────────────
+window.saveCourse = async function() {
+  if (!currentUser) return;
+  const title=document.getElementById('titleInp').value.trim();
+  if (!title){showToast('Курс атауын енгізіңіз');return;}
+  if (!courseModules.length){showToast('Кем дегенде бір модуль қосыңыз');return;}
+  document.getElementById('saveStatus').textContent='Сақталуда...';
+  const data={
+    title,
+    category:document.getElementById('cbCategory').value.trim()||'Курс',
+    level:document.getElementById('cbLevel').value,
+    description:document.getElementById('cbDesc').value.trim(),
+    visibility:document.getElementById('cbVis').value,
+    cover:COVERS[selectedCoverIdx],
+    uid:currentUser.uid, updatedAt:serverTimestamp(),
+    modules:courseModules.map(m=>({
+      title:m.title, desc:m.desc||'',
+      quizRefs:(m.quizRefs||[]).map(r=>({id:r.id,title:r.title,questionCount:r.questionCount||0}))
+    }))
+  };
+  try {
+    if (editCourseId){ await updateDoc(doc(db,'courses',editCourseId),data); showToast('✓ Курс жаңартылды'); }
+    else { data.createdAt=serverTimestamp(); const r=await addDoc(collection(db,'courses'),data); editCourseId=r.id; history.replaceState(null,'',`?editCourse=${editCourseId}`); showToast('✓ Курс сақталды'); }
+    document.getElementById('saveStatus').textContent='Сақталды';
+    document.getElementById('delCourseBtn').style.display='block';
+  } catch(e){ showToast('❌ Сақтау қатесі',true); document.getElementById('saveStatus').textContent='Қате'; }
+};
+
+window.toggleCoursePublish = async function() {
+  isCoursePublic=!isCoursePublic;
+  document.getElementById('cbVis').value=isCoursePublic?'public':'draft';
+  document.getElementById('coursePubBtn').textContent=isCoursePublic?'Жалпыға ашық ✓':'Жариялау';
+  await saveCourse();
+};
+
+window.confirmDeleteCourse = async function() {
+  if (!editCourseId||!confirm('Курсты мәңгілік жою?')) return;
+  try { await deleteDoc(doc(db,'courses',editCourseId)); showToast('Курс жойылды'); setTimeout(()=>window.location.href='./index.html',800); }
+  catch{ showToast('❌ Жою қатесі',true); }
+};
+
+async function loadCourse(id) {
+  editCourseId=id;
+  try {
+    const snap=await getDoc(doc(db,'courses',id));
+    if (!snap.exists()){showToast('Курс табылмады');return;}
+    const d=snap.data();
+    document.getElementById('titleInp').value=d.title||'';
+    document.getElementById('cbCategory').value=d.category||'';
+    document.getElementById('cbDesc').value=d.description||'';
+    document.getElementById('cbVis').value=d.visibility||'draft';
+    document.getElementById('cbLevel').value=d.level||'beginner';
+    isCoursePublic=d.visibility==='public';
+    document.getElementById('coursePubBtn').textContent=isCoursePublic?'Жалпыға ашық ✓':'Жариялау';
+    if (d.cover) { const idx=COVERS.indexOf(d.cover); if(idx>=0) selectedCoverIdx=idx; }
+    courseModules=(d.modules||[]).map(m=>({...m,_open:false}));
+    renderSwatches(); renderModules();
+    document.getElementById('delCourseBtn').style.display='block';
+    showToast('Курс жүктелді');
+  } catch(e){showToast('❌ Жүктеу қатесі',true);}
+}
+
+// ── Utils ──────────────────────────────────────
+function showToast(msg,isErr=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=isErr?'err show':'show';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',2800);
+}
+function eH(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ══════════════════════════════════════════════
+//  BOARD GAMES
+// ══════════════════════════════════════════════
+
+const BOARD_GAMES = [
+  {
+    id:'bg-tictactoe', name:'Ақылды Крестик-Нөлік', emoji:'❌',
+    category:'🎲 Тақтадағы ойындар', players:'2 команда', duration:'15–25 мин',
+    color:['#1e3a5f','#3b82f6'],
+    desc:'Тақтаға 3×3 (немесе 4×4 үлкен сыныптар үшін) тор сызыңыз. Сыныпты «Крестиктер» және «Нөлдіктер» командаларына бөліңіз. Клетқа белгі қою үшін сұраққа дұрыс жауап беру керек.',
+    rules:['Тақтаға 3×3 тор сызыңыз','Сыныпты 2 командаға бөліңіз: Крестиктер vs Нөлдіктер','Команда кезегімен клетка таңдайды','Сұраққа дұрыс жауап берген команда белгісін қояды','Қате жауап кезінде клетка бос қалады','Бір сызықты бірінші жинаған жеңеді'],
+    tips:'Бастауыш сыныпқа 3×3, жоғары сыныпқа 4×4 тор қолданыңыз. Сұрақтарды алдын ала карточкаларға дайындаңыз.',
+    questionType:'open',
+  },
+  {
+    id:'bg-four-corners', name:'Төрт Бұрыш (Рас/Жалған)', emoji:'🏃',
+    category:'🎲 Тақтадағы ойындар', players:'Бүкіл сынып', duration:'10–20 мин',
+    color:['#064e3b','#10b981'],
+    desc:'Мұғалім бір тұжырым оқиды. Оқушылар «Рас» деп санаса — сол бұрышқа, «Жалған» деп санаса — оң бұрышқа жүреді. Қате жауап берген оқушылар раундтан шығады.',
+    rules:['Сынып мұғалімнің алдында тұрады','Мұғалім тұжырым оқиды','Рас → Сол бұрышқа жүру','Жалған → Оң бұрышқа жүру','Қате жауап → раундтан шығу','Ең соңында қалған оқушы жеңеді'],
+    tips:'«Тұру/отыру» нұсқасын да қолдануға болады. Жауап бергенде бір-бірін көргізбеу үшін көздерін жұмдырыңыз.',
+    questionType:'true_false',
+  },
+  {
+    id:'bg-hot-potato', name:'Ыстық Картоп (Сұрақ Добы)', emoji:'🏐',
+    category:'🎲 Тақтадағы ойындар', players:'Бүкіл сынып', duration:'10–15 мин',
+    color:['#78350f','#d97706'],
+    desc:'Жұмсақ доп алыңыз. Кездейсоқ оқушыға допты лақтырыңыз және жылдам сұрақ қойыңыз. Жауап беруге 3–5 секунд. Дұрыс жауап — допты келесіге лақтырады.',
+    rules:['Жұмсақ доп дайындаңыз','Мұғалім допты кездейсоқ оқушыға лақтырады','Сұрақ қояды — жауап беруге 3–5 секунд','Дұрыс жауап → доп келесіге лақтырылады','Дұрыс жауап бермесе → «жанып кетті»','Ойынды тездету үшін таймер қолданыңыз'],
+    tips:'Мягкий плюшевый зат қолданыңыз. Сұрақтарды тақырыптың түйінді сөздеріне негіздеңіз.',
+    questionType:'open',
+  },
+  {
+    id:'bg-alias', name:'Алиас (Сөзді Түсіндір)', emoji:'🗣️',
+    category:'🧩 Үстел ойындары адаптациясы', players:'2+ топ', duration:'20–35 мин',
+    color:['#4c1d95','#7c3aed'],
+    desc:'Карточкаларға тақырып бойынша негізгі терминдерді жазыңыз. Оқушы тақтаға шығады, карточка алады және 1 минут ішінде сыныпқа түсіндіруі керек.',
+    rules:['Карточкаларға терминдер/ұғымдарды жазыңыз','Оқушы тақтаға шығып, карточка тартады','1 минут ішінде сөзді түсіндіруі керек','Тақырыптың бір тамырлас сөзін айтуға тыйым','Сынып дұрыс тапса — команда ұпай алады','Командалар кезектесіп ойнайды'],
+    tips:'Қиын терминдерге «мысал» арқылы түсіндіруге рұқсат беріңіз.',
+    questionType:'open',
+  },
+  {
+    id:'bg-bingo', name:'Терминологиялық Бинго', emoji:'🎯',
+    category:'🧩 Үстел ойындары адаптациясы', players:'Бүкіл сынып', duration:'15–25 мин',
+    color:['#7c1d44','#ec4899'],
+    desc:'Оқушылар дәптерге 3×3 квадрат сызады және тақтадан 9 терминді кездейсоқ ретпен жазады. Мұғалім анықтамаларды оқиды. Бір сызықты бірінші өшірген «Бинго!» деп айқайлайды.',
+    rules:['Оқушылар дәптерге 3×3 квадрат сызады','Мұғалім тақтаға 12–15 терминді жазады','Оқушылар кез-келген 9-ын ӨЗДЕРІ таңдап жазады','Мұғалім анықтамаларды оқиды','Оқушы термині сәйкес келсе — шаршыны белгілейді','3 шаршы бір сызықта → «БИНГО!»'],
+    tips:'Ойын алдында барлық терминдер тақтада тұруы керек. Оқушылар кестені ӨЗДЕРІ толтырады — бұл да оқу!',
+    questionType:'bingo',
+  },
+  {
+    id:'bg-associations', name:'Ассоциациялар (4 Сурет, 1 Ұғым)', emoji:'🖼️',
+    category:'🧩 Үстел ойындары адаптациясы', players:'Бүкіл сынып / командалар', duration:'15–30 мин',
+    color:['#1e3a5f','#0891b2'],
+    desc:'Экранда 3–4 суретті (немесе символдарды) көрсетіңіз, олар бір жасырын ұғыммен байланысты. Оқушылар не біріктіретінін табуы керек.',
+    rules:['Мұғалім тақтаға 3–4 сурет/символ сызады','Барлық суреттер бір ұғыммен байланысты','Оқушылар жазбаша немесе ауызша жауап береді','Командалар нұсқасы: бірінші дұрыс жауап берген жеңеді','Жауапты тақтаға ашыңыз және байланысты түсіндіріңіз','Оқушылар өздері де карточка дайындай алады!'],
+    tips:'Суреттер орнына қарапайым сөздер немесе белгілер де жарайды.',
+    questionType:'open',
+  },
+];
+
+let bgActiveGame = null;
+let bgGenState   = null; // {game, result}
+let bgInited     = false;
+
+function initBoardGamesPanel() {
+  if (bgInited) return;
+  bgInited = true;
+  renderBgGameList();
+}
+
+function renderBgGameList() {
+  const list = document.getElementById('bgGameList');
+  if (!list) return;
+  let html = '';
+  let lastCat = '';
+  BOARD_GAMES.forEach(g => {
+    if (g.category !== lastCat) {
+      html += `<div class="bg-cat-divider">${g.category}</div>`;
+      lastCat = g.category;
+    }
+    const grad = `linear-gradient(135deg,${g.color[0]},${g.color[1]})`;
+    html += `<div class="bg-game-item${bgActiveGame?.id===g.id?' active':''}" onclick="selectBgGame('${g.id}')">
+      <div class="bg-game-emoji" style="background:${grad}">${g.emoji}</div>
+      <div>
+        <div class="bg-game-name">${g.name}</div>
+        <div class="bg-game-cat">${g.players} · ${g.duration}</div>
+      </div>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+window.selectBgGame = function(id) {
+  bgActiveGame = BOARD_GAMES.find(g => g.id === id);
+  bgGenState = null;
+  bgManualQuestions = [];
+  renderBgGameList();
+  renderBgDetail();
+  renderBgTips();
+};
+
+function renderBgDetail() {
+  const g = bgActiveGame;
+  if (!g) return;
+  document.getElementById('bgWelcome').style.display = 'none';
+  const detail = document.getElementById('bgDetail');
+  detail.style.display = 'block';
+  const grad = `linear-gradient(135deg,${g.color[0]},${g.color[1]})`;
+  detail.innerHTML = `
+    <div class="bg-detail-header fu">
+      <div class="bg-detail-title">
+        <span style="width:44px;height:44px;border-radius:12px;background:${grad};display:inline-flex;align-items:center;justify-content:center;font-size:22px">${g.emoji}</span>
+        ${g.name}
+      </div>
+      <div class="bg-detail-meta">
+        <span>👥 ${g.players}</span>
+        <span>⏱ ${g.duration}</span>
+        <span style="opacity:.5">${g.category}</span>
+      </div>
+    </div>
+
+    <div class="bg-detail-desc fu">${g.desc}</div>
+
+    <div class="bg-rules-section fu">
+      <div class="bg-rules-title">📋 Ойын ережелері</div>
+      ${g.rules.map((r,i)=>`
+        <div class="bg-rule-item">
+          <div class="bg-rule-num">${i+1}.</div>
+          <div class="bg-rule-text">${r}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Tabs: AI vs Manual -->
+    <div class="bg-gen-panel fu">
+      <div style="display:flex;gap:4px;margin-bottom:18px;background:var(--bg3);border-radius:var(--r3);padding:3px;width:fit-content">
+        <button class="bg-tab-btn active" id="bgTabAI" onclick="switchBgTab('ai')">🤖 ЖИ арқылы</button>
+        <button class="bg-tab-btn" id="bgTabManual" onclick="switchBgTab('manual')">✏️ Қолмен</button>
+      </div>
+
+      <!-- AI panel -->
+      <div id="bgPanelAI">
+        <div class="bg-gen-row">
+          <input class="bg-gen-inp" id="bgTopic" placeholder="Тақырып: мысалы, Фотосинтез, Python, Тарих..." style="flex:2">
+          <select class="bg-gen-sel" id="bgDiff">
+            <option value="beginner">🟢 Бастауыш</option>
+            <option value="intermediate" selected>🟡 Орта</option>
+            <option value="advanced">🔴 Жоғары</option>
+          </select>
+          <select class="bg-gen-sel" id="bgCount">
+            <option value="6">6</option>
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="bg-gen-btn" id="bgGenBtn" onclick="runBgGen()">🚀 Сұрақтар жасау</button>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">Gemini 2.5 Flash</span>
+        </div>
+        <div id="bgGenLoading" style="display:none;text-align:center;padding:30px">
+          <div class="bg-spinner"></div>
+          <div style="margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--text3)">ЖИ сұрақтар жасауда...</div>
+        </div>
+        <div id="bgGenResult" style="display:none;margin-top:16px"></div>
+      </div>
+
+      <!-- Manual panel -->
+      <div id="bgPanelManual" style="display:none">
+        <div id="bgManualList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+        <button class="bg-gen-btn" style="background:rgba(255,255,255,.08);color:var(--text2);border:1.5px dashed var(--border2);margin-bottom:14px" onclick="addManualQ()">+ Сұрақ қосу</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="bg-gen-btn" onclick="saveManualAsQuiz()">💾 Квиз ретінде сақтау</button>
+          <button class="bg-gen-btn" style="background:rgba(255,255,255,.08);color:var(--text2)" onclick="printManualQuestions()">🖨️ Басып шығару</button>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('bgTopic').addEventListener('keydown', e => {
+    if (e.key === 'Enter') runBgGen();
+  });
+}
+
+function renderBgTips() {
+  const g = bgActiveGame;
+  if (!g) return;
+  document.getElementById('bgTips').innerHTML = `
+    <div style="background:rgba(255,217,0,.06);border:1px solid rgba(255,217,0,.2);border-radius:var(--r);padding:12px 14px;margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:9px;color:#ffd900;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">💡 Кеңес</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.6">${g.tips}</div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);line-height:1.65;margin-top:8px">
+      <b style="color:var(--text2)">Сұрақ типі:</b><br>
+      ${g.questionType === 'true_false' ? 'Рас/Жалған тұжырымдар' : g.questionType === 'bingo' ? 'Терминдер + анықтамалар' : 'Ашық сұрақтар'}
+    </div>`;
+}
+
+// ── Tab switching ──────────────────────────────
+let bgManualQuestions = []; // [{question, answer, hint}]
+
+window.switchBgTab = function(tab) {
+  const isAI = tab === 'ai';
+  document.getElementById('bgTabAI').classList.toggle('active', isAI);
+  document.getElementById('bgTabManual').classList.toggle('active', !isAI);
+  document.getElementById('bgPanelAI').style.display     = isAI ? '' : 'none';
+  document.getElementById('bgPanelManual').style.display = isAI ? 'none' : '';
+  if (!isAI && bgManualQuestions.length === 0) {
+    addManualQ(); // start with 1 empty row
+  }
+};
+
+window.addManualQ = function() {
+  const isTF = bgActiveGame?.questionType === 'true_false';
+  bgManualQuestions.push({ question:'', answer: isTF ? 'Рас' : '', hint:'' });
+  renderManualList();
+};
+
+function renderManualList() {
+  const isTF = bgActiveGame?.questionType === 'true_false';
+  const list = document.getElementById('bgManualList');
+  if (!list) return;
+  list.innerHTML = bgManualQuestions.map((q, i) => `
+    <div class="bg-manual-row">
+      <button class="bg-manual-del" onclick="delManualQ(${i})">×</button>
+      <div class="bg-manual-num">Сұрақ ${i + 1}</div>
+      <textarea class="bg-manual-inp" rows="2" placeholder="Сұрақ мәтіні..." oninput="updateManualQ(${i},'question',this.value)">${q.question}</textarea>
+      ${isTF
+        ? `<div style="display:flex;gap:8px">
+             <button class="bg-manual-inp" style="flex:1;cursor:pointer;font-weight:700;${q.answer==='Рас'?'border-color:var(--duo-green);color:var(--duo-green)':''}" onclick="updateManualQ(${i},'answer','Рас');renderManualList()">✅ Рас</button>
+             <button class="bg-manual-inp" style="flex:1;cursor:pointer;font-weight:700;${q.answer==='Жалған'?'border-color:var(--duo-red);color:var(--duo-red)':''}" onclick="updateManualQ(${i},'answer','Жалған');renderManualList()">❌ Жалған</button>
+           </div>`
+        : `<input class="bg-manual-inp" placeholder="Жауап..." value="${q.answer.replace(/"/g,'&quot;')}" oninput="updateManualQ(${i},'answer',this.value)">`
+      }
+      <input class="bg-manual-inp" placeholder="Кеңес (міндетті емес)..." value="${q.hint.replace(/"/g,'&quot;')}" oninput="updateManualQ(${i},'hint',this.value)" style="font-size:11px;color:var(--text3)">
+    </div>`).join('');
+}
+
+window.updateManualQ = function(i, field, val) {
+  if (bgManualQuestions[i]) bgManualQuestions[i][field] = val;
+};
+
+window.delManualQ = function(i) {
+  bgManualQuestions.splice(i, 1);
+  renderManualList();
+};
+
+window.saveManualAsQuiz = async function() {
+  if (!currentUser) { showToast('Аккаунтқа кіріңіз', true); return; }
+  const g = bgActiveGame;
+  const qs = bgManualQuestions.filter(q => q.question.trim());
+  if (!qs.length) { showToast('Кем дегенде 1 сұрақ жазыңыз', true); return; }
+  const title = `${g.name} — Қолмен жасалған`;
+  try {
+    const r = await addDoc(collection(db,'quizzes'), {
+      uid: currentUser.uid, title,
+      category: g.category,
+      questions: qs.map(q => ({
+        type: 'open', text: q.question, question: q.question,
+        answer: q.answer, hint: q.hint||'',
+        timeLimit:20, points:100, required:false, shuffle:false, imageUrl:'',
+      })),
+      visibility:'draft', createdAt:serverTimestamp(), updatedAt:serverTimestamp(),
+    });
+    showToast('✓ Квиз сақталды!');
+    setTimeout(() => { window.location.href=`./create-quiz.html?edit=${r.id}`; }, 1200);
+  } catch(e) { showToast('❌ Сақтау қатесі', true); }
+};
+
+window.printManualQuestions = function() {
+  const g = bgActiveGame;
+  const qs = bgManualQuestions.filter(q => q.question.trim());
+  if (!qs.length) { showToast('Сұрақтар жоқ', true); return; }
+  const isTF = g.questionType === 'true_false';
+  const rows = qs.map((q,i) =>
+    `<tr><td style="padding:10px;border:1px solid #ddd;font-size:14px;vertical-align:top">${i+1}. ${q.question}<\/td>
+     <td style="padding:10px;border:1px solid #ddd;font-size:14px;color:#1a6a2a;font-weight:bold;vertical-align:top">${q.answer}<\/td>
+     <td style="padding:10px;border:1px solid #ddd;font-size:12px;color:#666;vertical-align:top">${q.hint||''}<\/td><\/tr>`
+  ).join('');
+  const win = window.open('','_blank');
+  const printHtml = [
+    '<html><head><title>',g.name,' — Сұрақтар<\/title>',
+    '<style>body{font-family:Arial,sans-serif;padding:24px;max-width:900px;margin:0 auto}',
+    'table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:10px;border:1px solid #ddd;text-align:left}',
+    '@media print{button{display:none}}<\/style><\/head><body>',
+    '<h2>',g.name,' — Сұрақтар<\/h2>',
+    '<p style="color:#666">',qs.length,' сұрақ<\/p>',
+    '<button onclick="window.print()" style="margin-bottom:16px;padding:8px 20px;background:#3b82f6;color:#fff;border:none;border-radius:6px;cursor:pointer">🖨️ Басып шығару<\/button>',
+    '<table><thead><tr><th style="width:55%">Сұрақ',(isTF?' / Тұжырым':''),'<\/th><th style="width:20%">Жауап<\/th><th style="width:25%">Кеңес<\/th><\/tr><\/thead>',
+    '<tbody>',rows,'<\/tbody><\/table><\/body><\/html>'
+  ].join('');
+  win.document.write(printHtml);
+  win.document.close();
+};
+
+window.runBgGen = async function() {
+  const g = bgActiveGame; if (!g) return;
+  const topic = document.getElementById('bgTopic')?.value.trim();
+  if (!topic) { showToast('Тақырыпты енгізіңіз'); return; }
+  const diff  = document.getElementById('bgDiff')?.value || 'intermediate';
+  const count = document.getElementById('bgCount')?.value || '10';
+  const diffLabel = {beginner:'бастауыш',intermediate:'орта',advanced:'жоғары'}[diff];
+
+  const genBtn = document.getElementById('bgGenBtn');
+  genBtn.disabled = true;
+  document.getElementById('bgGenLoading').style.display = 'block';
+  document.getElementById('bgGenResult').style.display  = 'none';
+
+  const qtype = g.questionType === 'true_false'
+    ? 'Рас/Жалған тұжырымдар (answer: «Рас» немесе «Жалған»)'
+    : g.questionType === 'bingo'
+      ? 'Термин + анықтама жұптары (question = анықтама, answer = термин)'
+      : 'Ашық сұрақтар (нақты қысқа жауап)';
+
+  const prompt = `«${topic}» тақырыбы бойынша "${g.name}" ойынына арналған ${count} сұрақ жаса.
+Деңгей: ${diffLabel}. Тіл: қазақша.
+Сұрақ типі: ${qtype}.
+
+ТЕК JSON қайтар (markdown жоқ):
+{"topic":"${topic}","gameName":"${g.name}","questions":[{"question":"...","answer":"...","hint":"..."}]}
+
+Маңызды:
+- «question» — сұрақ немесе тұжырым мәтіні
+- «answer» — дұрыс жауап
+- «hint» — 1 сөйлем кеңес (мұғалімге)`;
+
+  const GEMINI = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyC8cQujMxuqebmvvaArU23N3xdbzfGYZfU`;
+  try {
+    const resp = await fetch(GEMINI, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        generationConfig:{response_mime_type:'application/json',temperature:0.7},
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error?.message||'Gemini error');
+    const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text
+      ?.replace(/```json\s*/g,'').replace(/```\s*$/g,'').trim();
+    if (!jsonText) throw new Error('Бос жауап');
+    const result = JSON.parse(jsonText);
+    bgGenState = {game:g, result};
+    showBgGenResult(result);
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Генерация қатесі. Қайталап көр.', true);
+  } finally {
+    genBtn.disabled = false;
+    document.getElementById('bgGenLoading').style.display = 'none';
+  }
+};
+
+function showBgGenResult(result) {
+  const g = bgActiveGame;
+  const isTF = g.id === 'bg-four-corners';
+  const isBingo = g.id === 'bg-bingo';
+  const el = document.getElementById('bgGenResult');
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <div>
+        <div style="font-size:14px;font-weight:800">${result.topic} — ${result.gameName}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${(result.questions||[]).length} сұрақ дайын</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="bg-gen-btn" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);padding:8px 14px;font-size:11px" onclick="printBgQuestions()">🖨️ Басып шығару</button>
+        <button class="bg-gen-btn" style="padding:8px 14px;font-size:11px" onclick="saveBgAsQuiz()">💾 Квиз ретінде сақтау</button>
+      </div>
+    </div>
+    ${isBingo?`<div style="background:rgba(255,217,0,.06);border:1px solid rgba(255,217,0,.2);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;font-size:12px;color:rgba(255,255,255,.75)"><b>📋 Бинго үшін:</b> Осы анықтамаларды оқыңыз, оқушылар терминді кестесінде белгілесін.</div>`:''}
+    <div style="display:flex;flex-direction:column;gap:7px;max-height:360px;overflow-y:auto;padding-right:4px">
+      ${(result.questions||[]).map((q,i)=>`
+        <div class="bg-q-card">
+          <div class="bg-q-idx">${i+1}</div>
+          <div class="bg-q-body">
+            <div class="bg-q-q">${q.question}</div>
+            <div class="bg-q-ans">
+              ${isTF
+                ? `<span class="bg-ans-badge ${q.answer.toLowerCase().includes('рас')||q.answer.toLowerCase().includes('true')?'bg-ans-true':'bg-ans-false'}">${q.answer.toLowerCase().includes('рас')||q.answer.toLowerCase().includes('true')?'✅ РАС':'❌ ЖАЛҒАН'}</span>`
+                : `<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">Жауап:</span> ${q.answer}`}
+            </div>
+            ${q.hint?`<div class="bg-q-hint">💡 ${q.hint}</div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+window.printBgQuestions = function() {
+  if (!bgGenState) return;
+  const {game:g, result} = bgGenState;
+  const isTF = g.id === 'bg-four-corners';
+  const rows = (result.questions||[]).map((q,i)=>
+    `<tr><td style="padding:10px;border:1px solid #ddd;font-size:14px;vertical-align:top">${i+1}. ${q.question}</td>
+     <td style="padding:10px;border:1px solid #ddd;font-size:14px;color:#1a6a2a;font-weight:bold;vertical-align:top">${q.answer}</td>
+     <td style="padding:10px;border:1px solid #ddd;font-size:12px;color:#666;vertical-align:top">${q.hint||''}</td></tr>`
+  ).join('');
+  const win = window.open('','_blank');
+  const printHtml = [
+    '<html><head><title>',result.topic,' — ',result.gameName,'<\/title>',
+    '<style>body{font-family:Arial,sans-serif;padding:24px;max-width:900px;margin:0 auto}',
+    'table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:10px;border:1px solid #ddd;text-align:left}',
+    '@media print{button{display:none}}<\/style><\/head><body>',
+    '<h2>',result.gameName,': ',result.topic,'<\/h2>',
+    '<p style="color:#666">',(result.questions||[]).length,' сұрақ<\/p>',
+    '<button onclick="window.print()" style="margin-bottom:16px;padding:8px 20px;background:#3b82f6;color:#fff;border:none;border-radius:6px;cursor:pointer">🖨️ Басып шығару<\/button>',
+    '<table><thead><tr><th style="width:55%">Сұрақ',(isTF?' / Тұжырым':''),'<\/th><th style="width:20%">Жауап<\/th><th style="width:25%">Кеңес<\/th><\/tr><\/thead>',
+    '<tbody>',rows,'<\/tbody><\/table><\/body><\/html>'
+  ].join('');
+  win.document.write(printHtml);
+  win.document.close();
+};
+
+window.saveBgAsQuiz = async function() {
+  if (!bgGenState || !currentUser) { showToast('Аккаунтқа кіріңіз', true); return; }
+  const {game:g, result} = bgGenState;
+  try {
+    const ref = await addDoc(collection(db,'quizzes'),{
+      uid:       currentUser.uid,
+      title:     `${result.topic} — ${result.gameName}`,
+      category:  g.category,
+      questions: (result.questions||[]).map(q=>({
+        type:'open', text:q.question, question:q.question,
+        answer:q.answer, hint:q.hint||'',
+        timeLimit:20, points:100, required:false, shuffle:false, imageUrl:'',
+      })),
+      visibility:'draft',
+      createdAt:  serverTimestamp(),
+      updatedAt:  serverTimestamp(),
+    });
+    showToast('✓ Квиз сақталды! Квиз редакторда ашылды');
+    setTimeout(()=>{ window.location.href=`./create-quiz.html?edit=${ref.id}`; }, 1200);
+  } catch(e) {
+    showToast('❌ Сақтау қатесі', true);
+  }
+};
+
+document.getElementById('titleInp').addEventListener('input',()=>{
+  document.getElementById('saveStatus').textContent='Сақталмаған';
+  updateCoverPreview();
 });
 </script>
 </body>

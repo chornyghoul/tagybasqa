@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<title>Seed Interactive Lessons — Tagybasqa</title>
+<style>
+  body { font-family: 'Courier New', monospace; background: #0d1117; color: #c9d1d9; padding: 32px; margin: 0; }
+  h1 { color: #58a6ff; font-size: 20px; margin-bottom: 4px; }
+  .sub { color: #8b949e; font-size: 12px; margin-bottom: 32px; }
+  .log { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.8; max-height: 60vh; overflow-y: auto; }
+  .ok  { color: #3fb950; } .err { color: #f85149; } .info{ color: #58a6ff; } .warn{ color: #e3b341; }
+  button { background: #238636; border: none; color: #fff; padding: 12px 28px; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; margin-right: 12px; margin-bottom: 12px; }
+  button:hover { background: #2ea043; } button:disabled { background: #21262d; color: #8b949e; cursor: not-allowed; }
+  .progress-bar { height: 6px; background: #21262d; border-radius: 99px; margin: 16px 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: #3fb950; border-radius: 99px; transition: width .3s; width: 0%; }
+  .badge { display: inline-block; background: #1f6feb; border-radius: 4px; padding: 2px 8px; font-size: 11px; margin-left: 8px; }
+</style>
+</head>
+<body>
+<h1>⚡ Tagybasqa — Интерактивті сабақтар Seed</h1>
+<p class="sub">Lesson Player үшін interactiveLessons коллекциясын және pythonPath lessonId-ларын жүктейді.</p>
+
+<div>
+  <button id="seedBtn" onclick="runSeed()">🚀 Интерактивті сабақтарды жүктеу</button>
+  <button onclick="checkExisting()" style="background:#1f6feb">🔍 Тексеру</button>
+  <button onclick="testLesson()" style="background:#6e40c9">🧪 Тест (demo)</button>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+<div class="log" id="logEl"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, getDocs,
+  collection, writeBatch, deleteDoc, updateDoc
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+  authDomain: "pystart-dd2db.firebaseapp.com",
+  projectId: "pystart-dd2db",
+  storageBucket: "pystart-dd2db.firebasestorage.app",
+  messagingSenderId: "9188811255",
+  appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+};
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const logEl = document.getElementById('logEl');
+const log   = (msg, cls='') => {
+  logEl.innerHTML += `<div class="${cls}">${new Date().toLocaleTimeString()} — ${msg}</div>`;
+  logEl.scrollTop = logEl.scrollHeight;
+};
+const progress = (n, total) =>
+  document.getElementById('progressFill').style.width = `${Math.round(n/total*100)}%`;
+
+// ══════════════════════════════════════════════════════════
+//  ИНТЕРАКТИВТІ САБАҚТАР ДЕРЕКТЕРІ
+//  Коллекция: interactiveLessons
+//  Байланыс: pythonPath шагы → lessonId өрісі
+// ══════════════════════════════════════════════════════════
+const INTERACTIVE_LESSONS = [
+
+  // ── 1. Python-ға кіріспе (pathStep: s1) ──────────────
+  {
+    id: 'il-intro-python',
+    pathStepId: 's1',
+    title: 'Python-ға кіріспе',
+    category: 'Негіздер',
+    level: 'beginner',
+    xp: 50,
+    steps: [
+      {
+        type: 'theory',
+        title: 'Python дегеніміз не?',
+        content: `**Python** — бастауыштарға ең ыңғайлы бағдарламалау тілдерінің бірі.\n\nОны 1991 жылы **Гвидо ван Россум** жасаған. Python қарапайым, оқуға оңай және қуатты.\n\nPython қайда қолданылады:\n- Веб-сайттар (Django, Flask)\n- Деректер ғылымы (Pandas, NumPy)\n- Жасанды интеллект (TensorFlow)\n- Автоматтандыру`,
+      },
+      {
+        type: 'example',
+        title: 'Алғашқы бағдарлама',
+        description: 'Python-дағы ең қарапайым бағдарлама — экранға мәтін шығару:',
+        code: `print("Сәлем, Әлем!")
+print("Python-ға қош келдіңіз!")`,
+        output: `Сәлем, Әлем!\nPython-ға қош келдіңіз!`,
+      },
+      {
+        type: 'task',
+        title: 'Өз сәлемдесуіңді жаз',
+        instruction: '`print()` функциясын пайдаланып, экранға `"Сәлем, Python!"` деп шығар.',
+        starterCode: `# print() функциясын осыған жаз\n`,
+        expectedOutput: 'Сәлем, Python!',
+        hints: [
+          'print() жақшасының ішіне мәтінді тырнақшамен жаз',
+          'print("Сәлем, Python!") деп жаз',
+        ],
+      },
+    ],
+  },
+
+  // ── 2. Айнымалылар және типтер (pathStep: s2) ────────
+  {
+    id: 'il-variables',
+    pathStepId: 's2',
+    title: 'Айнымалылар және типтер',
+    category: 'Негіздер',
+    level: 'beginner',
+    xp: 50,
+    steps: [
+      {
+        type: 'theory',
+        title: 'Айнымалы дегеніміз не?',
+        content: `**Айнымалы** — деректерді сақтайтын контейнер.\n\nPython-да айнымалыға мән беру:\n\`name = "Айдана"\`\n\nНегізгі деректер типтері:\n- **int** — бүтін сан: \`age = 17\`\n- **float** — ондық бөлшек: \`price = 4.99\`\n- **str** — мәтін: \`city = "Алматы"\`\n- **bool** — логикалық: \`is_student = True\``,
+      },
+      {
+        type: 'example',
+        title: 'Айнымалыларды пайдалану',
+        description: 'Айнымалы жасап, оны print арқылы экранға шығару:',
+        code: `name = "Мирас"
+age = 17
+city = "Алматы"
+
+print(name)
+print(age)
+print(city)`,
+        output: `Мирас\n17\nАлматы`,
+      },
+      {
+        type: 'example',
+        title: 'f-string — ыңғайлы форматтау',
+        description: 'f-string арқылы айнымалыларды мәтінге кірістіру:',
+        code: `name = "Сара"
+age = 16
+print(f"Атым {name}, жасым {age}")`,
+        output: `Атым Сара, жасым 16`,
+      },
+      {
+        type: 'task',
+        title: 'Өз айнымалыларыңды жаса',
+        instruction: '`name` және `age` айнымалыларын жасап, f-string арқылы мынадай нәтиже шығар:\n`Атым Алия, жасым 15`',
+        starterCode: `name = "Алия"\nage = 15\nprint(f"Атым {name}, жасым {age}")`,
+        expectedOutput: 'Атым Алия, жасым 15',
+        hints: [
+          'name = "Алия" деп жаз',
+          'age = 15 деп жаз',
+          'print(f"Атым {name}, жасым {age}") деп жаз',
+        ],
+      },
+    ],
+  },
+
+  // ── 3. if/else шарттары (pathStep: s4) ───────────────
+  {
+    id: 'il-conditions',
+    pathStepId: 's4',
+    title: 'if / else шарттары',
+    category: 'Басқару',
+    level: 'beginner',
+    xp: 60,
+    steps: [
+      {
+        type: 'theory',
+        title: 'Шарттар — if/else',
+        content: `**if** — шарт операторы. Егер шарт дұрыс болса, блок орындалады.\n\nСинтаксис:\n\`\`\`\nif шарт:\n    орында\nelif басқа_шарт:\n    орында\nelse:\n    орында\n\`\`\`\n\nСалыстыру операторлары: **>**, **<**, **>=**, **<=**, **==**, **!=**`,
+      },
+      {
+        type: 'example',
+        title: 'if/else мысалы',
+        description: 'Жас бойынша тексеру:',
+        code: `age = 18
+
+if age >= 18:
+    print("Сен кәмелеттісің")
+else:
+    print("Сен кәмелетке толмағансың")`,
+        output: `Сен кәмелеттісің`,
+      },
+      {
+        type: 'task',
+        title: 'Сан тексеру',
+        instruction: '`number = 7` берілген. Егер сан 5-тен үлкен болса `"Үлкен"`, кіші болса `"Кіші"` деп шығар.',
+        starterCode: `number = 7\n\nif number > 5:\n    print("Үлкен")\nelse:\n    print("Кіші")`,
+        expectedOutput: 'Үлкен',
+        hints: [
+          'if number > 5: деп жаз',
+          'print("Үлкен") if шарты дұрыс болса шығады',
+        ],
+      },
+    ],
+  },
+
+  // ── 4. for/while циклдары (pathStep: s5) ─────────────
+  {
+    id: 'il-loops',
+    pathStepId: 's5',
+    title: 'for және while циклдары',
+    category: 'Басқару',
+    level: 'beginner',
+    xp: 60,
+    steps: [
+      {
+        type: 'theory',
+        title: 'Цикл дегеніміз не?',
+        content: `**Цикл** — бір блок кодты бірнеше рет орындайды.\n\n**for** циклы — белгілі санда немесе тізім бойынша орындалады:\n\`for i in range(5):\`\n\n**while** циклы — шарт дұрыс болғанша орындалады:\n\`while шарт:\`\n\n**range(n)** — 0-ден n-1-ге дейінгі сандар тізімі.`,
+      },
+      {
+        type: 'example',
+        title: 'for циклы мысалы',
+        description: '1-ден 5-ке дейін санау:',
+        code: `for i in range(1, 6):
+    print(i)`,
+        output: `1\n2\n3\n4\n5`,
+      },
+      {
+        type: 'task',
+        title: 'Цикл жаз',
+        instruction: '`for` циклын пайдаланып, `"Python"` сөзін 3 рет экранға шығар.',
+        starterCode: `for i in range(3):\n    print("Python")`,
+        expectedOutput: 'Python\nPython\nPython',
+        hints: [
+          'range(3) — 0, 1, 2 санай береді (3 рет)',
+          'print("Python") цикл ішінде 4 бос орын (indent) болуы керек',
+        ],
+      },
+    ],
+  },
+
+  // ── 5. Функциялар (pathStep: s7) ──────────────────────
+  {
+    id: 'il-functions',
+    pathStepId: 's7',
+    title: 'def функциялары',
+    category: 'Функциялар',
+    level: 'intermediate',
+    xp: 70,
+    steps: [
+      {
+        type: 'theory',
+        title: 'Функция дегеніміз не?',
+        content: `**Функция** — бір атпен сақталған код блогы. Қажет кезде шақырылады.\n\nСинтаксис:\n\`def функция_аты(параметр):\`\n\n**return** — функция нәтижесін қайтарады.\n\nФункция пайдасы:\n- Кодты қайталамайсың\n- Бағдарлама ұқыпты болады\n- Тест жазу оңай`,
+      },
+      {
+        type: 'example',
+        title: 'Функция жасау',
+        description: 'Сәлемдесу функциясы:',
+        code: `def greet(name):
+    return f"Сәлем, {name}!"
+
+result = greet("Алия")
+print(result)`,
+        output: `Сәлем, Алия!`,
+      },
+      {
+        type: 'task',
+        title: 'Қосу функциясы',
+        instruction: 'Екі сан қосатын `add(a, b)` функциясын жаз. `add(3, 4)` нәтижесін экранға шығар.',
+        starterCode: `def add(a, b):\n    return a + b\n\nprint(add(3, 4))`,
+        expectedOutput: '7',
+        hints: [
+          'return a + b деп жаз',
+          'print(add(3, 4)) шығару үшін функцияны шақыр',
+        ],
+      },
+    ],
+  },
+
+  // ── 6. Тізімдер (pathStep: s10) ───────────────────────
+  {
+    id: 'il-lists',
+    pathStepId: 's10',
+    title: 'Тізімдер мен кортеждер',
+    category: 'Деректер',
+    level: 'intermediate',
+    xp: 65,
+    steps: [
+      {
+        type: 'theory',
+        title: 'Тізім (list)',
+        content: `**Тізім (list)** — бірнеше мәнді бір айнымалыда сақтайды.\n\nЖасау: \`fruits = ["алма", "алмұрт", "банан"]\`\n\nИндекстеу: \`fruits[0]\` → \`"алма"\`\n\nНегізгі операциялар:\n- \`append()\` — соңына қосу\n- \`len()\` — ұзындықты алу\n- \`sort()\` — сорттау`,
+      },
+      {
+        type: 'example',
+        title: 'Тізіммен жұмыс',
+        description: 'Тізім жасап, элементтерді шығару:',
+        code: `cities = ["Алматы", "Астана", "Шымкент"]
+
+print(cities[0])
+print(len(cities))
+
+cities.append("Қарағанды")
+print(len(cities))`,
+        output: `Алматы\n3\n4`,
+      },
+      {
+        type: 'task',
+        title: 'Тізім ұзындығы',
+        instruction: '`numbers = [10, 20, 30, 40, 50]` тізімін жаса және оның ұзындығын экранға шығар.',
+        starterCode: `numbers = [10, 20, 30, 40, 50]\nprint(len(numbers))`,
+        expectedOutput: '5',
+        hints: [
+          'len(numbers) — тізімдегі элемент санын қайтарады',
+          'print(len(numbers)) деп жаз',
+        ],
+      },
+    ],
+  },
+
+  // ── 7. Кластар (pathStep: s13) ────────────────────────
+  {
+    id: 'il-classes',
+    pathStepId: 's13',
+    title: 'Кластар мен объектілер',
+    category: 'ООП',
+    level: 'intermediate',
+    xp: 80,
+    steps: [
+      {
+        type: 'theory',
+        title: 'Класс дегеніміз не?',
+        content: `**Класс** — объектілерді жасау үлгісі (шаблон).\n\n**Объект** — класстан жасалған нақты нысан.\n\nСинтаксис:\n\`\`\`\nclass Аты:\n    def __init__(self, ...):\n        self.атрибут = мән\n\`\`\`\n\n**__init__** — конструктор, объект жасалғанда шақырылады.\n**self** — ағымдағы объектіні білдіреді.`,
+      },
+      {
+        type: 'example',
+        title: 'Класс мысалы',
+        description: 'Студент класы:',
+        code: `class Student:
+    def __init__(self, name, grade):
+        self.name = name
+        self.grade = grade
+
+    def info(self):
+        return f"{self.name} — {self.grade} сынып"
+
+s = Student("Мирас", 10)
+print(s.info())`,
+        output: `Мирас — 10 сынып`,
+      },
+      {
+        type: 'task',
+        title: 'Dog класы',
+        instruction: '`Dog` класын жаса. `__init__` ішінде `name` атрибутын қой. `bark()` әдісі `"Ав-ав!"` қайтарсын. `Dog("Рекс")` объектісін жасап, `bark()` нәтижесін шығар.',
+        starterCode: `class Dog:\n    def __init__(self, name):\n        self.name = name\n\n    def bark(self):\n        return "Ав-ав!"\n\nd = Dog("Рекс")\nprint(d.bark())`,
+        expectedOutput: 'Ав-ав!',
+        hints: [
+          'def bark(self): return "Ав-ав!" деп жаз',
+          'd = Dog("Рекс") объектісін жаса',
+          'print(d.bark()) деп шығар',
+        ],
+      },
+    ],
+  },
+];
+
+// ══════════════════════════════════════════════════════════
+//  SEED ФУНКЦИЯСЫ
+// ══════════════════════════════════════════════════════════
+window.runSeed = async function() {
+  const btn = document.getElementById('seedBtn');
+  btn.disabled = true;
+
+  log('🚀 Интерактивті сабақтар жүктелуде...', 'info');
+  log(`📦 Жалпы: ${INTERACTIVE_LESSONS.length} сабақ`, 'info');
+
+  let done = 0;
+  const total = INTERACTIVE_LESSONS.length * 2; // lesson + pathStep update
+
+  for (const lesson of INTERACTIVE_LESSONS) {
+    try {
+      // 1. Сабақты interactiveLessons коллекциясына жаз
+      await setDoc(doc(db, 'interactiveLessons', lesson.id), {
+        ...lesson,
+        createdAt: new Date(),
+      });
+      done++;
+      progress(done, total);
+      log(`  ✅ сабақ: ${lesson.id} — "${lesson.title}"`, 'ok');
+
+      // 2. pythonPath шагына lessonId қос
+      if (lesson.pathStepId) {
+        await updateDoc(doc(db, 'pythonPath', lesson.pathStepId), {
+          lessonId: lesson.id,
+          type: 'lesson',
+        });
+        done++;
+        progress(done, total);
+        log(`     🔗 pythonPath/${lesson.pathStepId} → lessonId: "${lesson.id}"`, 'info');
+      }
+    } catch(e) {
+      log(`  ❌ қате: ${lesson.id} — ${e.message}`, 'err');
+      done += 2;
+      progress(done, total);
+    }
+  }
+
+  progress(total, total);
+  log('', '');
+  log('🎉 Жүктеу аяқталды!', 'ok');
+  log(`✅ ${INTERACTIVE_LESSONS.length} интерактивті сабақ Firebase-ке жазылды`, 'ok');
+  log(`✅ ${INTERACTIVE_LESSONS.filter(l=>l.pathStepId).length} pythonPath шагы lessonId-пен жаңартылды`, 'ok');
+  log('➡️ Енді Python жолындағы сабақ батырмасын бас → lesson-player.html ашылады!', 'info');
+  btn.disabled = false;
+};
+
+window.checkExisting = async function() {
+  log('🔍 Firebase-ті тексеруде...', 'info');
+  try {
+    const lessonsSnap = await getDocs(collection(db, 'interactiveLessons'));
+    log(`📚 interactiveLessons: ${lessonsSnap.size} сабақ`, lessonsSnap.size > 0 ? 'ok' : 'warn');
+
+    if (lessonsSnap.size > 0) {
+      lessonsSnap.forEach(d => {
+        const data = d.data();
+        log(`   • ${d.id} — "${data.title}" (${data.steps?.length || 0} қадам, ${data.xp} XP)`, 'info');
+      });
+    } else {
+      log('⚠️ interactiveLessons бос — «Жүктеу» батырмасын бас', 'warn');
+    }
+
+    // pythonPath шагаларындағы lessonId тексеру
+    const pathSnap = await getDocs(collection(db, 'pythonPath'));
+    const withLesson = pathSnap.docs.filter(d => d.data().lessonId);
+    log(`🗺️ pythonPath: ${pathSnap.size} қадам, ${withLesson.length}-нде lessonId бар`, withLesson.length > 0 ? 'ok' : 'warn');
+
+  } catch(e) {
+    log(`❌ ${e.message}`, 'err');
+  }
+};
+
+window.testLesson = function() {
+  log('🧪 Demo урок ашылуда (lesson-player.html?id=demo)...', 'info');
+  window.open('./lesson-player.html', '_blank');
+};
+</script>
+</body>
+</html>

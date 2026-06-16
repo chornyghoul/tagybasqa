@@ -1,35 +1,10 @@
-/**
- * TAGYBASQA — code-runner.js
- * ═══════════════════════════════════════════════════════
- * Встроенная среда выполнения кода прямо в уроках.
- *
- * Возможности:
- *  — Python через Pyodide (WebAssembly, реальный CPython)
- *  — JavaScript через iframe sandbox
- *  — Автодополнение ключевых слов
- *  — Подсветка синтаксиса (highlight.js)
- *  — Запуск по Ctrl+Enter
- *  — История вывода
- *  — Сохранение кода в localStorage
- *
- * Подключение в index.html перед </body>:
- *   <script src="./static/js/code-runner.js"></script>
- *
- * Автоматически активируется для всех элементов с классом:
- *   .code-editor-inp  (textarea с атрибутом data-lang="python"|"javascript")
- *   .run-code-btn     (кнопка рядом с textarea)
- * ═══════════════════════════════════════════════════════
- */
-
 (function () {
   'use strict';
 
-  // ── Состояние Pyodide ──────────────────────────────────────────
   let _pyodide = null;
   let _pyodideLoading = false;
   let _pyodideCallbacks = [];
 
-  // ── Загрузка Pyodide (один раз лениво) ────────────────────────
   async function getPyodide() {
     if (_pyodide) return _pyodide;
     if (_pyodideLoading) {
@@ -37,7 +12,6 @@
     }
     _pyodideLoading = true;
 
-    // Загружаем скрипт Pyodide
     if (!window.loadPyodide) {
       await loadScript('https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js');
     }
@@ -48,7 +22,6 @@
         stdout: () => {},
         stderr: () => {},
       });
-      // Перехват stdout/stderr
       await _pyodide.runPythonAsync(`
 import sys, io
 class _Capture(io.StringIO):
@@ -76,7 +49,6 @@ sys.stderr = _Capture()
     });
   }
 
-  // ── Запуск Python ──────────────────────────────────────────────
   async function runPython(code) {
     let py;
     try {
@@ -87,7 +59,6 @@ sys.stderr = _Capture()
     if (!py) return { output: '', error: 'Pyodide недоступен.' };
 
     try {
-      // Сброс буферов
       await py.runPythonAsync(`
 import sys
 sys.stdout.truncate(0); sys.stdout.seek(0)
@@ -104,7 +75,6 @@ sys.stderr.truncate(0); sys.stderr.seek(0)
     }
   }
 
-  // ── Запуск JavaScript ─────────────────────────────────────────
   function runJavaScript(code) {
     return new Promise(resolve => {
       const logs = [];
@@ -149,7 +119,6 @@ parent._jsRunnerCb && parent._jsRunnerCb('done', []);
     });
   }
 
-  // ── Главная функция запуска ────────────────────────────────────
   async function executeCode(lang, code, outputEl, runBtn) {
     if (!code.trim()) return;
 

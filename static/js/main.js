@@ -39,8 +39,12 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         if (isAuthPage) { window.location.href = './index.html'; return; }
 
+        // Скрываем лендинг — пользователь авторизован
+        const landing = document.getElementById('landing-screen');
+        if (landing) landing.classList.add('hidden');
+
         document.getElementById('logoutBtn')?.addEventListener('click', () => {
-            if (confirm('Выйти из аккаунта?')) {
+            if (confirm('Аккаунттан шығу?')) {
                 signOut(auth).then(() => { window.location.href = './auth.html'; });
             }
         });
@@ -52,9 +56,8 @@ onAuthStateChanged(auth, async (user) => {
         setupSuggestedUsers(user);
         initSubscriptions(user, db, auth);
 
-
         if (isIndexPage) {
-            loadPlatformStats();          // УЛУЧШЕНИЕ 6: статистика платформы
+            loadPlatformStats();
             loadUserCourses(user);
             loadAllPublicCourses();
             loadUserProgress(user);
@@ -64,8 +67,10 @@ onAuthStateChanged(auth, async (user) => {
         }
 
     } else {
-        if (!isAuthPage) { window.location.href = './auth.html'; return; }
+        // Не авторизован: на index — показываем лендинг; на других страницах — редирект
         document.getElementById('global-preloader')?.classList.add('hidden');
+        if (!isAuthPage && !isIndexPage) { window.location.href = './auth.html'; return; }
+        // Лендинг виден по умолчанию (display:flex) — ничего не делаем
     }
 });
 async function recordUserVisit(user) {
@@ -93,9 +98,9 @@ async function loadPlatformStats() {
     const container = document.getElementById('platformStats');
     if (!container) return;
 
-    const coursesRef = query(collection(db, "courses"), where("status", "==", "approved"));
+    const coursesRef = collection(db, "courses");
     const usersRef = collection(db, "users");
-    const quizzesRef = query(collection(db, "quizzes"), where("visibility", "==", "public"));
+    const publicCoursesQuery = collection(db, "courses");
 
     // Реальное время
     onSnapshot(coursesRef, snap => {
@@ -365,7 +370,7 @@ function loadUserProfile(user) {
     });
 
     document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => {
-        if (!confirm('Удалить аккаунт навсегда? Это действие необратимо.')) return;
+        if (!confirm('Аккаунтты мәңгілік жою? Бұл әрекетті кері қайтару мүмкін емес.')) return;
         const btn = document.getElementById('deleteAccountBtn');
         btn.textContent = 'Удаление...';
         btn.disabled = true;
@@ -653,7 +658,7 @@ async function loadUserCourses(user) {
             collection(db, "courses"),
             where("uid", "==", user.uid),
         );
-        
+
         const snapshot = await getDocs(q);
         container.innerHTML = '';
 
@@ -663,13 +668,14 @@ async function loadUserCourses(user) {
         }
 
         let html = '<div class="courses-grid-modern">';
-        
+
         snapshot.forEach(docSnap => {
             const id = docSnap.id;
             const data = docSnap.data();
-            
+
             // Если статуса нет в БД, значит это старый курс, ставим approved
-            const status = data.status || "approved"; 
+            // Если статуса нет в БД, значит это старый курс, ставим approved
+            const status = data.status || "approved";
 
             // Логика формирования плашки статуса для курса
             let statusBadge = '';
@@ -680,13 +686,13 @@ async function loadUserCourses(user) {
             } else {
                 statusBadge = `<span class="badge-status approved">Опубликован</span>`;
             }
-
             html += `
             <div class="card-modern" onclick="viewCourse('${id}')">
               <div class="card-body-modern">
+                // Отредактированный фрагмент
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <span class="card-tag-modern" style="background:rgba(140,190,255,0.15);">Курс</span>
-                    ${statusBadge}
+                    <!-- ${statusBadge} удален отсюда -->
                 </div>
                 <h3 class="card-title-modern">${escHtml(data.title || 'Без названия')}</h3>
                 <p class="card-text-modern">${escHtml(data.description || 'Описание отсутствует')}</p>
@@ -724,7 +730,7 @@ async function loadAllPublicCourses() {
     }
 
     try {
-        const publicCoursesQuery = query(collection(db, "courses"), where("status", "==", "approved"));
+        const publicCoursesQuery = collection(db, "courses");
         const snap = await getDocs(publicCoursesQuery);
 
         if (snap.empty) {
@@ -834,7 +840,7 @@ async function loadAllPublicCourses() {
 
 window.editCourse = id => { window.location.href = `./create-course.html?edit=${id}`; };
 window.deleteCourse = async (courseId) => {
-    if (!confirm('Вы уверены, что хотите удалить этот курс? Все данные будут стерты навсегда.')) return;
+    if (!confirm('Бұл курсты жою керек пе? Барлық деректер өшіріледі.')) return;
     try {
         await deleteDoc(doc(db, "courses", courseId));
         showToast('Курс успешно удален');
@@ -1074,7 +1080,7 @@ function setupFeed(user) {
             }
 
             const delBtn = e.target.closest('.delete-post-btn');
-            if (delBtn && confirm('Удалить пост?')) {
+            if (delBtn && confirm('Жазбаны жою керек пе?')) {
                 try { await deleteDoc(doc(db, "posts", delBtn.dataset.id)); }
                 catch { alert('Ошибка удаления'); }
             }
@@ -1220,13 +1226,13 @@ async function setupSuggestedUsers(user) {
             btn.disabled = true; // Защита от спам-кликов
             try {
                 const isNowFollowing = await toggleFollowStatus(targetUid);
-                
+
                 btn.classList.toggle('following', isNowFollowing);
                 btn.textContent = isNowFollowing ? 'Вы следите' : 'Следить';
                 btn.style.borderColor = isNowFollowing ? 'var(--border3)' : '';
                 btn.style.color = isNowFollowing ? 'var(--text)' : '';
-            } catch (err) { 
-                console.error("Ошибка при подписке:", err); 
+            } catch (err) {
+                console.error("Ошибка при подписке:", err);
             } finally {
                 btn.disabled = false;
             }
@@ -1738,7 +1744,7 @@ async function loadRecommendedCourses() {
     grid.innerHTML = '<div class="empty-state">Загрузка лучших курсов</div>';
 
     try {
-        const publicQuery = query(collection(db, "courses"), where("status", "==", "approved"));
+        const publicQuery = collection(db, "courses");
         const snap = await getDocs(publicQuery);
 
         if (snap.empty) {
@@ -1888,18 +1894,18 @@ function initStoryHub(user) {
     // Поиск и фильтры
     document.getElementById('storySearch')?.addEventListener('input', e => {
         _storySearch = e.target.value.toLowerCase();
-        renderLessonsGrid(_storyTab === 'mine' ? _myLessons : _allLessons, 
-                          _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
+        renderLessonsGrid(_storyTab === 'mine' ? _myLessons : _allLessons,
+            _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
     });
     document.getElementById('storyFilterLevel')?.addEventListener('change', e => {
         _storyLevel = e.target.value;
         renderLessonsGrid(_storyTab === 'mine' ? _myLessons : _allLessons,
-                          _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
+            _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
     });
     document.getElementById('storyFilterSubject')?.addEventListener('change', e => {
         _storySubject = e.target.value;
         renderLessonsGrid(_storyTab === 'mine' ? _myLessons : _allLessons,
-                          _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
+            _storyTab === 'mine' ? 'myLessonsGrid' : 'allLessonsGrid', user);
     });
     document.getElementById('storyFilterReset')?.addEventListener('click', () => {
         _storySearch = ''; _storyLevel = ''; _storySubject = '';
@@ -1979,9 +1985,9 @@ function renderLessonsGrid(lessons, containerId, user, isMine = false) {
 
     let filtered = lessons.filter(l => {
         const title = (l.title || '').toLowerCase();
-        const desc  = (l.description || '').toLowerCase();
-        const matchSearch  = !_storySearch || title.includes(_storySearch) || desc.includes(_storySearch);
-        const matchLevel   = !_storyLevel   || l.level   === _storyLevel;
+        const desc = (l.description || '').toLowerCase();
+        const matchSearch = !_storySearch || title.includes(_storySearch) || desc.includes(_storySearch);
+        const matchLevel = !_storyLevel || l.level === _storyLevel;
         const matchSubject = !_storySubject || l.subject === _storySubject || (l.tags || []).includes(_storySubject);
         return matchSearch && matchLevel && matchSubject;
     });
@@ -1999,17 +2005,13 @@ function renderLessonsGrid(lessons, containerId, user, isMine = false) {
 }
 
 function lessonHubCard(l, user, isMine) {
-    const status = l.status || 'approved';
-    const isOwn  = user && l.uid === user.uid;
-    const statusTag = status === 'pending'  ? `<span class="lesson-hub-tag status-pending">На модерации</span>` :
-                      status === 'rejected' ? `<span class="lesson-hub-tag status-rejected">Отклонён</span>` :
-                                              `<span class="lesson-hub-tag status-approved">Опубликован</span>`;
+    const isOwn = user && l.uid === user.uid;
     const levelColors = { beginner: 'green', intermediate: 'orange', advanced: 'purple' };
-    const levelLabel  = { beginner: 'Начинающий', intermediate: 'Средний', advanced: 'Продвинутый' };
-    const lvlTag = l.level ? `<span class="lesson-hub-tag ${levelColors[l.level]||''}">${levelLabel[l.level]||l.level}</span>` : '';
+    const levelLabel = { beginner: 'Начинающий', intermediate: 'Средний', advanced: 'Продвинутый' };
+    const lvlTag = l.level ? `<span class="lesson-hub-tag ${levelColors[l.level] || ''}">${levelLabel[l.level] || l.level}</span>` : '';
     const subjectTag = l.subject ? `<span class="lesson-hub-tag blue">${escHtml(l.subject)}</span>` : '';
     const blocks = Array.isArray(l.blocks) ? l.blocks.length : 0;
-    const dateStr = l.createdAt?.toDate ? l.createdAt.toDate().toLocaleDateString('ru-RU', {day:'numeric',month:'short'}) : '—';
+    const dateStr = l.createdAt?.toDate ? l.createdAt.toDate().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : '—';
 
     const editBtns = (isOwn || isMine) ? `
         <button class="lesson-hub-edit-btn" onclick="event.stopPropagation();editLesson('${l.id}')">✏️ Изменить</button>
@@ -2020,7 +2022,7 @@ function lessonHubCard(l, user, isMine) {
       <div class="lesson-hub-card-top">
         <span class="lesson-hub-emoji">${l.emoji || '📖'}</span>
         <div class="lesson-hub-tags">
-          ${statusTag} ${lvlTag} ${subjectTag}
+            ${lvlTag} ${subjectTag}
         </div>
         <div class="lesson-hub-title">${escHtml(l.title || 'Без названия')}</div>
         <div class="lesson-hub-desc">${escHtml(l.description || 'Описание отсутствует')}</div>
@@ -2034,6 +2036,7 @@ function lessonHubCard(l, user, isMine) {
         <span class="lesson-hub-author">${escHtml(l.userName || 'Автор')}</span>
         <div class="lesson-hub-btns">
           ${editBtns}
+          <button class="lesson-hub-open-btn" onclick="event.stopPropagation();openPublicLesson('${l.id}','${(l.title||'').replace(/'/g,'')}','${l.emoji||'📖'}')"><svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16.6582 9.28638C18.098 10.1862 18.8178 10.6361 19.0647 11.2122C19.2803 11.7152 19.2803 12.2847 19.0647 12.7878C18.8178 13.3638 18.098 13.8137 16.6582 14.7136L9.896 18.94C8.29805 19.9387 7.49907 20.4381 6.83973 20.385C6.26501 20.3388 5.73818 20.0469 5.3944 19.584C5 19.053 5 18.1108 5 16.2264V7.77357C5 5.88919 5 4.94701 5.3944 4.41598C5.73818 3.9531 6.26501 3.66111 6.83973 3.6149C7.49907 3.5619 8.29805 4.06126 9.896 5.05998L16.6582 9.28638Z" stroke="#fff   " stroke-width="2" stroke-linejoin="round"></path> </g></svg></button>
           <button class="lesson-hub-run-btn" onclick="event.stopPropagation();viewLesson('${l.id}')">▶ Запустить</button>
         </div>
       </div>
@@ -2066,11 +2069,11 @@ function renderDocsGrid(docs, user) {
         </div>`;
         return;
     }
-    const fileIcons = { pdf:'📕', doc:'📘', docx:'📘', ppt:'📙', pptx:'📙', txt:'📃', png:'🖼️', jpg:'🖼️', jpeg:'🖼️', link:'🔗', text:'📝' };
+    const fileIcons = { pdf: '📕', doc: '📘', docx: '📘', ppt: '📙', pptx: '📙', txt: '📃', png: '🖼️', jpg: '🖼️', jpeg: '🖼️', link: '🔗', text: '📝' };
     grid.innerHTML = docs.map(d => {
-        const ext = (d.fileType || d.type || 'link').toLowerCase().replace('.','');
+        const ext = (d.fileType || d.type || 'link').toLowerCase().replace('.', '');
         const icon = fileIcons[ext] || '📄';
-        const dateStr = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'}) : '—';
+        const dateStr = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
         return `
         <div class="doc-card" onclick="viewDoc('${d.id}')">
           <div class="doc-card-icon">${icon}</div>
@@ -2092,12 +2095,12 @@ function renderDocsGrid(docs, user) {
 }
 
 // ── ПРОСМОТР ДОКУМЕНТА ──
-window.viewDoc = function(id) {
+window.viewDoc = function (id) {
     const doc_ = _docsCache.find(d => d.id === id);
     if (!doc_) return;
     const modal = document.getElementById('viewDocModal');
     const title = document.getElementById('viewDocTitle');
-    const meta  = document.getElementById('viewDocMeta');
+    const meta = document.getElementById('viewDocMeta');
     const frame = document.getElementById('viewDocFrame');
     const dlBtn = document.getElementById('viewDocDownload');
 
@@ -2122,41 +2125,41 @@ window.viewDoc = function(id) {
         dlBtn.style.display = '';
     }
     modal.classList.add('active');
-    document.getElementById('closeViewDocModal')?.addEventListener('click', () => modal.classList.remove('active'), {once:true});
-    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); }, {once:true});
+    document.getElementById('closeViewDocModal')?.addEventListener('click', () => modal.classList.remove('active'), { once: true });
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); }, { once: true });
 };
 
-window.deleteDoc = async function(id) {
-    if (!confirm('Удалить этот документ?')) return;
+window.deleteDoc = async function (id) {
+    if (!confirm('Құжатты жою керек пе?')) return;
     try {
         await deleteDoc(doc(db, "lectureDocs", id));
         _docsCache = _docsCache.filter(d => d.id !== id);
         renderDocsGrid(_docsCache, _storyUser);
         document.getElementById('statDocs').textContent = _docsCache.length;
         showToast('✅ Документ удалён');
-    } catch(e) { alert('Ошибка: ' + e.message) }
+    } catch (e) { alert('Ошибка: ' + e.message) }
 };
 
 // ── СТАТИСТИКА ──
 async function updateStoryStats(user) {
     try {
         document.getElementById('statTotalLessons').textContent = _allLessons.length || '—';
-        document.getElementById('statMyLessons').textContent    = _myLessons.length  || '—';
-        document.getElementById('statDocs').textContent         = _docsCache.length  || '—';
+        document.getElementById('statMyLessons').textContent = _myLessons.length || '—';
+        document.getElementById('statDocs').textContent = _docsCache.length || '—';
         // Пройдено — из прогресса
         const userDoc = await getDoc(doc(db, "users", user.uid));
         const progress = userDoc.data()?.lessonProgress || {};
         const done = Object.values(progress).filter(v => v === true || v === 100).length;
         document.getElementById('statCompleted').textContent = done || 0;
-    } catch(e) {}
+    } catch (e) { }
 }
 
 // ── DROP ZONE ──
 function setupDropZone(zoneId, inputId, callback) {
-    const zone  = document.getElementById(zoneId);
+    const zone = document.getElementById(zoneId);
     const input = document.getElementById(inputId);
     if (!zone) return;
-    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over') });
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over') });
     zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
     zone.addEventListener('drop', e => {
         e.preventDefault(); zone.classList.remove('drag-over');
@@ -2174,7 +2177,7 @@ function handleDocFiles(files) {
             <div class="import-file-icon">${fileIcon(f.name)}</div>
             <div class="import-file-info">
                 <div class="import-file-name">${escHtml(f.name)}</div>
-                <div class="import-file-size">${(f.size/1024/1024).toFixed(2)} MB</div>
+                <div class="import-file-size">${(f.size / 1024 / 1024).toFixed(2)} MB</div>
             </div>`;
         document.getElementById('importDrop').style.display = 'none';
         window._pendingFile = f;
@@ -2183,7 +2186,7 @@ function handleDocFiles(files) {
 
 function fileIcon(name) {
     const ext = name.split('.').pop().toLowerCase();
-    return {pdf:'📕',doc:'📘',docx:'📘',ppt:'📙',pptx:'📙',txt:'📃',png:'🖼️',jpg:'🖼️',jpeg:'🖼️'}[ext] || '📄';
+    return { pdf: '📕', doc: '📘', docx: '📘', ppt: '📙', pptx: '📙', txt: '📃', png: '🖼️', jpg: '🖼️', jpeg: '🖼️' }[ext] || '📄';
 }
 
 // ── ИМПОРТ МОДАЛ ──
@@ -2259,17 +2262,17 @@ async function saveDocument(user) {
             const ext = f.name.split('.').pop().toLowerCase();
             const storageRef = ref(storage, `lectureDocs/${user.uid}/${Date.now()}_${f.name}`);
             const snap = await uploadBytes(storageRef, f);
-            const url  = await getDownloadURL(snap.ref);
+            const url = await getDownloadURL(snap.ref);
             docData = { ...docData, title: f.name, url, fileType: ext, type: 'file' };
 
         } else if (activeTab === 'url') {
-            const url   = document.getElementById('importUrlInput').value.trim();
+            const url = document.getElementById('importUrlInput').value.trim();
             const title = document.getElementById('importUrlTitle').value.trim() || url;
             if (!url) { alert('Введите ссылку'); btn.textContent = '📥 Сохранить материал'; btn.disabled = false; return; }
             docData = { ...docData, title, url, type: 'link', fileType: 'link' };
 
         } else if (activeTab === 'text') {
-            const title   = document.getElementById('importTextTitle').value.trim() || 'Конспект';
+            const title = document.getElementById('importTextTitle').value.trim() || 'Конспект';
             const content = document.getElementById('importTextContent').value.trim();
             if (!content) { alert('Введите текст'); btn.textContent = '📥 Сохранить материал'; btn.disabled = false; return; }
             docData = { ...docData, title, content, type: 'text', fileType: 'text' };
@@ -2292,7 +2295,7 @@ async function saveDocument(user) {
         document.getElementById('importTextContent').value = '';
         document.querySelectorAll('.import-chip').forEach(c => c.classList.remove('selected'));
 
-    } catch(e) {
+    } catch (e) {
         alert('Ошибка сохранения: ' + e.message);
     } finally {
         btn.textContent = '📥 Сохранить материал'; btn.disabled = false;
@@ -2304,23 +2307,23 @@ function startLessonSession() {
     if (_storyTab !== 'running') {
         document.querySelector('.story-tab[data-story-tab="running"]')?.click();
     }
-    const code = Math.random().toString(36).slice(2,6).toUpperCase();
+    const code = Math.random().toString(36).slice(2, 6).toUpperCase();
     const hub = document.getElementById('runningHub');
     if (!hub) return;
     hub.innerHTML = `
     <div class="session-card">
-        <div class="session-live">🟢 Сессия активна</div>
+        <div class="session-live">🟢 Сессия белсенді</div>
         <div class="session-code">${code}</div>
         <div class="session-info">Поделитесь этим кодом со студентами для подключения</div>
         <div style="display:flex;gap:12px;justify-content:center;margin-top:20px">
             <button class="story-btn-secondary story-btn-sm" onclick="navigator.clipboard.writeText('${code}').then(()=>showToast('Код скопирован!'))">📋 Скопировать</button>
-            <button class="story-btn-secondary story-btn-sm" style="color:var(--duo-red)" onclick="endSession()">⏹ Завершить</button>
+            <button class="story-btn-secondary story-btn-sm" style="color:var(--duo-red)" onclick="endSession()">⏹ Аяқтау</button>
         </div>
     </div>`;
     _sessionActive = true;
 }
 
-window.endSession = function() {
+window.endSession = function () {
     const hub = document.getElementById('runningHub');
     if (hub) hub.innerHTML = `<div class="running-empty">
         <div style="font-size:48px;margin-bottom:16px">📡</div>
@@ -2364,7 +2367,7 @@ window.editLesson = (id) => {
 };
 
 window.deleteLesson = async (id) => {
-    if (!confirm('Удалить этот интерактивный урок навсегда?')) return;
+    if (!confirm('Интерактивті сабақты жою керек пе?')) return;
 
     try {
         await deleteDoc(doc(db, "interactiveLessons", id));
@@ -2420,32 +2423,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function sendHelpdeskTicket(user, subject, message) {
     if (!user || !message.trim()) return;
- 
+
     await addDoc(collection(db, "helpdesk"), {
-        uid:       user.uid,
-        email:     user.email || "",
-        subject:   subject || "Без темы",
-        message:   message.trim(),
-        status:    "open",
+        uid: user.uid,
+        email: user.email || "",
+        subject: subject || "Без темы",
+        message: message.trim(),
+        status: "open",
         createdAt: serverTimestamp(),
     });
- 
+
     showToast("✅ Ваше обращение отправлено администратору!");
 }
- 
- 
+
+
 // ═══════════════════════════════════════════════════════════
 // 3. ФРОНТЕНД — проверка бана перед публикацией поста
 //    Замените вашу существующую функцию создания поста на эту
 // ═══════════════════════════════════════════════════════════
- 
+
 async function createFeedPost(user, text) {
     // Получаем актуальный профиль
     const userSnap = await getDoc(doc(db, "users", user.uid));
     if (!userSnap.exists()) return;
- 
+
     const userData = userSnap.data();
- 
+
     if (userData.banned) {
         const until = userData.bannedUntil?.toDate?.();
         const msg = until
@@ -2454,20 +2457,108 @@ async function createFeedPost(user, text) {
         showToast(`🔴 ${msg}`);
         return;
     }
- 
+
     if (userData.canPost === false) {
         showToast("🚫 Вам ограничено право публикации.");
         return;
     }
- 
+
     // Публикуем пост (бот автоматически проверит содержимое)
     await addDoc(collection(db, "feedPosts"), {
-        uid:       user.uid,
-        text:      text.trim(),
+        uid: user.uid,
+        text: text.trim(),
         createdAt: serverTimestamp(),
-        likes:     0,
-        comments:  0,
+        likes: 0,
+        comments: 0,
     });
- 
+
     showToast("✅ Пост опубликован!");
 }
+// ─── АШЫҚ САБАҚ (Open Lesson) ─────────────────────────────────────────────
+window.openPublicLesson = function(lessonId, lessonTitle, lessonEmoji) {
+    const modal = document.getElementById('openLessonModal');
+    if (!modal) {
+        // Create modal on demand
+        buildOpenLessonModal();
+    }
+    document.getElementById('olm-lesson-title').textContent = lessonTitle || 'Сабақ';
+    document.getElementById('olm-lesson-emoji').textContent = lessonEmoji || '📖';
+    document.getElementById('olm-lesson-id').value = lessonId;
+    document.getElementById('openLessonModal').style.display = 'flex';
+};
+
+function buildOpenLessonModal() {
+    const el = document.createElement('div');
+    el.id = 'openLessonModal';
+    el.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:20px';
+    el.innerHTML = `
+    <div style="background:#161b22;border:1px solid rgba(255,255,255,.12);border-radius:20px;width:100%;max-width:460px;overflow:hidden">
+      <div style="padding:24px 24px 0;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span id="olm-lesson-emoji" style="font-size:32px">📖</span>
+          <div>
+            <div style="font-size:11px;font-family:monospace;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Ашық сабақ өткізу</div>
+            <div id="olm-lesson-title" style="font-size:16px;font-weight:700;color:#f0f6fc"></div>
+          </div>
+        </div>
+        <button onclick="document.getElementById('openLessonModal').style.display='none'" style="background:none;border:none;color:#8b949e;font-size:20px;cursor:pointer;padding:4px">✕</button>
+      </div>
+      <input type="hidden" id="olm-lesson-id">
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label style="font-size:11px;font-family:monospace;color:#8b949e;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px">Сынып / Топ</label>
+          <input id="olm-class" type="text" placeholder="мысалы: 7А немесе 9-сынып" style="width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#21262d;color:#f0f6fc;font-size:13px;outline:none">
+        </div>
+        <div>
+          <label style="font-size:11px;font-family:monospace;color:#8b949e;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px">Мектеп / Мекеме</label>
+          <input id="olm-school" type="text" placeholder="мысалы: Алматы, №5 мектеп" style="width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#21262d;color:#f0f6fc;font-size:13px;outline:none">
+        </div>
+        <div>
+          <label style="font-size:11px;font-family:monospace;color:#8b949e;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px">Сабақ ұзақтығы</label>
+          <select id="olm-duration" style="width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#21262d;color:#f0f6fc;font-size:13px;outline:none">
+            <option value="30">30 минут</option>
+            <option value="45" selected>45 минут</option>
+            <option value="60">60 минут</option>
+            <option value="90">90 минут</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-family:monospace;color:#8b949e;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:8px">Командалар саны</label>
+          <div style="display:flex;gap:8px">
+            <button class="olm-teams-btn active" data-teams="2" onclick="selectTeams(this,2)">2</button>
+            <button class="olm-teams-btn" data-teams="3" onclick="selectTeams(this,3)">3</button>
+            <button class="olm-teams-btn" data-teams="4" onclick="selectTeams(this,4)">4</button>
+            <button class="olm-teams-btn" data-teams="5" onclick="selectTeams(this,5)">5</button>
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 24px 24px;display:flex;gap:10px">
+        <button onclick="document.getElementById('openLessonModal').style.display='none'" style="flex:1;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:none;color:#8b949e;font-size:14px;font-weight:600;cursor:pointer">Бас тарту</button>
+        <button onclick="startOpenLesson()" style="flex:2;padding:12px;border:none;border-radius:10px;background:#1cb0f6;color:#fff;font-size:14px;font-weight:700;cursor:pointer">📡 Бастау</button>
+      </div>
+    </div>`;
+    document.body.appendChild(el);
+
+    // Add inline styles for team buttons
+    const style = document.createElement('style');
+    style.textContent = `.olm-teams-btn{flex:1;padding:10px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:#21262d;color:#8b949e;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}.olm-teams-btn.active{border-color:#1cb0f6;background:rgba(28,176,246,.15);color:#1cb0f6}.lesson-hub-open-btn{padding:6px 12px;border:1px solid rgba(28,176,246,.3);border-radius:8px;background:rgba(28,176,246,.08);color:#1cb0f6;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}.lesson-hub-open-btn:hover{background:rgba(28,176,246,.18);border-color:#1cb0f6}`;
+    document.head.appendChild(style);
+}
+
+window.selectTeams = function(btn, n) {
+    document.querySelectorAll('.olm-teams-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+};
+
+window.startOpenLesson = function() {
+    const lessonId = document.getElementById('olm-lesson-id').value;
+    const cls = document.getElementById('olm-class')?.value || '';
+    const school = document.getElementById('olm-school')?.value || '';
+    const duration = document.getElementById('olm-duration')?.value || '45';
+    const teams = document.querySelector('.olm-teams-btn.active')?.dataset.teams || '4';
+    const title = document.getElementById('olm-lesson-title')?.textContent || '';
+    const emoji = document.getElementById('olm-lesson-emoji')?.textContent || '📖';
+    document.getElementById('openLessonModal').style.display = 'none';
+    const params = new URLSearchParams({ id: lessonId, cls, school, duration, teams, title, emoji });
+    window.location.href = './open-lesson.html?' + params.toString();
+};

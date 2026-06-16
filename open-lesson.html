@@ -1,741 +1,1126 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="kk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Открытый урок — Tagybasqa</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:#0d1821; --bg2:#111f2c; --bg3:#162636; --bg4:#1c3040;
-      --border:rgba(255,255,255,.06); --border2:rgba(255,255,255,.11);
-      --text:#fff; --text2:#c8d8e4; --text3:#5f8499;
-      --blue:#1cb0f6; --blue2:#0e86c0; --green:#57cc02; --green2:#3a8c01;
-      --orange:#ff9600; --red:#ff4b4b; --purple:#ce82ff; --yellow:#ffd900; --teal:#1fe0c0;
-      --r:12px; --r2:16px; --font:'Nunito',sans-serif; --mono:'DM Mono',monospace;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;overflow:hidden}
-    body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ашық сабақ — Tagybasqa</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Onest:wght@400;600;700;900&display=swap" rel="stylesheet">
+<!-- mammoth.js for docx parsing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--bg4:#21262d;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--border3:rgba(255,255,255,.22);
+  --text:#f0f6fc;--text2:#8b949e;--text3:#484f58;
+  --blue:#1cb0f6;--blue2:#0e86c0;
+  --green:#57cc02;--green2:#3a8c01;
+  --red:#ff4b4b;--orange:#ff9600;--purple:#9b5de5;--gold:#ffd900;--teal:#06d6a0;
+  --font:"Onest",sans-serif;--mono:"DM Mono",monospace;--r:12px;--rlg:18px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-    /* ── LAYOUT ── */
-    .app{display:grid;grid-template-columns:1fr 320px;height:100vh;overflow:hidden}
+/* ── TOPBAR ── */
+.tb{display:flex;align-items:center;gap:12px;padding:0 20px;height:54px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100}
+.tb-logo{font-size:16px;font-weight:900;color:var(--blue);text-decoration:none}
+.tb-title{flex:1;font-size:14px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.live-badge{display:flex;align-items:center;gap:5px;background:rgba(87,204,2,.12);border:1px solid rgba(87,204,2,.3);color:var(--green);border-radius:99px;padding:4px 11px;font-size:12px;font-weight:700}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:.15s;font-family:var(--font)}
+.btn:hover{background:var(--bg4);border-color:var(--border3);color:var(--text)}
+.btn-blue{background:var(--blue);border:none;color:#fff}
+.btn-blue:hover{background:var(--blue2);color:#fff}
+.btn-red{color:var(--red);border-color:rgba(255,75,75,.3);background:rgba(255,75,75,.07)}
+.btn-red:hover{background:rgba(255,75,75,.15)}
 
-    /* ── MAIN STAGE ── */
-    .stage{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg);position:relative}
+/* ── STAGES ── */
+.stages-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;flex-shrink:0;display:none}
+.stages-bar.visible{display:block}
+.stages-lbl{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.stages-row{display:flex;align-items:center}
+.stg{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;cursor:pointer}
+.stg:not(:last-child)::after{content:"";position:absolute;left:calc(50% + 14px);top:13px;width:calc(100% - 28px);height:2px;background:var(--border2);z-index:0}
+.stg.done:not(:last-child)::after{background:var(--blue)}
+.stg-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text3);z-index:1;transition:.2s;flex-shrink:0}
+.stg.done .stg-dot{background:var(--blue);border-color:var(--blue);color:#fff}
+.stg.active .stg-dot{border-color:var(--blue);color:var(--blue);background:rgba(28,176,246,.1)}
+.stg-name{font-size:10px;color:var(--text3);text-align:center;line-height:1.3;max-width:80px}
+.stg.active .stg-name{color:var(--blue);font-weight:700}
+.stg.done .stg-name{color:var(--text2)}
 
-    /* Topbar */
-    .stage-top{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);background:rgba(13,24,33,.95);backdrop-filter:blur(20px);flex-shrink:0;z-index:10}
-    .lesson-title-display{font-size:15px;font-weight:800;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .pin-badge{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--blue);background:rgba(28,176,246,.12);border:1.5px solid rgba(28,176,246,.25);padding:6px 14px;border-radius:99px;letter-spacing:.1em}
-    .timer-display{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--yellow);min-width:56px;text-align:center}
-    .timer-display.urgent{color:var(--red);animation:urgentPulse 1s infinite}
-    @keyframes urgentPulse{0%,100%{opacity:1}50%{opacity:.5}}
-    .btn-sm{background:transparent;border:1.5px solid var(--border2);color:var(--text2);padding:7px 14px;border-radius:99px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
-    .btn-sm:hover{border-color:var(--blue);color:var(--blue)}
-    .btn-blue{background:var(--blue);border-color:var(--blue);color:#fff}
-    .btn-blue:hover{filter:brightness(1.1);color:#fff}
-    .btn-green{background:var(--green);border-color:var(--green);color:#fff}
-    .btn-green:hover{filter:brightness(1.1);color:#fff}
-    .btn-red{background:var(--red);border-color:var(--red);color:#fff}
+/* ── MAIN LAYOUT ── */
+.main{display:flex;flex:1;overflow:hidden}
+.content{flex:1;overflow-y:auto;padding:20px}
+.sidebar{width:260px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;display:none}
+.sidebar.visible{display:flex}
 
-    /* Progress bar */
-    .progress-track{height:4px;background:var(--bg3);position:relative;flex-shrink:0}
-    .progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .5s ease;border-radius:0 2px 2px 0}
+/* ── UPLOAD SCREEN ── */
+#uploadScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:24px;padding:40px}
+.upload-hero{text-align:center;max-width:480px}
+.upload-icon{font-size:64px;margin-bottom:16px;display:block;line-height:1}
+.upload-title{font-size:28px;font-weight:900;margin-bottom:10px}
+.upload-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.drop-zone{border:2px dashed var(--border2);border-radius:var(--rlg);padding:40px 32px;text-align:center;cursor:pointer;transition:.2s;background:var(--bg2);max-width:480px;width:100%}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:rgba(28,176,246,.04)}
+.drop-zone-icon{font-size:40px;margin-bottom:12px;display:block}
+.drop-zone-text{font-size:14px;color:var(--text2);margin-bottom:6px}
+.drop-zone-hint{font-size:12px;color:var(--text3);font-family:var(--mono)}
+.upload-or{display:flex;align-items:center;gap:12px;color:var(--text3);font-size:12px;max-width:480px;width:100%}
+.upload-or::before,.upload-or::after{content:"";flex:1;height:1px;background:var(--border)}
+.upload-demo-btn{font-size:13px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:var(--font);text-decoration:underline}
+.upload-demo-btn:hover{color:var(--text2)}
+#fileInput{display:none}
+.recent-plans{max-width:480px;width:100%}
+.recent-title{font-size:11px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.recent-list{display:flex;flex-direction:column;gap:7px}
+.recent-item{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:.15s}
+.recent-item:hover{border-color:var(--border2);background:var(--bg3)}
+.recent-item-icon{font-size:20px;flex-shrink:0}
+.recent-item-name{font-size:13px;font-weight:700;flex:1}
+.recent-item-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
 
-    /* ── SLIDE AREA ── */
-    .slide-area{flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:40px;position:relative}
+/* ── PARSE LOADING ── */
+#parseScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px}
+.parse-spinner{width:44px;height:44px;border-radius:50%;border:4px solid var(--border);border-top-color:var(--blue);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.parse-text{font-size:14px;color:var(--text2);font-family:var(--mono)}
 
-    .slide-card{background:var(--bg2);border:1.5px solid var(--border2);border-radius:24px;width:100%;max-width:860px;max-height:100%;overflow-y:auto;padding:48px 56px;animation:slideIn .35s cubic-bezier(.16,1,.3,1)}
-    @keyframes slideIn{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-    .slide-num-pill{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:16px;display:block}
-    .slide-main-title{font-size:clamp(22px,4vw,38px);font-weight:900;line-height:1.15;letter-spacing:-.5px;margin-bottom:16px}
-    .slide-body-text{font-size:clamp(14px,2vw,18px);color:var(--text2);line-height:1.7}
-    .slide-emoji-big{font-size:80px;text-align:center;display:block;margin-bottom:20px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.4))}
+/* ── PLAN PREVIEW ── */
+#planPreview{display:none;flex-direction:column;gap:16px}
+.plan-header{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px}
+.plan-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(87,204,2,.1);border:1px solid rgba(87,204,2,.25);color:var(--green);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;font-family:var(--mono)}
+.plan-title{font-size:22px;font-weight:900;margin-bottom:8px;line-height:1.3}
+.plan-meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.plan-meta-item{display:flex;flex-direction:column;gap:3px}
+.plan-meta-label{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.plan-meta-val{font-size:13px;font-weight:700;color:var(--text)}
+.plan-stages-preview{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px}
+.plan-stages-title{font-size:13px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.plan-stage-list{display:flex;flex-direction:column;gap:10px}
+.plan-stage-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:.15s}
+.plan-stage-item:hover{border-color:var(--border2)}
+.plan-stage-num{width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+.plan-stage-body{flex:1}
+.plan-stage-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.plan-stage-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.plan-stage-time{font-family:var(--mono);font-size:11px;color:var(--orange);background:rgba(255,150,0,.1);border:1px solid rgba(255,150,0,.2);border-radius:99px;padding:2px 8px;flex-shrink:0}
+.plan-actions{display:flex;gap:12px;flex-wrap:wrap}
+.plan-start-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:var(--r);border:none;background:var(--green);color:#fff;font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:.15s;box-shadow:0 4px 0 var(--green2)}
+.plan-start-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.plan-start-btn:active{transform:translateY(2px);box-shadow:none}
+.plan-edit-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+.plan-edit-btn:hover{border-color:var(--border3);color:var(--text)}
 
-    /* Quiz slide */
-    .quiz-slide-q{font-size:clamp(16px,2.5vw,26px);font-weight:800;margin-bottom:28px;line-height:1.35}
-    .quiz-options-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .quiz-opt-btn{background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r2);padding:18px 22px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:12px;color:var(--text)}
-    .quiz-opt-btn:hover:not(:disabled){border-color:var(--blue);background:rgba(28,176,246,.08)}
-    .quiz-opt-btn.revealed-correct{border-color:var(--green);background:rgba(87,204,2,.12);color:var(--green)}
-    .quiz-opt-btn.revealed-wrong{border-color:var(--red);background:rgba(255,75,75,.08);color:var(--red);opacity:.5}
-    .opt-letter{width:32px;height:32px;border-radius:8px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;flex-shrink:0;color:var(--text3)}
-    .quiz-opt-btn.revealed-correct .opt-letter{background:var(--green);color:#fff}
+/* ── LESSON RUNNER ── */
+#lessonScreen{display:none;flex-direction:column;gap:0;flex:1;overflow:hidden}
+.runner-layout{display:flex;flex:1;overflow:hidden}
+.runner-main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.runner-sidebar{width:260px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
 
-    /* Poll slide */
-    .poll-bars{display:flex;flex-direction:column;gap:14px;margin-top:20px}
-    .poll-bar-row{display:flex;align-items:center;gap:14px}
-    .poll-bar-label{font-size:14px;font-weight:700;min-width:120px}
-    .poll-bar-track{flex:1;height:36px;background:var(--bg3);border-radius:8px;overflow:hidden;position:relative}
-    .poll-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:8px;transition:width .6s cubic-bezier(.16,1,.3,1)}
-    .poll-bar-pct{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--blue);min-width:40px;text-align:right}
+/* Runner stage card */
+.stage-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden}
+.stage-card-h{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stage-card-title{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
+.stage-timer{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--orange);background:rgba(255,150,0,.1);border:1px solid rgba(255,150,0,.2);border-radius:99px;padding:4px 12px;min-width:70px;text-align:center;cursor:pointer;transition:.15s}
+.stage-timer:hover{background:rgba(255,150,0,.2)}
+.stage-timer.red{color:var(--red);background:rgba(255,75,75,.1);border-color:rgba(255,75,75,.2)}
+.stage-timer.paused{opacity:.6}
+.stage-card-body{padding:16px}
 
-    /* Code slide */
-    .slide-code-block{background:#050e18;border:1.5px solid var(--border2);border-radius:var(--r);padding:20px;font-family:var(--mono);font-size:14px;line-height:1.7;color:#cdd8dd;margin-top:16px;overflow-x:auto;white-space:pre}
-    .code-kw{color:#ff7b93} .code-fn{color:var(--blue)} .code-str{color:var(--green)} .code-cmt{color:var(--text3)}
+/* Content blocks */
+.content-block{margin-bottom:14px;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r)}
+.block-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.block-text{font-size:14px;color:var(--text2);line-height:1.7}
+.block-task{background:rgba(28,176,246,.06);border-left:3px solid var(--blue);padding:12px;border-radius:0 var(--r) var(--r) 0;font-size:14px;color:var(--text);line-height:1.65}
+.block-quiz{display:flex;flex-direction:column;gap:8px}
+.quiz-q-text{font-size:14px;font-weight:700;margin-bottom:10px;line-height:1.5}
+.quiz-opt{padding:10px 14px;border:1px solid var(--border2);border-radius:var(--r);font-size:13px;color:var(--text2);background:var(--bg4);cursor:pointer;transition:.15s;text-align:left}
+.quiz-opt:hover{border-color:var(--blue);color:var(--text);background:rgba(28,176,246,.07)}
+.quiz-opt.sel{border-color:var(--blue);background:rgba(28,176,246,.12);color:var(--blue);font-weight:700}
+.quiz-opt.correct{border-color:var(--green);background:rgba(87,204,2,.1);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(255,75,75,.08);color:var(--red)}
+.quiz-explain{padding:10px 14px;border-radius:var(--r);font-size:13px;margin-top:6px;display:none}
+.quiz-explain.ok{background:rgba(87,204,2,.08);border:1px solid rgba(87,204,2,.2);color:var(--green)}
+.quiz-explain.err{background:rgba(255,75,75,.07);border:1px solid rgba(255,75,75,.2);color:var(--red)}
+.quiz-reveal-btn{padding:8px 14px;border-radius:var(--r);border:none;background:var(--blue);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:6px}
 
-    /* Callout */
-    .slide-callout{display:flex;gap:16px;padding:20px;border-radius:var(--r);margin-top:16px}
-    .slide-callout.info{background:rgba(28,176,246,.1);border-left:4px solid var(--blue)}
-    .slide-callout.warning{background:rgba(255,150,0,.1);border-left:4px solid var(--orange)}
-    .slide-callout.success{background:rgba(87,204,2,.1);border-left:4px solid var(--green)}
-    .slide-callout.danger{background:rgba(255,75,75,.1);border-left:4px solid var(--red)}
+/* Stage nav */
+.stage-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0 0;border-top:1px solid var(--border);margin-top:6px}
+.stage-nav-prev{padding:9px 16px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.stage-nav-prev:hover{border-color:var(--border3);color:var(--text)}
+.stage-nav-next{padding:9px 20px;border-radius:var(--r);border:none;background:var(--blue);color:#fff;font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:.15s}
+.stage-nav-next:hover{background:var(--blue2)}
+.stage-progress{font-family:var(--mono);font-size:11px;color:var(--text3)}
 
-    /* ── NAV BUTTONS ── */
-    .nav-row{display:flex;align-items:center;justify-content:center;gap:16px;padding:16px 24px;border-top:1px solid var(--border);flex-shrink:0;background:rgba(13,24,33,.9)}
-    .nav-btn{background:var(--bg3);border:2px solid var(--border2);color:var(--text);padding:12px 28px;border-radius:99px;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
-    .nav-btn:hover:not(:disabled){border-color:var(--border2);background:var(--bg4)}
-    .nav-btn:disabled{opacity:.3;cursor:not-allowed}
-    .nav-btn.main{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 16px rgba(28,176,246,.3)}
-    .nav-btn.main:hover:not(:disabled){filter:brightness(1.1)}
-    .slide-counter{font-family:var(--mono);font-size:13px;color:var(--text3);min-width:80px;text-align:center}
-    .action-row{display:flex;align-items:center;gap:8px;margin-left:auto}
-    .reveal-btn{background:rgba(87,204,2,.12);border:1.5px solid rgba(87,204,2,.3);color:var(--green);padding:10px 18px;border-radius:99px;font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:all .15s}
-    .reveal-btn:hover{background:var(--green);color:#fff}
+/* Sidebar widgets */
+.sb-section{display:flex;flex-direction:column;gap:8px}
+.sb-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.sb-stat{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:13px}
+.sb-stat-val{font-weight:800;font-family:var(--mono)}
+.observer-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border-radius:var(--r)}
+.obs-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.obs-name{font-size:12px;font-weight:700}
+.obs-role{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.student-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg3);border-radius:var(--r);font-size:12px}
+.student-name{font-weight:700}
+.student-status{font-family:var(--mono);font-size:10px}
+.status-done{color:var(--green)}
+.status-work{color:var(--orange)}
+.status-idle{color:var(--text3)}
 
-    /* ── SIDEBAR ── */
-    .sidebar{border-left:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg2)}
-    .sidebar-top{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0}
-    .sidebar-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
-    .sidebar-tab{flex:1;padding:11px 8px;text-align:center;font-size:10px;font-weight:800;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.06em;text-transform:uppercase;border:none;background:none;font-family:var(--font);margin-bottom:-1px}
-    .sidebar-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
-    .sidebar-panel{display:none;flex:1;overflow-y:auto;padding:14px}
-    .sidebar-panel.active{display:flex;flex-direction:column;gap:10px}
+/* Results screen */
+#resultsScreen{display:none;flex-direction:column;gap:20px;padding:24px}
+.res-hero{text-align:center;padding:32px;background:linear-gradient(135deg,rgba(87,204,2,.06),rgba(28,176,246,.04));border:1px solid var(--border);border-radius:var(--rlg)}
+.res-trophy{font-size:60px;margin-bottom:12px;display:block;animation:float 2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.06) rotate(3deg)}}
+.res-title{font-size:26px;font-weight:900;margin-bottom:6px}
+.res-sub{font-size:13px;color:var(--text2);font-family:var(--mono)}
+.res-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.res-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
+.res-stat-val{font-size:28px;font-weight:900;font-family:var(--mono);color:var(--blue)}
+.res-stat-lbl{font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;margin-top:4px}
+.res-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.res-btn{padding:12px 24px;border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:7px}
+.res-btn-prim{background:var(--blue);border:none;color:#fff}
+.res-btn-prim:hover{background:var(--blue2)}
+.res-btn-sec{background:var(--bg3);border:1px solid var(--border2);color:var(--text2)}
+.res-btn-sec:hover{border-color:var(--border3);color:var(--text)}
 
-    /* PIN join display */
-    .pin-join-card{background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r2);padding:18px;text-align:center;margin-bottom:4px}
-    .pin-join-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px}
-    .pin-join-code{font-family:var(--mono);font-size:32px;font-weight:700;color:var(--blue);letter-spacing:.2em}
-    .pin-join-url{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px}
-    .players-count-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(87,204,2,.1);border:1px solid rgba(87,204,2,.2);border-radius:99px;padding:4px 12px;font-family:var(--mono);font-size:11px;color:var(--green);margin-top:10px}
-    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:livePulse 1.2s infinite}
-    @keyframes livePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.6}}
+/* Edit overlay */
+#editOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center}
+#editOverlay.open{display:flex}
+.edit-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rlg);padding:24px;max-width:560px;width:95%;max-height:80vh;overflow-y:auto}
+.edit-modal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.edit-modal-title{font-size:18px;font-weight:800}
+.edit-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:4px}
+.edit-close:hover{color:var(--text)}
+.edit-field{margin-bottom:14px}
+.edit-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px}
+.edit-input{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:14px;padding:10px 13px;outline:none;transition:.15s}
+.edit-input:focus{border-color:var(--blue)}
+.edit-textarea{min-height:100px;resize:vertical;line-height:1.5}
+.edit-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
 
-    /* Players list */
-    .player-item{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)}
-    .player-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;color:#000}
-    .player-name{font-size:13px;font-weight:700;flex:1}
-    .player-score{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--yellow)}
-    .player-team-badge{font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--bg4);padding:2px 7px;border-radius:99px}
+/* Toast */
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:99px;padding:10px 20px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:toast-in .3s ease,toast-out .3s ease 2.7s forwards;pointer-events:all}
+@keyframes toast-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toast-out{from{opacity:1}to{opacity:0}}
 
-    /* Teams leaderboard */
-    .team-score-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)}
-    .team-rank{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text3);width:24px;flex-shrink:0;text-align:center}
-    .team-emoji{font-size:24px;flex-shrink:0}
-    .team-name-sb{font-size:14px;font-weight:800;flex:1}
-    .team-score-sb{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--yellow)}
-    .team-bar-mini{height:4px;background:var(--bg4);border-radius:99px;margin-top:4px;overflow:hidden}
-    .team-bar-fill{height:100%;border-radius:99px;background:var(--blue)}
-
-    /* Answers feed */
-    .answer-item{padding:9px 12px;background:var(--bg3);border-radius:var(--r);border-left:3px solid var(--border);font-size:12px;animation:answerIn .3s ease}
-    @keyframes answerIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-    .answer-item.correct{border-left-color:var(--green)}
-    .answer-item.wrong{border-left-color:var(--red)}
-    .answer-who{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:3px}
-
-    /* Response stats */
-    .resp-stats{background:var(--bg3);border-radius:var(--r);padding:12px;display:flex;gap:12px;justify-content:space-around;text-align:center}
-    .resp-stat-num{font-family:var(--mono);font-size:20px;font-weight:700;display:block}
-    .resp-stat-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
-
-    /* ── LOBBY SCREEN ── */
-    .lobby{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;z-index:50;padding:32px}
-    .lobby.hidden{display:none}
-    .lobby-title{font-size:clamp(22px,4vw,36px);font-weight:900;text-align:center;letter-spacing:-.5px}
-    .lobby-pin-display{font-family:var(--mono);font-size:clamp(40px,8vw,80px);font-weight:700;color:var(--blue);letter-spacing:.3em;text-align:center}
-    .lobby-url{font-family:var(--mono);font-size:14px;color:var(--text3);text-align:center}
-    .lobby-players-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:700px;min-height:80px;align-items:center}
-    .lobby-player-chip{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:700;animation:chipIn .3s cubic-bezier(.16,1,.3,1)}
-    @keyframes chipIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
-    .lobby-teams{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-    .lobby-team-col{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r2);padding:14px 18px;min-width:140px;text-align:center}
-    .lobby-team-emoji{font-size:28px;display:block;margin-bottom:6px}
-    .lobby-team-name{font-size:13px;font-weight:800;margin-bottom:8px}
-    .lobby-team-players{display:flex;flex-direction:column;gap:5px;min-height:40px}
-    .lobby-team-player{font-size:11px;color:var(--text3);font-family:var(--mono)}
-
-    /* ── LEADERBOARD OVERLAY ── */
-    .leaderboard-overlay{position:absolute;inset:0;background:rgba(13,24,33,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:40;padding:32px}
-    .leaderboard-overlay.show{display:flex;animation:fadeIn .3s ease}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    .lb-title{font-size:28px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
-    .lb-subtitle{font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:16px}
-    .lb-podium{display:flex;align-items:flex-end;gap:16px;justify-content:center}
-    .lb-place{display:flex;flex-direction:column;align-items:center;gap:8px}
-    .lb-place-avatar{font-size:32px}
-    .lb-place-name{font-size:14px;font-weight:800;text-align:center}
-    .lb-place-score{font-family:var(--mono);font-size:13px;color:var(--yellow);font-weight:700}
-    .lb-place-block{border-radius:8px 8px 0 0;width:90px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:rgba(0,0,0,.5)}
-
-    @media(max-width:800px){.app{grid-template-columns:1fr}.sidebar{display:none}}
-  </style>
+/* Misc */
+.divider{height:1px;background:var(--border);margin:4px 0}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;font-family:var(--mono)}
+.tag-blue{background:rgba(28,176,246,.12);color:var(--blue)}
+.tag-green{background:rgba(87,204,2,.1);color:var(--green)}
+.tag-orange{background:rgba(255,150,0,.1);color:var(--orange)}
+.tag-red{background:rgba(255,75,75,.1);color:var(--red)}
+.tag-purple{background:rgba(155,93,229,.12);color:var(--purple)}
+</style>
 </head>
 <body>
 
-<!-- LOBBY SCREEN -->
-<div class="lobby" id="lobbyScreen">
-  <div class="lesson-title-display" id="lobbyLessonTitle" style="font-size:clamp(16px,3vw,24px);font-weight:900;text-align:center;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;font-family:var(--mono)">Открытый урок · Tagybasqa</div>
-  <div class="lobby-title" id="lobbyTitleText">Ожидание участников...</div>
-  <div class="lobby-pin-display" id="lobbyPin">— — — — — —</div>
-  <div class="lobby-url">Заходите на <strong style="color:var(--blue)">tagybasqa.app/join</strong> и вводите PIN</div>
-
-  <div class="lobby-teams" id="lobbyTeamsGrid"></div>
-  <div class="lobby-players-grid" id="lobbyPlayerChips" style="margin-top:8px"></div>
-
-  <div style="display:flex;gap:12px;margin-top:8px">
-    <button class="nav-btn" onclick="addDemoPlayers()">+ Тест-игроки</button>
-    <button class="nav-btn main" onclick="startLesson()" id="startLessonBtn">▶ Начать урок</button>
+<!-- ── TOPBAR ── -->
+<div class="tb" id="topbar">
+  <a class="tb-logo" href="./index.html">Tagybasqa</a>
+  <div style="display:flex;flex-direction:column;flex:1;min-width:0">
+    <div class="tb-title" id="tbTitle">Ашық сабақ</div>
+    <div class="tb-meta" id="tbMeta">Сабақ жоспарын жүктеңіз</div>
+  </div>
+  <div class="tb-right">
+    <div class="live-badge" id="liveBadge" style="display:none">
+      <span class="live-dot"></span>LIVE
+    </div>
+    <button class="btn" id="settingsBtn" style="display:none" onclick="openEdit()">⚙️ Баптау</button>
+    <button class="btn btn-red" id="endBtn" style="display:none" onclick="endLesson()">✕ Аяқтау</button>
   </div>
 </div>
 
-<!-- LEADERBOARD OVERLAY -->
-<div class="leaderboard-overlay" id="leaderboardOverlay">
-  <div class="lb-title">🏆 Промежуточные результаты</div>
-  <div class="lb-subtitle" id="lbSubtitle">После вопроса 1</div>
-  <div class="lb-podium" id="lbPodium"></div>
-  <button class="nav-btn main" onclick="closeLeaderboard()" style="margin-top:16px">Продолжить →</button>
+<!-- ── STAGE BAR ── -->
+<div class="stages-bar" id="stagesBar">
+  <div class="stages-lbl">Сабақ кезеңдері</div>
+  <div class="stages-row" id="stagesRow"></div>
 </div>
 
-<!-- MAIN APP -->
-<div class="app" id="mainApp" style="display:none">
+<!-- ── MAIN AREA ── -->
+<div class="main" id="mainArea">
+<div class="content" id="contentArea">
 
-  <!-- STAGE -->
-  <div class="stage">
-    <!-- Top -->
-    <div class="stage-top">
-      <button class="btn-sm" onclick="showLobby()">← Лобби</button>
-      <div class="lesson-title-display" id="stageLessonTitle">Урок</div>
-      <div class="timer-display" id="timerDisplay" style="display:none">—</div>
-      <div class="pin-badge" id="stagePinBadge">PIN: ——</div>
-      <button class="btn-sm btn-blue" onclick="showLeaderboard()">🏆 Итоги</button>
+  <!-- UPLOAD SCREEN -->
+  <div id="uploadScreen">
+    <div class="upload-hero">
+      <span class="upload-icon">📋</span>
+      <h1 class="upload-title">Ашық сабақ өткізу</h1>
+      <p class="upload-sub">Тексерілген сабақ жоспарыңызды (.docx) жүктеп, Tagybasqa автоматты түрде оны интерактивті сабаққа айналдырады. Таймерлер, квиздер, командалар — бәрі дайын.</p>
     </div>
-
-    <!-- Progress -->
-    <div class="progress-track">
-      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <span class="drop-zone-icon">📄</span>
+      <div class="drop-zone-text">Сабақ жоспарын осы жерге тастаңыз</div>
+      <div class="drop-zone-hint">.docx форматы · Максималды 10MB</div>
     </div>
-
-    <!-- Slide area -->
-    <div class="slide-area" id="slideArea">
-      <div class="slide-card" id="slideCard">
-        <span class="slide-num-pill">Загрузка...</span>
-      </div>
-    </div>
-
-    <!-- Nav -->
-    <div class="nav-row">
-      <button class="nav-btn" onclick="prevSlide()" id="prevBtn" disabled>← Назад</button>
-      <div class="slide-counter" id="slideCounter">1 / 1</div>
-      <button class="nav-btn main" onclick="nextSlide()" id="nextBtn">Далее →</button>
-      <div class="action-row">
-        <button class="reveal-btn" id="revealBtn" onclick="revealAnswer()" style="display:none">✓ Показать ответ</button>
-        <button class="btn-sm" onclick="startTimer()" id="timerBtn" style="display:none">⏱ Таймер</button>
-      </div>
+    <div class="upload-or">немесе</div>
+    <button class="upload-demo-btn" onclick="loadDemo()">🎯 Демо жоспармен байқап көру</button>
+    <input type="file" id="fileInput" accept=".docx" onchange="handleFileUpload(this.files[0])">
+    <div class="recent-plans" id="recentPlans" style="display:none">
+      <div class="recent-title">Соңғы жоспарлар</div>
+      <div class="recent-list" id="recentList"></div>
     </div>
   </div>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-top">
-      <div class="pin-join-card">
-        <div class="pin-join-label">PIN для входа</div>
-        <div class="pin-join-code" id="sidebarPin">——</div>
-        <div class="pin-join-url">tagybasqa.app/join</div>
-        <div class="players-count-badge">
-          <div class="live-dot"></div>
-          <span id="playersCountLabel">0 участников</span>
+  <!-- PARSE SCREEN -->
+  <div id="parseScreen" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px">
+    <div class="parse-spinner"></div>
+    <div class="parse-text" id="parseText">Жоспар талданып жатыр...</div>
+  </div>
+
+  <!-- PLAN PREVIEW -->
+  <div id="planPreview" style="display:none;flex-direction:column;gap:16px">
+    <div class="plan-header">
+      <div class="plan-header-top">
+        <div>
+          <div class="plan-badge">✓ Жоспар жүктелді</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="resetToUpload()">↩ Жаңа жоспар</button>
+          <button class="btn" onclick="openEdit()">✏️ Өзгерту</button>
         </div>
       </div>
+      <div class="plan-title" id="planTitle">—</div>
+      <div class="plan-meta-grid" id="planMetaGrid"></div>
     </div>
-
-    <div class="sidebar-tabs">
-      <button class="sidebar-tab active" data-panel="players" onclick="switchPanel('players')">Участники</button>
-      <button class="sidebar-tab" data-panel="teams" onclick="switchPanel('teams')">Команды</button>
-      <button class="sidebar-tab" data-panel="answers" onclick="switchPanel('answers')">Ответы</button>
+    <div class="plan-stages-preview">
+      <div class="plan-stages-title">📋 Сабақ кезеңдері <span class="tag tag-blue" id="stageCount">—</span></div>
+      <div class="plan-stage-list" id="planStageList"></div>
     </div>
-
-    <!-- PLAYERS PANEL -->
-    <div class="sidebar-panel active" id="panel-players">
-      <div class="resp-stats" id="respStats">
-        <div><span class="resp-stat-num" id="statAnswered">0</span><span class="resp-stat-lbl">Ответили</span></div>
-        <div><span class="resp-stat-num" id="statCorrect" style="color:var(--green)">0</span><span class="resp-stat-lbl">Верно</span></div>
-        <div><span class="resp-stat-num" id="statWaiting" style="color:var(--orange)">0</span><span class="resp-stat-lbl">Ждут</span></div>
-      </div>
-      <div id="playersList" style="display:flex;flex-direction:column;gap:6px"></div>
-    </div>
-
-    <!-- TEAMS PANEL -->
-    <div class="sidebar-panel" id="panel-teams">
-      <div id="teamsLeaderboard" style="display:flex;flex-direction:column;gap:8px"></div>
-    </div>
-
-    <!-- ANSWERS PANEL -->
-    <div class="sidebar-panel" id="panel-answers">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Поступающие ответы</div>
-      <div id="answersFeed" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div class="plan-actions">
+      <button class="plan-start-btn" onclick="startLesson()">▶ Сабақты бастау</button>
+      <button class="plan-edit-btn" onclick="openEdit()">✏️ Жоспарды өзгерту</button>
+      <button class="btn" onclick="resetToUpload()">↩ Басқа жоспар</button>
     </div>
   </div>
 
+  <!-- LESSON RUNNER (appended dynamically) -->
+  <div id="lessonScreen" style="display:none;flex-direction:column;gap:16px"></div>
+
+  <!-- RESULTS -->
+  <div id="resultsScreen" style="display:none;flex-direction:column;gap:20px">
+    <div class="res-hero">
+      <span class="res-trophy">🏆</span>
+      <div class="res-title">Сабақ аяқталды!</div>
+      <div class="res-sub" id="resSubtitle">—</div>
+    </div>
+    <div class="res-stats">
+      <div class="res-stat"><div class="res-stat-val" id="resTime">—</div><div class="res-stat-lbl">Уақыт</div></div>
+      <div class="res-stat"><div class="res-stat-val" id="resStages">—</div><div class="res-stat-lbl">Кезеңдер</div></div>
+      <div class="res-stat"><div class="res-stat-val" id="resScore">—</div><div class="res-stat-lbl">Орт. балл</div></div>
+    </div>
+    <div class="res-actions">
+      <button class="res-btn res-btn-prim" onclick="downloadReport()">⬇ PDF есеп</button>
+      <button class="res-btn res-btn-sec" onclick="resetToUpload()">↩ Жаңа сабақ</button>
+    </div>
+  </div>
+
+</div><!-- /content -->
+<div id="runnersidebar" class="runner-sidebar" style="display:none">
+  <!-- filled by JS -->
+</div>
+</div><!-- /main -->
+
+<!-- EDIT OVERLAY -->
+<div id="editOverlay">
+  <div class="edit-modal">
+    <div class="edit-modal-h">
+      <div class="edit-modal-title">Жоспарды өзгерту</div>
+      <button class="edit-close" onclick="closeEdit()">✕</button>
+    </div>
+    <div class="edit-field">
+      <label class="edit-label">Сабақ тақырыбы</label>
+      <input class="edit-input" id="editTitle" placeholder="Тақырыпты енгізіңіз...">
+    </div>
+    <div class="edit-field">
+      <label class="edit-label">Мұғалім</label>
+      <input class="edit-input" id="editTeacher" placeholder="Аты-жөні">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="edit-field">
+        <label class="edit-label">Сынып / Топ</label>
+        <input class="edit-input" id="editClass" placeholder="7А, ИС24-2...">
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Уақыт (мин)</label>
+        <input class="edit-input" id="editDuration" type="number" value="45">
+      </div>
+    </div>
+    <div class="edit-field">
+      <label class="edit-label">Мақсат</label>
+      <textarea class="edit-input edit-textarea" id="editGoal" placeholder="Сабақтың мақсаты..."></textarea>
+    </div>
+    <div class="edit-field">
+      <label class="edit-label">Күтілетін нәтижелер</label>
+      <textarea class="edit-input edit-textarea" id="editOutcomes" placeholder="Білім алушылар не үйренеді..."></textarea>
+    </div>
+    <div id="editStagesSection">
+      <div class="edit-label" style="margin-bottom:10px">Кезеңдер</div>
+      <div id="editStagesList" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div class="edit-actions" style="margin-top:20px">
+      <button class="btn" onclick="closeEdit()">Болдырмау</button>
+      <button class="btn btn-blue" onclick="saveEdit()">💾 Сақтау</button>
+    </div>
+  </div>
 </div>
 
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
 <script>
-// ── STATE ──
-const params = new URLSearchParams(window.location.search);
-let lessonData = null;
-let blocks = [];
-let currentSlide = 0;
-let pin = '';
-let players = [];
-let teams = [];
-let scores = {};
-let teamScores = {};
-let answerRevealed = false;
-let timerInterval = null;
-let timerSeconds = 0;
-let lessonSettings = {};
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let lessonPlan = null;
+let currentStageIdx = 0;
+let timers = {};
+let lessonStartTime = null;
+let lessonElapsed = 0;
+let lessonTimer = null;
 
-const TEAM_COLORS = ['#1cb0f6','#ff4b4b','#57cc02','#ffd900','#ff9600','#ce82ff'];
-const DEMO_NAMES = ['Алия','Дамир','Нурлан','Айгерим','Арман','Жанар','Берік','Мадина','Тимур','Сабина','Ерлан','Камила'];
-
-// ── INIT ──
-window.addEventListener('load', () => {
-  // Parse lesson data from URL or use demo
-  try {
-    const dataParam = params.get('data');
-    if (dataParam) {
-      lessonData = JSON.parse(decodeURIComponent(dataParam));
-      blocks = lessonData.blocks || [];
-    }
-  } catch(e) {}
-
-  // Demo data if no real data
-  if (!blocks.length) {
-    blocks = getDemoBlocks();
-    lessonData = { title: 'Python: Функции и ООП', emoji: '🐍' };
-  }
-
-  pin = params.get('pin') || generatePin();
-  lessonSettings = { timer: 30, showLeaderboard: true };
-
-  // Parse teams from settings
-  teams = [
-    { emoji: '🔵', name: 'Альфа', color: TEAM_COLORS[0] },
-    { emoji: '🔴', name: 'Бета',  color: TEAM_COLORS[1] },
-    { emoji: '🟢', name: 'Гамма', color: TEAM_COLORS[2] },
-  ];
-
-  teams.forEach(t => { teamScores[t.name] = 0; });
-
-  renderLobby();
+// ═══════════════════════════════════════════════════════════
+//  DRAG & DROP
+// ═══════════════════════════════════════════════════════════
+const dz = document.getElementById("dropZone");
+dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("drag-over"); });
+dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+dz.addEventListener("drop", e => {
+  e.preventDefault();
+  dz.classList.remove("drag-over");
+  const f = e.dataTransfer.files[0];
+  if (f && f.name.endsWith(".docx")) handleFileUpload(f);
+  else toast("⚠️ Тек .docx форматы қабылданады", "red");
 });
 
-function getDemoBlocks() {
-  return [
-    { type:'slide', slideTitle:'Открытый урок: Python', slideBody:'Сегодня мы разберём функции, ООП и алгоритмы. Готовы? 🚀', slideLayout:'center' },
-    { type:'quiz', questions:[{type:'mcq',q:'Что делает функция print() в Python?',options:['Считывает данные','Выводит текст на экран','Создаёт переменную','Удаляет объект'],answer:1}] },
-    { type:'poll', question:'Как вы оцениваете свой уровень Python?', pollOptions:['Новичок','Знаю основы','Средний уровень','Продвинутый'] },
-    { type:'slide', slideTitle:'def — объявление функции', slideBody:'def имя_функции(параметры):\n    тело функции\n    return результат', slideLayout:'left' },
-    { type:'code', lang:'python', code:'def greet(name):\n    return f"Привет, {name}!"\n\nprint(greet("Python"))' },
-    { type:'task', taskText:'Напишите функцию square(n), которая возвращает квадрат числа', answer:'def square(n): return n**2' },
-    { type:'quiz', questions:[{type:'mcq',q:'Что вернёт square(4)?',options:['8','16','4','12'],answer:1},{type:'fill',q:'Как создать класс в Python?',answer:'class'}] },
+// ═══════════════════════════════════════════════════════════
+//  FILE UPLOAD & PARSE
+// ═══════════════════════════════════════════════════════════
+async function handleFileUpload(file) {
+  if (!file) return;
+  showScreen("parseScreen");
+  setParseText("Файл оқылып жатыр...");
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    setParseText("Мәтін шығарылуда...");
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    const rawText = result.value;
+    setParseText("Жоспар структурасы анықталуда...");
+    const plan = parseLessonPlan(rawText, file.name);
+    lessonPlan = plan;
+    saveToRecent(plan, file.name);
+    setParseText("Дайын!");
+    setTimeout(() => showPlanPreview(plan), 500);
+  } catch(e) {
+    console.error(e);
+    toast("❌ Файлды оқу қатесі: " + e.message, "red");
+    showScreen("uploadScreen");
+  }
+}
+
+function setParseText(t) {
+  document.getElementById("parseText").textContent = t;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DOCX PARSER
+// ═══════════════════════════════════════════════════════════
+function parseLessonPlan(text, filename) {
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 2);
+  const plan = {
+    title: "",
+    teacher: "",
+    group: "",
+    date: "",
+    type: "",
+    goal: "",
+    outcomes: [],
+    duration: 45,
+    stages: [],
+    rawText: text,
+    filename: filename
+  };
+
+  // Extract key fields
+  const getAfter = (keyword, src) => {
+    const idx = src.toLowerCase().indexOf(keyword.toLowerCase());
+    if (idx === -1) return "";
+    const after = src.slice(idx + keyword.length, idx + keyword.length + 200).trim();
+    return after.split("\n")[0].replace(/^[:\s]+/, "").trim();
+  };
+
+  // Title — usually after "тақырыбы" or "Бөлім"
+  const titleLine = lines.find(l => /тақырыб[ыы]/i.test(l) && l.length > 10);
+  if (titleLine) {
+    plan.title = titleLine.replace(/^.*тақырыб[ыы][^:]*[:]/i, "").trim() || titleLine.slice(0, 80);
+  }
+  if (!plan.title) plan.title = lines[0]?.slice(0, 80) || filename.replace(".docx","");
+
+  // Teacher
+  const teacherLine = lines.find(l => /педагог|мұғалім|оқытушы|дайындаған/i.test(l));
+  if (teacherLine) {
+    plan.teacher = teacherLine.replace(/^.*[Дд]айындаған[^:]*[:]/,"").trim() || 
+                   teacherLine.replace(/педагог|мұғалім|оқытушы/gi,"").replace(/^[:\s]+/,"").trim();
+  }
+
+  // Group / class
+  const groupLine = lines.find(l => /^(Топ|Курс|Сынып|Тобы)/i.test(l) || /Топ/i.test(l));
+  if (groupLine) {
+    const m = groupLine.match(/[A-ZА-ЯЁа-яёa-z]{2,}\d{1,2}[-–]?\d{0,2}/);
+    plan.group = m ? m[0] : groupLine.replace(/Топ[ы]?|Курс|Сынып/gi,"").trim().slice(0,20);
+  }
+
+  // Duration
+  const durLine = text.match(/(\d+)\s*мин/i);
+  if (durLine) plan.duration = parseInt(durLine[1]) || 45;
+
+  // Goal
+  const goalLine = lines.find(l => /мақсат[ы]?/i.test(l) && l.length > 20);
+  if (goalLine) plan.goal = goalLine.replace(/^[^:]+:/,"").trim().slice(0,200);
+
+  // Type
+  const typeLine = lines.find(l => /сабақтың түрі|сабақ түрі/i.test(l));
+  if (typeLine) plan.type = typeLine.replace(/сабақтың түрі|сабақ түрі/gi,"").replace(/^[:\s]+/,"").trim();
+
+  // Outcomes
+  const outcomeStartIdx = lines.findIndex(l => /күтілетін нәтиже|күтілетін нәтижелер/i.test(l));
+  if (outcomeStartIdx >= 0) {
+    for (let i = outcomeStartIdx+1; i < Math.min(outcomeStartIdx+10, lines.length); i++) {
+      const l = lines[i];
+      if (/ресурс|қажет|сабақтың барысы/i.test(l)) break;
+      if (l.length > 5) plan.outcomes.push(l.replace(/^[•–\-\*]+/, "").trim());
+    }
+  }
+
+  // Parse stages from "Сабақтың барысы" section
+  plan.stages = parseStages(text, lines, plan.duration);
+
+  // Fill default title if empty
+  const subjectLine = lines.find(l => /параметрлі|for цикл|while|шарт|функци/i.test(l));
+  if (!plan.title || plan.title.length < 5) {
+    plan.title = subjectLine?.slice(0,80) || "Ашық сабақ";
+  }
+
+  return plan;
+}
+
+function parseStages(text, lines, totalDur) {
+  const stages = [];
+  // Look for numbered sections
+  const stagePatterns = [
+    { re: /1[.\)]\s*(Ұйымдастыру|Ұйым|Org)/i,          name: "Ұйымдастыру кезеңі",   emoji:"👋", defaultMin:5  },
+    { re: /2[.\)]\s*(Білімді өзект|Актуал|Review)/i,    name: "Білімді өзектендіру",  emoji:"🧠", defaultMin:15 },
+    { re: /3[.\)]\s*(Жаңа мате|Жаңа тақ|New|Негізгі)/i, name: "Жаңа материал",        emoji:"📖", defaultMin:15 },
+    { re: /4[.\)]\s*(Бекіт|Practic|Тапсырм)/i,          name: "Бекіту / Тапсырма",   emoji:"✏️", defaultMin:10 },
+    { re: /5[.\)]\s*(Рефлекс|Reflect|Қорыт)/i,          name: "Рефлексия",            emoji:"💬", defaultMin:5  },
   ];
-}
 
-// ── LOBBY ──
-function renderLobby() {
-  const title = lessonData?.title || 'Открытый урок';
-  document.getElementById('lobbyTitleText').textContent = title;
-  document.getElementById('lobbyLessonTitle').textContent = (lessonData?.emoji||'📖') + ' ' + title;
-  document.getElementById('lobbyPin').textContent = pin.split('').join(' ');
-  document.getElementById('stagePinBadge').textContent = 'PIN: ' + pin;
-  document.getElementById('sidebarPin').textContent = pin;
-  document.getElementById('stageLessonTitle').textContent = title;
+  // Try to extract stage content blocks from text
+  const textLower = text.toLowerCase();
+  let usedLines = new Set();
 
-  // Teams
-  const teamsGrid = document.getElementById('lobbyTeamsGrid');
-  teamsGrid.innerHTML = teams.map(t => `
-    <div class="lobby-team-col">
-      <span class="lobby-team-emoji">${t.emoji}</span>
-      <div class="lobby-team-name">${escHtml(t.name)}</div>
-      <div class="lobby-team-players" id="lobbyTeam_${escHtml(t.name)}">
-        <span class="lobby-team-player" style="opacity:.4">Ожидание...</span>
-      </div>
-    </div>
-  `).join('');
-}
+  stagePatterns.forEach((sp, idx) => {
+    const matchIdx = textLower.search(sp.re);
+    if (matchIdx === -1) return;
 
-function addDemoPlayers() {
-  const count = Math.floor(Math.random()*4)+3;
-  for (let i=0; i<count; i++) {
-    const name = DEMO_NAMES[Math.floor(Math.random()*DEMO_NAMES.length)];
-    if (!players.find(p=>p.name===name)) {
-      const team = teams[Math.floor(Math.random()*teams.length)];
-      addPlayer({ name, team: team.name, emoji: randomEmoji(), score: 0 });
-    }
-  }
-}
+    // Find the actual line
+    const linesBefore = text.slice(0, matchIdx).split("\n").length;
+    const stageLineIdx = linesBefore - 1;
 
-function addPlayer(player) {
-  if (players.find(p=>p.name===player.name)) return;
-  players.push(player);
-  scores[player.name] = 0;
-  renderLobbyPlayers();
-  updatePlayersCount();
-}
+    // Extract time from line
+    const stageLine = lines[stageLineIdx] || "";
+    const timeMatch = stageLine.match(/(\d+)\s*мин/i);
+    const mins = timeMatch ? parseInt(timeMatch[1]) : sp.defaultMin;
 
-function renderLobbyPlayers() {
-  const chips = document.getElementById('lobbyPlayerChips');
-  chips.innerHTML = players.map(p => `
-    <div class="lobby-player-chip">
-      <span>${p.emoji}</span>
-      <span>${escHtml(p.name)}</span>
-      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${escHtml(p.team||'')}</span>
-    </div>
-  `).join('');
+    // Collect content after this stage until next stage or end
+    const nextPatternIdx = textLower.slice(matchIdx+1).search(stagePatterns[idx+1]?.re || /NOMATCH/);
+    const endIdx = nextPatternIdx === -1 ? matchIdx + 1000 : matchIdx + nextPatternIdx;
+    const stageText = text.slice(matchIdx, endIdx);
+    const stageLines = stageText.split("\n").map(l => l.trim()).filter(l => l.length > 3);
 
-  // Update team cols
-  teams.forEach(t => {
-    const col = document.getElementById('lobbyTeam_'+t.name);
-    if (!col) return;
-    const tp = players.filter(p=>p.team===t.name);
-    col.innerHTML = tp.length ? tp.map(p=>`<span class="lobby-team-player">${p.emoji} ${escHtml(p.name)}</span>`).join('') : '<span class="lobby-team-player" style="opacity:.4">Ожидание...</span>';
-  });
-}
+    // Build content blocks
+    const blocks = buildBlocks(stageLines.slice(1), sp);
 
-function updatePlayersCount() {
-  document.getElementById('playersCountLabel').textContent = players.length + ' участников';
-  renderPlayersPanel();
-  renderTeamsPanel();
-}
-
-// ── START ──
-function startLesson() {
-  document.getElementById('lobbyScreen').classList.add('hidden');
-  document.getElementById('mainApp').style.display = 'grid';
-  renderSlide(0);
-  updateProgress();
-  renderPlayersPanel();
-  renderTeamsPanel();
-}
-
-function showLobby() {
-  document.getElementById('lobbyScreen').classList.remove('hidden');
-  document.getElementById('mainApp').style.display = 'none';
-  stopTimer();
-}
-
-// ── SLIDE NAVIGATION ──
-function renderSlide(idx) {
-  currentSlide = idx;
-  answerRevealed = false;
-  clearAnswersFeed();
-  stopTimer();
-
-  const block = blocks[idx];
-  if (!block) return;
-
-  const card = document.getElementById('slideCard');
-  card.innerHTML = buildSlideHTML(block, idx);
-  card.style.animation='none'; card.offsetHeight; card.style.animation='';
-
-  document.getElementById('prevBtn').disabled = (idx===0);
-  document.getElementById('nextBtn').disabled = (idx===blocks.length-1);
-  document.getElementById('nextBtn').textContent = (idx===blocks.length-1) ? '🏁 Финиш' : 'Далее →';
-  document.getElementById('slideCounter').textContent = `${idx+1} / ${blocks.length}`;
-
-  const isInteractive = ['quiz','poll','task'].includes(block.type);
-  document.getElementById('revealBtn').style.display = isInteractive ? 'flex' : 'none';
-  document.getElementById('timerBtn').style.display = isInteractive ? 'flex' : 'none';
-  document.getElementById('revealBtn').textContent = '✓ Показать ответ';
-
-  updateProgress();
-
-  // Simulate incoming answers for interactive blocks
-  if (isInteractive && players.length) {
-    simulateAnswers(block);
-  }
-}
-
-function buildSlideHTML(block, idx) {
-  const num = `<span class="slide-num-pill">Слайд ${idx+1} из ${blocks.length}</span>`;
-  switch (block.type) {
-    case 'slide': return `
-      ${num}
-      ${block.slideTitle ? `<div class="slide-main-title">${escHtml(block.slideTitle)}</div>` : ''}
-      ${block.slideBody ? `<div class="slide-body-text" style="white-space:pre-line">${escHtml(block.slideBody)}</div>` : ''}`;
-
-    case 'heading': return `${num}<div class="slide-main-title">${escHtml(block.content||'')}</div>`;
-    case 'subheading': return `${num}<div class="slide-body-text" style="font-size:22px;font-weight:800">${escHtml(block.content||'')}</div>`;
-    case 'text': return `${num}<div class="slide-body-text" style="font-size:18px">${escHtml(block.content||'')}</div>`;
-
-    case 'callout': {
-      const em={info:'ℹ️',warning:'⚠️',success:'✅',danger:'❗'};
-      const ct=block.calloutType||'info';
-      return `${num}<div class="slide-callout ${ct}"><span style="font-size:36px">${em[ct]}</span><div class="slide-body-text">${escHtml(block.content||'')}</div></div>`;
-    }
-
-    case 'code': return `
-      ${num}
-      <div class="slide-main-title" style="font-size:20px">💻 Блок кода — ${block.lang||'python'}</div>
-      <div class="slide-code-block">${syntaxHighlight(escHtml(block.code||''))}</div>`;
-
-    case 'image': return `
-      ${num}
-      <div style="text-align:center"><img src="${escHtml(block.url||'')}" style="max-width:100%;max-height:420px;border-radius:var(--r2)" onerror="this.style.display='none'"></div>
-      ${block.caption ? `<div style="text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3);margin-top:8px">${escHtml(block.caption)}</div>` : ''}`;
-
-    case 'video': {
-      const ytId=block.url?.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
-      return `${num}<div style="text-align:center">${ytId?`<iframe style="width:100%;max-width:700px;height:360px;border-radius:var(--r2);border:none" src="https://www.youtube.com/embed/${ytId}?autoplay=0" allowfullscreen></iframe>`:'<div style="color:var(--text3)">Видео недоступно</div>'}</div>`;
-    }
-
-    case 'quiz': {
-      const qs = block.questions||[];
-      if (!qs.length) return `${num}<div class="slide-main-title">❓ Вопрос</div>`;
-      const q = qs[0]; // show first question
-      const letters = ['A','B','C','D','E','F'];
-      return `
-        ${num}
-        <div class="quiz-slide-q">❓ ${escHtml(q.q||'Вопрос')}</div>
-        ${q.type==='fill' ? `<div style="background:var(--bg3);border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;font-family:var(--mono);font-size:16px;color:var(--text3)">Студенты вводят ответ на своих устройствах</div>`
-        : `<div class="quiz-options-grid">${(q.options||[]).map((o,i)=>`<button class="quiz-opt-btn" id="opt_${i}" onclick="revealOption(${i},${q.answer})"><div class="opt-letter">${letters[i]}</div>${escHtml(o)}</button>`).join('')}</div>`}
-        ${qs.length>1?`<div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:14px;text-align:right">+${qs.length-1} ещё вопросов в этом блоке</div>`:''}`;
-    }
-
-    case 'poll': {
-      const opts = block.pollOptions||[];
-      const barData = opts.map(o=>({label:o,pct:Math.floor(Math.random()*60)+5}));
-      return `
-        ${num}
-        <div class="quiz-slide-q">🗳 ${escHtml(block.question||'Голосование')}</div>
-        <div class="poll-bars" id="pollBars">
-          ${barData.map((d,i)=>`<div class="poll-bar-row"><div class="poll-bar-label">${escHtml(d.label)}</div><div class="poll-bar-track"><div class="poll-bar-fill" style="width:0%" id="pollBar_${i}"></div></div><div class="poll-bar-pct" id="pollPct_${i}">0%</div></div>`).join('')}
-        </div>`;
-    }
-
-    case 'task': return `
-      ${num}
-      <div class="slide-main-title" style="font-size:20px">✏️ Практическое задание</div>
-      <div class="slide-body-text" style="font-size:16px;margin-top:16px">${escHtml(block.taskText||'')}</div>
-      <div style="background:var(--bg3);border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;font-family:var(--mono);font-size:13px;color:var(--text3);margin-top:20px">Студенты пишут ответ на своих устройствах</div>
-      <div id="taskAnswerReveal" style="display:none;margin-top:16px;background:rgba(87,204,2,.1);border:1.5px solid rgba(87,204,2,.3);border-radius:var(--r);padding:14px;font-family:var(--mono);font-size:14px;color:var(--green)">✓ Правильный ответ: ${escHtml(block.answer||'—')}</div>`;
-
-    default: return `${num}<div class="slide-main-title">${getTypeLabel(block.type)}</div>`;
-  }
-}
-
-function revealOption(clicked, correct) {
-  document.querySelectorAll('.quiz-opt-btn').forEach((btn,i) => {
-    btn.disabled = true;
-    if (i===correct) btn.classList.add('revealed-correct');
-    else if (i===clicked) btn.classList.add('revealed-wrong');
-  });
-  answerRevealed = true;
-}
-
-function revealAnswer() {
-  const block = blocks[currentSlide];
-  if (!block) return;
-  if (block.type==='quiz') {
-    const q = block.questions?.[0];
-    if (q?.type==='mcq') revealOption(q.answer, q.answer);
-    else if (q?.type==='fill') {
-      const el = document.querySelector('.quiz-opt-btn') || document.getElementById('slideCard');
-      if (el) el.insertAdjacentHTML('beforeend',`<div style="background:rgba(87,204,2,.1);border:1.5px solid rgba(87,204,2,.3);border-radius:var(--r);padding:12px;font-family:var(--mono);font-size:15px;color:var(--green);margin-top:14px">✓ Ответ: ${escHtml(q.answer)}</div>`);
-    }
-  } else if (block.type==='task') {
-    const el = document.getElementById('taskAnswerReveal');
-    if (el) el.style.display='block';
-  } else if (block.type==='poll') {
-    // Animate poll bars
-    const opts = block.pollOptions||[];
-    const totals = opts.map(()=>Math.floor(Math.random()*40)+5);
-    const total = totals.reduce((a,b)=>a+b,0);
-    opts.forEach((_,i)=>{
-      const pct = Math.round(totals[i]/total*100);
-      setTimeout(()=>{
-        const bar=document.getElementById('pollBar_'+i);
-        const pctEl=document.getElementById('pollPct_'+i);
-        if (bar) bar.style.width=pct+'%';
-        if (pctEl) pctEl.textContent=pct+'%';
-      },i*120);
+    stages.push({
+      id: `stage-${idx}`,
+      name: sp.name,
+      emoji: sp.emoji,
+      duration: mins,
+      blocks: blocks,
+      done: false
     });
+  });
+
+  // If no stages found, create default structure
+  if (stages.length === 0) {
+    const defs = [
+      { name:"Ұйымдастыру кезеңі", emoji:"👋", duration:5,  blocks:[{type:"task",text:"Оқушыларды амандастыру, тізімге алу, сабаққа дайындау."}] },
+      { name:"Білімді өзектендіру", emoji:"🧠", duration:15, blocks:[{type:"task",text:"Алдыңғы тақырыпты қайталау. Тапсырмалар мен сұрақтар арқылы бұрынғы білімді жандандыру."}] },
+      { name:"Жаңа материал",      emoji:"📖", duration:15, blocks:[{type:"theory",text:"Жаңа тақырып: " + (lessonPlan?.title||"")},{type:"task",text:"Мысалдар мен жаттығулар арқылы жаңа материалды меңгерту."}] },
+      { name:"Бекіту",             emoji:"✏️", duration:10, blocks:[{type:"task",text:"Тапсырмаларды орындату, нәтижелерін тексеру."}] },
+      { name:"Рефлексия",          emoji:"💬", duration:5,  blocks:[{type:"task",text:"Сабақты қорытындылау. Оқушылардың білімін бағалау."}] },
+    ];
+    defs.forEach((d,i) => stages.push({ id:`stage-${i}`, ...d, done:false }));
   }
-  answerRevealed = true;
-  document.getElementById('revealBtn').textContent='✅ Показано';
-  document.getElementById('revealBtn').style.opacity='.5';
+
+  return stages;
 }
 
-function nextSlide() {
-  if (currentSlide>=blocks.length-1) {
-    showLeaderboard();
-    return;
-  }
-  if (lessonSettings.showLeaderboard && (currentSlide+1)%3===0) {
-    showLeaderboard();
-  } else {
-    renderSlide(currentSlide+1);
-  }
+function buildBlocks(lines, stageMeta) {
+  const blocks = [];
+  let current = [];
+  
+  lines.forEach(line => {
+    if (line.length < 4) return;
+    // Detect quiz questions (numbered)
+    if (/^\d+[.)]\./.test(line) || /A\.|B\.|C\.|D\./.test(line)) return; // skip raw quiz opts
+    if (/тапсырма_?\s*\d|тапсырма\s*:/i.test(line)) {
+      if (current.length) { blocks.push({type:"task",text:current.join("\n")}); current=[]; }
+      current.push(line.replace(/^тапсырма_?\s*\d[.):\s]*/i,"").trim() || line);
+    } else if (/https?:/i.test(line)) {
+      if (current.length) { blocks.push({type:"task",text:current.join("\n")}); current=[]; }
+      blocks.push({type:"link",text:line});
+    } else {
+      current.push(line);
+    }
+  });
+  if (current.length) blocks.push({type:"task",text:current.join(" ")});
+
+  // Ensure at least one block
+  if (blocks.length === 0) blocks.push({type:"info",text:stageMeta.name + " кезеңі"});
+  return blocks;
 }
 
-function prevSlide() {
-  if (currentSlide>0) renderSlide(currentSlide-1);
-}
-
-function updateProgress() {
-  const pct = blocks.length>1 ? (currentSlide/(blocks.length-1))*100 : 100;
-  document.getElementById('progressFill').style.width = pct+'%';
-}
-
-// ── TIMER ──
-function startTimer() {
-  stopTimer();
-  timerSeconds = lessonSettings.timer || 30;
-  const el = document.getElementById('timerDisplay');
-  el.style.display='block';
-  el.textContent = timerSeconds;
-  el.className = 'timer-display';
-  timerInterval = setInterval(()=>{
-    timerSeconds--;
-    el.textContent = timerSeconds;
-    if (timerSeconds<=5) el.className='timer-display urgent';
-    if (timerSeconds<=0) { stopTimer(); revealAnswer(); }
-  },1000);
-}
-function stopTimer() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval=null; }
-  document.getElementById('timerDisplay').style.display='none';
-}
-
-// ── LEADERBOARD ──
-function showLeaderboard() {
-  const overlay = document.getElementById('leaderboardOverlay');
-  overlay.classList.add('show');
-  document.getElementById('lbSubtitle').textContent = `После слайда ${currentSlide+1}`;
-  renderLeaderboardPodium();
-}
-function closeLeaderboard() {
-  document.getElementById('leaderboardOverlay').classList.remove('show');
-  if (currentSlide<blocks.length-1) renderSlide(currentSlide+1);
-}
-function renderLeaderboardPodium() {
-  // Sort teams by score
-  const sorted = [...teams].sort((a,b)=>(teamScores[b.name]||0)-(teamScores[a.name]||0));
-  const places = sorted.slice(0,3);
-  const medals = ['🥇','🥈','🥉'];
-  const heights = [140,110,90];
-  const order = places.length>=3 ? [1,0,2] : [0,1,2];
-
-  document.getElementById('lbPodium').innerHTML = order.slice(0,places.length).map(pi => {
-    const t=places[pi];
-    if (!t) return '';
-    return `<div class="lb-place">
-      <div class="lb-place-avatar">${t.emoji}</div>
-      <div class="lb-place-name">${escHtml(t.name)}</div>
-      <div class="lb-place-score">${teamScores[t.name]||0} очков</div>
-      <div class="lb-place-block" style="height:${heights[pi]||80}px;background:${t.color||'var(--bg3)'}30;border:1.5px solid ${t.color||'var(--border2)'}40">${medals[pi]||pi+1}</div>
-    </div>`;
-  }).join('');
-}
-
-// ── PANELS ──
-function switchPanel(id) {
-  document.querySelectorAll('.sidebar-tab').forEach(t=>t.classList.toggle('active',t.dataset.panel===id));
-  document.querySelectorAll('.sidebar-panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+id));
-}
-
-function renderPlayersPanel() {
-  const list = document.getElementById('playersList');
-  const sorted = [...players].sort((a,b)=>(scores[b.name]||0)-(scores[a.name]||0));
-  list.innerHTML = sorted.map((p,i) => `
-    <div class="player-item">
-      <div class="player-avatar" style="background:${getTeamColor(p.team)}">${p.emoji}</div>
-      <div style="flex:1"><div class="player-name">${escHtml(p.name)}</div><div class="player-team-badge">${escHtml(p.team||'')}</div></div>
-      <div class="player-score">${scores[p.name]||0}</div>
-    </div>
-  `).join('') || '<div style="font-family:var(--mono);font-size:12px;color:var(--text3);text-align:center;padding:24px">Нет участников</div>';
-}
-
-function renderTeamsPanel() {
-  const sorted = [...teams].sort((a,b)=>(teamScores[b.name]||0)-(teamScores[a.name]||0));
-  const maxScore = Math.max(1,...Object.values(teamScores));
-  document.getElementById('teamsLeaderboard').innerHTML = sorted.map((t,i) => {
-    const score = teamScores[t.name]||0;
-    const pct = Math.round(score/maxScore*100);
-    const tp = players.filter(p=>p.team===t.name);
-    return `<div class="team-score-row">
-      <div class="team-rank">${['🥇','🥈','🥉'][i]||i+1}</div>
-      <div class="team-emoji">${t.emoji}</div>
-      <div style="flex:1">
-        <div class="team-name-sb">${escHtml(t.name)}</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${tp.length} участников</div>
-        <div class="team-bar-mini"><div class="team-bar-fill" style="width:${pct}%;background:${t.color}"></div></div>
-      </div>
-      <div class="team-score-sb">${score}</div>
-    </div>`;
-  }).join('');
-}
-
-// ── SIMULATE ANSWERS (demo) ──
-function simulateAnswers(block) {
-  const feed = document.getElementById('answersFeed');
-  let answered=0, correct=0;
-
-  const delay = players.length ? 1200 : 0;
-  if (!players.length) return;
-
-  players.forEach((p,i) => {
-    setTimeout(()=>{
-      const isCorrect = Math.random()>.35;
-      answered++;
-      if (isCorrect) {
-        correct++;
-        const pts = 10 + Math.floor((players.length-i)*2);
-        scores[p.name]=(scores[p.name]||0)+pts;
-        teamScores[p.team]=(teamScores[p.team]||0)+pts;
+// ═══════════════════════════════════════════════════════════
+//  DEMO
+// ═══════════════════════════════════════════════════════════
+function loadDemo() {
+  lessonPlan = {
+    title: "Python: for циклі және range() функциясы",
+    teacher: "Бердибаева Салиха Диновна",
+    group: "ИС24-2",
+    date: "2026",
+    type: "Аралас сабақ",
+    goal: "for циклінің синтаксисін, range() функциясын және циклдің орындалу алгоритмін меңгерту",
+    outcomes: [
+      "for циклінің синтаксисін дұрыс жаза алады",
+      "range() функциясының параметрлерін қолданады",
+      "Қарапайым есептерді цикл арқылы шеше алады"
+    ],
+    duration: 45,
+    filename: "demo-lesson.docx",
+    stages: [
+      { id:"s0", emoji:"👋", name:"Ұйымдастыру кезеңі", duration:5, done:false,
+        blocks:[
+          {type:"task",text:"Оқушылармен амандасу, тізімге алу (2 мин). Сабақтың мақсаты мен бағалау шарттарын түсіндіру (3 мин)."}
+        ]
+      },
+      { id:"s1", emoji:"🧠", name:"Білімді өзектендіру", duration:15, done:false,
+        blocks:[
+          {type:"theory",text:"Алдыңғы тақырыпты қайталаймыз: if/elif/else шартты операторлар. Тернарлы операторды да еске түсіреміз."},
+          {type:"quiz",question:"Python-да if шартының синтаксисі:",
+           options:["if (x > 0):","if x > 0:","if x > 0","if: x > 0"],
+           answer:1, explain:"Python-да if шартынан кейін тырнақша керек емес, бірақ қос нүкте міндетті."},
+          {type:"quiz",question:"Тернарлы оператор қалай жазылады?",
+           options:["x if cond else y","cond ? x : y","if cond then x else y","x when cond otherwise y"],
+           answer:0, explain:"Python тернарлы операторы: мән_1 if шарт else мән_2"}
+        ]
+      },
+      { id:"s2", emoji:"📖", name:"Жаңа материал: for циклі", duration:15, done:false,
+        blocks:[
+          {type:"theory",text:"for циклі белгілі санда немесе тізім элементтері бойынша кодты қайталайды.\n\nСинтаксис:\nfor айнымалы in тізбек:\n    цикл денесі\n\nrange(n) → 0-ден n-1-ге дейін\nrange(a, b) → a-дан b-1-ге дейін\nrange(a, b, step) → a-дан b-1-ге дейін, қадам step"},
+          {type:"task",text:"Мысал 1: 1-ден 5-ке дейін шығару\nfor i in range(1, 6):\n    print(i)\n\nМысал 2: Тізім элементтерін шығару\nfruits = ['алма', 'алмұрт', 'шие']\nfor f in fruits:\n    print(f)"},
+          {type:"task",text:"Командалық тапсырма (5 мин): Топтарға бөлініңіз. Әр топ range() функциясының бір нұсқасын зерттейді:\n• 1-топ: range(n)\n• 2-топ: range(a, b)\n• 3-топ: range(a, b, step)\nНәтижені сыныпқа ұсыңыз."}
+        ]
+      },
+      { id:"s3", emoji:"✏️", name:"Бекіту / Тапсырмалар", duration:8, done:false,
+        blocks:[
+          {type:"quiz",question:"range(5) қандай мәндер береді?",
+           options:["1,2,3,4,5","0,1,2,3,4","0,1,2,3,4,5","1,2,3,4"],
+           answer:1, explain:"range(n) 0-ден n-1-ге дейін береді. range(5) → 0,1,2,3,4"},
+          {type:"quiz",question:"range(2, 8, 2) қандай мәндер береді?",
+           options:["2,4,6,8","2,4,6","0,2,4,6,8","2,3,4,5,6,7"],
+           answer:1, explain:"2-ден бастай, 8-ге дейін (8 кірмейді), 2-ден секіреді → 2,4,6"},
+          {type:"task",text:"Жеке тапсырма: for циклімен 5-тің кестесін 1-ден 10-ға дейін шығаратын код жазыңыз.\n\nfor i in range(1, 11):\n    print(5 * i)"}
+        ]
+      },
+      { id:"s4", emoji:"💬", name:"Рефлексия және қорытынды", duration:5, done:false,
+        blocks:[
+          {type:"quiz",question:"Бүгінгі сабақта не үйрендіңіз?",
+           options:["for циклінің синтаксисін","range() функциясын","Екеуін де","Ештеңе де"],
+           answer:2, explain:"Тамаша! Бүгін for циклі мен range() функциясын игердіңіз."},
+          {type:"task",text:"Үй тапсырмасы: for циклімен 1-ден 100-ге дейінгі жұп сандарды шығаратын бағдарлама жазыңыз.\n\nБағалау: Кері байланыс жинақталады, PDF есеп жасалады."}
+        ]
       }
+    ]
+  };
+  showPlanPreview(lessonPlan);
+}
 
-      // Update stats
-      document.getElementById('statAnswered').textContent=answered;
-      document.getElementById('statCorrect').textContent=correct;
-      document.getElementById('statWaiting').textContent=players.length-answered;
+// ═══════════════════════════════════════════════════════════
+//  PLAN PREVIEW
+// ═══════════════════════════════════════════════════════════
+function showPlanPreview(plan) {
+  showScreen("planPreview");
+  document.getElementById("planTitle").textContent = plan.title;
+  document.getElementById("tbTitle").textContent = plan.title;
+  document.getElementById("tbMeta").textContent = (plan.teacher||"") + (plan.group ? " · " + plan.group : "");
 
-      // Answer feed entry
-      const entry=document.createElement('div');
-      entry.className='answer-item '+(isCorrect?'correct':'wrong');
-      entry.innerHTML=`<div class="answer-who">${p.emoji} ${escHtml(p.name)} · ${escHtml(p.team)}</div><div>${isCorrect?'✓ Верно':'✗ Неверно'}</div>`;
-      feed.insertBefore(entry,feed.firstChild);
-      if (feed.children.length>10) feed.lastChild.remove();
+  // Meta grid
+  const mg = document.getElementById("planMetaGrid");
+  const metas = [
+    plan.teacher && { l:"Мұғалім", v:plan.teacher },
+    plan.group && { l:"Топ / Сынып", v:plan.group },
+    plan.type && { l:"Сабақ түрі", v:plan.type },
+    { l:"Ұзақтығы", v:(plan.duration||45) + " мин" },
+  ].filter(Boolean);
+  mg.innerHTML = metas.map(m =>
+    `<div class="plan-meta-item"><div class="plan-meta-label">${m.l}</div><div class="plan-meta-val">${m.v}</div></div>`
+  ).join("");
 
-      renderPlayersPanel();
-      renderTeamsPanel();
-    }, delay + i*400 + Math.random()*600);
+  // Goal
+  if (plan.goal) {
+    mg.innerHTML += `<div class="plan-meta-item" style="grid-column:1/-1"><div class="plan-meta-label">Мақсат</div><div class="plan-meta-val" style="font-size:13px;font-weight:400;color:var(--text2)">${plan.goal}</div></div>`;
+  }
+
+  // Stages
+  document.getElementById("stageCount").textContent = plan.stages.length + " кезең";
+  const sl = document.getElementById("planStageList");
+  sl.innerHTML = plan.stages.map((s,i) =>
+    `<div class="plan-stage-item">
+      <div class="plan-stage-num">${i+1}</div>
+      <div class="plan-stage-body">
+        <div class="plan-stage-name">${s.emoji} ${s.name}</div>
+        <div class="plan-stage-desc">${s.blocks.map(b=>b.text||b.question||"").join(" · ").slice(0,100)}...</div>
+      </div>
+      <div class="plan-stage-time">${s.duration} мин</div>
+    </div>`
+  ).join("");
+}
+
+// ═══════════════════════════════════════════════════════════
+//  START LESSON
+// ═══════════════════════════════════════════════════════════
+function startLesson() {
+  if (!lessonPlan) return;
+  currentStageIdx = 0;
+  lessonPlan.stages.forEach(s => s.done = false);
+  lessonStartTime = Date.now();
+  lessonTimer = setInterval(() => lessonElapsed = Math.floor((Date.now()-lessonStartTime)/1000), 1000);
+
+  document.getElementById("liveBadge").style.display = "flex";
+  document.getElementById("settingsBtn").style.display = "";
+  document.getElementById("endBtn").style.display = "";
+
+  // Build stages bar
+  buildStagesBar();
+  document.getElementById("stagesBar").classList.add("visible");
+
+  // Show sidebar
+  const sb = document.getElementById("runnersidebar");
+  sb.style.display = "flex";
+  buildSidebar(sb);
+
+  showScreen("lessonScreen");
+  renderStage(currentStageIdx);
+}
+
+function buildStagesBar() {
+  const row = document.getElementById("stagesRow");
+  row.innerHTML = lessonPlan.stages.map((s,i) =>
+    `<div class="stg ${i===0?"active":""}" id="stg-${i}" onclick="jumpToStage(${i})">
+      <div class="stg-dot" id="stgdot-${i}">${i+1}</div>
+      <div class="stg-name">${s.name}</div>
+    </div>`
+  ).join("");
+}
+
+function updateStagesBar(idx) {
+  lessonPlan.stages.forEach((_,i) => {
+    const el = document.getElementById("stg-"+i);
+    const dot = document.getElementById("stgdot-"+i);
+    if (!el) return;
+    el.className = "stg";
+    if (i < idx) { el.classList.add("done"); dot.textContent = "✓"; }
+    else if (i === idx) { el.classList.add("active"); dot.textContent = i+1; }
+    else { dot.textContent = i+1; }
   });
 }
 
-function clearAnswersFeed() {
-  document.getElementById('answersFeed').innerHTML='';
-  document.getElementById('statAnswered').textContent='0';
-  document.getElementById('statCorrect').textContent='0';
-  document.getElementById('statWaiting').textContent=players.length;
+function buildSidebar(sb) {
+  sb.innerHTML = `
+  <div class="sb-section">
+    <div class="sb-label">Сабақ уақыты</div>
+    <div class="sb-stat"><span>Басталды</span><span class="sb-stat-val" id="sbElapsed">00:00</span></div>
+  </div>
+  <div class="divider"></div>
+  <div class="sb-section">
+    <div class="sb-label">Бақылаушылар</div>
+    ${[{av:"ДМ",col:"rgba(28,176,246,.2)",tc:"var(--blue)",n:"Диана М.",r:"Директордың орынбасары"},
+       {av:"АС",col:"rgba(87,204,2,.15)",tc:"var(--green)",n:"Асель С.",r:"Аудан әдіскері"}].map(o=>
+    `<div class="observer-item"><div class="obs-av" style="background:${o.col};color:${o.tc}">${o.av}</div><div><div class="obs-name">${o.n}</div><div class="obs-role">${o.r}</div></div></div>`
+    ).join("")}
+  </div>
+  <div class="divider"></div>
+  <div class="sb-section">
+    <div class="sb-label">Белсенді оқушылар</div>
+    ${["Айгерім К.","Нұрлан Б.","Сабина Т.","Дамир А.","Зере М."].map((n,i)=>
+    `<div class="student-row"><span class="student-name">${n}</span><span class="student-status ${i<2?"status-done":i<4?"status-work":"status-idle"}">${i<2?"✓ Дайын":i<4?"Жұмыста...":"—"}</span></div>`
+    ).join("")}
+  </div>`;
+
+  // Elapsed timer
+  setInterval(() => {
+    const s = Math.floor((Date.now()-lessonStartTime)/1000);
+    const m = String(Math.floor(s/60)).padStart(2,"0");
+    const sec = String(s%60).padStart(2,"0");
+    const el = document.getElementById("sbElapsed");
+    if (el) el.textContent = m+":"+sec;
+  }, 1000);
 }
 
-// ── UTILS ──
-function generatePin() { return String(Math.floor(100000+Math.random()*900000)); }
-function randomEmoji() { return ['😊','🦊','🐼','🦁','🐸','🦄','🐧','🦋','🦅','🦩'][Math.floor(Math.random()*10)]; }
-function getTeamColor(name) { const t=teams.find(t=>t.name===name); return t?.color||'#888'; }
-function getTypeLabel(type) { const m={heading:'Заголовок',text:'Текст',code:'Код',quiz:'Вопрос',task:'Задание',poll:'Голосование',slide:'Слайд',callout:'Подсказка',image:'Изображение',video:'Видео'}; return m[type]||type; }
-function escHtml(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// ═══════════════════════════════════════════════════════════
+//  RENDER STAGE
+// ═══════════════════════════════════════════════════════════
+function renderStage(idx) {
+  const stage = lessonPlan.stages[idx];
+  if (!stage) return;
+  updateStagesBar(idx);
+  document.getElementById("tbMeta").textContent = `Кезең ${idx+1}/${lessonPlan.stages.length} · ${stage.name}`;
 
-function syntaxHighlight(code) {
-  return code
-    .replace(/(def|class|return|if|else|elif|for|while|import|from|as|in|not|and|or|True|False|None|lambda|with|try|except|finally|pass|break|continue)/g,'<span class="code-kw">$1</span>')
-    .replace(/(print|len|range|input|int|str|float|list|dict|set|type|super|__init__|self)/g,'<span class="code-fn">$1</span>')
-    .replace(/(["'])(?:(?=(\\?))\2.)*?\1/g,'<span class="code-str">$&</span>')
-    .replace(/(#.*)/g,'<span class="code-cmt">$1</span>');
+  const ls = document.getElementById("lessonScreen");
+  ls.innerHTML = "";
+  ls.style.display = "flex";
+
+  // Stage card
+  const card = document.createElement("div");
+  card.className = "stage-card";
+
+  // Header
+  card.innerHTML = `
+  <div class="stage-card-h">
+    <div class="stage-card-title">${stage.emoji} ${stage.name}</div>
+    <div class="stage-timer" id="stageTimer" title="Таймерді тоқтату/бастау үшін басыңыз">${fmt(stage.duration*60)}</div>
+  </div>
+  <div class="stage-card-body" id="stageCardBody"></div>`;
+
+  ls.appendChild(card);
+
+  // Build blocks
+  const body = card.querySelector("#stageCardBody");
+  stage.blocks.forEach((block, bi) => {
+    body.appendChild(buildBlock(block, bi));
+  });
+
+  // Stage nav
+  const nav = document.createElement("div");
+  nav.className = "stage-nav";
+  nav.innerHTML = `
+  <button class="stage-nav-prev" ${idx===0?"disabled":""} onclick="prevStage()">← Алдыңғы</button>
+  <span class="stage-progress">${idx+1} / ${lessonPlan.stages.length}</span>
+  <button class="stage-nav-next" onclick="nextStage()">
+    ${idx===lessonPlan.stages.length-1?"🏁 Аяқтау":"Келесі →"}
+  </button>`;
+  body.appendChild(nav);
+
+  // Start timer
+  startStageTimer(stage.duration * 60, "stageTimer");
 }
+
+function buildBlock(block, idx) {
+  const div = document.createElement("div");
+  div.className = "content-block";
+
+  if (block.type === "theory") {
+    div.innerHTML = `<div class="block-label">📖 Теория</div>
+    <div class="block-text">${block.text.replace(/\n/g,"<br>")}</div>`;
+  } else if (block.type === "task") {
+    div.innerHTML = `<div class="block-label">✏️ Тапсырма</div>
+    <div class="block-task">${block.text.replace(/\n/g,"<br>")}</div>`;
+  } else if (block.type === "quiz") {
+    let answered = false;
+    div.innerHTML = `<div class="block-label">❓ Сұрақ</div>
+    <div class="block-quiz">
+      <div class="quiz-q-text">${block.question}</div>
+      <div id="opts-${idx}">
+      ${(block.options||[]).map((o,i)=>`<button class="quiz-opt" data-i="${i}" onclick="answerQuiz(${idx},${i},${block.answer})">${o}</button>`).join("")}
+      </div>
+      <div class="quiz-explain" id="explain-${idx}"></div>
+      <button class="quiz-reveal-btn" onclick="revealAnswer(${idx},${block.answer},'${(block.explain||"").replace(/'/g,"\'")}')">Жауапты ашу</button>
+    </div>`;
+  } else if (block.type === "link") {
+    div.innerHTML = `<div class="block-label">🔗 Сілтеме</div>
+    <a href="${block.text}" target="_blank" style="color:var(--blue);font-size:13px;word-break:break-all">${block.text}</a>`;
+  } else {
+    div.innerHTML = `<div class="block-text">${block.text.replace(/\n/g,"<br>")}</div>`;
+  }
+  return div;
+}
+
+window.answerQuiz = function(blockIdx, chosen, correct) {
+  const opts = document.querySelectorAll(`#opts-${blockIdx} .quiz-opt`);
+  opts.forEach(o => o.disabled = true);
+  opts[chosen].classList.add(chosen === correct ? "correct" : "wrong");
+  if (chosen !== correct) opts[correct].classList.add("correct");
+};
+
+window.revealAnswer = function(blockIdx, correct, explain) {
+  const opts = document.querySelectorAll(`#opts-${blockIdx} .quiz-opt`);
+  opts.forEach(o => o.disabled = true);
+  opts[correct].classList.add("correct");
+  if (explain) {
+    const ex = document.getElementById(`explain-${blockIdx}`);
+    ex.textContent = "💡 " + explain;
+    ex.className = "quiz-explain ok";
+    ex.style.display = "block";
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+//  TIMERS
+// ═══════════════════════════════════════════════════════════
+let activeTimer = null;
+let timerPaused = false;
+
+function startStageTimer(totalSec, elemId) {
+  if (activeTimer) clearInterval(activeTimer);
+  timerPaused = false;
+  let remaining = totalSec;
+  const el = () => document.getElementById(elemId);
+  if (el()) el().textContent = fmt(remaining);
+
+  activeTimer = setInterval(() => {
+    if (timerPaused) return;
+    remaining--;
+    const e = el();
+    if (!e) { clearInterval(activeTimer); return; }
+    e.textContent = fmt(remaining);
+    if (remaining <= 60) e.classList.add("red");
+    else e.classList.remove("red");
+    if (remaining <= 0) {
+      clearInterval(activeTimer);
+      e.textContent = "00:00";
+      toast("⏰ Кезең уақыты аяқталды!");
+    }
+  }, 1000);
+
+  // Toggle pause on click
+  setTimeout(() => {
+    const e = el();
+    if (e) {
+      e.onclick = () => {
+        timerPaused = !timerPaused;
+        e.classList.toggle("paused", timerPaused);
+        if (timerPaused) toast("⏸ Таймер тоқтатылды");
+        else toast("▶ Таймер жалғасты");
+      };
+    }
+  }, 100);
+}
+
+function fmt(s) {
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
+
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function nextStage() {
+  if (activeTimer) clearInterval(activeTimer);
+  lessonPlan.stages[currentStageIdx].done = true;
+  if (currentStageIdx < lessonPlan.stages.length - 1) {
+    currentStageIdx++;
+    renderStage(currentStageIdx);
+  } else {
+    endLesson();
+  }
+}
+
+function prevStage() {
+  if (activeTimer) clearInterval(activeTimer);
+  if (currentStageIdx > 0) {
+    currentStageIdx--;
+    renderStage(currentStageIdx);
+  }
+}
+
+function jumpToStage(idx) {
+  if (activeTimer) clearInterval(activeTimer);
+  for (let i = 0; i < idx; i++) lessonPlan.stages[i].done = true;
+  currentStageIdx = idx;
+  renderStage(idx);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  END & RESULTS
+// ═══════════════════════════════════════════════════════════
+function endLesson() {
+  if (!confirm("Сабақты аяқтауды растайсыз ба?")) return;
+  if (activeTimer) clearInterval(activeTimer);
+  if (lessonTimer) clearInterval(lessonTimer);
+
+  const elapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
+  const m = String(Math.floor(elapsed/60)).padStart(2,"0");
+  const s = String(elapsed%60).padStart(2,"0");
+  const done = lessonPlan.stages.filter(s=>s.done).length;
+
+  document.getElementById("liveBadge").style.display = "none";
+  document.getElementById("stagesBar").classList.remove("visible");
+  document.getElementById("runnersidebar").style.display = "none";
+  document.getElementById("settingsBtn").style.display = "none";
+  document.getElementById("endBtn").style.display = "none";
+  document.getElementById("tbMeta").textContent = "Аяқталды";
+
+  document.getElementById("resSubtitle").textContent = `${lessonPlan.title} · ${lessonPlan.group||""}`;
+  document.getElementById("resTime").textContent = m+":"+s;
+  document.getElementById("resStages").textContent = done+"/"+lessonPlan.stages.length;
+  document.getElementById("resScore").textContent = "4.2";
+
+  showScreen("resultsScreen");
+}
+
+function downloadReport() {
+  const date = new Date().toLocaleDateString("kk-KZ");
+  const stages = lessonPlan.stages.map((s,i) => `${i+1}. ${s.emoji} ${s.name} (${s.done?"✓ Аяқталды":"Өтілмеді"}) — ${s.duration} мин`).join("\n");
+  const content = `АШЫҚ САБАҚ ЕСЕБІ\n${"=".repeat(40)}\n\nСабақ: ${lessonPlan.title}\nМұғалім: ${lessonPlan.teacher||"—"}\nТоп: ${lessonPlan.group||"—"}\nКүні: ${date}\nҰзақтығы: ${lessonPlan.duration} мин\n\nМАҚСАТ:\n${lessonPlan.goal||"—"}\n\nКЕЗЕҢДЕР:\n${stages}\n\nҚОРЫТЫНДЫ:\nСабақ сәтті өтті. Оқушылар мақсаттарға жетті.`;
+  const blob = new Blob([content], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "sabak-esep-"+Date.now()+".txt";
+  a.click();
+  toast("📄 Есеп жүктелді");
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EDIT OVERLAY
+// ═══════════════════════════════════════════════════════════
+function openEdit() {
+  if (!lessonPlan) return;
+  document.getElementById("editTitle").value = lessonPlan.title||"";
+  document.getElementById("editTeacher").value = lessonPlan.teacher||"";
+  document.getElementById("editClass").value = lessonPlan.group||"";
+  document.getElementById("editDuration").value = lessonPlan.duration||45;
+  document.getElementById("editGoal").value = lessonPlan.goal||"";
+  document.getElementById("editOutcomes").value = (lessonPlan.outcomes||[]).join("\n");
+
+  // Stages
+  const sl = document.getElementById("editStagesList");
+  sl.innerHTML = lessonPlan.stages.map((s,i) => `
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input class="edit-input" value="${s.emoji}" style="width:50px;text-align:center" onchange="lessonPlan.stages[${i}].emoji=this.value">
+      <input class="edit-input" value="${s.name}" style="flex:1" onchange="lessonPlan.stages[${i}].name=this.value">
+      <input class="edit-input" value="${s.duration}" type="number" style="width:70px" onchange="lessonPlan.stages[${i}].duration=+this.value">
+    </div>
+  </div>`).join("");
+
+  document.getElementById("editOverlay").classList.add("open");
+}
+
+function closeEdit() {
+  document.getElementById("editOverlay").classList.remove("open");
+}
+
+function saveEdit() {
+  lessonPlan.title    = document.getElementById("editTitle").value;
+  lessonPlan.teacher  = document.getElementById("editTeacher").value;
+  lessonPlan.group    = document.getElementById("editClass").value;
+  lessonPlan.duration = +document.getElementById("editDuration").value || 45;
+  lessonPlan.goal     = document.getElementById("editGoal").value;
+  lessonPlan.outcomes = document.getElementById("editOutcomes").value.split("\n").filter(Boolean);
+  document.getElementById("tbTitle").textContent = lessonPlan.title;
+  closeEdit();
+  toast("✅ Сақталды");
+  if (document.getElementById("planPreview").style.display !== "none") showPlanPreview(lessonPlan);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RECENT
+// ═══════════════════════════════════════════════════════════
+function saveToRecent(plan, filename) {
+  try {
+    const recent = JSON.parse(localStorage.getItem("tgb_recent_plans")||"[]");
+    const entry = { title:plan.title, filename, ts:Date.now(), stageCount:plan.stages.length };
+    const filtered = recent.filter(r=>r.filename!==filename);
+    localStorage.setItem("tgb_recent_plans", JSON.stringify([entry,...filtered].slice(0,5)));
+    renderRecent();
+  } catch(e){}
+}
+
+function renderRecent() {
+  try {
+    const recent = JSON.parse(localStorage.getItem("tgb_recent_plans")||"[]");
+    if (!recent.length) return;
+    const rp = document.getElementById("recentPlans");
+    const rl = document.getElementById("recentList");
+    rp.style.display = "block";
+    rl.innerHTML = recent.map((r,i)=>`
+    <div class="recent-item" onclick="loadRecentDemo()">
+      <div class="recent-item-icon">📄</div>
+      <div style="flex:1;min-width:0">
+        <div class="recent-item-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.title||r.filename}</div>
+        <div class="recent-item-meta">${r.stageCount} кезең · ${new Date(r.ts).toLocaleDateString("ru")}</div>
+      </div>
+    </div>`).join("");
+  } catch(e) {}
+}
+
+function loadRecentDemo() {
+  toast("💡 Демо жоспар жүктелуде...");
+  setTimeout(() => loadDemo(), 500);
+}
+
+function resetToUpload() {
+  lessonPlan = null;
+  currentStageIdx = 0;
+  if (activeTimer) clearInterval(activeTimer);
+  if (lessonTimer) clearInterval(lessonTimer);
+  document.getElementById("liveBadge").style.display = "none";
+  document.getElementById("settingsBtn").style.display = "none";
+  document.getElementById("endBtn").style.display = "none";
+  document.getElementById("stagesBar").classList.remove("visible");
+  document.getElementById("runnersidebar").style.display = "none";
+  document.getElementById("tbTitle").textContent = "Ашық сабақ";
+  document.getElementById("tbMeta").textContent = "Сабақ жоспарын жүктеңіз";
+  showScreen("uploadScreen");
+  renderRecent();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function showScreen(id) {
+  ["uploadScreen","parseScreen","planPreview","lessonScreen","resultsScreen"].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.style.display = "none";
+  });
+  const target = document.getElementById(id);
+  if (target) target.style.display = "flex";
+}
+
+function toast(msg, type="") {
+  const w = document.getElementById("toastWrap");
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.style.borderColor = type==="red" ? "rgba(255,75,75,.3)" : "var(--border2)";
+  if (type==="red") t.style.color = "var(--red)";
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 3100);
+}
+
+// Init
+document.addEventListener("DOMContentLoaded", () => {
+  renderRecent();
+});
 </script>
 </body>
 </html>

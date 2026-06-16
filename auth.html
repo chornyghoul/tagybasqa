@@ -1,234 +1,436 @@
+
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Авторизация</title>
+  <title>Tagybasqa — Кіру</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #131f24;
+      --bg2:       #1a2d35;
+      --bg3:       #1f3540;
+      --border:    rgba(255,255,255,.07);
+      --border2:   rgba(255,255,255,.13);
+      --text:      #ffffff;
+      --text2:     #cdd8dd;
+      --text3:     #7a9aaa;
+      --duo-blue:  #1cb0f6;
+      --duo-blue2: #0e86c0;
+      --duo-green: #57cc02;
+      --duo-teal:  #1fe0c0;
+      --duo-orange:#ff9600;
+      --duo-red:   #ff4b4b;
+      --font:      'Nunito', sans-serif;
+      --mono:      'DM Mono', monospace;
+      --r:         12px;
     }
 
+    html, body { height: 100%; }
+
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: #121212;
-      color: #ffffff;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
       min-height: 100vh;
+    }
+
+    /* ══ ЛЕВАЯ ПАНЕЛЬ ══════════════════════════════════════ */
+    .panel-left {
+      width: 52%;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 52px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-left::before {
+      content: '';
+      position: absolute;
+      width: 480px; height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(28,176,246,.07) 0%, transparent 70%);
+      top: -120px; right: -120px;
+      pointer-events: none;
+    }
+
+    .brand-logo {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+    }
+    .brand-name {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--duo-blue);
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .brand-tagline {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text3);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .panel-hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 0;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--duo-teal);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 16px;
+      letter-spacing: -.5px;
+    }
+    .hero-title span {
+      color: var(--duo-blue);
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--text3);
+      line-height: 1.6;
+      max-width: 380px;
+      margin-bottom: 40px;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .feature-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      border: 1px solid var(--border2);
+    }
+    .fi-blue   { background: rgba(28,176,246,.1);  border-color: rgba(28,176,246,.2); }
+    .fi-green  { background: rgba(87,204,2,.1);    border-color: rgba(87,204,2,.2); }
+    .fi-orange { background: rgba(255,150,0,.1);   border-color: rgba(255,150,0,.2); }
+
+    .feature-text strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text2);
+      margin-bottom: 2px;
+    }
+    .feature-text span {
+      font-size: 13px;
+      color: var(--text3);
+      line-height: 1.4;
+    }
+
+    .panel-bottom {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: .05em;
+    }
+
+    /* ══ ПРАВАЯ ПАНЕЛЬ — ФОРМА ═════════════════════════════ */
+    .panel-right {
+      width: 48%;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 48px 40px;
     }
 
-    .auth-container {
+    .auth-box {
       width: 100%;
-      max-width: 380px;
-      background: transparent;
-      padding: 20px;
+      max-width: 360px;
     }
 
-    .header-text {
-      text-align: left;
-      margin-bottom: 24px;
+    .auth-header {
+      margin-bottom: 32px;
     }
-
-    h1 {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 8px;
+    .auth-header h1 {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -.3px;
     }
-
-    .subtitle {
-      color: #888888;
+    .auth-header p {
       font-size: 14px;
+      color: var(--text3);
     }
 
-    .error-box,
-    .success-box {
-      padding: 12px;
+    .msg-box {
+      padding: 11px 14px;
       border-radius: 8px;
-      text-align: center;
       font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .msg-error   { background: rgba(255,75,75,.07);  border: 1px solid rgba(255,75,75,.25);  color: #ff6b6b; }
+    .msg-success { background: rgba(87,204,2,.07);   border: 1px solid rgba(87,204,2,.25);   color: #57cc02; }
+
+    .role-toggle {
+      display: flex;
+      gap: 8px;
       margin-bottom: 24px;
-      font-weight: 500;
     }
-
-    .error-box {
-      background: rgba(255, 68, 68, 0.05);
-      border: 1px solid #4a1c1c;
-      color: #ff5555;
+    .role-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border2);
+      background: transparent;
+      color: var(--text3);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all .15s;
+      text-align: center;
     }
-
-    .success-box {
-      background: rgba(68, 255, 136, 0.05);
-      border: 1px solid #1c4a2a;
-      color: #44ff88;
+    .role-btn:hover { border-color: var(--duo-blue); color: var(--text2); }
+    .role-btn.active {
+      background: rgba(28,176,246,.12);
+      border-color: var(--duo-blue);
+      color: var(--duo-blue);
     }
+    .role-btn .role-icon { display: block; font-size: 20px; margin-bottom: 4px; }
 
     .form-group {
-      margin-bottom: 20px;
-      position: relative;
+      margin-bottom: 18px;
     }
-
-    label {
+    .form-group label {
       display: block;
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text2);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
     }
-
-    input {
+    .form-group input {
       width: 100%;
-      background: #181818;
-      border: 1px solid #2a2a2a;
-      border-radius: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
       padding: 12px 14px;
       font-size: 14px;
-      color: white;
+      font-family: var(--font);
+      font-weight: 600;
+      color: var(--text);
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color .2s;
     }
+    .form-group input::placeholder { color: rgba(255,255,255,.2); font-weight: 400; }
+    .form-group input:focus { border-color: var(--duo-blue); }
 
-    input::placeholder {
-      color: #666666;
-    }
-
-    input:focus {
-      border-color: #555555;
-    }
-
-    .password-wrapper {
-      position: relative;
-    }
-
-    .eye-icon {
-      position: absolute;
-      right: 14px;
-      top: 50%;
+    .pwd-wrap { position: relative; }
+    .pwd-eye {
+      position: absolute; right: 13px; top: 50%;
       transform: translateY(-50%);
-      color: #666;
-      cursor: pointer;
-      font-size: 16px;
+      background: none; border: none; cursor: pointer;
+      color: var(--text3); font-size: 16px; padding: 4px;
+      line-height: 1;
     }
+    .pwd-eye:hover { color: var(--text2); }
 
-    .eye-icon:hover {
-      color: #aaa;
+    .strength-bar {
+      height: 3px; border-radius: 3px;
+      background: var(--border2); margin-top: 7px; overflow: hidden;
     }
-
-    .password-strength {
-      height: 3px;
-      margin-top: 6px;
-      border-radius: 3px;
-      background: transparent;
-      transition: all 0.3s;
+    .strength-fill {
+      height: 100%; border-radius: 3px;
+      width: 0; transition: width .3s, background .3s;
     }
 
     .agreement {
       font-size: 12px;
-      color: #777;
-      line-height: 1.5;
-      margin-bottom: 24px;
+      color: var(--text3);
+      line-height: 1.55;
+      margin-bottom: 22px;
     }
+    .agreement a { color: var(--duo-blue); text-decoration: none; }
+    .agreement a:hover { text-decoration: underline; }
 
-    .agreement a,
-    .footer-text a {
-      color: #3b82f6;
-      text-decoration: none;
-    }
-
-    .agreement a:hover,
-    .footer-text a:hover {
-      text-decoration: underline;
-    }
-
-    .btn-continue {
+    .btn-submit {
       width: 100%;
-      background: #ffffff;
-      color: #000000;
+      background: var(--duo-blue);
+      color: #fff;
       border: none;
       padding: 14px;
       font-size: 15px;
-      font-weight: 600;
-      border-radius: 24px;
+      font-weight: 900;
+      font-family: var(--font);
+      border-radius: 99px;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: background .2s, opacity .2s;
+      letter-spacing: .02em;
     }
+    .btn-submit:hover   { background: var(--duo-blue2); }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
 
-    .btn-continue:hover {
-      opacity: 0.9;
-    }
-
-    .btn-continue:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .footer-text {
+    .switch-text {
       text-align: center;
       font-size: 13px;
-      color: #777;
-      margin-top: 24px;
+      color: var(--text3);
+      margin-top: 20px;
+    }
+    .switch-text a {
+      color: var(--duo-blue);
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .switch-text a:hover { text-decoration: underline; }
+
+    /* ══ MOBILE ═══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .panel-left {
+        width: 100%; padding: 32px 28px 28px;
+        border-right: none; border-bottom: 1px solid var(--border);
+      }
+      .panel-hero { padding: 24px 0 0; }
+      .hero-title { font-size: 26px; }
+      .features { display: none; }
+      .panel-right { width: 100%; padding: 32px 24px 48px; }
     }
   </style>
 </head>
-
 <body>
 
-  <div class="auth-container">
+  <div class="panel-left">
+    <a class="brand-logo" href="./index.html">
+      <div class="brand-name">Tagybasqa</div>
+      <div class="brand-tagline">Python Platform · 2026</div>
+    </a>
 
-    <div class="header-text">
-      <h1 id="pageTitle">Создание аккаунта</h1>
-      <p class="subtitle" id="pageSubtitle">Пожалуйста, введите ваши данные</p>
+    <div class="panel-hero">
+      <div class="hero-eyebrow">Білім беру платформасы</div>
+      <h1 class="hero-title">
+        Тағы басқа<br><span>қадам алға.</span>
+      </h1>
+      <p class="hero-sub">
+        Python-ды ойын арқылы үйрен. Интерактивті сабақтар, тікелей эфир, квиздер — бәрі бір жерде.
+      </p>
+
+      <div class="features">
+        <div class="feature-item">
+          <div class="feature-icon fi-blue">🐍</div>
+          <div class="feature-text">
+            <strong>Интерактивті Python сабақтары</strong>
+            <span>Тапсырмаларды браузерде орындайсың — бағдарламаны орнатудың қажеті жоқ</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon fi-orange">📡</div>
+          <div class="feature-text">
+            <strong>Ашық сабақтар</strong>
+            <span>Мұғалімдер тікелей сабақ өткізеді, оқушылар нақты уақытта қатысады</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon fi-green">🏆</div>
+          <div class="feature-text">
+            <strong>Геймификация және жетістіктер</strong>
+            <span>Тізбектерді сақта, бейджиктер жина, рейтингте жоғарыла</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="error-box" id="errorBox" style="display:none;"></div>
-    <div class="success-box" id="successBox" style="display:none;"></div>
+    <div class="panel-bottom">© 2026 Tagybasqa · Дипломдық жоба</div>
+  </div>
 
-    <form id="authForm">
-      <div class="form-group" id="nameGroup" style="display: none;">
-        <label>Имя</label>
-        <input type="text" id="name" placeholder="Мирас">
+  <div class="panel-right">
+    <div class="auth-box">
+
+      <div class="auth-header">
+        <h1 id="pageTitle">Аккаунт жасау</h1>
+        <p id="pageSubtitle">Деректеріңізді енгізіңіз</p>
       </div>
 
-      <div class="form-group">
-        <label>E-Mail</label>
-        <input type="email" id="email" placeholder="miras@gmail.com" required>
+      <div class="msg-box msg-error"   id="errorBox"   style="display:none;"></div>
+      <div class="msg-box msg-success" id="successBox" style="display:none;"></div>
+
+      <div class="role-toggle" id="roleToggle">
+        <button class="role-btn active" id="roleStudent" type="button">
+          <span class="role-icon">🎓</span>Оқушы
+        </button>
+        <button class="role-btn" id="roleTeacher" type="button">
+          <span class="role-icon">👨‍🏫</span>Мұғалім
+        </button>
       </div>
 
-      <div class="form-group">
-        <label>Пароль</label>
-        <div class="password-wrapper">
-          <input type="password" id="password" placeholder="Минимум 10 символов" required>
-          <span class="eye-icon" id="togglePassword">👁</span>
+      <form id="authForm">
+        <div class="form-group" id="nameGroup" style="display:none;">
+          <label>Аты</label>
+          <input type="text" id="name" placeholder="Мирас">
         </div>
-        <div class="password-strength" id="strengthBar"></div>
+
+        <div class="form-group">
+          <label>E-Mail</label>
+          <input type="email" id="email" placeholder="miras@gmail.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Құпиясөз</label>
+          <div class="pwd-wrap">
+            <input type="password" id="password" placeholder="Кемінде 10 таңба" required>
+            <button type="button" class="pwd-eye" id="togglePassword">👁</button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+        </div>
+
+        <div class="agreement" id="agreementText">
+          Жалғастыру арқылы сіз <a href="#">пайдалану шарттарымен</a> және
+          <a href="#">құпиялылық саясатымен</a> келісесіз
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Жалғастыру →</button>
+      </form>
+
+      <div class="switch-text" id="switchArea">
+        Аккаунтыңыз бар ма? <a href="#" id="switchLink">Кіру</a>
       </div>
-
-      <div class="agreement" id="agreementText">
-        Продолжая, вы соглашаетесь с <a href="#">условиями использования</a> и
-        <a href="#">политикой конфиденциальности</a>
-      </div>
-
-      <button type="submit" class="btn-continue" id="submitBtn">Продолжить</button>
-    </form>
-
-    <div class="footer-text">
-      Уже есть аккаунт? <a href="#" id="switchLink">Войти</a>
     </div>
   </div>
 
   <script>
-    // ================== FIREBASE ==================
     const firebaseConfig = {
       apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
       authDomain: "pystart-dd2db.firebaseapp.com",
@@ -238,153 +440,123 @@
       appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2",
       measurementId: "G-7KEWYCP231"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     auth.languageCode = 'ru';
 
-    // ================== ПЕРЕМЕННЫЕ ==================
     let isRegister = true;
+    let selectedRole = 'student';
 
-    // ================== ФУНКЦИИ ==================
+    // Выбор роли
+    document.getElementById('roleStudent').addEventListener('click', () => setRole('student'));
+    document.getElementById('roleTeacher').addEventListener('click', () => setRole('teacher'));
+    function setRole(role) {
+      selectedRole = role;
+      document.getElementById('roleStudent').classList.toggle('active', role === 'student');
+      document.getElementById('roleTeacher').classList.toggle('active', role === 'teacher');
+    }
+
     function showError(text) {
-      document.getElementById('errorBox').innerHTML = text;
-      document.getElementById('errorBox').style.display = 'block';
+      const e = document.getElementById('errorBox');
+      e.innerHTML = text; e.style.display = 'block';
       document.getElementById('successBox').style.display = 'none';
     }
-
     function showSuccess(text) {
-      document.getElementById('successBox').innerHTML = text;
-      document.getElementById('successBox').style.display = 'block';
+      const s = document.getElementById('successBox');
+      s.innerHTML = text; s.style.display = 'block';
       document.getElementById('errorBox').style.display = 'none';
     }
-
     function clearMessages() {
       document.getElementById('errorBox').style.display = 'none';
       document.getElementById('successBox').style.display = 'none';
     }
 
-    function updatePasswordStrength(password) {
-      const bar = document.getElementById('strengthBar');
-      if (!password) {
-        bar.style.background = 'transparent';
-        bar.style.width = '0%';
-        return;
-      }
-
-      let strength = 0;
-      if (password.length >= 10) strength++;
-      if (/[A-Z]/.test(password)) strength++;
-      if (/[0-9]/.test(password)) strength++;
-      if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-      const colors = ['#ff4444', '#ffaa00', '#aaff00', '#44ff88'];
-      bar.style.background = colors[strength - 1] || '#44ff88';
-      bar.style.width = (strength * 25) + '%';
+    function updateStrength(pw) {
+      const fill = document.getElementById('strengthFill');
+      if (!pw) { fill.style.width = '0'; return; }
+      let s = 0;
+      if (pw.length >= 10) s++;
+      if (/[A-Z]/.test(pw)) s++;
+      if (/[0-9]/.test(pw)) s++;
+      if (/[^A-Za-z0-9]/.test(pw)) s++;
+      const colors = ['#ff4b4b','#ff9600','#ffd900','#57cc02'];
+      fill.style.width = (s * 25) + '%';
+      fill.style.background = colors[s - 1] || '#57cc02';
     }
 
     function switchMode(toRegister) {
       isRegister = toRegister;
-
-      if (isRegister) {
-        document.getElementById('pageTitle').textContent = "Создание аккаунта";
-        document.getElementById('pageSubtitle').textContent = "Пожалуйста, введите ваши данные";
-        document.getElementById('agreementText').style.display = "block";
-
-        document.querySelector('.footer-text').innerHTML = 'Уже есть аккаунт? <a href="#" id="switchLink">Войти</a>';
-      } else {
-        document.getElementById('pageTitle').textContent = "Вход в аккаунт";
-        document.getElementById('pageSubtitle').textContent = "Рады видеть вас снова";
-        document.getElementById('agreementText').style.display = "none";
-
-        document.querySelector('.footer-text').innerHTML = 'Нет аккаунта? <a href="#" id="switchLink">Создать</a>';
-      }
-
-      document.getElementById('switchLink').addEventListener('click', (e) => {
-        e.preventDefault();
-        switchMode(!isRegister);
-      });
-
       clearMessages();
-      document.getElementById('strengthBar').style.width = '0%';
+      document.getElementById('strengthFill').style.width = '0';
+      document.getElementById('roleToggle').style.display = toRegister ? 'flex' : 'none';
+      document.getElementById('agreementText').style.display = toRegister ? 'block' : 'none';
+
+      if (toRegister) {
+        document.getElementById('pageTitle').textContent = 'Аккаунт жасау';
+        document.getElementById('pageSubtitle').textContent = 'Деректеріңізді енгізіңіз';
+        document.getElementById('switchArea').innerHTML = 'Аккаунтыңыз бар ма? <a href="#" id="switchLink">Кіру</a>';
+        document.getElementById('submitBtn').textContent = 'Жалғастыру →';
+      } else {
+        document.getElementById('pageTitle').textContent = 'Қош келдіңіз!';
+        document.getElementById('pageSubtitle').textContent = 'Тағы басқа қадам жасауға дайынсыз ба?';
+        document.getElementById('switchArea').innerHTML = 'Аккаунт жоқ па? <a href="#" id="switchLink">Тіркелу</a>';
+        document.getElementById('submitBtn').textContent = 'Кіру →';
+      }
+      document.getElementById('switchLink').addEventListener('click', e => { e.preventDefault(); switchMode(!isRegister); });
     }
 
-    // ================== ОСНОВНАЯ ЛОГИКА ==================
     document.getElementById('authForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       clearMessages();
-
-      const email = document.getElementById('email').value.trim().toLowerCase();
+      const email    = document.getElementById('email').value.trim().toLowerCase();
       const password = document.getElementById('password').value;
+      if (!email || !password) return showError('Барлық өрістерді толтырыңыз');
+      if (isRegister && password.length < 10) return showError('Құпиясөз кемінде 10 таңбадан тұруы керек');
 
-      if (!email || !password) return showError("Заполните все поля");
-      if (isRegister && password.length < 10) return showError("Пароль должен содержать минимум 10 символов");
-
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Обработка...";
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Өңделуде...';
 
       try {
         if (isRegister) {
-          await auth.createUserWithEmailAndPassword(email, password);
-          showSuccess("Аккаунт успешно создан! Перенаправление...");
-          
-          // Задержка 1.5 секунды, чтобы пользователь успел увидеть плашку успеха
-          setTimeout(() => {
-            window.location.href = 'index.html';
-          }, 1500);
-
+          const cred = await auth.createUserWithEmailAndPassword(email, password);
+          await cred.user.updateProfile({ displayName: selectedRole });
+          showSuccess('Аккаунт сәтті жасалды! Бағытталуда...');
+          setTimeout(() => window.location.href = 'index.html', 1500);
         } else {
           await auth.signInWithEmailAndPassword(email, password);
-          showSuccess("Вход выполнен успешно! Перенаправление...");
-          
-          // Задержка 1 секунда перед перенаправлением на главную
-          setTimeout(() => {
-            window.location.href = 'index.html';
-          }, 1000);
+          showSuccess('Кіру сәтті! Бағытталуда...');
+          setTimeout(() => window.location.href = 'index.html', 1000);
         }
-      } catch (error) {
-        console.error(error);
-        let msg = "Произошла ошибка";
-        
-        if (error.code === 'auth/email-already-in-use') msg = "Email already exists";
-        else if (error.code === 'auth/weak-password') msg = "Пароль слишком слабый";
-        else if (error.code === 'auth/invalid-email') msg = "Неверный email";
-        else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential')
-          msg = "Неверный email или пароль";
-
-        showError(msg);
+      } catch (err) {
+        const map = {
+          'auth/email-already-in-use': 'Бұл email тіркелген',
+          'auth/weak-password':        'Құпиясөз тым қарапайым',
+          'auth/invalid-email':        'Email дұрыс емес',
+          'auth/user-not-found':       'Email немесе құпиясөз қате',
+          'auth/wrong-password':       'Email немесе құпиясөз қате',
+          'auth/invalid-credential':   'Email немесе құпиясөз қате',
+        };
+        showError(map[err.code] || 'Қате орын алды');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Продолжить";
+        btn.disabled = false;
+        btn.textContent = isRegister ? 'Жалғастыру →' : 'Кіру →';
       }
     });
 
-    document.getElementById('switchLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      switchMode(!isRegister);
-    });
+    document.getElementById('switchLink').addEventListener('click', e => { e.preventDefault(); switchMode(!isRegister); });
 
-    document.getElementById('togglePassword').addEventListener('click', function () {
+    document.getElementById('togglePassword').addEventListener('click', function() {
       const pwd = document.getElementById('password');
-      if (pwd.type === 'password') {
-        pwd.type = 'text';
-        this.textContent = '🙈';
-      } else {
-        pwd.type = 'password';
-        this.textContent = '👁';
-      }
+      const show = pwd.type === 'password';
+      pwd.type = show ? 'text' : 'password';
+      this.textContent = show ? '🙈' : '👁';
     });
 
-    document.getElementById('password').addEventListener('input', (e) => {
-      if (isRegister) updatePasswordStrength(e.target.value);
+    document.getElementById('password').addEventListener('input', e => {
+      if (isRegister) updateStrength(e.target.value);
     });
 
-    window.onload = () => {
-      document.getElementById('email').focus();
-    };
+    window.onload = () => document.getElementById('email').focus();
   </script>
-
 </body>
-
 </html>
