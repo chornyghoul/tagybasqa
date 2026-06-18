@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tagybasqa — Белсенділік рейтингі</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Onest:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0d1117;
+      --bg2:    #161b22;
+      --bg3:    #1c2330;
+      --border: rgba(255,255,255,.08);
+      --border2:rgba(255,255,255,.14);
+      --text:   #f0f6fc;
+      --text2:  #8b949e;
+      --text3:  #484f58;
+      --blue:   #1cb0f6;
+      --green:  #57cc02;
+      --gold:   #ffd900;
+      --orange: #ff9600;
+      --purple: #9b5de5;
+      --red:    #ff4b4b;
+      --font:   'Onest', sans-serif;
+      --mono:   'DM Mono', monospace;
+      --r:      12px;
+      --r-lg:   18px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 40% at 10% 5%, rgba(28,176,246,.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 90% 90%, rgba(155,93,229,.05) 0%, transparent 55%);
+    }
+
+    /* ── Header ── */
+    .hdr {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 60px;
+      background: rgba(13,17,23,.9); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .hdr-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 17px; font-weight: 900; letter-spacing: -.4px;
+      color: var(--blue); text-decoration: none;
+    }
+    .hdr-title {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--text2); background: var(--bg3); border: 1px solid var(--border);
+      padding: 4px 12px; border-radius: 99px; text-transform: uppercase; letter-spacing: .1em;
+    }
+    .hdr-right { display: flex; gap: 8px; align-items: center; }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 8px 14px; font-family: var(--font); font-size: 12px; font-weight: 700;
+      cursor: pointer; border: none; border-radius: var(--r);
+      display: inline-flex; align-items: center; gap: 6px; transition: all .15s;
+    }
+    .btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .btn-ghost { background: transparent; color: var(--text2); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+    .btn-blue { background: var(--blue); color: #fff; box-shadow: 0 4px 16px rgba(28,176,246,.2); }
+    .btn-blue:hover { filter: brightness(1.1); }
+
+    /* ── Main ── */
+    .main {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* ── Page title ── */
+    .page-head {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
+    }
+    .page-head-left {}
+    .page-eyebrow {
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      color: var(--text3); text-transform: uppercase; letter-spacing: .15em;
+      margin-bottom: 6px;
+    }
+    .page-title {
+      font-size: 28px; font-weight: 900; letter-spacing: -.5px;
+      background: linear-gradient(135deg, #fff 40%, var(--blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-sub { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+    /* ── Stats strip ── */
+    .stats-strip {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .stat-num {
+      font-size: 26px; font-weight: 900; font-family: var(--mono); line-height: 1;
+      color: var(--blue);
+    }
+    .stat-num.gold   { color: var(--gold); }
+    .stat-num.green  { color: var(--green); }
+    .stat-num.purple { color: var(--purple); }
+    .stat-lbl {
+      font-family: var(--mono); font-size: 9px; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .12em;
+    }
+
+    /* ── Sort/filter bar ── */
+    .filter-bar {
+      display: flex; gap: 8px; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .filter-lbl {
+      font-family: var(--mono); font-size: 10px; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .1em; margin-right: 4px;
+    }
+    .sort-btn {
+      padding: 6px 12px; font-family: var(--mono); font-size: 10px; font-weight: 700;
+      border: 1px solid var(--border); background: transparent; color: var(--text2);
+      border-radius: 8px; cursor: pointer; transition: all .12s; text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .sort-btn.active, .sort-btn:hover {
+      border-color: var(--blue); color: var(--blue); background: rgba(28,176,246,.08);
+    }
+
+    /* ── Leaderboard table ── */
+    .lb-table {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--r-lg); overflow: hidden;
+    }
+    .lb-header {
+      display: grid;
+      grid-template-columns: 52px 1fr 90px 90px 90px 80px;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+    }
+    .lb-header-cell {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      color: var(--text3); text-transform: uppercase; letter-spacing: .12em;
+    }
+    .lb-header-cell.right { text-align: right; }
+
+    .lb-row {
+      display: grid;
+      grid-template-columns: 52px 1fr 90px 90px 90px 80px;
+      padding: 14px 20px; align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      transition: background .12s; cursor: default;
+    }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row:hover { background: rgba(255,255,255,.025); }
+
+    /* Gold/silver/bronze top 3 */
+    .lb-row.rank-1 { background: rgba(255,217,0,.04); }
+    .lb-row.rank-2 { background: rgba(192,192,192,.03); }
+    .lb-row.rank-3 { background: rgba(205,127,50,.03); }
+    .lb-row.rank-1:hover { background: rgba(255,217,0,.07); }
+    .lb-row.rank-2:hover { background: rgba(192,192,192,.055); }
+    .lb-row.rank-3:hover { background: rgba(205,127,50,.055); }
+
+    .lb-rank {
+      font-family: var(--mono); font-size: 13px; font-weight: 900;
+      color: var(--text3); min-width: 32px;
+    }
+    .lb-rank.r1 { color: var(--gold); }
+    .lb-rank.r2 { color: #c0c0c0; }
+    .lb-rank.r3 { color: #cd7f32; }
+
+    .lb-name-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .lb-avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 900; font-family: var(--mono);
+    }
+    .lb-name {
+      font-size: 14px; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .lb-sessions-badge {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      color: var(--text3); background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 99px; padding: 2px 7px; margin-left: 6px; flex-shrink: 0;
+    }
+
+    .lb-num {
+      font-family: var(--mono); font-size: 13px; font-weight: 700;
+      color: var(--text2); text-align: right;
+    }
+    .lb-num.pts { color: var(--blue); font-size: 14px; font-weight: 900; }
+    .lb-num.pct { color: var(--green); }
+
+    /* Accuracy bar */
+    .lb-accuracy-wrap { text-align: right; }
+    .lb-acc-bar-wrap {
+      height: 4px; background: var(--bg3); border-radius: 99px;
+      overflow: hidden; margin-top: 4px;
+    }
+    .lb-acc-bar {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      transition: width .6s ease;
+    }
+
+    /* ── Loading ── */
+    .loading-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 16px; padding: 60px 0;
+    }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid var(--bg3);
+      border-top-color: var(--blue); border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-family: var(--mono); font-size: 12px; color: var(--text3); }
+
+    /* ── Empty ── */
+    .empty-wrap {
+      text-align: center; padding: 60px 20px;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .empty-sub { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+    /* ── Last updated ── */
+    .last-updated {
+      font-family: var(--mono); font-size: 10px; color: var(--text3);
+      text-align: center; margin-top: 24px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+      animation: livePulse 1.4s ease infinite; display: inline-block;
+    }
+    @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--bg2); color: var(--text);
+      border: 1px solid var(--border2);
+      padding: 11px 22px; border-radius: 99px;
+      font-size: 13px; font-weight: 700;
+      opacity: 0; pointer-events: none; z-index: 999;
+      transition: all .25s; white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 600px) {
+      .lb-header, .lb-row {
+        grid-template-columns: 44px 1fr 70px 70px;
+      }
+      .lb-header-cell.hide-sm,
+      .lb-col-hide-sm { display: none; }
+      .hdr-title { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <a class="hdr-logo" href="./index.html">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    Tagybasqa
+  </a>
+  <div class="hdr-title">Белсенділік рейтингі</div>
+  <div class="hdr-right">
+    <button class="btn btn-ghost" id="refreshBtn" onclick="loadData()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Жаңарту
+    </button>
+    <button class="btn btn-ghost" onclick="exportCSV()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      CSV
+    </button>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="page-head">
+    <div class="page-head-left">
+      <div class="page-eyebrow">Tagybasqa Platform</div>
+      <div class="page-title">Белсенділік рейтингі</div>
+      <div class="page-sub">Студенттердің квиз нәтижелері және белсенділігі</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip" id="statsStrip">
+    <div class="stat-card">
+      <div class="stat-num" id="statStudents">—</div>
+      <div class="stat-lbl">Студент</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num gold" id="statSessions">—</div>
+      <div class="stat-lbl">Сессия</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num green" id="statAnswers">—</div>
+      <div class="stat-lbl">Жауаптар</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num purple" id="statAccuracy">—</div>
+      <div class="stat-lbl">Орта дұрыстық</div>
+    </div>
+  </div>
+
+  <!-- Sort bar -->
+  <div class="filter-bar">
+    <span class="filter-lbl">Сорт:</span>
+    <button class="sort-btn active" data-sort="points" onclick="setSort('points',this)">Ұпай</button>
+    <button class="sort-btn" data-sort="accuracy" onclick="setSort('accuracy',this)">Дұрыстық</button>
+    <button class="sort-btn" data-sort="answered" onclick="setSort('answered',this)">Белсенділік</button>
+    <button class="sort-btn" data-sort="sessions" onclick="setSort('sessions',this)">Сессия</button>
+    <button class="sort-btn" data-sort="name" onclick="setSort('name',this)">Аты</button>
+  </div>
+
+  <!-- Table -->
+  <div class="lb-table">
+    <div class="lb-header">
+      <div class="lb-header-cell">#</div>
+      <div class="lb-header-cell">Студент</div>
+      <div class="lb-header-cell right hide-sm">Сессия</div>
+      <div class="lb-header-cell right">Жауап</div>
+      <div class="lb-header-cell right">Дұрыстық</div>
+      <div class="lb-header-cell right">Ұпай</div>
+    </div>
+    <div id="lbBody">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <div class="loading-text">Деректер жүктелуде...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-updated" id="lastUpdated" style="display:none">
+    <span class="live-dot"></span>
+    <span id="lastUpdatedText">жаңартылды</span>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, query, orderBy, limit
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const FB = {
+  apiKey:            "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+  authDomain:        "pystart-dd2db.firebaseapp.com",
+  projectId:         "pystart-dd2db",
+  storageBucket:     "pystart-dd2db.firebasestorage.app",
+  messagingSenderId: "9188811255",
+  appId:             "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+};
+const app = !getApps().length ? initializeApp(FB) : getApp();
+const db  = getFirestore(app);
+
+let allData   = [];
+let sortField = 'points';
+
+const AVATAR_COLORS = [
+  ['#1cb0f6','rgba(28,176,246,.15)'],
+  ['#57cc02','rgba(87,204,2,.15)'],
+  ['#9b5de5','rgba(155,93,229,.15)'],
+  ['#ff9600','rgba(255,150,0,.15)'],
+  ['#ff4b4b','rgba(255,75,75,.15)'],
+  ['#ffd900','rgba(255,217,0,.15)'],
+];
+
+function avatarColor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffffffff;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Load from Firestore ─────────────────────────────────────
+async function loadData() {
+  document.getElementById('lbBody').innerHTML = `
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-text">Деректер жүктелуде...</div>
+    </div>`;
+
+  try {
+    // First try studentActivity collection (created by quiz-play.html)
+    const actSnap = await getDocs(collection(db, 'studentActivity'));
+    
+    if (!actSnap.empty) {
+      allData = actSnap.docs.map(d => {
+        const v = d.data();
+        return {
+          name:          v.name || d.id,
+          totalAnswered: v.totalAnswered || 0,
+          totalCorrect:  v.totalCorrect  || 0,
+          totalPoints:   v.totalPoints   || 0,
+          sessionCount:  Array.isArray(v.sessions) ? v.sessions.length : 0,
+          lastSeen:      v.lastSeen || 0,
+        };
+      });
+    } else {
+      // Fallback: aggregate from quizResults collection
+      const resSnap = await getDocs(collection(db, 'quizResults'));
+      const byPlayer = {};
+      resSnap.docs.forEach(d => {
+        const v = d.data();
+        const key = v.playerName || 'Unknown';
+        if (!byPlayer[key]) {
+          byPlayer[key] = {
+            name: key,
+            totalPoints:   0,
+            totalAnswered: 0,
+            totalCorrect:  0,
+            sessions:      new Set(),
+            lastSeen:      0,
+          };
+        }
+        const p = byPlayer[key];
+        p.totalPoints  = Math.max(p.totalPoints, v.score || 0);
+        p.sessions.add(v.sessionId);
+        if (v.answers) {
+          p.totalAnswered += v.answers.length;
+          p.totalCorrect  += v.answers.filter(a => a.correct).length;
+        }
+        if (v.timestamp > p.lastSeen) p.lastSeen = v.timestamp;
+      });
+      allData = Object.values(byPlayer).map(p => ({
+        ...p,
+        sessionCount: p.sessions.size
+      }));
+    }
+
+    renderStats();
+    renderTable();
+
+    // Show last updated
+    const lu = document.getElementById('lastUpdated');
+    lu.style.display = 'flex';
+    document.getElementById('lastUpdatedText').textContent =
+      'Жаңартылды: ' + new Date().toLocaleTimeString('kk', { hour:'2-digit', minute:'2-digit' });
+
+  } catch (e) {
+    console.error(e);
+    document.getElementById('lbBody').innerHTML = `
+      <div class="empty-wrap">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">Қате болды</div>
+        <div class="empty-sub">${esc(e.message)}</div>
+      </div>`;
+  }
+}
+
+// ── Stats ────────────────────────────────────────────────────
+function renderStats() {
+  const total = allData.length;
+  const sessions = new Set(allData.flatMap(d => d.sessions ? [...d.sessions] : [])).size
+    || allData.reduce((s, d) => s + d.sessionCount, 0);
+  const answered = allData.reduce((s, d) => s + d.totalAnswered, 0);
+  const avgAcc   = total === 0 ? 0
+    : Math.round(allData.reduce((s, d) =>
+        s + (d.totalAnswered > 0 ? d.totalCorrect / d.totalAnswered : 0), 0
+      ) / total * 100);
+
+  document.getElementById('statStudents').textContent = total;
+  document.getElementById('statSessions').textContent = sessions || '—';
+  document.getElementById('statAnswers').textContent  = answered;
+  document.getElementById('statAccuracy').textContent = total ? avgAcc + '%' : '—';
+}
+
+// ── Table ────────────────────────────────────────────────────
+function renderTable() {
+  const body = document.getElementById('lbBody');
+  if (!allData.length) {
+    body.innerHTML = `
+      <div class="empty-wrap">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">Деректер жоқ</div>
+        <div class="empty-sub">Студенттер квизге қосылған соң рейтинг пайда болады.</div>
+      </div>`;
+    return;
+  }
+
+  const sorted = [...allData].sort((a, b) => {
+    if (sortField === 'name')     return a.name.localeCompare(b.name);
+    if (sortField === 'accuracy') {
+      const pa = a.totalAnswered ? a.totalCorrect / a.totalAnswered : 0;
+      const pb = b.totalAnswered ? b.totalCorrect / b.totalAnswered : 0;
+      return pb - pa;
+    }
+    if (sortField === 'answered') return b.totalAnswered - a.totalAnswered;
+    if (sortField === 'sessions') return b.sessionCount - a.sessionCount;
+    return b.totalPoints - a.totalPoints; // default: points
+  });
+
+  const rankClass = ['','rank-1','rank-2','rank-3'];
+  const rankLabel = (i) => {
+    if (i === 0) return '<span class="lb-rank r1">01</span>';
+    if (i === 1) return '<span class="lb-rank r2">02</span>';
+    if (i === 2) return '<span class="lb-rank r3">03</span>';
+    return `<span class="lb-rank">${String(i+1).padStart(2,'0')}</span>`;
+  };
+
+  body.innerHTML = sorted.map((s, i) => {
+    const acc = s.totalAnswered > 0
+      ? Math.round(s.totalCorrect / s.totalAnswered * 100)
+      : 0;
+    const [clr, bg] = avatarColor(s.name);
+    const initials  = s.name.slice(0, 2).toUpperCase();
+    const rowClass  = i < 3 ? rankClass[i + 1] : '';
+
+    return `
+      <div class="lb-row ${rowClass}" title="${esc(s.name)}">
+        <div>${rankLabel(i)}</div>
+        <div class="lb-name-cell">
+          <div class="lb-avatar" style="background:${bg};color:${clr}">${esc(initials)}</div>
+          <div>
+            <div class="lb-name">${esc(s.name)}</div>
+          </div>
+          <span class="lb-sessions-badge">${s.sessionCount} сессия</span>
+        </div>
+        <div class="lb-num lb-col-hide-sm">${s.sessionCount}</div>
+        <div class="lb-num">${s.totalAnswered}</div>
+        <div class="lb-accuracy-wrap">
+          <div class="lb-num pct" style="font-size:12px">${acc}%</div>
+          <div class="lb-acc-bar-wrap">
+            <div class="lb-acc-bar" style="width:${acc}%"></div>
+          </div>
+        </div>
+        <div class="lb-num pts">${s.totalPoints}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── Sort ─────────────────────────────────────────────────────
+window.setSort = function(field, el) {
+  sortField = field;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+};
+
+// ── CSV Export ───────────────────────────────────────────────
+window.exportCSV = function() {
+  if (!allData.length) { showToast('Экспорт үшін деректер жоқ'); return; }
+  const header = ['Аты', 'Сессия', 'Жауаптар', 'Дұрыс', 'Дұрыстық%', 'Ұпай'];
+  const rows   = allData.map(s => {
+    const acc = s.totalAnswered > 0
+      ? Math.round(s.totalCorrect / s.totalAnswered * 100)
+      : 0;
+    return [s.name, s.sessionCount, s.totalAnswered, s.totalCorrect, acc, s.totalPoints];
+  });
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const a   = document.createElement('a');
+  a.href    = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
+  a.download = `tagybasqa-leaderboard-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('CSV жүктелді!');
+};
+
+// ── Toast ─────────────────────────────────────────────────────
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3000);
+};
+
+// ── Init ─────────────────────────────────────────────────────
+window.loadData = loadData;
+loadData();
+
+// Auto-refresh every 30 seconds
+setInterval(loadData, 30_000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ашық сабақ есебі — Tagybasqa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Onest:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════
+   SCREEN STYLES
+════════════════════════════════════════════ */
+:root {
+  --bg:     #0d1117;  --bg2:   #161b22;  --bg3:   #1c2330;
+  --border: rgba(255,255,255,.08);  --border2: rgba(255,255,255,.14);
+  --text:   #f0f6fc;  --text2: #8b949e;  --text3: #484f58;
+  --blue:   #1cb0f6;  --green: #57cc02;  --gold:  #ffd900;
+  --purple: #9b5de5;  --red:   #ff4b4b;  --orange:#ff9600;
+  --font: 'Onest', sans-serif;  --mono: 'DM Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text);
+  min-height: 100dvh; -webkit-font-smoothing: antialiased; }
+
+/* Header */
+.hdr { position: sticky; top: 0; z-index: 50; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 24px; height: 60px;
+  background: rgba(13,17,23,.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); }
+.hdr-logo { display: flex; align-items: center; gap: 10px; font-size: 17px;
+  font-weight: 900; letter-spacing: -.4px; color: var(--blue); text-decoration: none; }
+.hdr-right { display: flex; gap: 8px; }
+.btn { padding: 8px 16px; font-family: var(--font); font-size: 12px; font-weight: 700;
+  border: none; border-radius: 10px; cursor: pointer; display: inline-flex;
+  align-items: center; gap: 6px; transition: all .15s; white-space: nowrap; }
+.btn svg { width: 13px; height: 13px; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1.5px solid var(--border); }
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+.btn-blue  { background: var(--blue); color: #fff; box-shadow: 0 4px 16px rgba(28,176,246,.2); }
+.btn-blue:hover { filter: brightness(1.1); }
+.btn-green { background: var(--green); color: #000; font-weight: 800; }
+.btn-green:hover { filter: brightness(1.08); }
+
+/* Layout */
+.main { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
+.loading-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 80px 0; }
+.spinner { width: 44px; height: 44px; border: 3px solid var(--bg3);
+  border-top-color: var(--blue); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-family: var(--mono); font-size: 12px; color: var(--text3); }
+
+/* Notes editor */
+.notes-section { background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+.notes-label { font-family: var(--mono); font-size: 10px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .12em; margin-bottom: 10px; display: block; }
+.notes-ta { width: 100%; min-height: 100px; background: var(--bg3);
+  border: 1.5px solid var(--border); border-radius: 10px; color: var(--text);
+  font-family: var(--font); font-size: 14px; line-height: 1.7; padding: 12px 16px;
+  outline: none; resize: vertical; transition: border-color .15s; }
+.notes-ta:focus { border-color: var(--blue); }
+.notes-ta::placeholder { color: var(--text3); }
+
+/* Toast */
+#toast { position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--bg2); border: 1px solid var(--border2);
+  padding: 11px 22px; border-radius: 99px; font-size: 13px; font-weight: 700;
+  opacity: 0; pointer-events: none; z-index: 999; transition: all .25s;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ════════════════════════════════════════════
+   REPORT PREVIEW (shown on screen)
+════════════════════════════════════════════ */
+.report-wrap { background: #fff; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.4); }
+
+/* Cover */
+.rpt-cover { background: linear-gradient(135deg, #0d1f2d 0%, #0a1628 100%);
+  padding: 40px; position: relative; overflow: hidden; }
+.rpt-cover::before { content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 70% 60% at 20% 20%, rgba(28,176,246,.12) 0%, transparent 55%),
+              radial-gradient(ellipse 50% 70% at 80% 80%, rgba(155,93,229,.08) 0%, transparent 55%); }
+.rpt-badge { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 14px; position: relative; }
+.rpt-title { font-size: 28px; font-weight: 900; color: #fff; line-height: 1.2;
+  margin-bottom: 8px; position: relative; letter-spacing: -.5px; }
+.rpt-sub { font-size: 14px; color: rgba(255,255,255,.55); margin-bottom: 28px; position: relative; }
+.rpt-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  max-width: 500px; position: relative; }
+.rpt-meta-item { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px; padding: 10px 14px; }
+.rpt-meta-lbl { font-family: var(--mono); font-size: 8px; font-weight: 700;
+  color: rgba(255,255,255,.3); text-transform: uppercase; letter-spacing: .15em; margin-bottom: 3px; }
+.rpt-meta-val { font-size: 13px; font-weight: 700; color: #fff; }
+
+/* Stats */
+.rpt-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+  border-bottom: 1px solid #e8eef2; }
+.rpt-stat { padding: 20px; text-align: center; border-right: 1px solid #e8eef2; }
+.rpt-stat:last-child { border-right: none; }
+.rpt-stat-num { font-size: 28px; font-weight: 900; font-family: var(--mono);
+  line-height: 1; margin-bottom: 4px; }
+.rpt-stat-lbl { font-family: var(--mono); font-size: 8px; color: #6a8090;
+  text-transform: uppercase; letter-spacing: .12em; }
+
+/* Section */
+.rpt-section { padding: 28px 40px; border-bottom: 1px solid #f0f4f8; }
+.rpt-section:last-child { border-bottom: none; }
+.rpt-section-title { font-size: 13px; font-weight: 900; color: #1a2d35;
+  font-family: var(--mono); text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e8eef2;
+  display: flex; align-items: center; gap: 8px; }
+.rpt-section-title::before { content: ''; display: block; width: 3px; height: 14px;
+  background: #1cb0f6; border-radius: 99px; }
+
+/* Leaderboard table */
+.rpt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rpt-table th { font-family: var(--mono); font-size: 8px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em; color: #fff;
+  background: #1a2d35; padding: 8px 12px; text-align: left; }
+.rpt-table td { padding: 9px 12px; border-bottom: 1px solid #f0f4f8; color: #2a3a45; }
+.rpt-table tr:last-child td { border-bottom: none; }
+.rpt-table tr:nth-child(even) td { background: #f8fafc; }
+.rpt-table tr:hover td { background: #f0f6ff; }
+.td-rank { font-family: var(--mono); font-weight: 900; font-size: 14px; text-align: center; min-width: 36px; }
+.td-score { font-family: var(--mono); font-weight: 900; color: #1cb0f6; }
+.td-acc { font-family: var(--mono); color: #57cc02; font-weight: 700; }
+.td-bar { min-width: 80px; }
+.bar-track { height: 6px; background: #e8eef2; border-radius: 99px; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, #1cb0f6, #57cc02);
+  border-radius: 99px; transition: width .6s ease; }
+
+/* Block list */
+.block-list { display: flex; flex-direction: column; gap: 6px; }
+.block-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+  background: #f8fafc; border: 1px solid #e8eef2; border-radius: 8px; }
+.block-num { font-family: var(--mono); font-size: 10px; color: #8090a0;
+  min-width: 24px; text-align: center; }
+.block-type-badge { font-family: var(--mono); font-size: 9px; font-weight: 700;
+  padding: 2px 8px; border-radius: 99px; flex-shrink: 0; text-transform: uppercase; letter-spacing: .06em; }
+.block-content { font-size: 12px; color: #2a3a45; flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.block-timer { font-family: var(--mono); font-size: 10px; color: #8090a0; flex-shrink: 0; }
+
+/* Quiz results per quiz */
+.quiz-result-block { background: #f4f8ff; border: 1px solid #dce8ff;
+  border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+.quiz-result-title { font-size: 13px; font-weight: 800; color: #1a2d35;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+
+/* Notes area in report */
+.rpt-notes { background: #f0f6ff; border: 1.5px solid #c0d8ff; border-radius: 10px;
+  padding: 14px 18px; font-size: 13px; color: #2a3a45; line-height: 1.7; white-space: pre-wrap; }
+
+/* Footer in report */
+.rpt-footer { padding: 16px 40px; background: #f8fafc; border-top: 1px solid #e8eef2;
+  display: flex; justify-content: space-between; align-items: center; }
+.rpt-footer-logo { font-size: 12px; font-weight: 900; color: #1cb0f6; }
+.rpt-footer-date { font-family: var(--mono); font-size: 9px; color: #8090a0; }
+
+/* ════════════════════════════════════════════
+   PRINT STYLES
+════════════════════════════════════════════ */
+@media print {
+  body { background: #fff !important; }
+  .hdr, .screen-only, #toast { display: none !important; }
+  .main { max-width: none; padding: 0; margin: 0; }
+  .report-wrap { border-radius: 0; box-shadow: none; }
+  .rpt-cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rpt-stats  { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rpt-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rpt-section { padding: 18px 32px; page-break-inside: avoid; }
+  .bar-fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .block-type-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { margin: 10mm; size: A4; }
+}
+</style>
+</head>
+<body>
+
+<header class="hdr screen-only">
+  <a class="hdr-logo" href="./index.html">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    Tagybasqa
+  </a>
+  <div class="hdr-right">
+    <button class="btn btn-ghost" onclick="location.reload()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Жаңарту
+    </button>
+    <button class="btn btn-ghost" onclick="copyShareLink()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      Бөлісу
+    </button>
+    <button class="btn btn-green" onclick="printReport()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      PDF / Басып шығару
+    </button>
+  </div>
+</header>
+
+<div class="main" id="mainEl">
+  <div class="loading-wrap" id="loadingWrap">
+    <div class="spinner"></div>
+    <div class="loading-text">Сессия деректері жүктелуде...</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, getDocs, collection, query, where, orderBy
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const FB = {
+  apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY",
+  authDomain: "pystart-dd2db.firebaseapp.com",
+  projectId: "pystart-dd2db",
+  storageBucket: "pystart-dd2db.firebasestorage.app",
+  messagingSenderId: "9188811255",
+  appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+};
+const app = !getApps().length ? initializeApp(FB) : getApp();
+const db  = getFirestore(app);
+
+const params   = new URLSearchParams(location.search);
+const PIN      = params.get('pin');
+const SID      = params.get('session');
+
+const MODE_NAMES = {
+  'presentation': 'Презентация',
+  'quiz-race':    'Квиз гонкасы',
+  'teams':        'Командалар',
+  'self-study':   'Өздік жұмыс'
+};
+const BLOCK_TYPE_NAMES = {
+  heading:'Тақырып', subheading:'Бөлім', text:'Мәтін', code:'Код',
+  quiz:'Квиз', task:'Тапсырма', poll:'Голосование', slide:'Слайд',
+  video:'Видео', image:'Сурет', callout:'Ескерту', checklist:'Тізім', divider:'Бөлгіш'
+};
+const BLOCK_TYPE_COLORS = {
+  quiz:    { bg:'#fff7e0', color:'#b07800', border:'#ffe099' },
+  poll:    { bg:'#f3eeff', color:'#7b3fc4', border:'#d4b8ff' },
+  task:    { bg:'#eafff0', color:'#1a7a30', border:'#a8f0bc' },
+  code:    { bg:'#e6f6ff', color:'#0068a5', border:'#a0d8ff' },
+  heading: { bg:'#f0f4f8', color:'#1a2d35', border:'#ccd8e0' },
+  video:   { bg:'#fff0f0', color:'#a52020', border:'#ffb0b0' },
+  slide:   { bg:'#f4f0ff', color:'#6040a0', border:'#c8b8ff' },
+};
+const DEFAULT_TYPE_COLOR = { bg:'#f0f4f8', color:'#4a6070', border:'#ccd8e0' };
+const RANK_COLORS = ['#c8870a','#6a6a7a','#8a4e18'];
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Load session data ────────────────────────────────────────
+async function loadSession() {
+  let sessionData = null;
+
+  if (SID) {
+    const snap = await getDoc(doc(db, 'openLessonSessions', SID));
+    if (snap.exists()) sessionData = { id: snap.id, ...snap.data() };
+  } else if (PIN) {
+    const q = query(collection(db, 'openLessonSessions'), where('pin', '==', PIN));
+    const snap = await getDocs(q);
+    if (!snap.empty) sessionData = { id: snap.docs[0].id, ...snap.docs[0].data() };
+  }
+
+  // Fallback: demo data if nothing found
+  if (!sessionData) {
+    sessionData = getDemoData();
+  }
+
+  return sessionData;
+}
+
+async function loadQuizResults(sessionId, lessonId) {
+  const results = [];
+  try {
+    const snap = await getDocs(query(
+      collection(db, 'quizResults'),
+      where('sessionId', '==', sessionId)
+    ));
+    const byPlayer = {};
+    snap.docs.forEach(d => {
+      const v = d.data();
+      const key = v.playerName || 'Unknown';
+      if (!byPlayer[key]) byPlayer[key] = { name: key, score: 0, answers: [] };
+      byPlayer[key].score = Math.max(byPlayer[key].score, v.score || 0);
+      if (v.answers) byPlayer[key].answers.push(...v.answers);
+    });
+    const players = Object.values(byPlayer).map(p => {
+      const total = p.answers.length;
+      const correct = p.answers.filter(a => a.correct).length;
+      return { name: p.name, score: p.score, correct, totalQuestions: total,
+               accuracy: total ? Math.round(correct/total*100) : 0 };
+    }).sort((a,b) => b.score - a.score);
+    if (players.length) results.push({ quizTitle: 'Барлық квиздер', players });
+  } catch(e) { console.warn('quizResults:', e); }
+  return results;
+}
+
+async function loadStudentActivity(sessionId) {
+  const lb = [];
+  try {
+    const snap = await getDocs(query(
+      collection(db, 'quizResults'),
+      where('sessionId', '==', sessionId)
+    ));
+    const byPlayer = {};
+    snap.docs.forEach(d => {
+      const v = d.data();
+      const key = v.playerName || 'Unknown';
+      if (!byPlayer[key]) byPlayer[key] = { name: key, score: 0, correct: 0, total: 0 };
+      byPlayer[key].score  = Math.max(byPlayer[key].score, v.score || 0);
+      if (v.answers) {
+        byPlayer[key].total   += v.answers.length;
+        byPlayer[key].correct += v.answers.filter(a => a.correct).length;
+      }
+    });
+    Object.values(byPlayer).forEach(p => {
+      lb.push({ name: p.name, score: p.score,
+        accuracy: p.total ? Math.round(p.correct/p.total*100) : 0 });
+    });
+    lb.sort((a,b) => b.score - a.score);
+  } catch(e) {}
+
+  // Also check openLessonSessions players field
+  if (!lb.length && sessionId) {
+    try {
+      const snap = await getDoc(doc(db, 'openLessonSessions', sessionId));
+      if (snap.exists()) {
+        const players = snap.data().players || {};
+        Object.values(players).forEach(p => {
+          lb.push({ name: p.name || '—', score: p.score || 0, accuracy: p.accuracy || 0 });
+        });
+        lb.sort((a,b) => b.score - a.score);
+      }
+    } catch(e) {}
+  }
+  return lb;
+}
+
+// ── Demo data fallback ────────────────────────────────────────
+function getDemoData() {
+  return {
+    id: 'demo',
+    lessonTitle: params.get('title') || 'Python — for циклі',
+    sessionName: params.get('name') || '10-сынып',
+    date: new Date().toLocaleDateString('kk-KZ'),
+    duration: params.get('duration') || '45:00',
+    mode: params.get('mode') || 'presentation',
+    pin: params.get('pin') || '——',
+    participants: [],
+    leaderboard: [],
+    blocks: [],
+    _demo: true
+  };
+}
+
+// ── Load lesson blocks ────────────────────────────────────────
+async function loadBlocks(lessonId) {
+  if (!lessonId) return [];
+  for (const col of ['interactiveLessons', 'lessons', 'openLessons']) {
+    try {
+      const snap = await getDoc(doc(db, col, lessonId));
+      if (snap.exists()) return snap.data().blocks || [];
+    } catch(e) {}
+  }
+  return [];
+}
+
+// ── Build report HTML ─────────────────────────────────────────
+function buildReport(session, leaderboard, quizResults, blocks, teacherNotes) {
+  const date = session.date || (session.startedAt?.toDate
+    ? session.startedAt.toDate().toLocaleDateString('kk-KZ')
+    : new Date().toLocaleDateString('kk-KZ'));
+  const duration = session.duration || '—';
+  const mode     = MODE_NAMES[session.mode] || session.mode || '—';
+  const pin      = session.pin || '—';
+  const title    = session.lessonTitle || session.lessonId || 'Сабақ';
+  const subname  = session.sessionName || '';
+  const avgScore = leaderboard.length
+    ? Math.round(leaderboard.reduce((s,p)=>s+p.score,0)/leaderboard.length) : 0;
+  const quizCount = blocks.filter(b=>b.type==='quiz').length;
+
+  // Cover meta items
+  const metaItems = [
+    { lbl:'Күні',     val: date },
+    { lbl:'Ұзақтығы', val: duration },
+    { lbl:'Режим',    val: mode },
+    { lbl:'PIN код',  val: pin },
+  ];
+
+  // Leaderboard rows
+  const lbRows = leaderboard.map((p,i) => {
+    const pct = leaderboard[0]?.score ? Math.round(p.score/leaderboard[0].score*100) : 0;
+    const rankColor = RANK_COLORS[i] || '#4a6070';
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    return `
+      <tr>
+        <td class="td-rank" style="color:${rankColor}">${medal || (i+1)}</td>
+        <td style="font-weight:${i<3?'700':'400'}">${esc(p.name)}</td>
+        <td class="td-score">${p.score}</td>
+        <td class="td-acc">${p.accuracy ?? 0}%</td>
+        <td class="td-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+        </td>
+      </tr>`;
+  }).join('') || `<tr><td colspan="5" style="text-align:center;color:#8090a0;padding:20px;font-family:monospace;font-size:12px">Нәтижелер жоқ</td></tr>`;
+
+  // Block list
+  const blockRows = blocks.map((b,i) => {
+    const type  = b.type || 'text';
+    const tname = BLOCK_TYPE_NAMES[type] || type;
+    const clr   = BLOCK_TYPE_COLORS[type] || DEFAULT_TYPE_COLOR;
+    const content = esc((b.slideTitle||b.content||b.question||b.taskText||b.text||'—').slice(0,90));
+    const timer = b.timeLimit ? `${b.timeLimit}с` : '';
+    return `
+      <div class="block-row">
+        <span class="block-num">${i+1}</span>
+        <span class="block-type-badge" style="background:${clr.bg};color:${clr.color};border:1px solid ${clr.border}">${esc(tname)}</span>
+        <span class="block-content">${content}</span>
+        <span class="block-timer">${timer}</span>
+      </div>`;
+  }).join('') || '<div style="color:#8090a0;font-family:monospace;font-size:12px;padding:8px">Блоктар жоқ</div>';
+
+  // Quiz results
+  const quizHtml = quizResults.map(qr => `
+    <div class="quiz-result-block">
+      <div class="quiz-result-title">⚡ ${esc(qr.quizTitle)}</div>
+      <table class="rpt-table">
+        <thead><tr><th>Ойыншы</th><th>Ұпай</th><th>Дұрыс</th><th>Қате</th><th>Дұрыстық</th></tr></thead>
+        <tbody>
+          ${qr.players.map((p,i) => `<tr>
+            <td style="font-weight:${i<3?'700':'400'}">${i<3?['🥇','🥈','🥉'][i]+' ':''} ${esc(p.name)}</td>
+            <td class="td-score">${p.score}</td>
+            <td style="color:#57cc02;font-weight:700">${p.correct ?? 0}</td>
+            <td style="color:#ff4b4b;font-weight:700">${(p.totalQuestions||0)-(p.correct||0)}</td>
+            <td class="td-acc">${p.accuracy ?? 0}%</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`).join('') || '<div style="color:#8090a0;font-family:monospace;font-size:12px">Квиз нәтижелері жоқ</div>';
+
+  // Teacher notes
+  const notesHtml = teacherNotes
+    ? `<div class="rpt-notes">${esc(teacherNotes)}</div>`
+    : '<div style="color:#8090a0;font-family:monospace;font-size:12px">Жазба жоқ</div>';
+
+  return `
+  <div class="report-wrap" id="reportWrap">
+
+    <!-- COVER -->
+    <div class="rpt-cover">
+      <div class="rpt-badge">Tagybasqa Platform · Ашық сабақ есебі</div>
+      <div class="rpt-title">${esc(title)}</div>
+      <div class="rpt-sub">${esc(subname)}</div>
+      <div class="rpt-meta-grid">
+        ${metaItems.map(m=>`
+          <div class="rpt-meta-item">
+            <div class="rpt-meta-lbl">${esc(m.lbl)}</div>
+            <div class="rpt-meta-val">${esc(m.val)}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="rpt-stats">
+      <div class="rpt-stat">
+        <div class="rpt-stat-num" style="color:#1cb0f6">${leaderboard.length}</div>
+        <div class="rpt-stat-lbl">Қатысушы</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-num" style="color:#9b5de5">${blocks.length}</div>
+        <div class="rpt-stat-lbl">Блок</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-num" style="color:#57cc02">${avgScore}</div>
+        <div class="rpt-stat-lbl">Орт. Ұпай</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-num" style="color:#ffd900">${quizCount}</div>
+        <div class="rpt-stat-lbl">Квиз</div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="rpt-section">
+      <div class="rpt-section-title">🏆 Рейтинг</div>
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Ойыншы</th><th>Ұпай</th><th>Дұрыстық</th><th>Прогресс</th>
+          </tr>
+        </thead>
+        <tbody>${lbRows}</tbody>
+      </table>
+    </div>
+
+    <!-- BLOCKS -->
+    <div class="rpt-section">
+      <div class="rpt-section-title">📋 Сабақ жоспары</div>
+      <div class="block-list">${blockRows}</div>
+    </div>
+
+    <!-- QUIZ RESULTS -->
+    <div class="rpt-section">
+      <div class="rpt-section-title">⚡ Квиз нәтижелері</div>
+      ${quizHtml}
+    </div>
+
+    <!-- NOTES -->
+    <div class="rpt-section">
+      <div class="rpt-section-title">📝 Мұғалім жазбалары</div>
+      ${notesHtml}
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="rpt-section">
+      <div class="rpt-section-title">📊 Жалпы қорытынды</div>
+      <table class="rpt-table">
+        <tbody>
+          ${[
+            ['Жалпы қатысушылар', leaderboard.length],
+            ['Блоктар саны', blocks.length],
+            ['Квиз блоктары', quizCount],
+            ['Голосование блоктары', blocks.filter(b=>b.type==='poll').length],
+            ['Тапсырма блоктары', blocks.filter(b=>b.type==='task').length],
+            ['Жеңімпаз', leaderboard[0]?.name || '—'],
+            ['Макс. ұпай', leaderboard[0]?.score || 0],
+            ['Орт. ұпай', avgScore],
+            ['Ұзақтығы', duration],
+            ['Режим', mode],
+          ].map(([k,v])=>`<tr><td style="font-family:monospace;font-size:11px;color:#6a8090;width:200px">${esc(String(k))}</td><td style="font-weight:600;color:#1a2d35">${esc(String(v))}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="rpt-footer">
+      <div class="rpt-footer-logo">Tagybasqa</div>
+      <div class="rpt-footer-date">Есеп жасалды: ${new Date().toLocaleString('kk-KZ')}</div>
+    </div>
+
+  </div>`;
+}
+
+// ── Render notes editor ───────────────────────────────────────
+function renderNotesEditor() {
+  return `
+    <div class="notes-section screen-only">
+      <span class="notes-label">📝 Мұғалімнің жазбалары (есепке қосылады)</span>
+      <textarea class="notes-ta" id="teacherNotesInput"
+        placeholder="Сабақ туралы ескертпелер, бақылаулар, болашақ жоспарлар..."></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-blue" onclick="applyNotes()" style="padding:8px 16px">
+          ✓ Жазбаны есепке қосу
+        </button>
+      </div>
+    </div>`;
+}
+
+// ── Main ──────────────────────────────────────────────────────
+let globalSession = null, globalLeaderboard = [], globalQuizResults = [], globalBlocks = [];
+
+async function main() {
+  try {
+    const session = await loadSession();
+    globalSession = session;
+
+    const [leaderboard, quizResults, blocks] = await Promise.all([
+      loadStudentActivity(session.id),
+      loadQuizResults(session.id, session.lessonId),
+      loadBlocks(session.lessonId),
+    ]);
+
+    globalLeaderboard  = leaderboard;
+    globalQuizResults  = quizResults;
+    globalBlocks       = blocks;
+
+    const mainEl = document.getElementById('mainEl');
+    mainEl.innerHTML = renderNotesEditor() + buildReport(session, leaderboard, quizResults, blocks, '');
+
+    if (session._demo) {
+      toast('⚠️ Демо деректер. URL-ге ?pin=XXXXXX немесе ?session=ID қосыңыз');
+    }
+  } catch(e) {
+    console.error(e);
+    document.getElementById('mainEl').innerHTML = `
+      <div class="loading-wrap">
+        <div style="font-size:32px">⚠️</div>
+        <div style="color:#ff4b4b;font-family:monospace">Қате: ${esc(e.message)}</div>
+      </div>`;
+  }
+}
+
+window.applyNotes = function() {
+  const notes = document.getElementById('teacherNotesInput')?.value || '';
+  const wrap = document.getElementById('reportWrap');
+  if (wrap) {
+    wrap.outerHTML = buildReport(globalSession, globalLeaderboard, globalQuizResults, globalBlocks, notes);
+  }
+  toast('✓ Жазба есепке қосылды');
+};
+
+window.printReport = function() {
+  // Save notes first
+  const notes = document.getElementById('teacherNotesInput')?.value || '';
+  if (notes) {
+    const wrap = document.getElementById('reportWrap');
+    if (wrap) wrap.outerHTML = buildReport(globalSession, globalLeaderboard, globalQuizResults, globalBlocks, notes);
+  }
+  window.print();
+};
+
+window.copyShareLink = function() {
+  navigator.clipboard.writeText(location.href).then(() => toast('🔗 Сілтеме көшірілді!'));
+};
+
+main();
+</script>
+</body>
+</html>

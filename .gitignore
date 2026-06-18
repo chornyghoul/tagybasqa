@@ -1,0 +1,6 @@
+node_modules/
+config.js
+*.log
+.DS_Store
+serviceAccountKey.json
+pystart-dd2db-firebase-adminsdk-*.json

@@ -129,7 +129,7 @@
   /* Screen: lessons */
   .lm-lesson-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:.15s}
   .lm-lesson-card:hover{border-color:rgba(28,176,246,.3);transform:translateX(2px)}
-  .lm-lc-emoji{font-size:22px;flex-shrink:0;margin-top:2px}
+  .lm-lc-emoji{font-size:0;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;width:24px;height:24px}
   .lm-lc-title{font-size:12px;font-weight:800;color:var(--text);margin-bottom:3px}
   .lm-lc-meta{font-size:10px;color:var(--text3);font-family:var(--mono)}
   .lm-lc-progress{height:3px;background:var(--border2);border-radius:99px;overflow:hidden;margin-top:6px}
@@ -175,7 +175,7 @@
   .lfc-c4::before{background:linear-gradient(90deg,var(--duo-purple),var(--duo-blue))}
   .lfc-c5::before{background:linear-gradient(90deg,var(--duo-teal),var(--duo-blue))}
   .lfc-c6::before{background:linear-gradient(90deg,var(--duo-red),var(--duo-orange))}
-  .lfc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;border:1px solid var(--border2)}
+  .lfc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0;margin-bottom:14px;border:1px solid var(--border2)}
   .lfc-blue{background:rgba(28,176,246,.1);border-color:rgba(28,176,246,.2)}
   .lfc-green{background:rgba(87,204,2,.1);border-color:rgba(87,204,2,.2)}
   .lfc-orange{background:rgba(255,150,0,.1);border-color:rgba(255,150,0,.2)}
@@ -240,7 +240,7 @@
   }
   .task-cat:hover{border-color:var(--border3);color:var(--text)}
   .task-cat.active{border-color:var(--duo-blue);background:rgba(28,176,246,.08);color:var(--duo-blue)}
-  .task-cat-icon{font-size:20px;flex-shrink:0}
+  .task-cat-icon{font-size:0;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0}
   .task-cat-count{margin-left:auto;font-family:var(--mono);font-size:10px;background:var(--bg3);padding:2px 7px;border-radius:99px;color:var(--text3)}
   .tasks-list{display:flex;flex-direction:column;gap:10px}
   .task-card{
@@ -335,28 +335,95 @@
   .fade-up{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
   .fade-up.visible{opacity:1;transform:translateY(0)}
 
+  /* ═══ MOBILE NAV TOGGLE / DROPDOWN ═══ */
+  .land-mob-toggle{
+    display:none;flex-direction:column;justify-content:center;align-items:center;
+    gap:4px;width:36px;height:36px;background:transparent;border:1.5px solid var(--border2);
+    border-radius:10px;cursor:pointer;flex-shrink:0;
+  }
+  .land-mob-toggle span{display:block;width:16px;height:2px;background:var(--text2);border-radius:2px;transition:.2s}
+  .land-mob-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .land-mob-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .land-mob-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+  .land-mob-menu{
+    display:none;flex-direction:column;gap:2px;
+    position:sticky;top:64px;z-index:99;
+    background:rgba(19,31,36,.98);backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);padding:10px 20px 16px;
+  }
+  .land-mob-menu.open{display:flex}
+  .land-mob-link{
+    padding:12px 6px;color:var(--text2);text-decoration:none;font-size:15px;font-weight:700;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .land-mob-link:active{color:var(--duo-blue)}
+  .land-mob-divider{height:1px;background:var(--border);margin:8px 0}
+  .land-mob-cta{
+    display:block;text-align:center;padding:13px;border-radius:99px;
+    background:var(--duo-blue);color:#fff;font-weight:900;font-size:14px;text-decoration:none;margin-top:4px;
+  }
+
   /* MOBILE */
   @media(max-width:900px){
-    .land-nav{padding:0 20px}
+    .land-nav{padding:0 16px}
     .land-nav-center{display:none}
-    .land-hero{flex-direction:column;padding:40px 20px;gap:40px}
+    .land-mob-toggle{display:flex}
+    .land-btn-ghost{display:none}
+    .lang-switcher{order:-1}
+    .land-hero{flex-direction:column;padding:32px 18px;gap:32px}
     .land-hero-right{width:100%}
-    .land-hero-title{font-size:38px}
-    .land-hero-title .ht-sub{font-size:28px}
-    .land-features,.land-courses,.land-tasks,.land-roles,.land-faq,.land-footer{padding:40px 20px}
-    .land-feat-grid{grid-template-columns:1fr 1fr}
+    .land-hero-title{font-size:32px}
+    .land-hero-title .ht-sub{font-size:24px}
+    .land-hero-sub{font-size:15px}
+    .land-hero-cta{flex-direction:column;align-items:stretch}
+    .land-cta-main,.land-cta-secondary{text-align:center;width:100%;box-sizing:border-box}
+    .land-hero-stats{gap:18px;justify-content:space-between}
+    .land-features,.land-courses,.land-tasks,.land-roles,.land-faq,.land-footer{padding:36px 18px}
+    .land-feat-title,.land-feat-grid+*{font-size:26px}
+    .land-feat-grid{grid-template-columns:1fr 1fr;gap:10px}
+    .land-feat-card{padding:18px}
     .land-courses-grid{grid-template-columns:1fr}
-    .land-tasks-layout{grid-template-columns:1fr}
-    .task-categories{flex-direction:row;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+    .land-tasks-layout{grid-template-columns:1fr;gap:16px}
+    .task-categories{flex-direction:row;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+    .task-cat{flex-shrink:0;white-space:nowrap}
     .task-cat-count{display:none}
     .land-roles-grid{grid-template-columns:1fr}
+    .land-role-card{padding:22px}
+    .lrc-title{font-size:20px}
+    .faq-q{padding:15px 16px;font-size:14px}
+    .faq-a{padding:0 16px}
+    .faq-item.open .faq-a{padding:14px 16px}
+    .land-footer{flex-direction:column;align-items:flex-start;gap:12px;padding:24px 18px}
+    .land-footer-links{gap:10px 16px}
+    .task-card{padding:14px;gap:10px}
+    .tc-num{width:32px;height:32px;font-size:12px}
+    .tc-title{font-size:13px}
+    .tc-desc{font-size:11.5px}
+    .tc-right{align-items:flex-end}
+    .lco-banner{height:100px;font-size:40px}
+    .lm-screen{padding:12px 14px;min-height:200px}
   }
   @media(max-width:560px){
     .land-feat-grid{grid-template-columns:1fr}
-    .land-hero-stats{gap:20px}
-    .lang-switcher{display:none}
+    .land-hero-stats{gap:14px}
+    .land-stat-val{font-size:20px}
+    .lang-switcher{display:flex}
+    .land-hero-title{font-size:27px}
+    .land-hero-title .ht-sub{font-size:20px}
+    .land-hero-eyebrow{font-size:10px;padding:4px 11px}
+    .task-card{flex-direction:column}
+    .tc-right{flex-direction:row;align-items:center;justify-content:space-between;width:100%}
+    .lco-stats{flex-wrap:wrap;gap:8px 14px}
   }
+  @media(max-width:380px){
+    .land-hero-title{font-size:23px}
+    .land-hero-title .ht-sub{font-size:18px}
+    .lnl-badge{display:none}
+    .land-hero-stats{flex-wrap:wrap}
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
 <canvas id="particle-field" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.6"></canvas>
@@ -404,8 +471,31 @@
     <a class="land-btn-solid" href="./auth.html" data-kk>Тіркелу</a>
     <a class="land-btn-solid" href="./auth.html" data-ru>Регистрация</a>
     <a class="land-btn-solid" href="./auth.html" data-en>Sign up</a>
+    <button class="land-mob-toggle" onclick="toggleMobileNav()" aria-label="Меню" aria-expanded="false" id="landMobToggleBtn">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<!-- ═══ MOBILE NAV DROPDOWN ═══ -->
+<div class="land-mob-menu" id="landMobMenu">
+  <a class="land-mob-link" href="#land-courses" onclick="closeMobileNav()" data-kk>Курстар</a>
+  <a class="land-mob-link" href="#land-courses" onclick="closeMobileNav()" data-ru>Курсы</a>
+  <a class="land-mob-link" href="#land-courses" onclick="closeMobileNav()" data-en>Courses</a>
+  <a class="land-mob-link" href="#land-tasks" onclick="closeMobileNav()" data-kk>Тапсырмалар</a>
+  <a class="land-mob-link" href="#land-tasks" onclick="closeMobileNav()" data-ru>Задания</a>
+  <a class="land-mob-link" href="#land-tasks" onclick="closeMobileNav()" data-en>Assignments</a>
+  <a class="land-mob-link" href="#land-features" onclick="closeMobileNav()" data-kk>Мүмкіндіктер</a>
+  <a class="land-mob-link" href="#land-features" onclick="closeMobileNav()" data-ru>Возможности</a>
+  <a class="land-mob-link" href="#land-features" onclick="closeMobileNav()" data-en>Features</a>
+  <a class="land-mob-link" href="#land-roles" onclick="closeMobileNav()" data-kk>Рөлдер</a>
+  <a class="land-mob-link" href="#land-roles" onclick="closeMobileNav()" data-ru>Роли</a>
+  <a class="land-mob-link" href="#land-roles" onclick="closeMobileNav()" data-en>Roles</a>
+  <div class="land-mob-divider"></div>
+  <a class="land-mob-cta" href="./auth.html" data-kk>Тіркелу →</a>
+  <a class="land-mob-cta" href="./auth.html" data-ru>Регистрация →</a>
+  <a class="land-mob-cta" href="./auth.html" data-en>Sign up →</a>
+</div>
 
 <!-- ═══ HERO ═══ -->
 <section class="land-hero">
@@ -450,16 +540,16 @@
         <div class="lm-tab" onclick="lmSwitch(2,this)" data-kk>Квиз</div><div class="lm-tab" onclick="lmSwitch(2,this)" data-ru style="display:none">Квиз</div><div class="lm-tab" onclick="lmSwitch(2,this)" data-en style="display:none">Quiz</div>
       </div>
       <div class="lm-screen" id="lm-scr-0">
-        <div class="lm-lesson-card"><div class="lm-lc-emoji">🐍</div><div style="flex:1"><div class="lm-lc-title" data-kk>Python негіздері</div><div class="lm-lc-title" data-ru>Основы Python</div><div class="lm-lc-title" data-en>Python Basics</div><div class="lm-lc-meta">3 / 8 · 45 XP</div><div class="lm-lc-progress"><div class="lm-lc-prog-fill" style="width:38%"></div></div></div><div class="lm-lc-badge lm-badge-blue" data-kk>Жалғасуда</div><div class="lm-lc-badge lm-badge-blue" data-ru>В процессе</div><div class="lm-lc-badge lm-badge-blue" data-en>In progress</div></div>
-        <div class="lm-lesson-card"><div class="lm-lc-emoji">📦</div><div style="flex:1"><div class="lm-lc-title" data-kk>Деректер типтері</div><div class="lm-lc-title" data-ru>Типы данных</div><div class="lm-lc-title" data-en>Data Types</div><div class="lm-lc-meta">0 / 6 · 60 XP</div><div class="lm-lc-progress"><div class="lm-lc-prog-fill" style="width:0%"></div></div></div><div class="lm-lc-badge lm-badge-orange" data-kk>Жаңа</div><div class="lm-lc-badge lm-badge-orange" data-ru>Новый</div><div class="lm-lc-badge lm-badge-orange" data-en>New</div></div>
-        <div class="lm-lesson-card"><div class="lm-lc-emoji">🔄</div><div style="flex:1"><div class="lm-lc-title" data-kk>Циклдар</div><div class="lm-lc-title" data-ru>Циклы</div><div class="lm-lc-title" data-en>Loops</div><div class="lm-lc-meta">6 / 6 · 80 XP</div><div class="lm-lc-progress"><div class="lm-lc-prog-fill" style="width:100%;background:var(--duo-green)"></div></div></div><div class="lm-lc-badge lm-badge-green" data-kk>✓ Аяқталды</div><div class="lm-lc-badge lm-badge-green" data-ru>✓ Готово</div><div class="lm-lc-badge lm-badge-green" data-en>✓ Done</div></div>
+        <div class="lm-lesson-card"><div class="lm-lc-emoji"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><div style="flex:1"><div class="lm-lc-title" data-kk>Python негіздері</div><div class="lm-lc-title" data-ru>Основы Python</div><div class="lm-lc-title" data-en>Python Basics</div><div class="lm-lc-meta">3 / 8 · 45 XP</div><div class="lm-lc-progress"><div class="lm-lc-prog-fill" style="width:38%"></div></div></div><div class="lm-lc-badge lm-badge-blue" data-kk>Жалғасуда</div><div class="lm-lc-badge lm-badge-blue" data-ru>В процессе</div><div class="lm-lc-badge lm-badge-blue" data-en>In progress</div></div>
+        <div class="lm-lesson-card"><div class="lm-lc-emoji"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div style="flex:1"><div class="lm-lc-title" data-kk>Деректер типтері</div><div class="lm-lc-title" data-ru>Типы данных</div><div class="lm-lc-title" data-en>Data Types</div><div class="lm-lc-meta">0 / 6 · 60 XP</div><div class="lm-lc-progress"><div class="lm-lc-prog-fill" style="width:0%"></div></div></div><div class="lm-lc-badge lm-badge-orange" data-kk>Жаңа</div><div class="lm-lc-badge lm-badge-orange" data-ru>Новый</div><div class="lm-lc-badge lm-badge-orange" data-en>New</div></div>
+        <div class="lm-lesson-card"><div class="lm-lc-emoji"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div><div style="flex:1"><div class="lm-lc-title" data-kk>Циклдар</div><div class="lm-lc-title" data-ru>Циклы</div><div class="lm-lc-title" data-en>Loops</div><div class="lm-lc-meta">6 / 6 · 80 XP</div><div class="lm-lc-progress"><div class="lm-lc-prog-fill" style="width:100%;background:var(--duo-green)"></div></div></div><div class="lm-lc-badge lm-badge-green" data-kk>✓ Аяқталды</div><div class="lm-lc-badge lm-badge-green" data-ru>✓ Готово</div><div class="lm-lc-badge lm-badge-green" data-en>✓ Done</div></div>
       </div>
       <div class="lm-screen" id="lm-scr-1" style="display:none">
         <div class="lm-code-block"><span class="cm"># Функция анықтау</span><br><span class="kw">def</span> <span class="fn">greet</span>(name):<br>&nbsp;&nbsp;<span class="kw">return</span> <span class="str">f"Сәлем, {name}!"</span><br><br><span class="fn">print</span>(<span class="fn">greet</span>(<span class="str">"Мирас"</span>))</div>
         <div class="lm-quiz-mini"><div class="lm-q" data-kk>Қандай нәтиже шығады?</div><div class="lm-q" data-ru>Что выведет программа?</div><div class="lm-q" data-en>What is the output?</div><div class="lm-opts"><div class="lm-opt correct">✓ &nbsp;Сәлем, Мирас!</div><div class="lm-opt wrong">✗ &nbsp;greet(Мирас)</div><div class="lm-opt">{"Сәлем": "Мирас"}</div></div></div>
       </div>
       <div class="lm-screen" id="lm-scr-2" style="display:none">
-        <div class="lm-qz-prog"><div class="lm-hearts">❤️❤️❤️</div><div class="lm-qz-bar"><div class="lm-qz-fill" style="width:60%" id="lm-qz-fill"></div></div><div class="lm-qz-xp" id="lm-qz-xp">+120 XP</div></div>
+        <div class="lm-qz-prog"><div class="lm-hearts"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>️<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>️<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>️</div><div class="lm-qz-bar"><div class="lm-qz-fill" style="width:60%" id="lm-qz-fill"></div></div><div class="lm-qz-xp" id="lm-qz-xp">+120 XP</div></div>
         <div class="lm-quiz-mini"><div class="lm-q" id="lm-qz-q" data-kk>Python-да list жасау синтаксисі?</div><div class="lm-q" id="lm-qz-q-ru" data-ru>Синтаксис создания list в Python?</div><div class="lm-q" id="lm-qz-q-en" data-en>Syntax to create a list in Python?</div><div class="lm-opts" id="lm-qz-opts"><div class="lm-opt" onclick="lmAns(this,false)">list(1,2,3)</div><div class="lm-opt" onclick="lmAns(this,true)">[1, 2, 3]</div><div class="lm-opt" onclick="lmAns(this,false)">{1, 2, 3}</div></div></div>
       </div>
     </div>
@@ -480,7 +570,7 @@
   <div class="land-courses-grid">
 
     <div class="lco-card fade-up">
-      <div class="lco-banner lco-b1"><span>🐍</span><span class="lco-level lco-lv-beg" data-kk>Бастауыш</span><span class="lco-level lco-lv-beg" data-ru>Начинающий</span><span class="lco-level lco-lv-beg" data-en>Beginner</span></div>
+      <div class="lco-banner lco-b1"><span style="font-size:0;display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span><span class="lco-level lco-lv-beg" data-kk>Бастауыш</span><span class="lco-level lco-lv-beg" data-ru>Начинающий</span><span class="lco-level lco-lv-beg" data-en>Beginner</span></div>
       <div class="lco-body">
         <div class="lco-tag" data-kk>Python · Бағдарламалау</div><div class="lco-tag" data-ru>Python · Программирование</div><div class="lco-tag" data-en>Python · Programming</div>
         <div class="lco-title" data-kk>Python негіздері</div><div class="lco-title" data-ru>Основы Python</div><div class="lco-title" data-en>Python Fundamentals</div>
@@ -488,9 +578,9 @@
         <div class="lco-desc" data-ru>Переменные, типы, циклы, функции. Первый шаг в программирование.</div>
         <div class="lco-desc" data-en>Variables, types, loops, functions. Your first step into programming.</div>
         <div class="lco-stats">
-          <div class="lco-stat">📦 8 <span data-kk>сабақ</span><span data-ru>урок</span><span data-en>lessons</span></div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> 8 <span data-kk>сабақ</span><span data-ru>урок</span><span data-en>lessons</span></div>
           <div class="lco-stat">⏱ 4 <span data-kk>сағат</span><span data-ru>часа</span><span data-en>hours</span></div>
-          <div class="lco-stat">🏆 320 XP</div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg> 320 XP</div>
         </div>
         <div class="lco-footer">
           <div class="lco-author"><div class="lco-av" style="background:rgba(28,176,246,.2);color:var(--duo-blue)">АС</div><span class="lco-author-name">Айдар С.</span></div>
@@ -503,7 +593,7 @@
     </div>
 
     <div class="lco-card fade-up">
-      <div class="lco-banner lco-b2"><span>🔄</span><span class="lco-level lco-lv-mid" data-kk>Орта</span><span class="lco-level lco-lv-mid" data-ru>Средний</span><span class="lco-level lco-lv-mid" data-en>Intermediate</span></div>
+      <div class="lco-banner lco-b2"><span style="font-size:0;display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span><span class="lco-level lco-lv-mid" data-kk>Орта</span><span class="lco-level lco-lv-mid" data-ru>Средний</span><span class="lco-level lco-lv-mid" data-en>Intermediate</span></div>
       <div class="lco-body">
         <div class="lco-tag" data-kk>Python · Алгоритмдер</div><div class="lco-tag" data-ru>Python · Алгоритмы</div><div class="lco-tag" data-en>Python · Algorithms</div>
         <div class="lco-title" data-kk>Алгоритмдер мен деректер құрылымы</div><div class="lco-title" data-ru>Алгоритмы и структуры данных</div><div class="lco-title" data-en>Algorithms & Data Structures</div>
@@ -511,9 +601,9 @@
         <div class="lco-desc" data-ru>Сортировки, поиск, стек, очередь, связный список. Задачи в стиле LeetCode.</div>
         <div class="lco-desc" data-en>Sorting, search, stack, queue, linked list. LeetCode-style tasks.</div>
         <div class="lco-stats">
-          <div class="lco-stat">📦 12 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> 12 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
           <div class="lco-stat">⏱ 8 <span data-kk>сағат</span><span data-ru>часов</span><span data-en>hours</span></div>
-          <div class="lco-stat">🏆 640 XP</div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg> 640 XP</div>
         </div>
         <div class="lco-footer">
           <div class="lco-author"><div class="lco-av" style="background:rgba(206,130,255,.2);color:var(--duo-purple)">НС</div><span class="lco-author-name">Нурлан С.</span></div>
@@ -526,7 +616,7 @@
     </div>
 
     <div class="lco-card fade-up">
-      <div class="lco-banner lco-b3"><span>🏗️</span><span class="lco-level lco-lv-mid" data-kk>Орта</span><span class="lco-level lco-lv-mid" data-ru>Средний</span><span class="lco-level lco-lv-mid" data-en>Intermediate</span></div>
+      <div class="lco-banner lco-b3"><span style="font-size:0;display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span><span class="lco-level lco-lv-mid" data-kk>Орта</span><span class="lco-level lco-lv-mid" data-ru>Средний</span><span class="lco-level lco-lv-mid" data-en>Intermediate</span></div>
       <div class="lco-body">
         <div class="lco-tag" data-kk>Python · ООП</div><div class="lco-tag" data-ru>Python · ООП</div><div class="lco-tag" data-en>Python · OOP</div>
         <div class="lco-title" data-kk>Объектіге бағытталған бағдарламалау</div><div class="lco-title" data-ru>Объектно-ориентированное программирование</div><div class="lco-title" data-en>Object-Oriented Programming</div>
@@ -534,9 +624,9 @@
         <div class="lco-desc" data-ru>Классы, наследование, инкапсуляция, полиморфизм. Завершается реальным проектом.</div>
         <div class="lco-desc" data-en>Classes, inheritance, encapsulation, polymorphism. Ends with a real project.</div>
         <div class="lco-stats">
-          <div class="lco-stat">📦 10 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> 10 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
           <div class="lco-stat">⏱ 6 <span data-kk>сағат</span><span data-ru>часов</span><span data-en>hours</span></div>
-          <div class="lco-stat">🏆 520 XP</div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg> 520 XP</div>
         </div>
         <div class="lco-footer">
           <div class="lco-author"><div class="lco-av" style="background:rgba(87,204,2,.15);color:var(--duo-green)">ГБ</div><span class="lco-author-name">Гүлнар Б.</span></div>
@@ -549,7 +639,7 @@
     </div>
 
     <div class="lco-card fade-up">
-      <div class="lco-banner lco-b4"><span>🌐</span><span class="lco-level lco-lv-adv" data-kk>Жоғары</span><span class="lco-level lco-lv-adv" data-ru>Продвинутый</span><span class="lco-level lco-lv-adv" data-en>Advanced</span></div>
+      <div class="lco-banner lco-b4"><span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="lco-level lco-lv-adv" data-kk>Жоғары</span><span class="lco-level lco-lv-adv" data-ru>Продвинутый</span><span class="lco-level lco-lv-adv" data-en>Advanced</span></div>
       <div class="lco-body">
         <div class="lco-tag" data-kk>Python · FastAPI · Web</div><div class="lco-tag" data-ru>Python · FastAPI · Web</div><div class="lco-tag" data-en>Python · FastAPI · Web</div>
         <div class="lco-title" data-kk>FastAPI-мен веб-серверлер</div><div class="lco-title" data-ru>Веб-серверы с FastAPI</div><div class="lco-title" data-en>Web Servers with FastAPI</div>
@@ -557,9 +647,9 @@
         <div class="lco-desc" data-ru>REST API, маршруты, Pydantic, база данных. Профессиональный уровень.</div>
         <div class="lco-desc" data-en>REST API, routes, Pydantic, database integration. Professional level.</div>
         <div class="lco-stats">
-          <div class="lco-stat">📦 14 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> 14 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
           <div class="lco-stat">⏱ 10 <span data-kk>сағат</span><span data-ru>часов</span><span data-en>hours</span></div>
-          <div class="lco-stat">🏆 800 XP</div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg> 800 XP</div>
         </div>
         <div class="lco-footer">
           <div class="lco-author"><div class="lco-av" style="background:rgba(255,75,75,.15);color:var(--duo-red)">МН</div><span class="lco-author-name">Марат Н.</span></div>
@@ -571,7 +661,7 @@
     </div>
 
     <div class="lco-card fade-up">
-      <div class="lco-banner lco-b5"><span>🤖</span><span class="lco-level lco-lv-mid" data-kk>Орта</span><span class="lco-level lco-lv-mid" data-ru>Средний</span><span class="lco-level lco-lv-mid" data-en>Intermediate</span></div>
+      <div class="lco-banner lco-b5"><span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span><span class="lco-level lco-lv-mid" data-kk>Орта</span><span class="lco-level lco-lv-mid" data-ru>Средний</span><span class="lco-level lco-lv-mid" data-en>Intermediate</span></div>
       <div class="lco-body">
         <div class="lco-tag" data-kk>Python · Gemini API · ЖИ</div><div class="lco-tag" data-ru>Python · Gemini API · ИИ</div><div class="lco-tag" data-en>Python · Gemini API · AI</div>
         <div class="lco-title" data-kk>ЖИ-қосымшалар жасау</div><div class="lco-title" data-ru>Создание ИИ-приложений</div><div class="lco-title" data-en>Building AI Applications</div>
@@ -579,9 +669,9 @@
         <div class="lco-desc" data-ru>Gemini 2.5 API, prompt engineering, создание чатбота, анализ данных.</div>
         <div class="lco-desc" data-en>Gemini 2.5 API, prompt engineering, chatbot building, data analysis.</div>
         <div class="lco-stats">
-          <div class="lco-stat">📦 9 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> 9 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
           <div class="lco-stat">⏱ 5 <span data-kk>сағат</span><span data-ru>часов</span><span data-en>hours</span></div>
-          <div class="lco-stat">🏆 460 XP</div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg> 460 XP</div>
         </div>
         <div class="lco-footer">
           <div class="lco-author"><div class="lco-av" style="background:rgba(31,224,192,.15);color:var(--duo-teal)">АС</div><span class="lco-author-name">Айгерім С.</span></div>
@@ -593,7 +683,7 @@
     </div>
 
     <div class="lco-card fade-up">
-      <div class="lco-banner lco-b6"><span>📊</span><span class="lco-level lco-lv-mid" data-kk>Орта</span><span class="lco-level lco-lv-mid" data-ru>Средний</span><span class="lco-level lco-lv-mid" data-en>Intermediate</span></div>
+      <div class="lco-banner lco-b6"><span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="lco-level lco-lv-mid" data-kk>Орта</span><span class="lco-level lco-lv-mid" data-ru>Средний</span><span class="lco-level lco-lv-mid" data-en>Intermediate</span></div>
       <div class="lco-body">
         <div class="lco-tag" data-kk>Python · pandas · Деректер</div><div class="lco-tag" data-ru>Python · pandas · Данные</div><div class="lco-tag" data-en>Python · pandas · Data</div>
         <div class="lco-title" data-kk>Деректерді талдау: pandas + matplotlib</div><div class="lco-title" data-ru>Анализ данных: pandas + matplotlib</div><div class="lco-title" data-en>Data Analysis: pandas + matplotlib</div>
@@ -601,9 +691,9 @@
         <div class="lco-desc" data-ru>Чтение CSV, очистка данных, визуализация, диаграммы. Работа с реальными данными.</div>
         <div class="lco-desc" data-en>Reading CSV, data cleaning, visualization, charts. Work with real datasets.</div>
         <div class="lco-stats">
-          <div class="lco-stat">📦 11 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> 11 <span data-kk>сабақ</span><span data-ru>уроков</span><span data-en>lessons</span></div>
           <div class="lco-stat">⏱ 7 <span data-kk>сағат</span><span data-ru>часов</span><span data-en>hours</span></div>
-          <div class="lco-stat">🏆 580 XP</div>
+          <div class="lco-stat" style="display:flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg> 580 XP</div>
         </div>
         <div class="lco-footer">
           <div class="lco-author"><div class="lco-av" style="background:rgba(255,150,0,.15);color:var(--duo-orange)">БА</div><span class="lco-author-name">Болат А.</span></div>
@@ -630,11 +720,11 @@
   <div class="land-feat-sub" data-en>Step-by-step tasks by topic. Write your answer in the browser and check it instantly.</div>
   <div class="land-tasks-layout">
     <div class="task-categories">
-      <button class="task-cat active" onclick="switchTaskCat(this,'py-basics')"><span class="task-cat-icon">🐍</span><span data-kk>Python негіздері</span><span data-ru>Основы Python</span><span data-en>Python Basics</span><span class="task-cat-count">12</span></button>
-      <button class="task-cat" onclick="switchTaskCat(this,'py-funcs')"><span class="task-cat-icon">⚡</span><span data-kk>Функциялар</span><span data-ru>Функции</span><span data-en>Functions</span><span class="task-cat-count">8</span></button>
-      <button class="task-cat" onclick="switchTaskCat(this,'py-oop')"><span class="task-cat-icon">🏗️</span><span data-kk>ООП</span><span data-ru>ООП</span><span data-en>OOP</span><span class="task-cat-count">10</span></button>
-      <button class="task-cat" onclick="switchTaskCat(this,'py-algo')"><span class="task-cat-icon">🔢</span><span data-kk>Алгоритмдер</span><span data-ru>Алгоритмы</span><span data-en>Algorithms</span><span class="task-cat-count">15</span></button>
-      <button class="task-cat" onclick="switchTaskCat(this,'py-files')"><span class="task-cat-icon">📁</span><span data-kk>Файлдар</span><span data-ru>Файлы</span><span data-en>Files</span><span class="task-cat-count">6</span></button>
+      <button class="task-cat active" onclick="switchTaskCat(this,'py-basics')"><span class="task-cat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span><span data-kk>Python негіздері</span><span data-ru>Основы Python</span><span data-en>Python Basics</span><span class="task-cat-count">12</span></button>
+      <button class="task-cat" onclick="switchTaskCat(this,'py-funcs')"><span class="task-cat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="7" y2="20"/><line x1="9" y1="20" x2="12" y2="20"/><line x1="4" y1="4" x2="5.5" y2="12.5"/><path d="M4 4h16"/><path d="M15 4 9 20"/><line x1="16" y1="20" x2="20" y2="20"/></svg></span><span data-kk>Функциялар</span><span data-ru>Функции</span><span data-en>Functions</span><span class="task-cat-count">8</span></button>
+      <button class="task-cat" onclick="switchTaskCat(this,'py-oop')"><span class="task-cat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span><span data-kk>ООП</span><span data-ru>ООП</span><span data-en>OOP</span><span class="task-cat-count">10</span></button>
+      <button class="task-cat" onclick="switchTaskCat(this,'py-algo')"><span class="task-cat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></span><span data-kk>Алгоритмдер</span><span data-ru>Алгоритмы</span><span data-en>Algorithms</span><span class="task-cat-count">15</span></button>
+      <button class="task-cat" onclick="switchTaskCat(this,'py-files')"><span class="task-cat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span><span data-kk>Файлдар</span><span data-ru>Файлы</span><span data-en>Files</span><span class="task-cat-count">6</span></button>
     </div>
     <div class="tasks-list" id="tasksList"></div>
   </div>
@@ -652,12 +742,12 @@
   <div class="land-feat-sub" data-ru>Закрываем все потребности учителя и ученика.</div>
   <div class="land-feat-sub" data-en>We cover the needs of both teachers and students.</div>
   <div class="land-feat-grid">
-    <div class="land-feat-card lfc-c1"><div class="lfc-icon lfc-blue">🐍</div><div class="lfc-name" data-kk>Интерактивті сабақтар</div><div class="lfc-name" data-ru>Интерактивные уроки</div><div class="lfc-name" data-en>Interactive Lessons</div><div class="lfc-desc" data-kk>Python кодын тікелей браузерде жазасың. Орнату қажет емес.</div><div class="lfc-desc" data-ru>Пишешь Python прямо в браузере. Ничего устанавливать не нужно.</div><div class="lfc-desc" data-en>Write Python directly in the browser. No installation needed.</div></div>
-    <div class="land-feat-card lfc-c2"><div class="lfc-icon lfc-orange">📡</div><div class="lfc-name" data-kk>Ашық сабақтар</div><div class="lfc-name" data-ru>Открытые уроки</div><div class="lfc-name" data-en>Open Classes</div><div class="lfc-desc" data-kk>Мұғалімдер тікелей эфирде сабақ өткізеді. Оқушылар нақты уақытта қатысады.</div><div class="lfc-desc" data-ru>Учителя проводят уроки в прямом эфире. Ученики участвуют в реальном времени.</div><div class="lfc-desc" data-en>Teachers host live open classes. Students participate in real time.</div></div>
-    <div class="land-feat-card lfc-c3"><div class="lfc-icon lfc-green">🏆</div><div class="lfc-name" data-kk>Геймификация</div><div class="lfc-name" data-ru>Геймификация</div><div class="lfc-name" data-en>Gamification</div><div class="lfc-desc" data-kk>Тізбектер, XP, бейджиктер және рейтинг. Үйрену — ойын сияқты.</div><div class="lfc-desc" data-ru>Стрики, XP, значки и рейтинг. Учёба как игра.</div><div class="lfc-desc" data-en>Streaks, XP, badges, and leaderboards. Learning like a game.</div></div>
-    <div class="land-feat-card lfc-c4"><div class="lfc-icon lfc-purple">🧠</div><div class="lfc-name" data-kk>ЖИ-квиздер</div><div class="lfc-name" data-ru>ИИ-квизы</div><div class="lfc-name" data-en>AI Quizzes</div><div class="lfc-desc" data-kk>Gemini 2.5 кез келген тақырып бойынша автоматты сұрақтар жасайды.</div><div class="lfc-desc" data-ru>Gemini 2.5 автоматически создаёт вопросы по любой теме.</div><div class="lfc-desc" data-en>Gemini 2.5 auto-generates questions on any topic.</div></div>
-    <div class="land-feat-card lfc-c5"><div class="lfc-icon lfc-teal">🗺️</div><div class="lfc-name" data-kk>Python жол картасы</div><div class="lfc-name" data-ru>Карта пути Python</div><div class="lfc-name" data-en>Python Roadmap</div><div class="lfc-desc" data-kk>Нөлден бастап тұрақты прогрес. Duolingo стиліндегі оқу жолы.</div><div class="lfc-desc" data-ru>Стабильный прогресс с нуля. Путь обучения в стиле Duolingo.</div><div class="lfc-desc" data-en>Steady progress from zero. Duolingo-style learning path.</div></div>
-    <div class="land-feat-card lfc-c6"><div class="lfc-icon lfc-red">⚡</div><div class="lfc-name" data-kk>Код жарысы</div><div class="lfc-name" data-ru>Соревнование в коде</div><div class="lfc-name" data-en>Code Battle</div><div class="lfc-desc" data-kk>Команда ретінде немесе жеке — нақты уақытта бәсекелес.</div><div class="lfc-desc" data-ru>В команде или соло — соревнуйся в реальном времени.</div><div class="lfc-desc" data-en>In a team or solo — compete in real time.</div></div>
+    <div class="land-feat-card lfc-c1"><div class="lfc-icon lfc-blue"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div class="lfc-name" data-kk>Интерактивті сабақтар</div><div class="lfc-name" data-ru>Интерактивные уроки</div><div class="lfc-name" data-en>Interactive Lessons</div><div class="lfc-desc" data-kk>Python кодын тікелей браузерде жазасың. Орнату қажет емес.</div><div class="lfc-desc" data-ru>Пишешь Python прямо в браузере. Ничего устанавливать не нужно.</div><div class="lfc-desc" data-en>Write Python directly in the browser. No installation needed.</div></div>
+    <div class="land-feat-card lfc-c2"><div class="lfc-icon lfc-orange"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 1 0 8"/><path d="M6 8a6 6 0 0 0 0 8"/><line x1="12" y1="12" x2="12.01" y2="12"/></svg></div><div class="lfc-name" data-kk>Ашық сабақтар</div><div class="lfc-name" data-ru>Открытые уроки</div><div class="lfc-name" data-en>Open Classes</div><div class="lfc-desc" data-kk>Мұғалімдер тікелей эфирде сабақ өткізеді. Оқушылар нақты уақытта қатысады.</div><div class="lfc-desc" data-ru>Учителя проводят уроки в прямом эфире. Ученики участвуют в реальном времени.</div><div class="lfc-desc" data-en>Teachers host live open classes. Students participate in real time.</div></div>
+    <div class="land-feat-card lfc-c3"><div class="lfc-icon lfc-green"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg></div><div class="lfc-name" data-kk>Геймификация</div><div class="lfc-name" data-ru>Геймификация</div><div class="lfc-name" data-en>Gamification</div><div class="lfc-desc" data-kk>Тізбектер, XP, бейджиктер және рейтинг. Үйрену — ойын сияқты.</div><div class="lfc-desc" data-ru>Стрики, XP, значки и рейтинг. Учёба как игра.</div><div class="lfc-desc" data-en>Streaks, XP, badges, and leaderboards. Learning like a game.</div></div>
+    <div class="land-feat-card lfc-c4"><div class="lfc-icon lfc-purple"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="1" y1="9" x2="4" y2="9"/></svg></div><div class="lfc-name" data-kk>ЖИ-квиздер</div><div class="lfc-name" data-ru>ИИ-квизы</div><div class="lfc-name" data-en>AI Quizzes</div><div class="lfc-desc" data-kk>Gemini 2.5 кез келген тақырып бойынша автоматты сұрақтар жасайды.</div><div class="lfc-desc" data-ru>Gemini 2.5 автоматически создаёт вопросы по любой теме.</div><div class="lfc-desc" data-en>Gemini 2.5 auto-generates questions on any topic.</div></div>
+    <div class="land-feat-card lfc-c5"><div class="lfc-icon lfc-teal"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></div><div class="lfc-name" data-kk>Python жол картасы</div><div class="lfc-name" data-ru>Карта пути Python</div><div class="lfc-name" data-en>Python Roadmap</div><div class="lfc-desc" data-kk>Нөлден бастап тұрақты прогрес. Duolingo стиліндегі оқу жолы.</div><div class="lfc-desc" data-ru>Стабильный прогресс с нуля. Путь обучения в стиле Duolingo.</div><div class="lfc-desc" data-en>Steady progress from zero. Duolingo-style learning path.</div></div>
+    <div class="land-feat-card lfc-c6"><div class="lfc-icon lfc-red"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="lfc-name" data-kk>Код жарысы</div><div class="lfc-name" data-ru>Соревнование в коде</div><div class="lfc-name" data-en>Code Battle</div><div class="lfc-desc" data-kk>Команда ретінде немесе жеке — нақты уақытта бәсекелес.</div><div class="lfc-desc" data-ru>В команде или соло — соревнуйся в реальном времени.</div><div class="lfc-desc" data-en>In a team or solo — compete in real time.</div></div>
   </div>
 </section>
 
@@ -671,7 +761,7 @@
   <div class="land-feat-title" data-en>Your role</div>
   <div class="land-roles-grid">
     <div class="land-role-card lrc-student">
-      <div class="lrc-badge lrc-s-badge" data-kk>🎓 Оқушы</div><div class="lrc-badge lrc-s-badge" data-ru>🎓 Ученик</div><div class="lrc-badge lrc-s-badge" data-en>🎓 Student</div>
+      <div class="lrc-badge lrc-s-badge" data-kk><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Оқушы</div><div class="lrc-badge lrc-s-badge" data-ru><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Ученик</div><div class="lrc-badge lrc-s-badge" data-en><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Student</div>
       <div class="lrc-title" data-kk>Өз қарқыныңда үйрен</div><div class="lrc-title" data-ru>Учись в своём темпе</div><div class="lrc-title" data-en>Learn at your own pace</div>
       <div class="lrc-sub" data-kk>Браузер ашты — сабақ басталды. Тапсырмалар, квиздер, жетістіктер.</div><div class="lrc-sub" data-ru>Открыл браузер — урок начался. Задания, квизы, достижения.</div><div class="lrc-sub" data-en>Open the browser — the lesson starts. Tasks, quizzes, achievements.</div>
       <ul class="lrc-list">
@@ -685,7 +775,7 @@
       <a class="lrc-cta lrc-s-cta" href="./auth.html" data-en>Sign up as a student →</a>
     </div>
     <div class="land-role-card lrc-teacher">
-      <div class="lrc-badge lrc-t-badge" data-kk>👨‍🏫 Мұғалім</div><div class="lrc-badge lrc-t-badge" data-ru>👨‍🏫 Учитель</div><div class="lrc-badge lrc-t-badge" data-en>👨‍🏫 Teacher</div>
+      <div class="lrc-badge lrc-t-badge" data-kk><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg> Мұғалім</div><div class="lrc-badge lrc-t-badge" data-ru><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg> Учитель</div><div class="lrc-badge lrc-t-badge" data-en><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg> Teacher</div>
       <div class="lrc-title" data-kk>Сабағыңды өткіз — онлайн</div><div class="lrc-title" data-ru>Проводи уроки онлайн</div><div class="lrc-title" data-en>Teach online, effortlessly</div>
       <div class="lrc-sub" data-kk>Тікелей эфирде сабақ ашасың, квиздер жасайсың, нәтижені цифрмен дәлелдейсің.</div><div class="lrc-sub" data-ru>Открываешь урок в прямом эфире, делаешь квизы, доказываешь результат цифрами.</div><div class="lrc-sub" data-en>Host live lessons, create quizzes, prove results with real data.</div>
       <ul class="lrc-list">
@@ -775,11 +865,11 @@
 
       <div class="nav-links">
         <button class="nav-item tab-btn active" data-target="view-menu">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Басты бет
         </button>
         <button class="nav-item tab-btn" data-target="view-story">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
           Ашық сабақтар
         </button>
         <button class="nav-item tab-btn" data-target="view-quizzes">
@@ -813,7 +903,7 @@
       <div id="view-pythonway" class="view-section">
         <div style="max-width:760px;margin:0 auto;padding:0 16px 48px;">
           <div style="padding:24px 0 0;text-align:center">
-            <p class="section-heading" style="margin-bottom:4px">🐍 Python жолы</p>
+            <p class="section-heading" style="margin-bottom:4px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Python жолы</p>
             <p id="pathDescription" style="color:var(--text3);font-size:13px;font-family:var(--mono)"></p>
           </div>
           <div id="pythonPathStats" class="path-stats" style="justify-content:center;padding:0"></div>
@@ -825,12 +915,12 @@
 
         <div class="story-header">
           <div class="story-header-left">
-            <h2 class="story-header-title">📡 Ашық сабақтар</h2>
+            <h2 class="story-header-title" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M7.76 7.76a6 6 0 0 0 0 8.49"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/></svg> Ашық сабақтар</h2>
             <p class="story-header-sub">Сабақ таңдаңыз → баптаңыз → класта іске қосыңыз</p>
           </div>
           <div class="story-header-actions">
             <button class="story-btn-secondary" onclick="window.location.href='./create-lesson.html'">+ Жаңа сабақ</button>
-            <button class="story-btn-primary" onclick="window.location.href='./lessons-library.html'" style="background:linear-gradient(135deg,var(--blue),var(--teal))">📚 Кітапхана</button>
+            <button class="story-btn-primary" onclick="window.location.href='./lessons-library.html'" style="background:linear-gradient(135deg,var(--blue),var(--teal))"> Кітапхана</button>
           </div>
         </div>
 
@@ -859,9 +949,9 @@
           </div>
           <select id="storyFilterLevel" class="story-select">
             <option value="">Барлық деңгейлер</option>
-            <option value="beginner">🟢 Бастауыш</option>
-            <option value="intermediate">🟡 Орта</option>
-            <option value="advanced">🔴 Жоғары</option>
+            <option value="beginner"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#57cc02;flex-shrink:0"></span> Бастауыш</option>
+            <option value="intermediate"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ffd900;flex-shrink:0"></span> Орта</option>
+            <option value="advanced"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff4b4b;flex-shrink:0"></span> Жоғары</option>
           </select>
           <select id="storyFilterSubject" class="story-select">
             <option value="">Барлық пәндер</option>
@@ -877,10 +967,10 @@
         <div id="story-tab-all" class="story-panel active">
           <div style="margin:16px 24px 4px;padding:14px 18px;background:linear-gradient(135deg,rgba(28,176,246,.07),rgba(6,214,160,.04));border:1px solid rgba(28,176,246,.14);border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:12px">
-              <span style="font-size:24px">📡</span>
+              <span style="font-size:24px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 1 0 8"/><path d="M6 8a6 6 0 0 0 0 8"/><line x1="12" y1="12" x2="12.01" y2="12"/></svg></span>
               <div>
                 <div style="font-size:13px;font-weight:700;margin-bottom:2px">Ашық сабақты іске қосу</div>
-                <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">Сабақ картасындағы «📡 Іске қосу» батырмасын басыңыз</div>
+                <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">Сабақ картасындағы «<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Іске қосу» батырмасын басыңыз</div>
               </div>
             </div>
             <a href="./lessons-library.html" style="padding:8px 16px;border:none;border-radius:99px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">Толық кітапхана →</a>
@@ -910,14 +1000,14 @@
         <div id="story-tab-langlab" class="story-panel" style="display:none"><div id="lang-lab-root"></div></div>
         <div id="story-tab-docs" class="story-panel" style="display:none">
           <div style="padding:20px;">
-            <div class="story-docs-top"><p class="section-heading" style="margin:0;">📚 Оқу материалдары</p><button class="story-btn-secondary story-btn-sm" id="btnImportDoc2" onclick="document.getElementById('btnImportDoc').click()">+ Жүктеу</button></div>
+            <div class="story-docs-top"><p class="section-heading" style="margin:0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Оқу материалдары</p><button class="story-btn-secondary story-btn-sm" id="btnImportDoc2" onclick="document.getElementById('btnImportDoc').click()">+ Жүктеу</button></div>
             <div class="story-drop-zone" id="docsDropZone">
               <input type="file" id="docFileInput" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg" style="display:none">
-              <div class="story-drop-icon">📂</div><div class="story-drop-title">Файлды апарыңыз</div>
+              <div class="story-drop-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div><div class="story-drop-title">Файлды апарыңыз</div>
               <div class="story-drop-sub">PDF, DOCX, PPTX · 25 МБ-қа дейін</div>
               <button class="story-btn-secondary story-btn-sm" onclick="document.getElementById('docFileInput').click()">Файл таңдау</button>
             </div>
-            <div class="story-docs-grid" id="docsGrid"><div class="story-empty" style="grid-column:1/-1"><div class="story-empty-icon">📄</div><div class="story-empty-title">Материалдар жоқ</div><div class="story-empty-sub">Конспект, дәріс немесе слайдтар жүктеңіз</div></div></div>
+            <div class="story-docs-grid" id="docsGrid"><div class="story-empty" style="grid-column:1/-1"><div class="story-empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div><div class="story-empty-title">Материалдар жоқ</div><div class="story-empty-sub">Конспект, дәріс немесе слайдтар жүктеңіз</div></div></div>
           </div>
         </div>
         <div id="story-tab-running" class="story-panel" style="display:none"><div id="runningHub"></div></div>
@@ -932,17 +1022,17 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
           <div style="padding:28px;">
-            <h2 style="margin:0 0 6px;">📂 Материал жүктеу</h2>
+            <h2 style="margin:0 0 6px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Материал жүктеу</h2>
             <p style="color:var(--text3);margin-bottom:24px;font-size:13px;">Конспект, дәріс немесе оқулық тіркеңіз</p>
             <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-              <button class="import-chip selected" data-import-tab="file">📎 Файл</button>
-              <button class="import-chip" data-import-tab="url">🔗 Сілтеме</button>
-              <button class="import-chip" data-import-tab="text">📝 Мәтін</button>
+              <button class="import-chip selected" data-import-tab="file"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> Файл</button>
+              <button class="import-chip" data-import-tab="url"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Сілтеме</button>
+              <button class="import-chip" data-import-tab="text"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Мәтін</button>
             </div>
             <div id="importTabFile">
               <div class="story-drop-zone" id="importDrop">
                 <input type="file" id="importFileInput" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg">
-                <div class="story-drop-icon">📂</div>
+                <div class="story-drop-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
                 <div class="story-drop-title">Файлды апарыңыз</div>
                 <div class="story-drop-sub">PDF, DOCX, PPTX, суреттер</div>
                 <button class="story-btn-secondary story-btn-sm" onclick="document.getElementById('importFileInput').click()">Таңдау</button>
@@ -975,7 +1065,7 @@
             </div>
             <div class="settings-footer" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
               <button id="cancelImportBtn" class="settings-cancel-btn">Бас тарту</button>
-              <button id="saveImportBtn" class="settings-save-btn">📥 Сақтау материал</button>
+              <button id="saveImportBtn" class="settings-save-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Сақтау материал</button>
             </div>
           </div>
         </div>
@@ -1095,12 +1185,12 @@
         <div id="profile-achievements" class="inner-view" style="padding: 28px;">
           <p class="section-heading">Жетістіктер</p>
           <div class="achievements-grid">
-            <div class="achievement-card"><div class="ach-icon">🔥</div><div class="ach-name">Жолдың басы</div><div class="ach-desc">Бірінші сабақ аяқталды</div></div>
-            <div class="achievement-card"><div class="ach-icon">⚡</div><div class="ach-name">Жылдам старт</div><div class="ach-desc">Бір күнде 3 сабақ</div></div>
-            <div class="achievement-card locked"><div class="ach-icon">🏆</div><div class="ach-name">Шебер</div><div class="ach-desc">Бірінші курс аяқталды</div></div>
-            <div class="achievement-card locked"><div class="ach-icon">💎</div><div class="ach-name">Сарапшы</div><div class="ach-desc">5 курс аяқталды</div></div>
-            <div class="achievement-card locked"><div class="ach-icon">🌟</div><div class="ach-name">Автор</div><div class="ach-desc">Бірінші курс жасалды</div></div>
-            <div class="achievement-card locked"><div class="ach-icon">🐍</div><div class="ach-name">Питонист</div><div class="ach-desc">Python бойынша 50 есеп</div></div>
+            <div class="achievement-card"><div class="ach-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></div><div class="ach-name">Жолдың басы</div><div class="ach-desc">Бірінші сабақ аяқталды</div></div>
+            <div class="achievement-card"><div class="ach-icon" style="font-size:0"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="ach-name">Жылдам старт</div><div class="ach-desc">Бір күнде 3 сабақ</div></div>
+            <div class="achievement-card locked"><div class="ach-icon" style="font-size:0"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg></div><div class="ach-name">Шебер</div><div class="ach-desc">Бірінші курс аяқталды</div></div>
+            <div class="achievement-card locked"><div class="ach-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 18 3 22 9 12 22 2 9"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="12" y1="3" x2="6" y2="9"/><line x1="12" y1="3" x2="18" y2="9"/></svg></div><div class="ach-name">Сарапшы</div><div class="ach-desc">5 курс аяқталды</div></div>
+            <div class="achievement-card locked"><div class="ach-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="ach-name">Автор</div><div class="ach-desc">Бірінші курс жасалды</div></div>
+            <div class="achievement-card locked"><div class="ach-icon" style="font-size:0"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><div class="ach-name">Питонист</div><div class="ach-desc">Python бойынша 50 есеп</div></div>
           </div>
         </div>
         <div id="profile-progress" class="inner-view" style="padding: 28px;">
@@ -1160,23 +1250,22 @@
               <div class="qz-stat"><span class="qz-stat-num" id="qs-ai" style="color:#8b5cf6;">—</span><span class="qz-stat-lbl">ЖИ-квиздер</span></div>
               <div class="qz-stat"><span class="qz-stat-num" id="qs-total-q" style="color:var(--gold);">—</span><span class="qz-stat-lbl">Сұрақтар</span></div>
             </div>
-            <p class="section-heading" style="margin-bottom:16px;">✨ Жасау тәсілі</p>
+            <p class="section-heading" style="margin-bottom:16px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Жасау тәсілі</p>
             <div class="quiz-create-options" style="margin-bottom:28px;">
-              <button class="quiz-create-option" onclick="window.location.href='./create-quiz.html'"><div class="qco-icon">📝</div><div class="qco-title">Нөлден</div><div class="qco-desc">Толық сұрақ конструкторын ашу</div></button>
-              <button class="quiz-create-option" style="border-left:2px solid #8b5cf6;" onclick="openAIQuizModal()"><div class="qco-icon">✨</div><div class="qco-title">ЖИ көмегімен</div><div class="qco-desc">Gemini тақырып бойынша автоматты квиз жасайды</div><span class="qco-badge-ai">Gemini 2.5</span></button>
-              <button class="quiz-create-option" onclick="showToast('📄 Загрузите .py или .txt файл')"><div class="qco-icon">📄</div><div class="qco-title">Кодтан</div><div class="qco-desc">.py файл жүктеңіз — ЖИ сұрақтарды алады</div></button>
+              <button class="quiz-create-option" onclick="window.location.href='./create-quiz.html'"><div class="qco-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="qco-title">Нөлден</div><div class="qco-desc">Толық сұрақ конструкторын ашу</div></button>
+              <button class="quiz-create-option" onclick="openDocxQuizModal()"><div class="qco-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div><div class="qco-title">Құжаттан</div><div class="qco-desc">.docx файл жүктеңіз — ЖИ сұрақтарды алады</div></button>
             </div>
             <div style="margin-bottom:28px">
-              <p class="section-heading" style="margin-bottom:14px">📚 Курс жасау</p>
+              <p class="section-heading" style="margin-bottom:14px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Курс жасау</p>
               <div class="quiz-create-options">
                 <button class="quiz-create-option" style="border-left:2px solid #6366f1" onclick="window.location.href='./create-quiz.html?mode=course'">
-                  <div class="qco-icon">📚</div>
+                  <div class="qco-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
                   <div class="qco-title">Жаңа курс</div>
                   <div class="qco-desc">Квиздерді модульдерге жинап, толық курс жасаңыз</div>
                 </button>
               </div>
             </div>
-            <p class="section-heading" style="margin-bottom:16px;">🕐 Соңғы квиздер</p>
+            <p class="section-heading" style="margin-bottom:16px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Соңғы квиздер</p>
             <div id="recentQuizzesCreate"><div class="qz-loading">Жүктелуде...</div></div>
           </div>
         </div>
@@ -1211,7 +1300,7 @@
 
           <!-- ═══ COURSES SECTION ═══ -->
           <div class="quiz-my-header" style="margin-top:24px;border-top:1px solid var(--border);padding-top:16px">
-            <span class="quiz-my-header-title">📚 Менің курстарым</span>
+            <span class="quiz-my-header-title"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Менің курстарым</span>
             <button class="story-btn-primary" style="font-size:12px;padding:7px 14px" onclick="window.location.href='./create-quiz.html?mode=course'">+ Курс жасау</button>
           </div>
           <div class="courses-grid" id="myCoursesSection" style="padding:0;margin-top:8px">
@@ -1220,38 +1309,38 @@
         </div>
         <div id="qp-launch" class="quiz-panel">
           <div style="padding:24px;max-width:520px;margin:0 auto;">
-            <p class="section-heading" style="margin-bottom:20px;">🚀 PIN-код арқылы іске қосу</p>
+            <p class="section-heading" style="margin-bottom:20px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg> PIN-код арқылы іске қосу</p>
             <div class="qz-pin-card">
               <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px;">Сессия кодын енгізіңіз</div>
               <div class="qz-pin-digits">
                 <div class="qz-pin-digit" id="pd0">_</div><div class="qz-pin-digit" id="pd1">_</div><div class="qz-pin-digit" id="pd2">_</div>
                 <div class="qz-pin-digit" id="pd3">_</div><div class="qz-pin-digit" id="pd4">_</div><div class="qz-pin-digit" id="pd5">_</div>
               </div>
-              <input id="quizPinInput" class="quiz-pin-input" type="text" inputmode="numeric" maxlength="6" placeholder="6 санды PIN енгізіңіз" oninput="onPinInput(this.value)" onkeydown="if(event.key==='Enter')joinByPin()">
+              <input id="quizPinInput" class="quiz-pin-input" type="text" inputmode="numeric" maxlength="6" placeholder="6 енгізіңіз" oninput="onPinInput(this.value)" onkeydown="if(event.key==='Enter')joinByPin()">
               <div id="pinHint" style="font-family:var(--mono);font-size:11px;color:var(--text3);min-height:16px;text-align:center;margin-top:4px;"></div>
-              <button class="quiz-pin-btn" onclick="joinByPin()">⚡ Қосылу →</button>
+              <button class="quiz-pin-btn" onclick="joinByPin()" style="display:inline-flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Қосылу →</button>
             </div>
             <div style="text-align:center;font-family:var(--mono);font-size:11px;color:var(--text3);margin:20px 0;">— немесе тізімнен квиз іске қосыңыз —</div>
             <p class="section-heading" style="margin-bottom:14px;">Менің квизімді іске қосу</p>
             <div id="launchMyQuizList"><div class="qz-loading">Квиздер жүктелуде...</div></div>
-            <p class="section-heading" style="margin:28px 0 14px;">🔴 Белсенді сессиялар</p>
+            <p class="section-heading" style="margin:28px 0 14px;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff4b4b;flex-shrink:0"></span> Белсенді сессиялар</p>
             <div id="activeSessionsList"><div class="qz-loading">Сессиялар жүктелуде...</div></div>
           </div>
         </div>
         <div id="qp-analytics" class="quiz-panel">
           <div style="padding:24px;">
-            <p class="section-heading" style="margin-bottom:20px;">📊 Тапсырмалар аналитикасы</p>
+            <p class="section-heading" style="margin-bottom:20px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Тапсырмалар аналитикасы</p>
             <div class="qz-stats-strip" id="analyticsStats">
               <div class="qz-stat"><span class="qz-stat-num" id="an-quizzes">—</span><span class="qz-stat-lbl">Квиздер</span></div>
               <div class="qz-stat"><span class="qz-stat-num" id="an-questions">—</span><span class="qz-stat-lbl">Сұрақтар</span></div>
               <div class="qz-stat"><span class="qz-stat-num" id="an-sessions">—</span><span class="qz-stat-lbl">Сессиялар</span></div>
               <div class="qz-stat"><span class="qz-stat-num" id="an-players">—</span><span class="qz-stat-lbl">Ойыншылар</span></div>
             </div>
-            <p class="section-heading" style="margin:24px 0 14px;">🏆 Сұрақтар бойынша үздік квиздер</p>
+            <p class="section-heading" style="margin:24px 0 14px;display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 8 17 16 17 16 21"/><path d="M12 17v-4"/><path d="M5 4H2v3a7 7 0 0 0 7 7h6a7 7 0 0 0 7-7V4h-3"/><path d="M5 4h14v3"/></svg> Сұрақтар бойынша үздік квиздер</p>
             <div id="analyticsTopQuizzes"><div class="qz-loading">Жүктелуде...</div></div>
-            <p class="section-heading" style="margin:28px 0 14px;">🤖 ЖИ vs қолмен жасалған</p>
+            <p class="section-heading" style="margin:28px 0 14px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg> ЖИ vs қолмен жасалған</p>
             <div id="analyticsAIChart" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
-            <p class="section-heading" style="margin:28px 0 14px;">📋 Сессия тарихы</p>
+            <p class="section-heading" style="margin:28px 0 14px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Сессия тарихы</p>
             <div id="analyticsSessionHistory"><div class="qz-loading">Жүктелуде...</div></div>
           </div>
         </div>
@@ -1261,14 +1350,14 @@
       <div id="aiQuizModal" class="modal-overlay" style="display:none;">
         <div class="settings-modal-content" style="max-width:640px;width:100%;height:auto;max-height:90vh;overflow:auto;">
           <div id="aiFormStep" style="padding:28px;width:100%;">
-            <h2 style="margin:0 0 6px;">✨ ЖИ арқылы квиз жасау</h2>
+            <h2 style="margin:0 0 6px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ЖИ арқылы квиз жасау</h2>
             <p style="color:var(--text3);margin-bottom:24px;font-size:13px;">Gemini кез келген тақырып бойынша секундта квиз жасайды</p>
             <div style="margin-bottom:20px;">
               <label style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:8px;">Үлгі</label>
               <div id="modelSelector" style="display:flex;gap:6px;flex-wrap:wrap;">
-                <button data-model="gemini-2.5-flash" class="model-btn active">⚡ Flash<small style="display:block;font-size:10px;opacity:.6;">жылдам</small></button>
-                <button data-model="gemini-2.5-flash-lite" class="model-btn">⚡ Flash Lite<small style="display:block;font-size:10px;opacity:.6;">самый жылдам</small></button>
-                <button data-model="gemini-2.5-pro" class="model-btn">🧠 Pro<small style="display:block;font-size:10px;opacity:.6;">ең ақылды</small></button>
+                <button data-model="gemini-2.5-flash" class="model-btn active"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Flash<small style="display:block;font-size:10px;opacity:.6;">жылдам</small></button>
+                <button data-model="gemini-2.5-flash-lite" class="model-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Flash Lite<small style="display:block;font-size:10px;opacity:.6;">самый жылдам</small></button>
+                <button data-model="gemini-2.5-pro" class="model-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="1" y1="9" x2="4" y2="9"/></svg> Pro<small style="display:block;font-size:10px;opacity:.6;">ең ақылды</small></button>
               </div>
             </div>
             <div class="settings-field-row" style="flex-direction:column;align-items:flex-start;gap:8px;border:none;padding:0;margin-bottom:16px;">
@@ -1298,7 +1387,7 @@
             <div id="dailyLimitInfo" style="font-size:12px;color:var(--text3);text-align:center;font-family:var(--mono);margin-bottom:8px;"></div>
             <div class="settings-footer" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
               <button onclick="closeAIQuizModal()" class="settings-cancel-btn">Бас тарту</button>
-              <button onclick="generateQuizWithAI()" class="settings-save-btn" style="background:linear-gradient(90deg,#8b5cf6,#ec4899);">✨ Жасау</button>
+              <button onclick="generateQuizWithAI()" class="settings-save-btn" style="background:linear-gradient(90deg,#8b5cf6,#ec4899);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Жасау</button>
             </div>
           </div>
           <div id="aiPreviewStep" style="display:none;padding:28px;width:100%;">
@@ -1306,14 +1395,78 @@
             <div id="aiPreviewContent"></div>
             <div class="settings-footer" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
               <button onclick="backToAIForm()" class="settings-cancel-btn">← Артқа</button>
-              <button onclick="openInConstructor()" class="settings-cancel-btn">📝 Конструкторда ашу</button>
-              <button onclick="saveGeneratedQuizDirect()" class="settings-save-btn" style="background:var(--green);">💾 Сақтау</button>
+              <button onclick="openInConstructor()" class="settings-cancel-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Конструкторда ашу</button>
+              <button onclick="saveGeneratedQuizDirect()" class="settings-save-btn" style="background:var(--green);"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Сақтау</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ═══ КУРСЫ ═══ -->
+      <!-- ═══ DOCX → КВИЗ МОДАЛ ═══ -->
+      <div id="docxQuizModal" class="modal-overlay" style="display:none;">
+        <div class="settings-modal-content" style="max-width:560px;width:100%;height:auto;max-height:90vh;overflow:auto;">
+          <div id="docxFormStep" style="padding:28px;width:100%;">
+            <h2 style="margin:0 0 6px;display:flex;align-items:center;gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> Құжаттан квиз жасау</h2>
+            <p style="color:var(--text3);margin-bottom:20px;font-size:13px;">.docx файл жүктеңіз — ЖИ мазмұны бойынша сұрақтар құрастырады</p>
+
+            <div id="docxDropZone" style="border:2px dashed var(--border2);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:.15s;margin-bottom:16px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4;margin-bottom:10px;"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+              <div style="font-size:13px;color:var(--text2);margin-bottom:4px;">.docx файлды осы жерге тастаңыз</div>
+              <div style="font-size:11px;color:var(--text3);font-family:var(--mono);">немесе басып таңдаңыз · макс. 10MB</div>
+              <input type="file" id="docxFileInput" accept=".docx" style="display:none;">
+            </div>
+
+            <div id="docxFileInfo" style="display:none;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+              <span id="docxFileName" style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+              <button onclick="resetDocxUpload()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:2px;">✕</button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+              <div>
+                <label style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:6px;">Сұрақтар саны</label>
+                <select id="docxQuestionCount" class="settings-input">
+                  <option value="5">5 сұрақ</option>
+                  <option value="8" selected>8 сұрақ</option>
+                  <option value="10">10 сұрақ</option>
+                  <option value="12">12 сұрақ</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:6px;">Күрделілік</label>
+                <select id="docxDifficulty" class="settings-input">
+                  <option value="beginner">Бастауыштар үшін</option>
+                  <option value="intermediate" selected>Орта</option>
+                  <option value="advanced">Жоғары</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="docxLimitInfo" style="font-size:12px;color:var(--text3);text-align:center;font-family:var(--mono);margin-bottom:8px;"></div>
+            <div class="settings-footer" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+              <button onclick="closeDocxQuizModal()" class="settings-cancel-btn">Бас тарту</button>
+              <button onclick="generateQuizFromDocx()" id="docxGenerateBtn" class="settings-save-btn" style="background:linear-gradient(90deg,#8b5cf6,#ec4899);" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Жасау
+              </button>
+            </div>
+          </div>
+
+          <div id="docxLoadingStep" style="display:none;padding:48px 28px;text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;border:3px solid var(--border2);border-top-color:#8b5cf6;animation:spin .8s linear infinite;margin:0 auto 16px;"></div>
+            <div id="docxLoadingText" style="font-family:var(--mono);font-size:13px;color:var(--text2);">Файл оқылып жатыр...</div>
+          </div>
+
+          <div id="docxPreviewStep" style="display:none;padding:28px;width:100%;">
+            <h2 style="margin:0 0 16px;">Квизді алдын ала қарау</h2>
+            <div id="docxPreviewContent"></div>
+            <div class="settings-footer" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+              <button onclick="backToDocxForm()" class="settings-cancel-btn">← Артқа</button>
+              <button onclick="openDocxQuizInConstructor()" class="settings-cancel-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Конструкторда ашу</button>
+              <button onclick="saveDocxQuizDirect()" class="settings-save-btn" style="background:var(--green);"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Сақтау</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="view-courses" class="view-section">
         <div id="courseFilterPills" class="filter-pills">
           <button class="filter-pill active" data-filter="all">Все</button>
@@ -1333,8 +1486,8 @@
     <!-- ═══ ПРАВЫЙ САЙДБАР ═══ -->
     <aside class="right-sidebar">
       <div class="pet-widget">
-        <div class="widget-title">🐍 Үй жануары</div>
-        <span class="pet-snake">🐍</span>
+        <div class="widget-title" style="display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Үй жануары</div>
+        <span class="pet-snake" style="font-size:0;display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points='4 17 10 11 4 5'/><line x1='12' y1='19' x2='20' y2='19'/></svg></span>
         <div class="pet-name">Пит — Жауынгер Питон</div>
         <div class="pet-sub">LV.7 · Сирек</div>
         <div class="pet-xp-row">
@@ -1345,7 +1498,7 @@
 
       <!-- Следующий урок -->
       <div>
-        <div class="widget-title">📖 Келесі сабақ</div>
+        <div class="widget-title"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Келесі сабақ</div>
         <div class="next-lesson" onclick="showToast('Открываем урок...')">
           <div class="next-lesson-label">ООП · 3-модуль, 5-сабақ</div>
           <div class="next-lesson-title">__str__ және __repr__ сиқырлы әдістері</div>
@@ -1357,7 +1510,7 @@
 
       <!-- Python совет -->
       <div class="tip-card">
-        <div class="tip-label">💡 Python кеңесі #247</div>
+        <div class="tip-label"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> Python кеңесі #247</div>
         <div style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">f-strings қолдан!</div>
         <div style="font-size: 12px; color: var(--text3); margin-bottom: 8px;">Python 3.6+ жолдарды пішімдеудің ең оқылымды тәсілі</div>
         <div class="tip-code">
@@ -1403,10 +1556,10 @@
         <div id="settings-account" class="settings-panel active">
           <h3 class="panel-header">Аккаунт</h3>
           <div class="settings-field-col">
-            <div class="field-info" style="margin-bottom: 14px;"><label>Профиль аватары</label><span>Сурет URL немесе эмодзи (мысалы: 🐼)</span></div>
+            <div class="field-info" style="margin-bottom: 14px;"><label>Профиль аватары</label><span>Сурет URL немесе эмодзи (мысалы: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="8.5" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15.5" cy="9" r="1.5" fill="currentColor" stroke="none"/><path d="M8.5 14a5.5 5.5 0 0 0 7 0"/></svg>)</span></div>
             <div style="display: flex; gap: 16px; align-items: center;">
-              <div class="clan-avatar" id="editAvatarPreview">😶</div>
-              <input type="text" id="avatarUrlInput" class="settings-input" placeholder="https://... или 🐼" style="flex:1;">
+              <div class="clan-avatar" id="editAvatarPreview"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+              <input type="text" id="avatarUrlInput" class="settings-input" placeholder="https://... или <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="8.5" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15.5" cy="9" r="1.5" fill="currentColor" stroke="none"/><path d="M8.5 14a5.5 5.5 0 0 0 7 0"/></svg>" style="flex:1;">
             </div>
           </div>
           <div class="settings-field-row"><div class="field-info"><label>Аты</label><span>Платформадағы көрсетілетін аты</span></div><div class="field-control"><input type="text" id="editNameInput" maxlength="50" class="settings-input" placeholder="Ваше имя"></div></div>
@@ -1419,7 +1572,7 @@
             <div class="field-control">
               <div class="theme-switcher" id="themeSwitcher">
                 <button id="themeLightBtn" class="theme-btn">☀️ Ашық</button>
-                <button id="themeDarkBtn" class="theme-btn">🌙 Күңгірт</button>
+                <button id="themeDarkBtn" class="theme-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Күңгірт</button>
                 <button id="themeSystemBtn" class="theme-btn">⚙️ Жүйелік</button>
               </div>
             </div>
@@ -1453,10 +1606,9 @@
 
   <!-- ═══ ПАТЧ: карточки уроков с кнопкой "Ашық сабақ" ═══ -->
   
+  <script src="./config.js"></script>
   <script src="./static/js/quizzes.js" type="module"></script>
-  <script type="module" src="./static/js/lang-lab.js"></script>
   <script src="./static/js/code-runner.js"></script>
-  <script src="./static/js/mobile-enhancements.js"></script>
   <script src="./static/js/index-inline.js"></script>
 <script>
 // ═══ LANGUAGE SYSTEM ═══
@@ -1521,7 +1673,7 @@ function renderTasks(cat) {
     }).join('');
     const typeTag = t.type ? `<span class="tc-tag tt-type" data-kk>${t.type.kk}</span><span class="tc-tag tt-type" data-ru>${t.type.ru}</span><span class="tc-tag tt-type" data-en>${t.type.en}</span>` : '';
     const rightHtml = t.locked
-      ? `<div class="tc-right"><span class="tc-lock-icon">🔒</span><span class="tc-xp">${t.xp}</span></div>`
+      ? `<div class="tc-right"><span class="tc-lock-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="tc-xp">${t.xp}</span></div>`
       : `<div class="tc-right"><span class="tc-xp">${t.xp}</span>${!t.done ? `<button class="tc-start-btn" onclick="location.href='./auth.html'" data-kk>Бастау</button><button class="tc-start-btn" onclick="location.href='./auth.html'" data-ru>Начать</button><button class="tc-start-btn" onclick="location.href='./auth.html'" data-en>Start</button>` : `<span style="color:var(--duo-green);font-size:18px">✓</span>`}</div>`;
     return `<div class="task-card ${t.locked?'locked':''}">
       <div class="tc-num ${numClass}">${numText}</div>
@@ -1560,6 +1712,22 @@ function applyLang() {
     });
   });
 }
+
+// ═══ MOBILE NAV TOGGLE ═══
+function toggleMobileNav() {
+  const menu = document.getElementById('landMobMenu');
+  const btn  = document.getElementById('landMobToggleBtn');
+  if (!menu || !btn) return;
+  const open = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeMobileNav() {
+  const menu = document.getElementById('landMobMenu');
+  const btn  = document.getElementById('landMobToggleBtn');
+  if (menu) menu.classList.remove('open');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+window.addEventListener('resize', () => { if (window.innerWidth > 900) closeMobileNav(); });
 
 // ═══ MOCKUP SWITCHER ═══
 function lmSwitch(idx, btn) {

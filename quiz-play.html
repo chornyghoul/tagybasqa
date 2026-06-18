@@ -381,6 +381,10 @@
         <div class="score-num" id="finalScore">0</div>
         <div class="score-unit">ұпай</div>
       </div>
+      <a class="btn btn-primary" href="./leaderboard.html" style="text-decoration:none;margin-top:12px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Белсенділік рейтингі
+      </a>
       <button class="btn btn-ghost" onclick="location.reload()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         Басынан бастау
@@ -579,12 +583,47 @@ async function handleAnswer(idx, question) {
       </div>`;
   }, 400);
 
-  // Save result
+  // Save detailed result — per-answer + cumulative score
   try {
-    await setDoc(doc(db, 'quizResults', `${sessionId}_${playerId}`), {
-      sessionId, playerName, score: playerScore, timestamp: Date.now()
-    });
-  } catch (e) { console.error(e); }
+    const resultRef = doc(db, 'quizResults', `${sessionId}_${playerId}`);
+    const existing  = await getDoc(resultRef);
+    const prev      = existing.exists() ? (existing.data().answers || []) : [];
+    await setDoc(resultRef, {
+      sessionId,
+      playerId,
+      playerName,
+      score:     playerScore,
+      timestamp: Date.now(),
+      answers:   [...prev, {
+        questionIndex: lastQIndex,
+        selectedIndex: idx,
+        correct:       isCorrect,
+        points:        isCorrect ? (question.points || 100) : 0
+      }]
+    }, { merge: true });
+
+    // Also update activity summary per student (by name, cross-session)
+    const actRef = doc(db, 'studentActivity', playerName.toLowerCase().replace(/\s+/g,'_'));
+    await setDoc(actRef, {
+      name:          playerName,
+      totalScore:    isCorrect ? 1 : 0,   // will be incremented via merge below
+      totalAnswered: 1,
+      totalCorrect:  isCorrect ? 1 : 0,
+      lastSeen:      Date.now(),
+      sessions:      [sessionId]
+    }, { merge: false }).catch(() => {});   // handled below with increment
+
+    // Use increment for atomic counters
+    const { increment, arrayUnion } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
+    await setDoc(actRef, {
+      name:          playerName,
+      totalAnswered: increment(1),
+      totalCorrect:  increment(isCorrect ? 1 : 0),
+      totalPoints:   increment(isCorrect ? (question.points || 100) : 0),
+      lastSeen:      Date.now(),
+      sessions:      arrayUnion(sessionId)
+    }, { merge: true });
+  } catch (e) { console.error('Save error:', e); }
 }
 
 // ── UTILS ─────────────────────────────────────────────────────

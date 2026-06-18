@@ -792,6 +792,33 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
 
 /* Confetti canvas */
 #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:9998}
+
+/* ══ AI GEN CARD ══ */
+.ai-gen-card{background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(28,176,246,.05));
+  border:1.5px solid rgba(139,92,246,.2);border-radius:var(--r2);padding:16px;margin-bottom:20px}
+.ai-gen-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ai-gen-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#4c1d95);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ai-gen-title{font-size:14px;font-weight:800;color:var(--text)}
+.ai-gen-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.ai-gen-toggle{background:transparent;border:1.5px solid var(--border2);border-radius:var(--r);
+  padding:5px 12px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text3);
+  cursor:pointer;transition:.15s;white-space:nowrap}
+.ai-gen-toggle:hover{border-color:var(--border3);color:var(--text)}
+.ai-gen-body{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.ai-gen-ta{width:100%;min-height:110px;background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.7;
+  padding:12px 14px;outline:none;resize:vertical;transition:border-color .15s}
+.ai-gen-ta:focus{border-color:var(--blue)}
+.ai-gen-ta::placeholder{color:var(--text3);font-size:12px}
+/* ══ SETUP SECTION LABEL ══ */
+.setup-section-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:12px;margin-top:4px}
+/* ══ CS SIDE PANELS ══ */
+.cs-side-panel{display:none;flex-direction:column;flex:1;overflow:hidden}
+.cs-side-panel.active{display:flex}
+.cs-tab-btn.active{color:var(--blue)!important;border-bottom-color:var(--blue)!important}
+
 </style>
 </head>
 <body>
@@ -879,115 +906,154 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
   </div>
 </div>
 
-<!-- TAB: CONDUCT -->
+<!-- TAB: CONDUCT (redesigned) -->
 <div class="panel" id="panel-conduct">
   <div class="conduct-layout">
-    <div class="conduct-main">
 
-      <!-- Setup screen -->
-      <div id="setupScreen">
-        <div class="setup-title">📡 Ашық сабақ баптаулары</div>
-        <div class="setup-sub">Сабақты іске қосу алдында режим мен параметрлерді таңдаңыз</div>
+    <!-- ══ MAIN AREA ══ -->
+    <div class="conduct-main" id="conductMain">
 
-        <div style="margin-bottom:20px">
-          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Режим</div>
-          <div class="mode-cards">
-            <div class="mode-card sel" data-mode="presentation" onclick="selMode(this)">
-              <div class="mode-card-check"></div>
-              <div class="mode-icon">📊</div>
-              <div class="mode-name">Презентация</div>
-              <div class="mode-desc">Слайд-шоу режимі. Таймер + студенттерге PIN.</div>
+      <!-- ── SETUP SCREEN ── -->
+      <div id="setupScreen" style="max-width:680px;margin:0 auto;padding:28px 0">
+
+        <!-- AI Plan generator -->
+        <div class="ai-gen-card" id="aiGenCard">
+          <div class="ai-gen-header">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="ai-gen-icon">✦</div>
+              <div>
+                <div class="ai-gen-title">ИИ сабақ жасаушы</div>
+                <div class="ai-gen-sub">Жоспар жазыңыз — ИИ толық сабақ жасайды</div>
+              </div>
             </div>
-            <div class="mode-card" data-mode="quiz-race" onclick="selMode(this)">
-              <div class="mode-card-check"></div>
-              <div class="mode-icon">⚡</div>
-              <div class="mode-name">Квиз гонкасы</div>
-              <div class="mode-desc">Оқушылар жарысады. Кім жылдам — лидер.</div>
-            </div>
-            <div class="mode-card" data-mode="teams" onclick="selMode(this)">
-              <div class="mode-card-check"></div>
-              <div class="mode-icon">👥</div>
-              <div class="mode-name">Командалар</div>
-              <div class="mode-desc">Сынып командаларға бөлінеді. Жалпы ұпай.</div>
-            </div>
-            <div class="mode-card" data-mode="self-study" onclick="selMode(this)">
-              <div class="mode-card-check"></div>
-              <div class="mode-icon">🎧</div>
-              <div class="mode-name">Өздік жұмыс</div>
-              <div class="mode-desc">Оқушылар өз қарқынымен өтеді. Мұғалім бақылайды.</div>
+            <button class="ai-gen-toggle" id="aiGenToggleBtn" onclick="toggleAiGen()">Ашу ↓</button>
+          </div>
+          <div class="ai-gen-body" id="aiGenBody" style="display:none">
+            <textarea class="ai-gen-ta" id="aiPlanInput" placeholder="Мысалы:
+Тақырып: Python-да тізімдер (lists)
+Сынып: 9-сынып
+Ұзақтығы: 45 минут
+Мазмұн: list дегеніміз не, .append(), .remove(), for цикл арқылы өту, квиз, тапсырма"></textarea>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-blue" id="aiGenBtn" onclick="generateWithAI()" style="flex:1">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                ИИ-мен жасау
+              </button>
+              <span id="aiGenStatus" style="font-family:var(--mono);font-size:11px;color:var(--text3)"></span>
             </div>
           </div>
         </div>
 
+        <!-- Session info -->
+        <div class="setup-section-label">Сессия параметрлері</div>
         <div class="setup-grid">
           <div class="setup-field">
             <label>Сессия атауы</label>
             <input class="setup-inp" id="sessionName" placeholder="Python — for циклі">
           </div>
           <div class="setup-field">
-            <label>Қатысушылар (макс.)</label>
-            <select class="setup-sel" id="sessionMax">
-              <option value="10">До 10</option>
-              <option value="20">До 20</option>
-              <option value="30" selected>До 30</option>
-              <option value="40">До 40</option>
-            </select>
-          </div>
-          <div class="setup-field">
-            <label>Блоктар таймері (сек)</label>
-            <input class="setup-inp" id="sessionTimer" type="number" value="60" min="10" max="600">
-          </div>
-          <div class="setup-field">
             <label>Квиз таймері (сек)</label>
             <input class="setup-inp" id="quizTimer" type="number" value="30" min="5" max="120">
           </div>
-        </div>
-
-        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:24px">
-          <div class="tog-row">
-            <div class="tog-info"><div class="tog-name">Лидерборд</div><div class="tog-sub">Ұпай кестесін көрсету</div></div>
-            <label class="tog"><input type="checkbox" id="togLb" checked><span class="tog-track"></span><span class="tog-thumb"></span></label>
-          </div>
-          <div class="tog-row">
-            <div class="tog-info"><div class="tog-name">Аноним жауаптар</div><div class="tog-sub">Есімді жасыру</div></div>
-            <label class="tog"><input type="checkbox" id="togAnon"><span class="tog-track"></span><span class="tog-thumb"></span></label>
-          </div>
-          <div class="tog-row">
-            <div class="tog-info"><div class="tog-name">Кешігіп қосылу</div><div class="tog-sub">Сессия басталғаннан кейін де</div></div>
-            <label class="tog"><input type="checkbox" id="togLate" checked><span class="tog-track"></span><span class="tog-thumb"></span></label>
-          </div>
-          <div class="tog-row">
-            <div class="tog-info"><div class="tog-name">Дыбыс эффекттері</div><div class="tog-sub">Дұрыс/бұрыс жауапта дыбыс</div></div>
-            <label class="tog"><input type="checkbox" id="togSound" checked><span class="tog-track"></span><span class="tog-thumb"></span></label>
+          <div class="setup-field">
+            <label>Дайын квиз (сабақ кезінде ойнату үшін)</label>
+            <select class="setup-inp" id="quizSelect">
+              <option value="">— Квизсіз —</option>
+            </select>
           </div>
         </div>
 
-        <button class="btn btn-green" style="width:100%;justify-content:center;padding:14px;font-size:15px" onclick="startSession()">
-          🚀 Сессияны бастау
+        <!-- Quick toggles -->
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;margin-bottom:20px;display:flex;gap:16px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
+            <input type="checkbox" id="togLb" checked style="accent-color:var(--blue)"> Лидерборд
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
+            <input type="checkbox" id="togLate" checked style="accent-color:var(--blue)"> Кешігіп қосылу
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
+            <input type="checkbox" id="togAnon" style="accent-color:var(--blue)"> Аноним жауап
+          </label>
+          <input type="hidden" id="sessionTimer" value="60">
+          <input type="hidden" id="sessionMax" value="30">
+        </div>
+
+        <button class="btn btn-green" style="width:100%;justify-content:center;padding:14px;font-size:15px;border-radius:var(--r2)" onclick="startSession()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Ашық сабақты бастау
         </button>
       </div>
 
-      <!-- Live session -->
-      <div id="sessionScreen">
+      <!-- ── LIVE SESSION SCREEN ── -->
+      <div id="sessionScreen" style="display:none;flex-direction:column;flex:1;height:100%">
+
+        <!-- Stage bar (block tabs) -->
         <div class="stage-bar" id="stageBar"></div>
-        <div class="stage-content" id="stageContent"></div>
+        <div id="gameBar" style="display:none;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg2)">
+          <button class="btn btn-orange btn-sm" onclick="startGame()" id="startGameBtn">
+            🎮 Сақталған квизді бастау
+          </button>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:8px" id="gameBarHint"></span>
+        </div>
+
+        <!-- Current block content -->
+        <div class="stage-content" id="stageContent" style="flex:1;overflow-y:auto"></div>
+
+        <!-- Bottom nav -->
         <div class="stage-nav">
           <button class="btn btn-ghost btn-sm" id="prevBtn" onclick="prevStage()" disabled>← Артқа</button>
           <span class="stage-progress" id="stageProgress">1 / 1</span>
           <button class="btn btn-blue btn-sm" id="nextBtn" onclick="nextStage()">Келесі →</button>
         </div>
       </div>
+
     </div>
 
-    <!-- Conduct sidebar -->
+    <!-- ══ SIDEBAR ══ -->
     <aside class="conduct-sidebar">
-      <div class="cs-header" id="csHeader">Ашық сабақ</div>
-      <div class="cs-body" id="csSideBody">
-        <div style="text-align:center;padding:32px 16px;color:var(--text3);font-family:var(--mono);font-size:12px;line-height:1.7">
-          Сессияны бастаңыз.<br>PIN коды мен қатысушылар осы жерде пайда болады.
+      <!-- Sidebar tabs -->
+      <div style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0">
+        <button class="cs-tab-btn active" id="cstab-pin" onclick="switchCsTab('pin',this)" style="flex:1;padding:9px 0;font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:none;background:transparent;color:var(--text3);border-bottom:2px solid transparent;transition:.15s">PIN</button>
+        <button class="cs-tab-btn" id="cstab-students" onclick="switchCsTab('students',this)" style="flex:1;padding:9px 0;font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:none;background:transparent;color:var(--text3);border-bottom:2px solid transparent;transition:.15s">Студенттер</button>
+        <button class="cs-tab-btn" id="cstab-lb" onclick="switchCsTab('lb',this)" style="flex:1;padding:9px 0;font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:none;background:transparent;color:var(--text3);border-bottom:2px solid transparent;transition:.15s">Рейтинг</button>
+      </div>
+
+      <!-- PIN panel -->
+      <div class="cs-side-panel active" id="cspanel-pin">
+        <div style="padding:16px;border-bottom:1px solid var(--border);text-align:center">
+          <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Студенттер PIN-і</div>
+          <div style="font-family:var(--mono);font-size:32px;font-weight:700;color:var(--blue);letter-spacing:.25em;line-height:1" id="csPinDisplay">——</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:8px;background:var(--bg3);border-radius:8px;padding:6px 10px;display:inline-block" id="csPinUrl">student-view.html?pin=——</div>
+          <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;justify-content:center" onclick="copyJoinLinkNew()">🔗 Сілтемені көшіру</button>
+        </div>
+        <div style="padding:14px 16px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Ағымдағы блок</div>
+          <div id="csCurrentBlock" style="font-size:13px;font-weight:600;color:var(--text2)">—</div>
+        </div>
+      </div>
+
+      <!-- Students panel -->
+      <div class="cs-side-panel" id="cspanel-students">
+        <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)">Қосылған</span>
+          <span style="background:var(--blue);color:#fff;border-radius:99px;padding:2px 8px;font-family:var(--mono);font-size:10px;font-weight:700" id="csStudentCount">0</span>
+        </div>
+        <div id="csStudentList" style="overflow-y:auto;flex:1">
+          <div style="padding:28px 16px;text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;line-height:1.7">Студенттер кіргеннен кейін<br>осы жерде пайда болады</div>
+        </div>
+      </div>
+
+      <!-- Leaderboard panel -->
+      <div class="cs-side-panel" id="cspanel-lb">
+        <div style="padding:10px 16px;border-bottom:1px solid var(--border)">
+          <span style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)">Рейтинг</span>
+        </div>
+        <div id="csLbList" style="overflow-y:auto;flex:1">
+          <div style="padding:28px 16px;text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;line-height:1.7">Квиз аяқталғаннан кейін<br>рейтинг пайда болады</div>
         </div>
       </div>
     </aside>
+
   </div>
 </div>
 
@@ -1158,7 +1224,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
       <div id="resultsTopList"></div>
     </div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-blue" onclick="downloadReport()">⬇ Есеп жүктеу</button>
+      <button class="btn btn-blue" onclick="downloadReport()">📊 Толық есеп</button>
       <button class="btn btn-ghost" onclick="closeResults()">← Қайта</button>
     </div>
   </div>
@@ -1167,11 +1233,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex
 <canvas id="confettiCanvas"></canvas>
 <div id="toast"></div>
 
+<script src="./config.js"></script>
 <script type="module">
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, addDoc, updateDoc, collection, serverTimestamp
+  getFirestore, doc, getDoc, addDoc, updateDoc, collection, serverTimestamp,
+  onSnapshot, getDocs, query, where
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const FB = {
@@ -1201,6 +1269,13 @@ let sessionStart = null;
 let stageTimer = null;
 let participants = [];
 let scores = {};
+let openSessionDocId = null;
+let sessionUnsubHost = null;
+let myQuizzes = [];
+let currentQuizData = null;
+let gameQuestions = [];
+let gameIndex = 0;
+let inGame = false;
 
 // Quiz/poll state per block
 let quizAnswers  = {};   // blockId → chosen opt idx
@@ -1332,6 +1407,7 @@ function initLesson() {
       const fsBtn = document.getElementById('fsBtn');
       if (fsBtn) fsBtn.style.display = blocks.length ? 'flex' : 'none';
       try { renderStructure(); } catch(e) { console.warn('renderStructure:', e); }
+      try { loadQuizList(); } catch(e) { console.warn('loadQuizList:', e); }
     }, 150);
 
   } catch(err) {
@@ -1613,42 +1689,77 @@ window.startSession = async function() {
   sessionStart = Date.now();
   sessionActive = true;
   currentStage = 0;
+  participants = [];
+  scores = {};
 
-  // Spawn demo participants
-  participants = [
-    {name:'Айгерім К.',av:'АК',col:'#1cb0f6'},
-    {name:'Нұрлан Б.',av:'НБ',col:'#57cc02'},
-    {name:'Санжар Т.',av:'СТ',col:'#ff9600'},
-    {name:'Зере М.',av:'ЗМ',col:'#ce82ff'},
-    {name:'Дамир А.',av:'ДА',col:'#1fe0c0'},
-  ];
-  participants.forEach(p=>{ scores[p.name]=0; });
+  const quizSelEl = document.getElementById('quizSelect');
+  const selectedQuizId = quizSelEl ? quizSelEl.value : '';
+  currentQuizData = myQuizzes.find(q=>q.id===selectedQuizId) || null;
 
   // Save session to Firestore
   try {
-    await addDoc(collection(db,'openLessonSessions'),{
+    const ref = await addDoc(collection(db,'openLessonSessions'),{
       pin:sessionPin, lessonId:lesson.id||null, lessonTitle:lesson.title,
+      blocks: blocks, // fallback so student-view can render even without lessonId
       mode:selectedMode, uid:currentUser?.uid||null, startedAt:serverTimestamp(),
       maxPlayers:parseInt(document.getElementById('sessionMax').value),
       timer:parseInt(document.getElementById('sessionTimer').value),
-      status:'active',
+      status:'active', currentSlide:0, currentQuizState:null,
+      quizId: selectedQuizId||null, quizTitle: currentQuizData?.title||null,
+      players:{},
     });
-  } catch(e){}
+    openSessionDocId = ref.id;
+    listenSession();
+  } catch(e){ console.warn('startSession save:', e); }
 
   // Switch UI
   document.getElementById('setupScreen').style.display='none';
-  document.getElementById('sessionScreen').style.display='flex';
-  document.getElementById('sessionScreen').style.flexDirection='column';
-  document.getElementById('sessionScreen').style.flex='1';
+  const ss=document.getElementById('sessionScreen');
+  ss.style.display='flex';
+  ss.style.flexDirection='column';
+  ss.style.flex='1';
   document.getElementById('liveBadge').style.display='flex';
   document.getElementById('launchBtn').style.display='none';
   document.getElementById('endBtn').style.display='flex';
+
+  const gameBar = document.getElementById('gameBar');
+  const gameHint = document.getElementById('gameBarHint');
+  if (gameBar) gameBar.style.display = currentQuizData ? 'block' : 'none';
+  if (gameHint) gameHint.textContent = currentQuizData ? `«${currentQuizData.title||'Квиз'}» · ${(currentQuizData.questions||[]).length} сұрақ` : '';
 
   buildStageBar();
   buildSidebar();
   renderStage(0);
   toast('🚀 Сессия бастады! PIN: '+sessionPin, 'ok');
 };
+
+// ── Real-time session listener (players & scores) ──────────────
+function listenSession() {
+  if (sessionUnsubHost) { sessionUnsubHost(); sessionUnsubHost=null; }
+  if (!openSessionDocId) return;
+  sessionUnsubHost = onSnapshot(doc(db,'openLessonSessions',openSessionDocId), snap => {
+    const d = snap.data();
+    if (!d) return;
+    const pl = d.players || {};
+    participants = Object.values(pl).map(p => ({ name: p.name || 'Студент' }));
+    scores = {};
+    Object.values(pl).forEach(p => { scores[p.name || 'Студент'] = p.score || 0; });
+  });
+}
+
+// ── Load teacher's saved quizzes for the selector ───────────────
+async function loadQuizList() {
+  if (!currentUser) return;
+  try {
+    const snap = await getDocs(query(collection(db,'quizzes'), where('uid','==',currentUser.uid)));
+    myQuizzes = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    const sel = document.getElementById('quizSelect');
+    if (sel) {
+      sel.innerHTML = '<option value="">— Квизсіз —</option>' +
+        myQuizzes.map(q => `<option value="${q.id}">${eH(q.title||'Атаусыз квиз')} (${(q.questions||[]).length} сұрақ)</option>`).join('');
+    }
+  } catch(e) { console.warn('loadQuizList:', e); }
+}
 
 // ══════════════════════════════════════════
 //  STAGE BAR
@@ -1728,6 +1839,13 @@ window.renderStage = function(idx) {
 
   // Auto-scroll stage bar
   document.getElementById('stgBtn'+idx)?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+
+  // Broadcast current slide to students in real time
+  if (openSessionDocId) {
+    updateDoc(doc(db,'openLessonSessions',openSessionDocId), {
+      currentSlide: idx, currentQuizState: null
+    }).catch(()=>{});
+  }
 };
 
 function stageBlockBody(b, idx) {
@@ -1841,6 +1959,11 @@ window.revealAnswer = function(qid, correct) {
     btn.disabled=true;
     if(i===correct)btn.classList.add('correct');
   });
+  if (openSessionDocId) {
+    updateDoc(doc(db,'openLessonSessions',openSessionDocId), {
+      currentQuizState: { revealed:true, correct }
+    }).catch(()=>{});
+  }
 };
 
 window.livePollVote = function(id,oi,total) {
@@ -1891,6 +2014,75 @@ window.prevStage = function() {
 };
 window.jumpStage = function(i) { clearInterval(stageTimer); renderStage(i); };
 
+// ══════════════════════════════════════════
+//  SAVED QUIZ GAME (launched mid-lesson)
+// ══════════════════════════════════════════
+window.startGame = async function() {
+  if (!currentQuizData) { toast('Алдымен сессия параметрлерінде квиз таңдаңыз', 'err'); return; }
+  gameQuestions = currentQuizData.questions || [];
+  if (!gameQuestions.length) { toast('Бұл квизде сұрақ жоқ', 'err'); return; }
+  gameIndex = 0; inGame = true;
+  clearInterval(stageTimer);
+  await pushGameState(false);
+  renderGameStage();
+  toast('🎮 Квиз ойыны басталды!', 'ok');
+};
+
+function pushGameState(revealed) {
+  if (!openSessionDocId) return Promise.resolve();
+  const q = gameQuestions[gameIndex] || {};
+  return updateDoc(doc(db,'openLessonSessions',openSessionDocId), {
+    activeGame: {
+      qIndex: gameIndex, total: gameQuestions.length,
+      revealed: !!revealed, correct: q.correctIndex ?? q.correct ?? 0,
+      startedAt: Date.now()
+    }
+  }).catch(()=>{});
+}
+
+function renderGameStage() {
+  const q = gameQuestions[gameIndex] || {};
+  const opts = q.options || q.answers || [];
+  const cols = ['var(--blue)','var(--orange)','var(--green)','var(--purple)'];
+  const content = document.getElementById('stageContent');
+  content.innerHTML = `<div class="stage-block fu">
+    <div class="stage-block-head">
+      <div>
+        <div class="stage-block-type">🎮 ${eH(currentQuizData?.title||'Квиз')} — сұрақ ${gameIndex+1}/${gameQuestions.length}</div>
+        <div class="stage-block-title">${eH(q.question||q.text||'')}</div>
+      </div>
+    </div>
+    <div class="stage-block-body">
+      <div class="live-opts">
+        ${opts.map((o,oi)=>`<div class="live-opt" style="--lc:${cols[oi%4]};border-color:${cols[oi%4]}44;background:${cols[oi%4]}1f">
+          ${'ABCD'[oi]||oi+1}. ${eH(typeof o==='object'?o.text:o)}
+        </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="revealGame()">👁 Жауапты ашу</button>
+        <button class="btn btn-blue btn-sm" onclick="nextGame()">Келесі сұрақ →</button>
+        <button class="btn btn-red btn-sm" onclick="endGame()">⏹ Ойынды аяқтап, сабаққа оралу</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+window.revealGame = function() { pushGameState(true); };
+
+window.nextGame = function() {
+  gameIndex++;
+  if (gameIndex >= gameQuestions.length) { endGame(); return; }
+  pushGameState(false);
+  renderGameStage();
+};
+
+window.endGame = function() {
+  inGame = false;
+  if (openSessionDocId) updateDoc(doc(db,'openLessonSessions',openSessionDocId), { activeGame:null }).catch(()=>{});
+  renderStage(currentStage);
+  toast('Квиз ойыны аяқталды, нәтижелер сақталды', 'ok');
+};
+
 // ── Stage timer ──────────────────────────────
 function startStageTimer(sec) {
   let remaining=sec;
@@ -1919,40 +2111,51 @@ function fmt(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%6
 //  SIDEBAR (Live)
 // ══════════════════════════════════════════
 function buildSidebar() {
-  document.getElementById('csHeader').textContent='📡 Тікелей эфир';
-  const body=document.getElementById('csSideBody');
+  const fmtPin = (sessionPin||'').replace(/(\d{3})(\d{3})/, '$1 $2');
+  const pinEl  = document.getElementById('csPinDisplay');
+  const urlEl  = document.getElementById('csPinUrl');
+  if(pinEl) pinEl.textContent = fmtPin;
+  if(urlEl) urlEl.textContent = 'student-view.html?pin='+(sessionPin||'');
 
-  // Refresh sidebar every 3s with demo data updates
   function renderSB() {
-    const elapsed=Math.floor((Date.now()-sessionStart)/1000);
-    const em=String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
+    const COLORS=['#1cb0f6','#57cc02','#ff9600','#ce82ff','#1fe0c0','#ffd900'];
+    const countEl=document.getElementById('csStudentCount');
+    const listEl =document.getElementById('csStudentList');
+    if(countEl) countEl.textContent=participants.length;
+    if(listEl){
+      if(!participants.length){
+        listEl.innerHTML='<div style="padding:28px 16px;text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;line-height:1.7">Студенттер кіргеннен кейін осы жерде пайда болады</div>';
+      } else {
+        listEl.innerHTML=participants.map((p,i)=>`
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:50%;background:${COLORS[i%COLORS.length]}22;color:${COLORS[i%COLORS.length]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${(p.av||p.name||'?').slice(0,2).toUpperCase()}</div>
+            <span style="flex:1;font-size:12px;font-weight:600;color:var(--text2)">${eH(p.name)}</span>
+            <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--yellow)">${scores[p.name]||0}</span>
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>
+          </div>`).join('');
+      }
+    }
     const lb=getLeaderboard();
-    body.innerHTML=`
-      <div class="pin-display">
-        <div class="pin-label">PIN код</div>
-        <div class="pin-code">${sessionPin?.match(/.{1,3}/g)?.join(' ')||'—'}</div>
-      </div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Уақыт: ${em}</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin:10px 0 8px">Қатысушылар (${participants.length})</div>
-      ${participants.map(p=>`
-        <div class="participant-row">
-          <div class="p-avatar" style="background:${p.col}22;color:${p.col}">${p.av}</div>
-          <span class="p-name">${p.name}</span>
-          <span class="p-score">${scores[p.name]||0}</span>
-          <div class="p-status online"></div>
-        </div>`).join('')}
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 8px">🏆 Лидерборд</div>
-      ${lb.slice(0,5).map((p,i)=>`
-        <div class="lb-row">
-          <div class="lb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${['🥇','🥈','🥉','4','5'][i]}</div>
-          <div class="lb-name">${p.name}</div>
-          <div class="lb-score">${p.score}</div>
-        </div>`).join('')}`;
+    const lbEl=document.getElementById('csLbList');
+    const maxSc=lb[0]?.score||1;
+    if(lbEl&&lb.length){
+      lbEl.innerHTML=lb.slice(0,10).map((p,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border)">
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;min-width:24px;text-align:center;color:${i===0?'#ffd900':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text3)'}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${eH(p.name)}</div>
+            <div style="height:3px;background:var(--bg3);border-radius:99px;margin-top:4px;overflow:hidden"><div style="height:100%;background:var(--blue);border-radius:99px;width:${Math.round(p.score/maxSc*100)}%"></div></div>
+          </div>
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--yellow);margin-left:4px">${p.score}</span>
+        </div>`).join('');
+    }
+    const b=blocks[currentStage];
+    const cbEl=document.getElementById('csCurrentBlock');
+    if(cbEl&&b) cbEl.textContent=(currentStage+1)+'/'+blocks.length+' — '+(b.slideTitle||b.content||b.question||b.taskText||b.type||'').slice(0,55);
   }
   renderSB();
-  setInterval(renderSB, 3000);
+  setInterval(renderSB,2000);
 }
-
 function getLeaderboard() {
   return participants.map(p=>({name:p.name,score:scores[p.name]||0}))
     .sort((a,b)=>b.score-a.score);
@@ -1968,9 +2171,13 @@ window.endSession = async function() {
   if(sessionActive && !confirm('Сессияны аяқтаусыз ба?')) return;
   clearInterval(stageTimer);
   sessionActive=false;
+  if (sessionUnsubHost) { sessionUnsubHost(); sessionUnsubHost=null; }
+  if (openSessionDocId) updateDoc(doc(db,'openLessonSessions',openSessionDocId), { status:'finished', activeGame:null }).catch(()=>{});
   document.getElementById('liveBadge').style.display='none';
   document.getElementById('endBtn').style.display='none';
   document.getElementById('launchBtn').style.display='flex';
+  const gameBar = document.getElementById('gameBar');
+  if (gameBar) gameBar.style.display='none';
 
   const elapsed=Math.floor((Date.now()-sessionStart)/1000);
   const em=String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
@@ -1993,26 +2200,21 @@ window.closeResults = function() {
   document.getElementById('resultsOverlay').classList.remove('show');
   document.getElementById('setupScreen').style.display='block';
   document.getElementById('sessionScreen').style.display='none';
+  document.getElementById('sessionScreen').style.display='none';
   document.getElementById('csHeader').textContent='Ашық сабақ';
   document.getElementById('csSideBody').innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--text3);font-family:var(--mono);font-size:12px;line-height:1.7">Сессияны бастаңыз.</div>';
   toast('Сессия аяқталды');
 };
 
 window.downloadReport = function() {
-  const lb=getLeaderboard();
-  const date=new Date().toLocaleDateString('kk-KZ');
   const elapsed=Math.floor((Date.now()-sessionStart)/1000);
   const em=String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
-  const txt=`АШЫҚ САБАҚ ЕСЕБІ\n${'='.repeat(40)}\n\n` +
-    `Сабақ: ${lesson.title||'—'}\nКүні: ${date}\nРежим: ${selectedMode}\n` +
-    `Ұзақтығы: ${em}\nPIN: ${sessionPin}\n\nҚАТЫСУШЫЛАР (${participants.length}):\n` +
-    lb.map((p,i)=>`${i+1}. ${p.name} — ${p.score} ұпай`).join('\n')+
-    `\n\nАйт. балл: ${Math.round(lb.reduce((s,p)=>s+p.score,0)/lb.length||0)}\n\nБлоктар:\n`+
-    blocks.map((b,i)=>`${i+1}. [${b.type}] ${b.slideTitle||b.content||b.question||b.taskText||'—'}`).join('\n');
-  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`sabak-esep-${Date.now()}.txt`;a.click();
-  toast('📄 Есеп жүктелді','ok');
+  if (openSessionDocId) {
+    window.open('./lesson-report.html?session='+openSessionDocId, '_blank');
+  } else {
+    window.open('./lesson-report.html?pin='+(sessionPin||'')+'&title='+encodeURIComponent(lesson?.title||'Сабақ')+'&duration='+em+'&mode='+(selectedMode||''), '_blank');
+  }
+  toast('📊 Есеп ашылуда...', 'ok');
 };
 
 window.editLesson = function() {
@@ -2659,6 +2861,139 @@ function toast(msg,type=''){
   clearTimeout(t._t);t._t=setTimeout(()=>t.className='',3200);
 }
 function eH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ══════════════════════════════════════════
+//  AI УРОК ГЕНЕРАТОРЫ
+// ══════════════════════════════════════════
+window.toggleAiGen = function() {
+  const body = document.getElementById('aiGenBody');
+  const btn  = document.getElementById('aiGenToggleBtn');
+  const open = body.style.display === 'none';
+  body.style.display = open ? 'flex' : 'none';
+  btn.textContent    = open ? 'Жабу ↑' : 'Ашу ↓';
+};
+
+window.generateWithAI = async function() {
+  const plan = document.getElementById('aiPlanInput')?.value?.trim();
+  if (!plan) { toast('Алдымен жоспарды жазыңыз', 'err'); return; }
+
+  const btn    = document.getElementById('aiGenBtn');
+  const status = document.getElementById('aiGenStatus');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Жасалуда...';
+  status.textContent = 'ИИ жауабын күтуде...';
+
+  const PROMPT = `Сен Tagybasqa платформасының ИИ сабақ жасаушысысың. Мұғалімнің жоспары бойынша толық сабақ блоктарын JSON форматында жасайсың.
+
+МАҢЫЗДЫ: тек JSON массив қайтар, басқа мәтін жоқ, markdown belgісіз.
+
+Блок типтері және олардың форматтары:
+- {"type":"heading","content":"Тақырып атауы"}
+- {"type":"subheading","content":"Бөлімше атауы"}
+- {"type":"text","content":"Түсіндіру мәтіні"}
+- {"type":"callout","calloutType":"info","content":"Ескерту мәтіні"} (calloutType: info/warning/success/danger)
+- {"type":"code","language":"python","code":"код мәтіні"}
+- {"type":"quiz","question":"Сұрақ мәтіні","options":[{"text":"А","correct":false},{"text":"Б","correct":true},{"text":"В","correct":false},{"text":"Г","correct":false}],"timeLimit":20}
+- {"type":"task","taskText":"Тапсырма мәтіні"}
+- {"type":"poll","question":"Сұрақ","pollOptions":["Вариант 1","Вариант 2","Вариант 3"]}
+- {"type":"checklist","items":["Тармақ 1","Тармақ 2"]}
+
+Ережелер:
+- Барлық мазмұн ҚАЗАҚ тілінде болуы керек
+- 10-18 блок жаса
+- Кем дегенде 2 quiz, 1 task блогы болуы керек
+- Мазмұн нақты, пайдалы және мұғалімнің жоспарына сай болуы керек
+- JSON массивді тікелей қайтар, басқа мәтінсіз
+
+Мына жоспар бойынша сабақ блоктарын жаса:
+
+${plan}`;
+
+  try {
+    const GEMINI_MODEL = (window.GEMINI_MODEL || 'gemini-2.5-flash');
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${window.GEMINI_API_KEY || ''}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: PROMPT }] }],
+          generationConfig: { response_mime_type: 'application/json', temperature: 0.7 },
+        })
+      }
+    );
+
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error?.message || 'Gemini error');
+
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // Parse JSON — strip markdown fences if present
+    let jsonStr = raw.trim();
+    const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]+?)```/);
+    if (fenceMatch) jsonStr = fenceMatch[1].trim();
+
+    const newBlocks = JSON.parse(jsonStr);
+    if (!Array.isArray(newBlocks) || !newBlocks.length) throw new Error('Блоктар бос');
+
+    // Inject into lesson
+    blocks = newBlocks;
+    renderContent();
+    try { renderStructure(); } catch(e) {}
+
+    // Pre-fill session name from plan
+    const titleMatch = plan.match(/[Тт]ақырып[:\s]+(.+)/);
+    if (titleMatch) {
+      const sn = document.getElementById('sessionName');
+      if (sn) sn.value = titleMatch[1].trim().slice(0, 60);
+    }
+
+    // Close AI panel, show success
+    document.getElementById('aiGenBody').style.display = 'none';
+    document.getElementById('aiGenToggleBtn').textContent = 'Ашу ↓';
+    status.textContent = `✓ ${newBlocks.length} блок жасалды`;
+    status.style.color = 'var(--green)';
+    toast(`✓ ИИ ${newBlocks.length} блок жасады! Мазмұн қосылды.`, 'ok');
+
+    // Switch to content tab to show result
+    setTimeout(() => { try { switchTab('content'); } catch(e) {} }, 400);
+
+  } catch(err) {
+    console.error('AI gen error:', err);
+    status.textContent = '✗ Қате: ' + err.message.slice(0, 50);
+    status.style.color = 'var(--red)';
+    toast('ИИ қатесі: ' + err.message.slice(0, 40), 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ИИ-мен жасау';
+  }
+};
+
+// ══════════════════════════════════════════
+//  SIDEBAR TAB SWITCHING (conduct)
+// ══════════════════════════════════════════
+window.switchCsTab = function(tab, btn) {
+  document.querySelectorAll('.cs-tab-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.color = 'var(--text3)';
+    b.style.borderBottomColor = 'transparent';
+  });
+  document.querySelectorAll('.cs-side-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  btn.style.color = 'var(--blue)';
+  btn.style.borderBottomColor = 'var(--blue)';
+  const panel = document.getElementById('cspanel-' + tab);
+  if (panel) panel.classList.add('active');
+};
+
+// ══════════════════════════════════════════
+//  COPY JOIN LINK (new sidebar)
+// ══════════════════════════════════════════
+window.copyJoinLinkNew = function() {
+  const url = location.origin + '/student-view.html?pin=' + (sessionPin || '');
+  navigator.clipboard.writeText(url).then(() => toast('🔗 Сілтеме көшірілді!', 'ok'));
+};
+
 </script>
 </body>
 </html>

@@ -1,17 +1,16 @@
 {
-  "name": "tagybasqa-moderator-bot",
+  "name": "tagybasqa-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tagybasqa static frontend + Gemini API proxy",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "firebase-admin": "^13.10.0",
-    "node-telegram-bot-api": "^0.67.0"
+    "express": "^4.19.2"
   }
 }

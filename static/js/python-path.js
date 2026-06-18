@@ -113,6 +113,164 @@ const UNITS = [
 const ZIGZAG = [0, 60, 90, 60, 0, -60, -90, -60];
 
 // ═══════════════════════════════════════════════════════════
+//  EXERCISES — нағыз тапсырмалар банкі (Duolingo-стиль)
+// ═══════════════════════════════════════════════════════════
+const Q    = (q, o, c, e='') => ({ type:'mcq',    q, o, c, e });
+const TF   = (q, c, e='')    => ({ type:'tf',     q, c, e });
+const OUT  = (code, o, c, e='') => ({ type:'output', code, q:'Бұл код нені шығарады?', o, c, e });
+const FILL = (q, code, a, e='') => ({ type:'fill', q, code, a:(Array.isArray(a)?a:[a]), e });
+
+const EXERCISES = {
+  u1l1: [
+    Q('Python-да экранға мәтін шығаратын функция қандай?', ['print()','echo()','output()','display()'], 0, '"print()" — Python-дағы негізгі шығару функциясы.'),
+    OUT('print("Сәлем, Python!")', ['Сәлем, Python!','"Сәлем, Python!"','print','Қате шығады'], 0, 'print() тырнақшаларды көрсетпей, тек мәтінді шығарады.'),
+  ],
+  u1l2: [
+    Q('"x = 5" жолында "=" белгісі нені білдіреді?', ['Теңдікті тексеру','Мәнді айнымалыға меншіктеу','Салыстыру','Ештеңе'], 1, 'Python-да жалғыз "=" мәнді айнымалыға меншіктеу үшін қолданылады.'),
+    TF('Айнымалы атауы санмен басталуы мүмкін (мысалы 2name).', false, 'Python айнымалылары әріптен немесе "_" таңбасынан басталуы керек.'),
+  ],
+  u1l3: [
+    Q('Қайсысы дұрыс жазылған print()?', ['print "Сәлем"','print("Сәлем")','Print("Сәлем")','print[Сәлем]'], 1),
+    Q('y = 10 деп жазылса, y қандай мәнге ие болады?', ['"10"','10','y','Қате'], 1),
+    TF('print(2+2) нәтижесінде 4 саны экранға шығады.', true),
+  ],
+  u1l4: [
+    Q('"Айгүл" деректер типі қандай?', ['int','float','str','bool'], 2, 'Тырнақшаға алынған мән — жол (string).'),
+    Q('type(3.14) нені қайтарады?', ['int','float','str','bool'], 1),
+  ],
+  u1l5: [
+    Q('input() функциясы әдетте қандай типте мән қайтарады?', ['int','float','str','bool'], 2, 'input() әрқашан жол (str) түрінде қайтарады, тіпті сан енгізсеңіз де.'),
+    FILL('Жасты санға айналдыру үшін бос орынды толтыр:', 'age = ___(input())', ['int'], 'Жолды бүтін санға айналдыру үшін int() қолданылады.'),
+  ],
+  u1l6: [
+    Q('17 // 5 нәтижесі қандай?', ['3.4','3','2','17'], 1, '// — бүтін бөлу, қалдықсыз нәтиже береді.'),
+    Q('2 ** 3 нәтижесі қандай?', ['6','8','9','5'], 1, '** — дәрежеге шығару: 2 үш дәрежеде = 8.'),
+    OUT('print(10 % 3)', ['3','1','0','10'], 1, '% — қалдықты табады: 10-ды 3-ке бөлгенде қалдық 1.'),
+  ],
+  u2l1: [
+    Q('if шартының қасында жазылатын ":" белгісі нені білдіреді?', ['Циклдың аяқталуын','Блоктың басталуын','Қатені','Ешнәрсе'], 1, '":" — блок (отступ) кодының басталуын білдіреді.'),
+    TF('elif тек if-тен кейін жазылады, ол жеке тұра алмайды.', true),
+  ],
+  u2l2: [
+    Q('5 != 5 нәтижесі қандай?', ['True','False','5','Error'], 1),
+    OUT('print(7 > 3 and 2 < 1)', ['True','False','Error','7'], 1, 'and операторы екі шарт та True болғанда ғана True қайтарады.'),
+  ],
+  u2l3: [
+    Q('if x > 10:\n    print("үлкен")\nкодында x=5 болса, не болады?', ['"үлкен" басылады','Ешнәрсе басылмайды','Қате шығады','x=10 болады'], 1),
+    Q('Қайсысы дұрыс салыстыру операторы?', ['=>','=<','>=','=>'], 2),
+    TF('elif бірнеше рет қолданылуы мүмкін.', true),
+  ],
+  u2l4: [
+    Q('range(5) қанша рет қайталанады?', ['4','5','6','0'], 1, 'range(5) — 0-ден 4-ке дейін, барлығы 5 мән.'),
+    OUT('for i in range(3):\n    print(i)', ['0 1 2','1 2 3','0 1 2 3','3'], 0),
+  ],
+  u2l5: [
+    Q('while циклі қашан тоқтайды?', ['Ешқашан','Шарт False болғанда','1 реттен кейін','Кездейсоқ'], 1),
+    TF('while True: циклі break болмаса шексіз жұмыс істейді.', true),
+  ],
+  u2l6: [
+    Q('break операторы нені істейді?', ['Циклды толығымен тоқтатады','Келесі итерацияға өтеді','Ештеңе істемейді','Қате шығарады'], 0),
+    Q('continue операторы нені істейді?', ['Циклды тоқтатады','Ағымдағы итерацияны өткізіп, келесіге өтеді','Бағдарламаны тоқтатады','Айнымалыны өшіреді'], 1),
+  ],
+  u3l1: [
+    Q('Функция анықтау үшін қандай түйінді сөз қолданылады?', ['func','define','def','function'], 2),
+    TF('Функция атауы сан тіркесінен басталуы мүмкін.', false),
+  ],
+  u3l2: [
+    Q('def greet(name): жолындағы "name" не болады?', ['Айнымалы мән','Параметр','Функция атауы','Қате'], 1),
+    OUT('def add(a, b):\n    return a + b\nprint(add(2, 3))', ['5','23','Error','a+b'], 0),
+  ],
+  u3l3: [
+    Q('return операторы нені істейді?', ['Функцияны шақырады','Функциядан мән қайтарып, оны тоқтатады','Циклды тоқтатады','Айнымалы жасайды'], 1),
+    TF('return жазылмаған функция автоматты түрде None қайтарады.', true),
+  ],
+  u3l4: [
+    Q('def f(): pass дегенде f() не қайтарады?', ['0','None','Error',''], 1),
+    OUT('def square(x):\n    return x*x\nprint(square(4))', ['8','16','4','x*x'], 1),
+    Q('Функцияны шақыру үшін не керек?', ['Тек атауын жазу','Атауы + жақша ()','def сөзі','return сөзі'], 1),
+  ],
+  u3l5: [
+    Q('def greet(name="Дос"): жолында "Дос" нені білдіреді?', ['Міндетті мән','Үндемелі (default) мән','Қате','Тип'], 1),
+    OUT('def greet(name="Дос"):\n    print("Сәлем,", name)\ngreet()', ['Сәлем, Дос','Сәлем,','Error','Сәлем, name'], 0),
+  ],
+  u3l6: [
+    Q('*args функцияда нені білдіреді?', ['Белгілі бір аргумент','Белгісіз санды позициялық аргументтер','Сөздік','Қате'], 1),
+    Q('**kwargs нені қабылдайды?', ['Тізім','Кілт-мән жұптарын','Бір ғана санды','Ештеңе'], 1),
+  ],
+  u4l1: [
+    Q('Тізім қалай жасалады?', ['{}','()','[]','<>'], 2),
+    OUT('a = [1,2,3]\nprint(a[0])', ['1','2','3','Error'], 0, 'Индекс 0-ден басталады.'),
+  ],
+  u4l2: [
+    Q('append() әдісі нені істейді?', ['Тізімнен элемент өшіреді','Тізімнің соңына элемент қосады','Тізімді сұрыптайды','Тізімді көшіреді'], 1),
+    OUT('a = [3,1,2]\na.sort()\nprint(a)', ['[3,1,2]','[1,2,3]','[2,1,3]','Error'], 1),
+  ],
+  u4l3: [
+    Q('Кортеж (tuple) тізімнен немен ерекшеленеді?', ['Жылдамдығымен','Өзгермейтіндігімен (immutable)','Түсімен','Ештеңемен'], 1),
+    TF('Кортеж дөңгелек жақшамен () жазылады.', true),
+  ],
+  u4l4: [
+    Q('a = [1,2,3]; a.append(4) кейін a неге тең?', ['[1,2,3]','[1,2,3,4]','[4,1,2,3]','Error'], 1),
+    TF('Tuple-дың элементтерін өзгертуге болады.', false),
+    Q('len([1,2,3,4]) нәтижесі қандай?', ['3','4','5','Error'], 1),
+  ],
+  u4l5: [
+    Q('Сөздік (dict) қалай жазылады?', ['[]','()','{}','<>'], 2),
+    OUT('d = {"name":"Айдос"}\nprint(d["name"])', ['name','"Айдос"','Айдос','Error'], 2),
+  ],
+  u4l6: [
+    Q('Жиын (set) элементтерінің ерекшелігі қандай?', ['Қайталанады','Бірегей (қайталанбайды)','Реттелген','Өзгермейтін'], 1),
+    TF('set() жиынында бірдей элементтер бірнеше рет сақталады.', false),
+  ],
+  u5l1: [
+    Q('Класс анықтау үшін қандай түйінді сөз қолданылады?', ['def','class','object','struct'], 1),
+    TF('Объект — бұл класстың нақты данасы (instance).', true),
+  ],
+  u5l2: [
+    Q('__init__ әдісі қашан шақырылады?', ['Класс жойылғанда','Жаңа объект жасалғанда','Әдіс шақырылғанда','Ешқашан'], 1),
+    Q('self параметрі нені білдіреді?', ['Класс атауын','Ағымдағы объектінің өзін','Функция нәтижесін','Ештеңе'], 1),
+  ],
+  u5l3: [
+    Q('Класс ішіндегі функциялар қалай аталады?', ['Процедуралар','Әдістер (methods)','Модульдер','Атрибуттар'], 1),
+    TF('Әдіс шақырылғанда self автоматты түрде беріледі.', true),
+  ],
+  u5l4: [
+    Q('class Dog:\n    def __init__(self, name):\n        self.name = name\nd = Dog("Боско")\nprint(d.name) нәтижесі?', ['Dog','name','Боско','Error'], 2),
+    Q('__init__ әдісінің тағы бір аты қалай аталады?', ['Конструктор','Деструктор','Циклдатор','Итератор'], 0),
+    TF('Бір класстан бірнеше объект жасауға болады.', true),
+  ],
+  u5l5: [
+    Q('Мұрагерлік (inheritance) нені білдіреді?', ['Класс өзгерту','Класстың басқа класстан қасиет алуын','Функция шақыру','Айнымалы жасау'], 1),
+    Q('super() функциясы не үшін қолданылады?', ['Аталық класстың әдістеріне қол жеткізу үшін','Жаңа класс жасау үшін','Циклды бастау үшін','Қате шығару үшін'], 0),
+  ],
+  u5l6: [
+    Q('Инкапсуляция дегеніміз не?', ['Деректерді жасырып қорғау','Деректерді ашық қылу','Циклдау','Мұрагерлік'], 0),
+    TF('Python-да атрибут атауының алдында "__" қою оны жартылай жасырын етеді.', true),
+  ],
+  u6l1: [
+    Q('Файлды ашу үшін қандай функция қолданылады?', ['file()','open()','read()','load()'], 1),
+    TF('"w" режимі файлды оқу үшін қолданылады.', false, '"w" — жазу (write) режимі, оқу үшін "r" қолданылады.'),
+  ],
+  u6l2: [
+    Q('Қате орын алса, қай блок орындалады?', ['try','except','finally','def'], 1),
+    TF('finally блогы қате болса да, болмаса да әрқашан орындалады.', true),
+  ],
+  u6l3: [
+    Q('[x*2 for x in range(3)] нәтижесі қандай?', ['[0,2,4]','[1,2,3]','[2,4,6]','Error'], 0),
+    OUT('print([x for x in range(5) if x%2==0])', ['[0,1,2,3,4]','[0,2,4]','[1,3]','Error'], 1),
+  ],
+  u6l4: [
+    Q('Декоратор қандай таңбадан басталады?', ['#','@','$','&'], 1),
+    TF('Декоратор функцияны өзгертпей-ақ оның жұмысын кеңейте алады.', true),
+  ],
+  u6l5: [
+    Q('open("file.txt", "r") дегендегі "r" нені білдіреді?', ['Write','Read','Remove','Run'], 1),
+    Q('[x for x in range(4)] нәтижесі?', ['[0,1,2,3]','[1,2,3,4]','[0,1,2,3,4]','Error'], 0),
+    TF('try/except қолданбай тұрып бағдарлама қатеде толығымен тоқтайды.', true),
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════
 //  MAIN EXPORT
 // ═══════════════════════════════════════════════════════════
 export async function initPythonPath(user, db) {
@@ -408,17 +566,18 @@ function openModal(lesson, isDone, db, user, completed, progress, container) {
   ov.onclick = e => { if (e.target === ov) close(); };
 
   const startBtn = ov.querySelector('#ppStart') || ov.querySelector('#ppRepeat');
-  startBtn?.addEventListener('click', async () => {
+  startBtn?.addEventListener('click', () => {
     close();
-    if (!isDone) await markDone(lesson, db, user, completed, progress, container);
-    navigate(lesson);
+    openLessonPlayer(lesson, isDone, db, user, completed, progress, container);
   });
 }
 
 // ═══════════════════════════════════════════════════════════
 //  MARK DONE
 // ═══════════════════════════════════════════════════════════
-async function markDone(lesson, db, user, completed, progress, container) {
+async function markDone(lesson, db, user, completed, progress, container, earnedXP) {
+  const xp = (earnedXP != null) ? earnedXP : lesson.xp;
+  const alreadyDone = completed.has(lesson.id);
   completed.add(lesson.id);
   progress[lesson.id] = 'done';
 
@@ -429,9 +588,11 @@ async function markDone(lesson, db, user, completed, progress, container) {
     }, { merge: true });
   } catch(e) { console.warn(e); }
 
-  // Animate XP
-  spawnXP(lesson.xp);
-  ppToast(`+${lesson.xp} XP — «${lesson.title}» аяқталды! 🎉`);
+  // Animate XP (only show first-time completion toast as a fresh reward)
+  spawnXP(xp);
+  ppToast(alreadyDone
+    ? `+${xp} XP — қайталау аяқталды! 🔄`
+    : `+${xp} XP — «${lesson.title}» аяқталды! 🎉`);
 
   // Re-render path
   const roadmapEl = document.getElementById('pythonRoadmap');
@@ -442,6 +603,236 @@ async function markDone(lesson, db, user, completed, progress, container) {
     renderPath(roadmapEl, completed);
     attachHandlers(roadmapEl, db, user, completed, progress);
   }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  LESSON PLAYER — толыққанды интерактивті тапсырмалар (Duolingo)
+// ═══════════════════════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function prepareExercise(ex) {
+  const e = JSON.parse(JSON.stringify(ex));
+  if ((e.type === 'mcq' || e.type === 'output') && Array.isArray(e.o)) {
+    const correctValue = e.o[e.c];
+    const shuffled = shuffle(e.o);
+    e.o = shuffled;
+    e.c = shuffled.indexOf(correctValue);
+  }
+  return e;
+}
+
+function getExercisesForLesson(lesson) {
+  let pool;
+  if (lesson.type === 'checkpoint') {
+    const unitLessons = (lesson.unit?.lessons || []).filter(l => EXERCISES[l.id]);
+    pool = shuffle(unitLessons.flatMap(l => EXERCISES[l.id]));
+    pool = pool.slice(0, Math.max(1, Math.min(6, pool.length)));
+  } else if (lesson.type === 'boss') {
+    pool = shuffle(Object.values(EXERCISES).flat());
+    pool = pool.slice(0, Math.max(1, Math.min(10, pool.length)));
+  } else {
+    pool = EXERCISES[lesson.id];
+  }
+  if (!pool || !pool.length) {
+    pool = [TF(`«${lesson.title}» тақырыбын меңгердің бе?`, true, 'Жалғастыру үшін жауап бер!')];
+  }
+  return pool.map(prepareExercise);
+}
+
+function openLessonPlayer(lesson, isDone, db, user, completed, progress, container) {
+  document.getElementById('ppPlayer')?.remove();
+
+  const exercises = getExercisesForLesson(lesson);
+  const unitColor = lesson.unit?.color || '#58cc02';
+  const unitDark  = lesson.unit?.darkColor || '#46a302';
+  let idx = 0, hearts = 5, correctCount = 0, mistakes = 0, answered = false, selected = null;
+
+  const ov = document.createElement('div');
+  ov.id = 'ppPlayer';
+  ov.className = 'pp-player';
+  ov.innerHTML = `
+    <div class="pp-player-head">
+      <button class="pp-player-close" id="ppPlayerClose" aria-label="Жабу">✕</button>
+      <div class="pp-player-bar"><div class="pp-player-bar-fill" id="ppBarFill" style="background:${unitColor}"></div></div>
+      <div class="pp-player-hearts" id="ppHeartsBox"></div>
+    </div>
+    <div class="pp-player-body" id="ppPlayerBody"></div>
+    <div class="pp-player-foot" id="ppPlayerFoot"></div>
+  `;
+  document.body.appendChild(ov);
+  const prevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => ov.classList.add('pp-player-show'));
+
+  function closePlayer() {
+    document.body.style.overflow = prevOverflow;
+    ov.classList.remove('pp-player-show');
+    setTimeout(() => ov.remove(), 220);
+  }
+  ov.querySelector('#ppPlayerClose').onclick = () => {
+    if (idx > 0 && idx < exercises.length) {
+      if (!confirm('Сабақтан шығасың ба? Прогресс сақталмайды.')) return;
+    }
+    closePlayer();
+  };
+
+  function updateBar() {
+    ov.querySelector('#ppBarFill').style.width = `${Math.round((idx/exercises.length)*100)}%`;
+    const left = Math.max(hearts, 0);
+    ov.querySelector('#ppHeartsBox').textContent = '❤️'.repeat(left) + '🖤'.repeat(5-left);
+  }
+
+  function renderExercise() {
+    answered = false; selected = null;
+    updateBar();
+    const ex = exercises[idx];
+    const body = ov.querySelector('#ppPlayerBody');
+    const foot = ov.querySelector('#ppPlayerFoot');
+    body.classList.remove('pp-shake');
+    foot.className = 'pp-player-foot';
+
+    let html = '';
+    if (ex.type === 'mcq' || ex.type === 'tf' || ex.type === 'output') {
+      const opts = ex.type === 'tf' ? ['Дұрыс','Бұрыс'] : ex.o;
+      html += `<div class="pp-ex-kicker">${ex.type==='output' ? '🖥️ Код нәтижесі' : '🤔 Дұрыс жауапты таңда'}</div>`;
+      if (ex.type === 'output') html += `<pre class="pp-ex-code">${esc(ex.code)}</pre>`;
+      html += `<div class="pp-ex-q">${esc(ex.q).replace(/\n/g,'<br>')}</div>`;
+      html += `<div class="pp-ex-options">`;
+      opts.forEach((o, i) => { html += `<button class="pp-ex-opt" data-i="${i}">${esc(o)}</button>`; });
+      html += `</div>`;
+    } else if (ex.type === 'fill') {
+      html += `<div class="pp-ex-kicker">✍️ Бос орынды толтыр</div>`;
+      if (ex.code) html += `<pre class="pp-ex-code">${esc(ex.code)}</pre>`;
+      html += `<div class="pp-ex-q">${esc(ex.q)}</div>`;
+      html += `<input type="text" class="pp-ex-input" id="ppFillInput" placeholder="Жауабыңды жаз..." autocomplete="off" autocapitalize="off" spellcheck="false">`;
+    }
+    body.innerHTML = html;
+
+    if (ex.type === 'fill') {
+      const input = body.querySelector('#ppFillInput');
+      setTimeout(() => input.focus(), 50);
+      input.addEventListener('input', () => {
+        selected = input.value;
+        foot.querySelector('#ppCheckBtn').disabled = !selected.trim();
+      });
+      input.addEventListener('keydown', e => { if (e.key === 'Enter' && selected?.trim()) checkAnswer(); });
+    } else {
+      body.querySelectorAll('.pp-ex-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          body.querySelectorAll('.pp-ex-opt').forEach(b => b.classList.remove('pp-ex-opt-sel'));
+          btn.classList.add('pp-ex-opt-sel');
+          selected = ex.type === 'tf' ? (Number(btn.dataset.i) === 0) : Number(btn.dataset.i);
+          foot.querySelector('#ppCheckBtn').disabled = false;
+        });
+      });
+    }
+
+    foot.innerHTML = `<button class="pp-mbtn pp-mbtn-main" id="ppCheckBtn" disabled style="background:${unitColor};box-shadow:0 4px 0 ${unitDark}">Тексеру</button>`;
+    foot.querySelector('#ppCheckBtn').addEventListener('click', checkAnswer);
+  }
+
+  function checkAnswer() {
+    if (answered) return;
+    answered = true;
+    const ex = exercises[idx];
+    const body = ov.querySelector('#ppPlayerBody');
+    const foot = ov.querySelector('#ppPlayerFoot');
+    let correct;
+
+    if (ex.type === 'fill') {
+      const norm = s => String(s).trim().toLowerCase();
+      correct = ex.a.some(a => norm(a) === norm(selected));
+      const inp = body.querySelector('#ppFillInput');
+      inp.disabled = true;
+      inp.classList.add(correct ? 'pp-ex-input-ok' : 'pp-ex-input-bad');
+    } else {
+      correct = selected === ex.c;
+      body.querySelectorAll('.pp-ex-opt').forEach((b, i) => {
+        b.classList.add('pp-ex-opt-disabled');
+        if (i === ex.c) b.classList.add('pp-ex-opt-correct');
+        else if (b.classList.contains('pp-ex-opt-sel')) b.classList.add('pp-ex-opt-wrong');
+      });
+    }
+
+    if (correct) {
+      correctCount++;
+      foot.className = 'pp-player-foot pp-foot-ok';
+      foot.innerHTML = `
+        <div class="pp-ex-feedback"><span>✅ Дұрыс!</span>${ex.e ? `<p>${esc(ex.e)}</p>` : ''}</div>
+        <button class="pp-mbtn pp-mbtn-main" id="ppNextBtn" style="background:#58cc02;box-shadow:0 4px 0 #46a302">Жалғастыру</button>`;
+    } else {
+      mistakes++; hearts--;
+      foot.className = 'pp-player-foot pp-foot-bad';
+      const answerText = ex.type === 'fill' ? ex.a[0] : (ex.type === 'tf' ? (ex.c ? 'Дұрыс' : 'Бұрыс') : ex.o[ex.c]);
+      foot.innerHTML = `
+        <div class="pp-ex-feedback"><span>❌ Дұрыс емес</span><p>Дұрыс жауап: <b>${esc(answerText)}</b>${ex.e ? ` — ${esc(ex.e)}` : ''}</p></div>
+        <button class="pp-mbtn pp-mbtn-main" id="ppNextBtn" style="background:#ff4b4b;box-shadow:0 4px 0 #b83333">Жалғастыру</button>`;
+      body.classList.add('pp-shake');
+      updateBar();
+    }
+
+    foot.querySelector('#ppNextBtn').addEventListener('click', () => {
+      if (hearts <= 0) { showFail(); return; }
+      idx++;
+      if (idx >= exercises.length) showComplete();
+      else renderExercise();
+    });
+  }
+
+  function showFail() {
+    const body = ov.querySelector('#ppPlayerBody');
+    const foot = ov.querySelector('#ppPlayerFoot');
+    foot.className = 'pp-player-foot';
+    body.innerHTML = `
+      <div class="pp-ex-result">
+        <div class="pp-ex-result-emoji">💔</div>
+        <div class="pp-ex-result-title">Жүректер бітті!</div>
+        <div class="pp-ex-result-sub">Қайталап көр, бәрі жақсы болады 💪</div>
+      </div>`;
+    foot.innerHTML = `
+      <button class="pp-mbtn pp-mbtn-main" id="ppRetryBtn" style="background:${unitColor};box-shadow:0 4px 0 ${unitDark}">🔄 Қайталау</button>
+      <button class="pp-mbtn pp-mbtn-outline" id="ppQuitBtn">Шығу</button>`;
+    foot.querySelector('#ppRetryBtn').onclick = () => {
+      idx = 0; hearts = 5; correctCount = 0; mistakes = 0;
+      renderExercise();
+    };
+    foot.querySelector('#ppQuitBtn').onclick = closePlayer;
+  }
+
+  function showComplete() {
+    const body = ov.querySelector('#ppPlayerBody');
+    const foot = ov.querySelector('#ppPlayerFoot');
+    const perfect = mistakes === 0;
+    const earnedXP = lesson.xp + (perfect ? Math.round(lesson.xp * 0.5) : 0);
+    ov.querySelector('#ppBarFill').style.width = '100%';
+
+    body.innerHTML = `
+      <div class="pp-ex-result">
+        <div class="pp-ex-result-emoji">${perfect ? '🌟' : '🎉'}</div>
+        <div class="pp-ex-result-title">${perfect ? 'Тамаша! Қателіксіз!' : 'Сабақ аяқталды!'}</div>
+        <div class="pp-ex-result-stats">
+          <div class="pp-ex-stat"><span class="pp-ex-stat-n">${correctCount}/${exercises.length}</span><span class="pp-ex-stat-l">Дұрыс</span></div>
+          <div class="pp-ex-stat"><span class="pp-ex-stat-n">${Math.max(hearts,0)}</span><span class="pp-ex-stat-l">Жүрек қалды</span></div>
+          <div class="pp-ex-stat pp-ex-stat-xp"><span class="pp-ex-stat-n">+${earnedXP}</span><span class="pp-ex-stat-l">XP</span></div>
+        </div>
+      </div>`;
+    foot.className = 'pp-player-foot';
+    foot.innerHTML = `<button class="pp-mbtn pp-mbtn-main" id="ppDoneBtn" style="background:#58cc02;box-shadow:0 4px 0 #46a302">Жалғастыру →</button>`;
+    foot.querySelector('#ppDoneBtn').onclick = async () => {
+      closePlayer();
+      await markDone(lesson, db, user, completed, progress, container, earnedXP);
+    };
+  }
+
+  renderExercise();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -678,6 +1069,98 @@ function injectStyles() {
 /* ── SHAKE ── */
 .pp-shake{animation:pp-shake .42s ease both}
 @keyframes pp-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+/* ══════════════════════════════════════════════════════
+   LESSON PLAYER — толыққанды Duolingo-стиль тапсырмалар
+   ══════════════════════════════════════════════════════ */
+.pp-player{
+  position:fixed;inset:0;background:var(--bg1,var(--bg2));z-index:4000;
+  display:flex;flex-direction:column;opacity:0;transform:translateY(16px);
+  transition:opacity .22s,transform .22s;
+}
+.pp-player.pp-player-show{opacity:1;transform:translateY(0)}
+
+.pp-player-head{
+  display:flex;align-items:center;gap:12px;
+  padding:max(14px,env(safe-area-inset-top)) 16px 12px;flex-shrink:0;
+}
+.pp-player-close{
+  background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;flex-shrink:0;transition:.15s;
+}
+.pp-player-close:hover{background:var(--bg3);color:var(--text)}
+.pp-player-bar{flex:1;height:14px;background:var(--bg4);border-radius:99px;overflow:hidden}
+.pp-player-bar-fill{height:100%;border-radius:99px;transition:width .35s cubic-bezier(.16,1,.3,1);width:0}
+.pp-player-hearts{font-size:16px;letter-spacing:1px;flex-shrink:0;white-space:nowrap}
+
+.pp-player-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:8px 20px 32px;max-width:560px;margin:0 auto;width:100%;box-sizing:border-box;
+}
+.pp-ex-kicker{font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 16px;font-family:var(--mono)}
+.pp-ex-q{font-size:19px;font-weight:800;color:var(--text);line-height:1.45;margin-bottom:20px}
+.pp-ex-code{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:14px;
+  padding:16px 18px;font-family:var(--mono);font-size:13.5px;line-height:1.6;
+  color:var(--text);overflow-x:auto;margin-bottom:16px;white-space:pre-wrap;word-break:break-word;
+}
+.pp-ex-options{display:flex;flex-direction:column;gap:10px}
+.pp-ex-opt{
+  text-align:left;padding:15px 18px;border-radius:14px;border:2px solid var(--border2);
+  background:var(--bg2);color:var(--text);font-family:var(--font);font-size:15px;font-weight:600;
+  cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent;
+}
+.pp-ex-opt:hover:not(.pp-ex-opt-disabled){border-color:var(--border3);background:var(--bg3)}
+.pp-ex-opt-sel{border-color:#1cb0f6;background:rgba(28,176,246,.1)}
+.pp-ex-opt-disabled{cursor:default}
+.pp-ex-opt-correct{border-color:#58cc02;background:rgba(88,204,2,.12);color:#58cc02}
+.pp-ex-opt-wrong{border-color:#ff4b4b;background:rgba(255,75,75,.12);color:#ff4b4b}
+.pp-ex-input{
+  width:100%;padding:15px 18px;border-radius:14px;border:2px solid var(--border2);
+  background:var(--bg2);color:var(--text);font-family:var(--mono);font-size:15px;
+  box-sizing:border-box;outline:none;transition:.12s;
+}
+.pp-ex-input:focus{border-color:#1cb0f6}
+.pp-ex-input-ok{border-color:#58cc02;background:rgba(88,204,2,.08)}
+.pp-ex-input-bad{border-color:#ff4b4b;background:rgba(255,75,75,.08)}
+
+.pp-player-foot{
+  flex-shrink:0;padding:14px 20px max(20px,env(safe-area-inset-bottom));border-top:1px solid var(--border);
+  max-width:560px;margin:0 auto;width:100%;box-sizing:border-box;
+}
+.pp-foot-ok{background:rgba(88,204,2,.08)}
+.pp-foot-bad{background:rgba(255,75,75,.08)}
+.pp-ex-feedback{margin-bottom:12px;font-size:14px}
+.pp-ex-feedback span{font-weight:900;font-size:16px;display:block;margin-bottom:4px}
+.pp-foot-ok .pp-ex-feedback span{color:#58cc02}
+.pp-foot-bad .pp-ex-feedback span{color:#ff4b4b}
+.pp-ex-feedback p{color:var(--text3);margin:0;line-height:1.5}
+#ppCheckBtn:disabled{opacity:.4;cursor:not-allowed}
+
+.pp-ex-result{display:flex;flex-direction:column;align-items:center;text-align:center;padding:48px 12px 24px}
+.pp-ex-result-emoji{font-size:64px;margin-bottom:14px;animation:pp-trophy 2.2s ease-in-out infinite}
+.pp-ex-result-title{font-size:22px;font-weight:900;color:var(--text);margin-bottom:8px}
+.pp-ex-result-sub{font-size:13px;color:var(--text3);margin-bottom:14px}
+.pp-ex-result-stats{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.pp-ex-stat{background:var(--bg3);border:1px solid var(--border2);border-radius:16px;padding:14px 22px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:84px}
+.pp-ex-stat-n{font-size:20px;font-weight:900;font-family:var(--mono);color:var(--text)}
+.pp-ex-stat-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.pp-ex-stat-xp .pp-ex-stat-n{color:#ffd900}
+
+@media(min-width:700px){
+  .pp-player-body{padding-top:28px}
+  .pp-ex-q{font-size:21px}
+  .pp-ex-opt{padding:16px 20px}
+}
+@media(max-width:420px){
+  .pp-ex-q{font-size:17px}
+  .pp-player-head{padding-left:12px;padding-right:12px;gap:10px}
+  .pp-ex-opt{padding:13px 14px;font-size:14px}
+  .pp-ex-code{font-size:12.5px;padding:13px 14px}
+  .pp-player-body{padding-left:16px;padding-right:16px}
+  .pp-player-foot{padding-left:16px;padding-right:16px}
+}
 `;
   document.head.appendChild(s);
 }

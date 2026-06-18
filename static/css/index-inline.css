@@ -167,6 +167,57 @@
     animation: fadeUpSmooth .35s cubic-bezier(.16,1,.3,1) both;
   }
 
+  /* ═══════════════════════════════════════
+     АДАПТАЦИЯ — sl-hero / sl-stats / sl-tabs
+     (бұл блоктарда мобильді бейімдеу мүлдем болмаған)
+     ═══════════════════════════════════════ */
+  @media (max-width: 900px) {
+    .sl-hero { padding: 22px 18px 0; }
+    .sl-hero-grid {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .sl-hero-title { font-size: 22px; }
+    .sl-hero-sub { max-width: none; }
+    .sl-hero-actions {
+      flex-direction: row;
+      align-items: stretch;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .sl-btn-primary, .sl-btn-secondary {
+      flex: 1 1 auto;
+      min-width: 140px;
+      text-align: center;
+      justify-content: center;
+    }
+    .sl-stats {
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .sl-stat {
+      flex: 1 1 50%;
+      min-width: 0;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 14px;
+    }
+    .sl-stat:nth-child(2n) { border-right: none; }
+    .sl-stat:last-child, .sl-stat:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+    .sl-stat-num { font-size: 18px; }
+
+    .sl-tabs { padding: 0 4px; }
+    .sl-tab { padding: 12px 14px; font-size: 11px; }
+  }
+  @media (max-width: 480px) {
+    .sl-hero-title { font-size: 19px; }
+    .sl-hero-actions { flex-direction: column; }
+    .sl-btn-primary, .sl-btn-secondary { width: 100%; }
+    .sl-stat { flex: 1 1 100%; border-right: none; }
+    .sl-tab { padding: 11px 12px; font-size: 10px; gap: 5px; }
+    .sl-tab svg { width: 12px; height: 12px; }
+  }
+
   /* ═══════════════════════════════════════════════════════════
      LANDING SCREEN — показывается незалогиненным пользователям
      ═══════════════════════════════════════════════════════════ */
@@ -384,16 +435,30 @@
 
   /* Mobile */
   @media (max-width: 900px) {
-    .land-nav { padding: 16px 20px; }
-    .land-hero { flex-direction: column; padding: 40px 20px; gap: 40px; }
-    .land-hero-title { font-size: 36px; }
+    .land-nav { padding: 14px 18px; }
+    .land-nav-btns { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .land-btn-ghost, .land-btn-solid { padding: 8px 16px; font-size: 12px; }
+    .land-hero { flex-direction: column; padding: 36px 18px; gap: 32px; }
+    .land-hero-title { font-size: 32px; }
     .land-hero-right { width: 100%; }
-    .land-features, .land-roles { padding: 40px 20px; }
-    .land-feat-grid { grid-template-columns: 1fr 1fr; }
+    .land-hero-cta { flex-direction: column; align-items: stretch; }
+    .land-cta-main, .land-cta-secondary { text-align: center; width: 100%; box-sizing: border-box; }
+    .land-hero-stats { gap: 16px; }
+    .land-features, .land-roles { padding: 36px 18px; }
+    .land-feat-title { font-size: 24px; }
+    .land-feat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .land-feat-card { padding: 16px; }
     .land-roles-grid { grid-template-columns: 1fr; }
-    .land-footer { padding: 20px; flex-direction: column; gap: 8px; text-align: center; }
+    .land-role-card { padding: 20px; }
+    .lrc-title { font-size: 19px; }
+    .land-footer { padding: 18px; flex-direction: column; gap: 8px; text-align: center; }
+    .lm-header { gap: 8px; }
   }
   @media (max-width: 560px) {
     .land-feat-grid { grid-template-columns: 1fr; }
-    .land-hero-stats { gap: 20px; }
+    .land-hero-stats { gap: 14px; }
+    .land-hero-title { font-size: 25px; }
+    .land-hero-title .ht-kz { font-size: 19px; }
+    .land-hero-sub { font-size: 14px; }
+    .land-mockup { padding: 14px; }
   }

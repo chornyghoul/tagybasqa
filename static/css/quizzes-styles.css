@@ -1,4 +1,3 @@
-
 .boss-card {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -265,17 +264,72 @@
 @media (max-width: 768px) {
   .boss-card { padding: 12px; gap: 10px }
   .boss-avatar { width: 38px; height: 38px; font-size: 18px }
+  .boss-meta { flex-wrap: wrap; gap: 6px 12px }
   .boss-footer { flex-direction: column; align-items: flex-start; gap: 6px }
   .boss-btn { width: 100%; text-align: center; padding: 9px }
+
   .quiz-create-options { grid-template-columns: 1fr }
   .model-btn { width: 100%; min-width: unset }
   .analytics-grid { grid-template-columns: repeat(2, 1fr) }
   .qz-pin-digits { gap: 5px }
   .qz-pin-digit { width: 34px; height: 42px; font-size: 17px }
+
+  /* ── Хедер «Менің квиздерім» — поиск/фильтры в столбик ── */
+  .quiz-my-header {
+    flex-direction: column; align-items: stretch; gap: 10px;
+    padding: 10px 14px;
+  }
+  .quiz-my-header-title { font-size: 13px }
+  .qz-filter-row { width: 100%; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 2px }
+  .qz-filter-tag { flex-shrink: 0 }
+  .quiz-search-bar { width: 100% }
+  .quiz-search-bar input { width: 100%; flex: 1 }
+  .qz-sort-select { width: 100% }
+
+  /* ── Испытания ── */
+  .challenge-row { flex-direction: column; align-items: stretch; gap: 8px; padding: 12px }
+  .challenge-btn { width: 100%; text-align: center; padding: 9px }
+  .challenge-badge { margin-left: 0; margin-top: 4px; display: inline-block }
+
+  /* ── Карточки статистики квизов ── */
+  .qz-stats-strip { flex-wrap: wrap }
+  .quiz-stats-row { flex-wrap: wrap }
+  .quiz-stat-chip { flex: 1 1 33%; min-width: 70px }
 }
 
 @media (max-width: 480px) {
   .analytics-grid { grid-template-columns: 1fr }
   .qz-stats-strip { flex-wrap: wrap }
   .qz-stat { min-width: 80px }
+
+  .boss-card { padding: 10px; gap: 8px }
+  .boss-header { gap: 8px }
+  .boss-avatar { width: 34px; height: 34px; font-size: 16px }
+  .boss-name { font-size: 13px }
+  .boss-sub { font-size: 9px }
+
+  .qz-pin-digit { width: 28px; height: 38px; font-size: 14px }
+  .qz-pin-digits { gap: 4px }
+
+  .quiz-create-option { padding: 14px 12px }
+  .qco-icon { font-size: 18px }
+
+  .model-btn { padding: 8px 10px; font-size: 11px }
+
+  .quiz-stat-chip { flex: 1 1 50% }
+  .quiz-stat-num { font-size: 14px }
+
+  .analytics-stat-value { font-size: 19px }
+  .analytics-chart { padding: 12px }
+}
+
+@media (max-width: 360px) {
+  .quiz-stat-chip { flex: 1 1 100% }
+  .qz-pin-digit { width: 24px; height: 34px; font-size: 12px }
+  .qz-pin-digits { gap: 3px }
+}
+
+/* Сенсорлық құрылғыларда hover-тек элементтер әрқашан көрінсін */
+@media (hover: none) {
+  .delete-course-btn { opacity: 1 }
 }

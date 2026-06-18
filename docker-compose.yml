@@ -1,0 +1,7 @@
+services:
+  web:
+    build: .
+    container_name: tagybasqa_web
+    restart: unless-stopped
+    ports:
+      - "5500:80"

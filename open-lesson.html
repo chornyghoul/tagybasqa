@@ -3,1123 +3,1063 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ашық сабақ — Tagybasqa</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Onest:wght@400;600;700;900&display=swap" rel="stylesheet">
-<!-- mammoth.js for docx parsing -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<title>Мұғалім — Python негіздері</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Onest:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2330;--bg4:#21262d;
-  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--border3:rgba(255,255,255,.22);
-  --text:#f0f6fc;--text2:#8b949e;--text3:#484f58;
-  --blue:#1cb0f6;--blue2:#0e86c0;
-  --green:#57cc02;--green2:#3a8c01;
-  --red:#ff4b4b;--orange:#ff9600;--purple:#9b5de5;--gold:#ffd900;--teal:#06d6a0;
-  --font:"Onest",sans-serif;--mono:"DM Mono",monospace;--r:12px;--rlg:18px;
+  --ink:#0f1923; --ink2:#2a3a48; --ink3:#5a7080;
+  --paper:#f7f9fb; --paper2:#eef2f6; --paper3:#e2e8ef;
+  --blue:#1a6ef5; --blue-dim:rgba(26,110,245,.12);
+  --green:#12b76a; --green-dim:rgba(18,183,106,.12);
+  --gold:#f59e0b; --gold-dim:rgba(245,158,11,.12);
+  --red:#ef4444; --red-dim:rgba(239,68,68,.1);
+  --purple:#8b5cf6; --purple-dim:rgba(139,92,246,.1);
+  --teal:#06b6d4; --teal-dim:rgba(6,182,212,.1);
+  --font:'Onest',sans-serif; --mono:'JetBrains Mono',monospace;
+  --r:10px; --r2:16px; --r3:99px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --shadow2:0 2px 8px rgba(0,0,0,.1),0 8px 32px rgba(0,0,0,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+html,body{height:100%;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--paper);color:var(--ink);display:flex;flex-direction:column}
 
 /* ── TOPBAR ── */
-.tb{display:flex;align-items:center;gap:12px;padding:0 20px;height:54px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100}
-.tb-logo{font-size:16px;font-weight:900;color:var(--blue);text-decoration:none}
-.tb-title{flex:1;font-size:14px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tb-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.live-badge{display:flex;align-items:center;gap:5px;background:rgba(87,204,2,.12);border:1px solid rgba(87,204,2,.3);color:var(--green);border-radius:99px;padding:4px 11px;font-size:12px;font-weight:700}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:.15s;font-family:var(--font)}
-.btn:hover{background:var(--bg4);border-color:var(--border3);color:var(--text)}
-.btn-blue{background:var(--blue);border:none;color:#fff}
-.btn-blue:hover{background:var(--blue2);color:#fff}
-.btn-red{color:var(--red);border-color:rgba(255,75,75,.3);background:rgba(255,75,75,.07)}
-.btn-red:hover{background:rgba(255,75,75,.15)}
+.top{height:52px;background:#fff;border-bottom:1px solid var(--paper3);
+  display:flex;align-items:center;gap:0;padding:0;flex-shrink:0;position:sticky;top:0;z-index:100}
+.top-logo{padding:0 20px;font-size:15px;font-weight:900;color:var(--blue);
+  border-right:1px solid var(--paper3);height:100%;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.top-lesson{flex:1;padding:0 20px;font-size:13px;font-weight:700;color:var(--ink2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-status{padding:0 16px;border-left:1px solid var(--paper3);border-right:1px solid var(--paper3);
+  display:flex;align-items:center;gap:8px;height:100%}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--paper3)}
+.status-dot.live{background:var(--green);box-shadow:0 0 0 3px var(--green-dim);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(18,183,106,.4)}50%{box-shadow:0 0 0 6px rgba(18,183,106,0)}}
+.status-txt{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink3)}
+.top-btns{display:flex;gap:6px;padding:0 16px;height:100%;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r3);
+  font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+.btn-ghost{background:transparent;color:var(--ink3);border:1.5px solid var(--paper3)}
+.btn-ghost:hover{border-color:var(--paper3);background:var(--paper2);color:var(--ink2)}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(26,110,245,.3)}
+.btn-blue:hover{filter:brightness(1.08)}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(18,183,106,.3)}
+.btn-green:hover{filter:brightness(1.08)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none!important}
 
-/* ── STAGES ── */
-.stages-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;flex-shrink:0;display:none}
-.stages-bar.visible{display:block}
-.stages-lbl{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.stages-row{display:flex;align-items:center}
-.stg{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;cursor:pointer}
-.stg:not(:last-child)::after{content:"";position:absolute;left:calc(50% + 14px);top:13px;width:calc(100% - 28px);height:2px;background:var(--border2);z-index:0}
-.stg.done:not(:last-child)::after{background:var(--blue)}
-.stg-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text3);z-index:1;transition:.2s;flex-shrink:0}
-.stg.done .stg-dot{background:var(--blue);border-color:var(--blue);color:#fff}
-.stg.active .stg-dot{border-color:var(--blue);color:var(--blue);background:rgba(28,176,246,.1)}
-.stg-name{font-size:10px;color:var(--text3);text-align:center;line-height:1.3;max-width:80px}
-.stg.active .stg-name{color:var(--blue);font-weight:700}
-.stg.done .stg-name{color:var(--text2)}
+/* ── LAYOUT ── */
+.body{display:flex;flex:1;min-height:0}
+.main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.side{width:300px;border-left:1px solid var(--paper3);background:#fff;
+  display:flex;flex-direction:column;flex-shrink:0}
 
-/* ── MAIN LAYOUT ── */
-.main{display:flex;flex:1;overflow:hidden}
-.content{flex:1;overflow-y:auto;padding:20px}
-.sidebar{width:260px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;display:none}
-.sidebar.visible{display:flex}
+/* ── SLIDE AREA ── */
+.slide-wrap{flex:1;display:flex;align-items:center;justify-content:center;
+  padding:32px;background:var(--paper);overflow:hidden;position:relative}
+.slide{background:#fff;border-radius:var(--r2);box-shadow:var(--shadow2);
+  width:100%;max-width:860px;aspect-ratio:16/9;display:flex;align-items:center;
+  justify-content:center;position:relative;overflow:hidden;flex-shrink:0}
+.slide-inner{width:100%;height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:40px 56px;text-align:center;gap:0}
 
-/* ── UPLOAD SCREEN ── */
-#uploadScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:24px;padding:40px}
-.upload-hero{text-align:center;max-width:480px}
-.upload-icon{font-size:64px;margin-bottom:16px;display:block;line-height:1}
-.upload-title{font-size:28px;font-weight:900;margin-bottom:10px}
-.upload-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
-.drop-zone{border:2px dashed var(--border2);border-radius:var(--rlg);padding:40px 32px;text-align:center;cursor:pointer;transition:.2s;background:var(--bg2);max-width:480px;width:100%}
-.drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:rgba(28,176,246,.04)}
-.drop-zone-icon{font-size:40px;margin-bottom:12px;display:block}
-.drop-zone-text{font-size:14px;color:var(--text2);margin-bottom:6px}
-.drop-zone-hint{font-size:12px;color:var(--text3);font-family:var(--mono)}
-.upload-or{display:flex;align-items:center;gap:12px;color:var(--text3);font-size:12px;max-width:480px;width:100%}
-.upload-or::before,.upload-or::after{content:"";flex:1;height:1px;background:var(--border)}
-.upload-demo-btn{font-size:13px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:var(--font);text-decoration:underline}
-.upload-demo-btn:hover{color:var(--text2)}
-#fileInput{display:none}
-.recent-plans{max-width:480px;width:100%}
-.recent-title{font-size:11px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
-.recent-list{display:flex;flex-direction:column;gap:7px}
-.recent-item{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:.15s}
-.recent-item:hover{border-color:var(--border2);background:var(--bg3)}
-.recent-item-icon{font-size:20px;flex-shrink:0}
-.recent-item-name{font-size:13px;font-weight:700;flex:1}
-.recent-item-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
+/* ── SLIDE FOOTER ── */
+.slide-footer{height:52px;border-top:1px solid var(--paper3);background:#fff;
+  display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.slide-counter{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink3)}
+.slide-progress-wrap{flex:1;margin:0 20px;height:4px;background:var(--paper3);border-radius:99px;overflow:hidden}
+.slide-progress-fill{height:100%;background:var(--blue);border-radius:99px;transition:width .4s ease}
+.nav-btns{display:flex;gap:8px}
 
-/* ── PARSE LOADING ── */
-#parseScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px}
-.parse-spinner{width:44px;height:44px;border-radius:50%;border:4px solid var(--border);border-top-color:var(--blue);animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.parse-text{font-size:14px;color:var(--text2);font-family:var(--mono)}
+/* ── SLIDE TYPES ── */
+/* Cover */
+.sl-cover{background:linear-gradient(135deg,#0f1f40 0%,#1a3a6e 50%,#0d2040 100%)}
+.sl-cover .slide-inner{color:#fff}
+.sl-cover-tag{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:20px}
+.sl-cover-title{font-size:clamp(28px,4.5vw,52px);font-weight:900;line-height:1.1;
+  letter-spacing:-.03em;margin-bottom:16px;
+  background:linear-gradient(135deg,#fff 40%,rgba(99,179,255,.8));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sl-cover-sub{font-size:clamp(14px,1.8vw,20px);color:rgba(255,255,255,.55);font-weight:500;margin-bottom:32px}
+.sl-cover-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.sl-cover-chip{padding:6px 16px;border:1px solid rgba(255,255,255,.15);border-radius:99px;
+  font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.5)}
 
-/* ── PLAN PREVIEW ── */
-#planPreview{display:none;flex-direction:column;gap:16px}
-.plan-header{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px}
-.plan-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
-.plan-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(87,204,2,.1);border:1px solid rgba(87,204,2,.25);color:var(--green);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;font-family:var(--mono)}
-.plan-title{font-size:22px;font-weight:900;margin-bottom:8px;line-height:1.3}
-.plan-meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
-.plan-meta-item{display:flex;flex-direction:column;gap:3px}
-.plan-meta-label{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
-.plan-meta-val{font-size:13px;font-weight:700;color:var(--text)}
-.plan-stages-preview{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px}
-.plan-stages-title{font-size:13px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.plan-stage-list{display:flex;flex-direction:column;gap:10px}
-.plan-stage-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:.15s}
-.plan-stage-item:hover{border-color:var(--border2)}
-.plan-stage-num{width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
-.plan-stage-body{flex:1}
-.plan-stage-name{font-size:13px;font-weight:700;margin-bottom:3px}
-.plan-stage-desc{font-size:12px;color:var(--text2);line-height:1.5}
-.plan-stage-time{font-family:var(--mono);font-size:11px;color:var(--orange);background:rgba(255,150,0,.1);border:1px solid rgba(255,150,0,.2);border-radius:99px;padding:2px 8px;flex-shrink:0}
-.plan-actions{display:flex;gap:12px;flex-wrap:wrap}
-.plan-start-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:var(--r);border:none;background:var(--green);color:#fff;font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:.15s;box-shadow:0 4px 0 var(--green2)}
-.plan-start-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
-.plan-start-btn:active{transform:translateY(2px);box-shadow:none}
-.plan-edit-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
-.plan-edit-btn:hover{border-color:var(--border3);color:var(--text)}
+/* Section */
+.sl-section .slide-inner{align-items:flex-start;text-align:left}
+.sl-section-num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--blue);
+  margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sl-section-num::after{content:'';flex:1;height:1px;background:var(--paper3)}
+.sl-section-title{font-size:clamp(24px,4vw,44px);font-weight:900;letter-spacing:-.03em;
+  color:var(--ink);line-height:1.1;margin-bottom:14px}
+.sl-section-desc{font-size:clamp(13px,1.6vw,18px);color:var(--ink3);font-weight:500;line-height:1.6;max-width:580px}
 
-/* ── LESSON RUNNER ── */
-#lessonScreen{display:none;flex-direction:column;gap:0;flex:1;overflow:hidden}
-.runner-layout{display:flex;flex:1;overflow:hidden}
-.runner-main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
-.runner-sidebar{width:260px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+/* Concept / explain */
+.sl-concept .slide-inner{align-items:flex-start;text-align:left;gap:20px}
+.sl-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;padding:4px 12px;border-radius:99px;display:inline-block}
+.sl-heading{font-size:clamp(22px,3.2vw,36px);font-weight:900;color:var(--ink);
+  letter-spacing:-.02em;line-height:1.2;margin-bottom:4px}
+.sl-body{font-size:clamp(13px,1.5vw,17px);color:var(--ink2);line-height:1.75;font-weight:500;max-width:680px}
 
-/* Runner stage card */
-.stage-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden}
-.stage-card-h{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.stage-card-title{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
-.stage-timer{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--orange);background:rgba(255,150,0,.1);border:1px solid rgba(255,150,0,.2);border-radius:99px;padding:4px 12px;min-width:70px;text-align:center;cursor:pointer;transition:.15s}
-.stage-timer:hover{background:rgba(255,150,0,.2)}
-.stage-timer.red{color:var(--red);background:rgba(255,75,75,.1);border-color:rgba(255,75,75,.2)}
-.stage-timer.paused{opacity:.6}
-.stage-card-body{padding:16px}
+/* Code slide */
+.sl-code .slide-inner{align-items:flex-start;text-align:left;justify-content:flex-start;padding:28px 40px;gap:16px}
+.code-block{background:#0f1923;border-radius:var(--r2);padding:20px 24px;width:100%;overflow:auto}
+.code-block pre{font-family:var(--mono);font-size:clamp(13px,1.4vw,16px);line-height:1.7;color:#e2e8ef;white-space:pre}
+.code-kw{color:#7dd3fc}    /* keywords */
+.code-fn{color:#86efac}    /* functions */
+.code-str{color:#fde68a}   /* strings */
+.code-num{color:#f9a8d4}   /* numbers */
+.code-cm{color:#6b7280;font-style:italic}  /* comments */
+.code-output{background:#1a2535;border-radius:var(--r);padding:14px 18px;
+  font-family:var(--mono);font-size:clamp(12px,1.3vw,14px);color:#86efac;line-height:1.6;width:100%}
+.code-output-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
 
-/* Content blocks */
-.content-block{margin-bottom:14px;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r)}
-.block-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.block-text{font-size:14px;color:var(--text2);line-height:1.7}
-.block-task{background:rgba(28,176,246,.06);border-left:3px solid var(--blue);padding:12px;border-radius:0 var(--r) var(--r) 0;font-size:14px;color:var(--text);line-height:1.65}
-.block-quiz{display:flex;flex-direction:column;gap:8px}
-.quiz-q-text{font-size:14px;font-weight:700;margin-bottom:10px;line-height:1.5}
-.quiz-opt{padding:10px 14px;border:1px solid var(--border2);border-radius:var(--r);font-size:13px;color:var(--text2);background:var(--bg4);cursor:pointer;transition:.15s;text-align:left}
-.quiz-opt:hover{border-color:var(--blue);color:var(--text);background:rgba(28,176,246,.07)}
-.quiz-opt.sel{border-color:var(--blue);background:rgba(28,176,246,.12);color:var(--blue);font-weight:700}
-.quiz-opt.correct{border-color:var(--green);background:rgba(87,204,2,.1);color:var(--green)}
-.quiz-opt.wrong{border-color:var(--red);background:rgba(255,75,75,.08);color:var(--red)}
-.quiz-explain{padding:10px 14px;border-radius:var(--r);font-size:13px;margin-top:6px;display:none}
-.quiz-explain.ok{background:rgba(87,204,2,.08);border:1px solid rgba(87,204,2,.2);color:var(--green)}
-.quiz-explain.err{background:rgba(255,75,75,.07);border:1px solid rgba(255,75,75,.2);color:var(--red)}
-.quiz-reveal-btn{padding:8px 14px;border-radius:var(--r);border:none;background:var(--blue);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:6px}
+/* Two column */
+.sl-two .slide-inner{flex-direction:row;align-items:stretch;text-align:left;gap:32px;padding:32px 48px}
+.sl-col{flex:1;display:flex;flex-direction:column;gap:12px;justify-content:center}
+.sl-col-divider{width:1px;background:var(--paper3);flex-shrink:0}
 
-/* Stage nav */
-.stage-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0 0;border-top:1px solid var(--border);margin-top:6px}
-.stage-nav-prev{padding:9px 16px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
-.stage-nav-prev:hover{border-color:var(--border3);color:var(--text)}
-.stage-nav-next{padding:9px 20px;border-radius:var(--r);border:none;background:var(--blue);color:#fff;font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:.15s}
-.stage-nav-next:hover{background:var(--blue2)}
-.stage-progress{font-family:var(--mono);font-size:11px;color:var(--text3)}
+/* List slide */
+.sl-list .slide-inner{align-items:flex-start;text-align:left;gap:16px}
+.sl-list-items{display:flex;flex-direction:column;gap:10px;width:100%}
+.sl-list-item{display:flex;align-items:flex-start;gap:14px;padding:12px 16px;
+  background:var(--paper);border-radius:var(--r);border:1px solid var(--paper3)}
+.sl-list-item-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:16px;flex-shrink:0;margin-top:1px}
+.sl-list-item-text{font-size:clamp(13px,1.4vw,16px);color:var(--ink2);font-weight:500;line-height:1.5}
+.sl-list-item-text b{color:var(--ink);font-weight:700}
 
-/* Sidebar widgets */
-.sb-section{display:flex;flex-direction:column;gap:8px}
-.sb-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-.sb-stat{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:13px}
-.sb-stat-val{font-weight:800;font-family:var(--mono)}
-.observer-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border-radius:var(--r)}
-.obs-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.obs-name{font-size:12px;font-weight:700}
-.obs-role{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.student-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg3);border-radius:var(--r);font-size:12px}
-.student-name{font-weight:700}
-.student-status{font-family:var(--mono);font-size:10px}
-.status-done{color:var(--green)}
-.status-work{color:var(--orange)}
-.status-idle{color:var(--text3)}
+/* Quiz slide */
+.sl-quiz .slide-inner{gap:20px;padding:28px 48px}
+.quiz-q{font-size:clamp(16px,2.2vw,24px);font-weight:800;color:var(--ink);line-height:1.35;max-width:700px}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:700px}
+.quiz-opt{padding:14px 18px;border-radius:var(--r2);border:2px solid transparent;
+  font-size:clamp(13px,1.4vw,16px);font-weight:700;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:12px;text-align:left;font-family:var(--font)}
+.quiz-opt-key{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0}
+.qo-a{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+.qo-a .quiz-opt-key{background:#bfdbfe;color:#1d4ed8}
+.qo-b{background:#fef3c7;border-color:#fde68a;color:#92400e}
+.qo-b .quiz-opt-key{background:#fde68a;color:#92400e}
+.qo-c{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+.qo-c .quiz-opt-key{background:#bbf7d0;color:#166534}
+.qo-d{background:#faf5ff;border-color:#ddd6fe;color:#5b21b6}
+.qo-d .quiz-opt-key{background:#ddd6fe;color:#5b21b6}
+.quiz-opt.revealed-ok{border-color:var(--green)!important;background:var(--green-dim)!important;
+  box-shadow:0 0 0 3px rgba(18,183,106,.2)}
+.quiz-opt.revealed-err{opacity:.45;border-color:var(--red)!important}
+.quiz-opt:disabled{cursor:default}
+.quiz-timer-bar{height:4px;background:var(--paper3);border-radius:99px;overflow:hidden;width:100%;max-width:700px}
+.quiz-timer-fill{height:100%;background:var(--blue);border-radius:99px;transition:width 1s linear}
+.quiz-stats{display:flex;gap:20px;align-items:center;font-family:var(--mono);font-size:12px;color:var(--ink3)}
 
-/* Results screen */
-#resultsScreen{display:none;flex-direction:column;gap:20px;padding:24px}
-.res-hero{text-align:center;padding:32px;background:linear-gradient(135deg,rgba(87,204,2,.06),rgba(28,176,246,.04));border:1px solid var(--border);border-radius:var(--rlg)}
-.res-trophy{font-size:60px;margin-bottom:12px;display:block;animation:float 2s ease-in-out infinite}
-@keyframes float{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.06) rotate(3deg)}}
-.res-title{font-size:26px;font-weight:900;margin-bottom:6px}
-.res-sub{font-size:13px;color:var(--text2);font-family:var(--mono)}
-.res-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.res-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
-.res-stat-val{font-size:28px;font-weight:900;font-family:var(--mono);color:var(--blue)}
-.res-stat-lbl{font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;margin-top:4px}
-.res-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.res-btn{padding:12px 24px;border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:7px}
-.res-btn-prim{background:var(--blue);border:none;color:#fff}
-.res-btn-prim:hover{background:var(--blue2)}
-.res-btn-sec{background:var(--bg3);border:1px solid var(--border2);color:var(--text2)}
-.res-btn-sec:hover{border-color:var(--border3);color:var(--text)}
+/* Task slide */
+.sl-task .slide-inner{gap:20px;text-align:left;align-items:flex-start}
+.task-card{background:var(--blue-dim);border:1.5px solid rgba(26,110,245,.2);border-radius:var(--r2);
+  padding:20px 24px;width:100%;max-width:720px}
+.task-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.15em;
+  color:var(--blue);text-transform:uppercase;margin-bottom:10px}
+.task-text{font-size:clamp(15px,1.8vw,20px);font-weight:700;color:var(--ink);line-height:1.5}
+.task-hint{font-size:13px;color:var(--ink3);margin-top:10px;font-style:italic}
 
-/* Edit overlay */
-#editOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center}
-#editOverlay.open{display:flex}
-.edit-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rlg);padding:24px;max-width:560px;width:95%;max-height:80vh;overflow-y:auto}
-.edit-modal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.edit-modal-title{font-size:18px;font-weight:800}
-.edit-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:4px}
-.edit-close:hover{color:var(--text)}
-.edit-field{margin-bottom:14px}
-.edit-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px}
-.edit-input{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:14px;padding:10px 13px;outline:none;transition:.15s}
-.edit-input:focus{border-color:var(--blue)}
-.edit-textarea{min-height:100px;resize:vertical;line-height:1.5}
-.edit-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+/* End slide */
+.sl-end{background:linear-gradient(135deg,#0d2012 0%,#0a3320 50%,#061a0e 100%)}
+.sl-end .slide-inner{color:#fff;gap:20px}
+.end-trophy{font-size:64px;filter:drop-shadow(0 0 24px rgba(18,183,106,.4));animation:float 2.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ── SIDEBAR ── */
+.side-tabs{display:flex;border-bottom:1px solid var(--paper3);flex-shrink:0}
+.side-tab{flex:1;padding:10px 0;font-size:11px;font-weight:700;font-family:var(--mono);
+  cursor:pointer;border:none;background:transparent;color:var(--ink3);
+  border-bottom:2px solid transparent;transition:.15s;letter-spacing:.03em;text-transform:uppercase}
+.side-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.side-panel{flex:1;overflow-y:auto;display:none}
+.side-panel.active{display:flex;flex-direction:column}
+.side-panel::-webkit-scrollbar{width:3px}
+.side-panel::-webkit-scrollbar-thumb{background:var(--paper3);border-radius:99px}
+
+/* Pin panel */
+.pin-hero{padding:20px;border-bottom:1px solid var(--paper3);text-align:center}
+.pin-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.pin-code{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--ink);
+  letter-spacing:.18em;line-height:1}
+.pin-url{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:8px;
+  background:var(--paper2);border-radius:8px;padding:6px 10px;display:inline-block}
+.copy-btn{margin-top:10px;width:100%}
+
+/* Students panel */
+.students-header{padding:12px 16px;border-bottom:1px solid var(--paper3);
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;justify-content:space-between}
+.students-count{background:var(--blue);color:#fff;border-radius:99px;padding:2px 8px;
+  font-size:10px;font-weight:700}
+.student-row{display:flex;align-items:center;gap:10px;padding:9px 16px;
+  border-bottom:1px solid var(--paper3)}
+.student-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.student-name{flex:1;font-size:13px;font-weight:600;color:var(--ink2)}
+.student-score{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold)}
+.student-status{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.empty-students{padding:40px 16px;text-align:center;color:var(--ink3);
+  font-size:12px;font-family:var(--mono);line-height:1.8}
+
+/* Leaderboard panel */
+.lb-row-side{display:flex;align-items:center;gap:10px;padding:10px 16px;
+  border-bottom:1px solid var(--paper3)}
+.lb-rank-side{font-family:var(--mono);font-size:13px;font-weight:700;
+  min-width:28px;text-align:center}
+.lb-bar-wrap{flex:1;height:5px;background:var(--paper3);border-radius:99px;overflow:hidden;margin:0 8px}
+.lb-bar-fill{height:100%;background:var(--blue);border-radius:99px;transition:width .5s ease}
+
+/* Slides thumb panel */
+.thumb-list{padding:10px}
+.thumb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;
+  border-radius:var(--r);cursor:pointer;transition:.12s;margin-bottom:4px;border:1.5px solid transparent}
+.thumb-item:hover{background:var(--paper2)}
+.thumb-item.active{background:var(--blue-dim);border-color:rgba(26,110,245,.3)}
+.thumb-num{font-family:var(--mono);font-size:10px;color:var(--ink3);min-width:20px;text-align:right}
+.thumb-preview{width:52px;height:32px;border-radius:5px;border:1px solid var(--paper3);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;overflow:hidden}
+.thumb-title{font-size:11px;font-weight:600;color:var(--ink2);flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb-type{font-family:var(--mono);font-size:9px;color:var(--ink3);flex-shrink:0}
+
+/* ── QUIZ REVEAL PANEL (bottom) ── */
+.quiz-reveal-bar{background:#fff;border-top:1px solid var(--paper3);padding:12px 20px;
+  display:none;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0}
+.quiz-reveal-bar.show{display:flex}
+.qrb-stat{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.qrb-stat b{color:var(--ink);font-size:14px}
+
+/* ── SETUP OVERLAY ── */
+#setupOverlay{position:fixed;inset:0;z-index:500;background:rgba(15,25,35,.6);
+  backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px}
+.setup-modal{background:#fff;border-radius:20px;padding:36px;max-width:480px;width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.setup-logo{font-size:15px;font-weight:900;color:var(--blue);margin-bottom:28px;display:flex;align-items:center;gap:8px}
+.setup-title{font-size:24px;font-weight:900;color:var(--ink);margin-bottom:6px;letter-spacing:-.03em}
+.setup-sub{font-size:14px;color:var(--ink3);margin-bottom:28px;line-height:1.6}
+.setup-field{margin-bottom:16px}
+.setup-field label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px}
+.setup-inp{width:100%;padding:11px 14px;border:1.5px solid var(--paper3);border-radius:var(--r);
+  font-family:var(--font);font-size:14px;color:var(--ink);background:var(--paper);
+  outline:none;transition:border-color .15s}
+.setup-inp:focus{border-color:var(--blue)}
+.setup-pin-display{background:var(--paper2);border:1.5px dashed var(--paper3);border-radius:var(--r);
+  padding:14px;text-align:center;margin-bottom:20px}
+.setup-pin{font-family:var(--mono);font-size:32px;font-weight:700;color:var(--ink);letter-spacing:.25em}
+.setup-pin-sub{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:4px}
+
+/* ── RESULTS OVERLAY ── */
+#resultsOverlay{position:fixed;inset:0;z-index:500;background:rgba(15,25,35,.75);
+  backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:24px}
+#resultsOverlay.show{display:flex}
+.results-modal{background:#fff;border-radius:20px;padding:36px;max-width:520px;width:100%;
+  box-shadow:0 32px 80px rgba(0,0,0,.25);text-align:center}
+.results-emoji{font-size:56px;margin-bottom:12px;display:block;animation:float 2.5s infinite}
+.results-title{font-size:26px;font-weight:900;color:var(--ink);margin-bottom:4px;letter-spacing:-.03em}
+.results-sub{font-size:13px;color:var(--ink3);margin-bottom:24px;font-family:var(--mono)}
+.results-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.res-stat{background:var(--paper2);border-radius:var(--r);padding:14px}
+.res-stat-num{font-size:26px;font-weight:900;font-family:var(--mono);color:var(--blue)}
+.res-stat-lbl{font-family:var(--mono);font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+.res-top{text-align:left;margin-bottom:20px}
+.res-top-lbl{font-family:var(--mono);font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.res-lb-row{display:flex;align-items:center;gap:10px;padding:9px 12px;
+  background:var(--paper);border-radius:var(--r);margin-bottom:6px}
+.res-lb-rank{font-family:var(--mono);font-size:14px;font-weight:700;min-width:28px;text-align:center}
+.res-lb-name{flex:1;font-size:13px;font-weight:700}
+.res-lb-score{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--gold)}
+.results-btns{display:flex;gap:10px;justify-content:center}
 
 /* Toast */
-.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
-.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:99px;padding:10px 20px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:toast-in .3s ease,toast-out .3s ease 2.7s forwards;pointer-events:all}
-@keyframes toast-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes toast-out{from{opacity:1}to{opacity:0}}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--ink);color:#fff;padding:10px 20px;border-radius:99px;
+  font-size:13px;font-weight:600;opacity:0;pointer-events:none;z-index:999;
+  transition:all .22s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* Misc */
-.divider{height:1px;background:var(--border);margin:4px 0}
-.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;font-family:var(--mono)}
-.tag-blue{background:rgba(28,176,246,.12);color:var(--blue)}
-.tag-green{background:rgba(87,204,2,.1);color:var(--green)}
-.tag-orange{background:rgba(255,150,0,.1);color:var(--orange)}
-.tag-red{background:rgba(255,75,75,.1);color:var(--red)}
-.tag-purple{background:rgba(155,93,229,.12);color:var(--purple)}
+/* Confetti */
+#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:9998}
 </style>
 </head>
 <body>
 
-<!-- ── TOPBAR ── -->
-<div class="tb" id="topbar">
-  <a class="tb-logo" href="./index.html">Tagybasqa</a>
-  <div style="display:flex;flex-direction:column;flex:1;min-width:0">
-    <div class="tb-title" id="tbTitle">Ашық сабақ</div>
-    <div class="tb-meta" id="tbMeta">Сабақ жоспарын жүктеңіз</div>
-  </div>
-  <div class="tb-right">
-    <div class="live-badge" id="liveBadge" style="display:none">
-      <span class="live-dot"></span>LIVE
+<!-- SETUP OVERLAY -->
+<div id="setupOverlay">
+  <div class="setup-modal">
+    <div class="setup-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Tagybasqa
     </div>
-    <button class="btn" id="settingsBtn" style="display:none" onclick="openEdit()">⚙️ Баптау</button>
-    <button class="btn btn-red" id="endBtn" style="display:none" onclick="endLesson()">✕ Аяқтау</button>
+    <div class="setup-title">Ашық сабақты бастау</div>
+    <div class="setup-sub">Студенттер PIN арқылы қосылады және сіздің экраныңызды нақты уақытта көреді.</div>
+
+    <div class="setup-field">
+      <label>Сыныбыңыздың аты</label>
+      <input class="setup-inp" id="classNameInput" placeholder="Мысалы: 10А сыныбы" value="">
+    </div>
+
+    <div class="setup-pin-display">
+      <div class="setup-pin" id="setupPinDisplay">——</div>
+      <div class="setup-pin-sub">Студент PIN коды — авто генерацияланады</div>
+    </div>
+
+    <button class="btn btn-green" style="width:100%;justify-content:center;padding:14px;font-size:15px" onclick="beginSession()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Сессияны бастау
+    </button>
   </div>
 </div>
 
-<!-- ── STAGE BAR ── -->
-<div class="stages-bar" id="stagesBar">
-  <div class="stages-lbl">Сабақ кезеңдері</div>
-  <div class="stages-row" id="stagesRow"></div>
+<!-- TOPBAR -->
+<div class="top">
+  <div class="top-logo">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    Tagybasqa
+  </div>
+  <div class="top-lesson" id="topLesson">Python негіздері — Айнымалылар мен деректер түрлері</div>
+  <div class="top-status">
+    <div class="status-dot live" id="statusDot"></div>
+    <span class="status-txt" id="statusTxt">LIVE</span>
+  </div>
+  <div class="top-btns">
+    <button class="btn btn-ghost" id="pinShowBtn" onclick="showPinPanel()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      PIN: <span id="topPinDisplay">——</span>
+    </button>
+    <button class="btn btn-red" onclick="endSession()">
+      Аяқтау
+    </button>
+  </div>
 </div>
 
-<!-- ── MAIN AREA ── -->
-<div class="main" id="mainArea">
-<div class="content" id="contentArea">
+<!-- BODY -->
+<div class="body">
 
-  <!-- UPLOAD SCREEN -->
-  <div id="uploadScreen">
-    <div class="upload-hero">
-      <span class="upload-icon">📋</span>
-      <h1 class="upload-title">Ашық сабақ өткізу</h1>
-      <p class="upload-sub">Тексерілген сабақ жоспарыңызды (.docx) жүктеп, Tagybasqa автоматты түрде оны интерактивті сабаққа айналдырады. Таймерлер, квиздер, командалар — бәрі дайын.</p>
+  <!-- MAIN: slide + nav -->
+  <div class="main">
+    <div class="slide-wrap">
+      <div class="slide" id="slideEl">
+        <div class="slide-inner" id="slideInner"><!-- rendered by JS --></div>
+      </div>
     </div>
-    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <span class="drop-zone-icon">📄</span>
-      <div class="drop-zone-text">Сабақ жоспарын осы жерге тастаңыз</div>
-      <div class="drop-zone-hint">.docx форматы · Максималды 10MB</div>
-    </div>
-    <div class="upload-or">немесе</div>
-    <button class="upload-demo-btn" onclick="loadDemo()">🎯 Демо жоспармен байқап көру</button>
-    <input type="file" id="fileInput" accept=".docx" onchange="handleFileUpload(this.files[0])">
-    <div class="recent-plans" id="recentPlans" style="display:none">
-      <div class="recent-title">Соңғы жоспарлар</div>
-      <div class="recent-list" id="recentList"></div>
-    </div>
-  </div>
 
-  <!-- PARSE SCREEN -->
-  <div id="parseScreen" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px">
-    <div class="parse-spinner"></div>
-    <div class="parse-text" id="parseText">Жоспар талданып жатыр...</div>
-  </div>
+    <!-- Quiz actions bar -->
+    <div class="quiz-reveal-bar" id="quizRevealBar">
+      <div class="quiz-stats" id="quizStats">
+        <span>Жауап берді: <b id="answeredCount">0</b></span>
+        <span>Дұрыс: <b id="correctCount" style="color:var(--green)">0</b></span>
+        <span>Уақыт: <b id="timerDisplay">—</b></span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" id="revealAnswerBtn" onclick="revealAnswer()">👁 Жауапты ашу</button>
+        <button class="btn btn-blue" onclick="nextSlide()">Келесіге →</button>
+      </div>
+    </div>
 
-  <!-- PLAN PREVIEW -->
-  <div id="planPreview" style="display:none;flex-direction:column;gap:16px">
-    <div class="plan-header">
-      <div class="plan-header-top">
-        <div>
-          <div class="plan-badge">✓ Жоспар жүктелді</div>
+    <div class="slide-footer">
+      <button class="btn btn-ghost" id="prevBtn" onclick="prevSlide()">← Артқа</button>
+      <div style="display:flex;align-items:center;gap:12px;flex:1;margin:0 20px">
+        <div class="slide-counter" id="slideCounter">1 / 14</div>
+        <div class="slide-progress-wrap">
+          <div class="slide-progress-fill" id="slideProgressFill" style="width:7%"></div>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn" onclick="resetToUpload()">↩ Жаңа жоспар</button>
-          <button class="btn" onclick="openEdit()">✏️ Өзгерту</button>
+      </div>
+      <button class="btn btn-blue" id="nextBtn" onclick="nextSlide()">Келесі →</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="side">
+    <div class="side-tabs">
+      <button class="side-tab active" onclick="switchSideTab('pin',this)">PIN</button>
+      <button class="side-tab" onclick="switchSideTab('students',this)">Студенттер</button>
+      <button class="side-tab" onclick="switchSideTab('slides',this)">Слайдтар</button>
+      <button class="side-tab" onclick="switchSideTab('lb',this)">Рейтинг</button>
+    </div>
+
+    <!-- PIN panel -->
+    <div class="side-panel active" id="panel-pin">
+      <div class="pin-hero">
+        <div class="pin-label">Студенттерге PIN</div>
+        <div class="pin-code" id="sidePin">——</div>
+        <div class="pin-url" id="sideUrl">student-view.html?pin=——</div>
+        <button class="btn btn-ghost copy-btn" onclick="copyJoinLink()">🔗 Сілтемені көшіру</button>
+      </div>
+      <div style="padding:16px;border-bottom:1px solid var(--paper3)">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Нұсқаулық</div>
+        <div style="font-size:12px;color:var(--ink3);line-height:1.7">
+          1. Студенттер браузерде <b style="color:var(--ink)">student-view.html</b> ашады<br>
+          2. PIN кодты енгізіп, атын жазады<br>
+          3. Сіздің слайдтарыңыз нақты уақытта пайда болады<br>
+          4. Квиз слайдына жеткенде — студенттер жауап береді
         </div>
       </div>
-      <div class="plan-title" id="planTitle">—</div>
-      <div class="plan-meta-grid" id="planMetaGrid"></div>
-    </div>
-    <div class="plan-stages-preview">
-      <div class="plan-stages-title">📋 Сабақ кезеңдері <span class="tag tag-blue" id="stageCount">—</span></div>
-      <div class="plan-stage-list" id="planStageList"></div>
-    </div>
-    <div class="plan-actions">
-      <button class="plan-start-btn" onclick="startLesson()">▶ Сабақты бастау</button>
-      <button class="plan-edit-btn" onclick="openEdit()">✏️ Жоспарды өзгерту</button>
-      <button class="btn" onclick="resetToUpload()">↩ Басқа жоспар</button>
-    </div>
-  </div>
-
-  <!-- LESSON RUNNER (appended dynamically) -->
-  <div id="lessonScreen" style="display:none;flex-direction:column;gap:16px"></div>
-
-  <!-- RESULTS -->
-  <div id="resultsScreen" style="display:none;flex-direction:column;gap:20px">
-    <div class="res-hero">
-      <span class="res-trophy">🏆</span>
-      <div class="res-title">Сабақ аяқталды!</div>
-      <div class="res-sub" id="resSubtitle">—</div>
-    </div>
-    <div class="res-stats">
-      <div class="res-stat"><div class="res-stat-val" id="resTime">—</div><div class="res-stat-lbl">Уақыт</div></div>
-      <div class="res-stat"><div class="res-stat-val" id="resStages">—</div><div class="res-stat-lbl">Кезеңдер</div></div>
-      <div class="res-stat"><div class="res-stat-val" id="resScore">—</div><div class="res-stat-lbl">Орт. балл</div></div>
-    </div>
-    <div class="res-actions">
-      <button class="res-btn res-btn-prim" onclick="downloadReport()">⬇ PDF есеп</button>
-      <button class="res-btn res-btn-sec" onclick="resetToUpload()">↩ Жаңа сабақ</button>
-    </div>
-  </div>
-
-</div><!-- /content -->
-<div id="runnersidebar" class="runner-sidebar" style="display:none">
-  <!-- filled by JS -->
-</div>
-</div><!-- /main -->
-
-<!-- EDIT OVERLAY -->
-<div id="editOverlay">
-  <div class="edit-modal">
-    <div class="edit-modal-h">
-      <div class="edit-modal-title">Жоспарды өзгерту</div>
-      <button class="edit-close" onclick="closeEdit()">✕</button>
-    </div>
-    <div class="edit-field">
-      <label class="edit-label">Сабақ тақырыбы</label>
-      <input class="edit-input" id="editTitle" placeholder="Тақырыпты енгізіңіз...">
-    </div>
-    <div class="edit-field">
-      <label class="edit-label">Мұғалім</label>
-      <input class="edit-input" id="editTeacher" placeholder="Аты-жөні">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="edit-field">
-        <label class="edit-label">Сынып / Топ</label>
-        <input class="edit-input" id="editClass" placeholder="7А, ИС24-2...">
-      </div>
-      <div class="edit-field">
-        <label class="edit-label">Уақыт (мин)</label>
-        <input class="edit-input" id="editDuration" type="number" value="45">
+      <div style="padding:16px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Ағымдағы слайд</div>
+        <div id="currentSlideInfo" style="font-size:13px;font-weight:600;color:var(--ink2)">—</div>
       </div>
     </div>
-    <div class="edit-field">
-      <label class="edit-label">Мақсат</label>
-      <textarea class="edit-input edit-textarea" id="editGoal" placeholder="Сабақтың мақсаты..."></textarea>
+
+    <!-- Students panel -->
+    <div class="side-panel" id="panel-students">
+      <div class="students-header">
+        Қосылған студенттер
+        <span class="students-count" id="studentsCount">0</span>
+      </div>
+      <div id="studentsList">
+        <div class="empty-students">
+          Әлі ешкім қосылған жоқ.<br>Студенттер PIN енгізгеннен кейін<br>осы жерде пайда болады.
+        </div>
+      </div>
     </div>
-    <div class="edit-field">
-      <label class="edit-label">Күтілетін нәтижелер</label>
-      <textarea class="edit-input edit-textarea" id="editOutcomes" placeholder="Білім алушылар не үйренеді..."></textarea>
+
+    <!-- Slides panel -->
+    <div class="side-panel" id="panel-slides">
+      <div class="thumb-list" id="thumbList"></div>
     </div>
-    <div id="editStagesSection">
-      <div class="edit-label" style="margin-bottom:10px">Кезеңдер</div>
-      <div id="editStagesList" style="display:flex;flex-direction:column;gap:10px"></div>
-    </div>
-    <div class="edit-actions" style="margin-top:20px">
-      <button class="btn" onclick="closeEdit()">Болдырмау</button>
-      <button class="btn btn-blue" onclick="saveEdit()">💾 Сақтау</button>
+
+    <!-- Leaderboard panel -->
+    <div class="side-panel" id="panel-lb">
+      <div class="students-header">Рейтинг</div>
+      <div id="lbList">
+        <div class="empty-students">Квиз аяқталғаннан кейін<br>рейтинг осы жерде пайда болады.</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast-wrap" id="toastWrap"></div>
+<!-- RESULTS OVERLAY -->
+<div id="resultsOverlay">
+  <div class="results-modal">
+    <span class="results-emoji">🏆</span>
+    <div class="results-title">Сабақ аяқталды!</div>
+    <div class="results-sub" id="resultsSub">Python негіздері · 2026</div>
+    <div class="results-stats">
+      <div class="res-stat"><div class="res-stat-num" id="resStudents">0</div><div class="res-stat-lbl">Студент</div></div>
+      <div class="res-stat"><div class="res-stat-num" id="resSlides">14</div><div class="res-stat-lbl">Слайд</div></div>
+      <div class="res-stat"><div class="res-stat-num" id="resAvg">0</div><div class="res-stat-lbl">Орт. ұпай</div></div>
+    </div>
+    <div class="res-top">
+      <div class="res-top-lbl">Топ-3</div>
+      <div id="resultsTopList"></div>
+    </div>
+    <div class="results-btns">
+      <button class="btn btn-ghost" onclick="closeResults()">Жабу</button>
+      <button class="btn btn-blue" onclick="openReport()">📊 Есеп</button>
+    </div>
+  </div>
+</div>
 
-<script>
-// ═══════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════
-let lessonPlan = null;
-let currentStageIdx = 0;
-let timers = {};
-let lessonStartTime = null;
-let lessonElapsed = 0;
-let lessonTimer = null;
+<canvas id="confettiCanvas"></canvas>
+<div id="toast"></div>
 
-// ═══════════════════════════════════════════════════════════
-//  DRAG & DROP
-// ═══════════════════════════════════════════════════════════
-const dz = document.getElementById("dropZone");
-dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("drag-over"); });
-dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
-dz.addEventListener("drop", e => {
-  e.preventDefault();
-  dz.classList.remove("drag-over");
-  const f = e.dataTransfer.files[0];
-  if (f && f.name.endsWith(".docx")) handleFileUpload(f);
-  else toast("⚠️ Тек .docx форматы қабылданады", "red");
-});
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore, doc, addDoc, updateDoc, onSnapshot, collection, query, where, getDocs, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// ═══════════════════════════════════════════════════════════
-//  FILE UPLOAD & PARSE
-// ═══════════════════════════════════════════════════════════
-async function handleFileUpload(file) {
-  if (!file) return;
-  showScreen("parseScreen");
-  setParseText("Файл оқылып жатыр...");
+const FB = {
+  apiKey: "AIzaSyAywbSZkiReHjTq4oc46Kbw9iZ0iDHVTpY", authDomain: "pystart-dd2db.firebaseapp.com",
+  projectId: "pystart-dd2db", storageBucket: "pystart-dd2db.firebasestorage.app",
+  messagingSenderId: "9188811255", appId: "1:9188811255:web:6f7280f1f7f67b80d90ef2"
+};
+const app = !getApps().length ? initializeApp(FB) : getApp();
+const db  = getFirestore(app);
+
+// ══ LESSON DATA ══════════════════════════════════════════════
+const LESSON = {
+  title: 'Python негіздері',
+  subtitle: 'Айнымалылар мен деректер түрлері',
+  slides: [
+    {
+      type: 'cover',
+      title: 'Python негіздері',
+      sub: 'Айнымалылар мен деректер түрлері',
+      meta: ['10-сынып', '45 минут', 'Бастауыш деңгей'],
+    },
+    {
+      type: 'section', num: '01', color: '#1a6ef5',
+      title: 'Python дегеніміз не?',
+      desc: 'Программалау тілі және оның мүмкіндіктері',
+    },
+    {
+      type: 'list', label: 'PYTHON ТУРАЛЫ', labelColor: '#1a6ef5',
+      heading: 'Python — ең танымал тіл',
+      items: [
+        { icon: '🌍', text: '<b>Дүние жүзінде #1</b> — 2024 жылы ең көп қолданылатын программалау тілі' },
+        { icon: '🤖', text: '<b>AI & Machine Learning</b> — Google, OpenAI, Tesla осы тілде жұмыс жасайды' },
+        { icon: '📖', text: '<b>Оңай оқуға</b> — синтаксисі ағылшын тіліне өте ұқсас, түсінікті' },
+        { icon: '🚀', text: '<b>Жылдам нәтиже</b> — бірінші бағдарламаны 5 минутта жазуға болады' },
+      ],
+    },
+    {
+      type: 'section', num: '02', color: '#8b5cf6',
+      title: 'Айнымалылар',
+      desc: 'Деректерді жадыда сақтау жолы',
+    },
+    {
+      type: 'concept', label: 'АНЫҚТАМА', labelBg: '#f3e8ff', labelColor: '#7c3aed',
+      heading: 'Айнымалы (variable) дегеніміз не?',
+      body: 'Айнымалы — бұл деректерді сақтайтын жады ұяшығы. Оны атаулы қорап ретінде елестетіңіз: қорапқа мән саласыз, ал атауы арқылы оны кейін тауып алуға болады.',
+    },
+    {
+      type: 'code',
+      label: 'КОД МЫСАЛЫ', labelBg: '#f0fdf4', labelColor: '#166534',
+      heading: 'Айнымалыларды жариялау',
+      code: `<span class="code-cm"># Айнымалы жасау — өте қарапайым!</span>
+<span class="code-kw">есім</span> = <span class="code-str">"Айгерім"</span>
+<span class="code-kw">жас</span> = <span class="code-num">16</span>
+<span class="code-kw">бой</span> = <span class="code-num">1.65</span>
+<span class="code-kw">оқушы</span> = <span class="code-num">True</span>
+
+<span class="code-fn">print</span>(<span class="code-str">f"Менің атым {есім}, жасым {жас}"</span>)`,
+      output: 'Менің атым Айгерім, жасым 16',
+    },
+    {
+      type: 'quiz',
+      question: 'Төмендегі кодтың нәтижесі қандай болады?\n\nx = 5\ny = 3\nprint(x + y)',
+      opts: ['2', '53', '8', 'Қате шығады'],
+      correct: 2,
+      points: 100,
+      time: 20,
+    },
+    {
+      type: 'section', num: '03', color: '#f59e0b',
+      title: 'Деректер түрлері',
+      desc: 'Python-дағы негізгі деректер типтері',
+    },
+    {
+      type: 'two',
+      left: {
+        label: 'ДЕРЕКТЕР ТҮРЛЕРІ', labelBg: '#fffbeb', labelColor: '#92400e',
+        items: [
+          { icon: '🔢', name: 'int', desc: 'Бүтін сан: 1, -5, 100' },
+          { icon: '💧', name: 'float', desc: 'Ондық сан: 3.14, -0.5' },
+          { icon: '📝', name: 'str', desc: 'Мәтін: "Сәлем", "Python"' },
+          { icon: '✅', name: 'bool', desc: 'Логика: True немесе False' },
+        ],
+      },
+      right: {
+        code: `<span class="code-cm"># Деректер түрін тексеру</span>
+<span class="code-kw">a</span> = <span class="code-num">42</span>
+<span class="code-kw">b</span> = <span class="code-num">3.14</span>
+<span class="code-kw">c</span> = <span class="code-str">"Python"</span>
+<span class="code-kw">d</span> = <span class="code-num">True</span>
+
+<span class="code-fn">print</span>(<span class="code-fn">type</span>(a))
+<span class="code-fn">print</span>(<span class="code-fn">type</span>(b))
+<span class="code-fn">print</span>(<span class="code-fn">type</span>(c))`,
+        output: `<class 'int'>
+<class 'float'>
+<class 'str'>`,
+      },
+    },
+    {
+      type: 'quiz',
+      question: 'Қай жолда STR (мәтін) деректер түрі пайдаланылған?',
+      opts: ['x = 42', 'x = 3.14', 'x = "Сәлем"', 'x = True'],
+      correct: 2,
+      points: 100,
+      time: 20,
+    },
+    {
+      type: 'section', num: '04', color: '#12b76a',
+      title: 'Операторлар',
+      desc: 'Арифметикалық және салыстыру операторлары',
+    },
+    {
+      type: 'code',
+      label: 'ОПЕРАТОРЛАР', labelBg: '#ecfdf5', labelColor: '#065f46',
+      heading: 'Python-да есептеу',
+      code: `<span class="code-cm"># Арифметикалық операторлар</span>
+<span class="code-kw">a</span>, <span class="code-kw">b</span> = <span class="code-num">10</span>, <span class="code-num">3</span>
+
+<span class="code-fn">print</span>(a + b)   <span class="code-cm"># 13 — қосу</span>
+<span class="code-fn">print</span>(a - b)   <span class="code-cm"># 7  — алу</span>
+<span class="code-fn">print</span>(a * b)   <span class="code-cm"># 30 — көбейту</span>
+<span class="code-fn">print</span>(a / b)   <span class="code-cm"># 3.33 — бөлу</span>
+<span class="code-fn">print</span>(a // b)  <span class="code-cm"># 3  — бүтін бөлу</span>
+<span class="code-fn">print</span>(a % b)   <span class="code-cm"># 1  — қалдық</span>
+<span class="code-fn">print</span>(a ** b)  <span class="code-cm"># 1000 — дәреже</span>`,
+      output: '13\n7\n30\n3.3333...\n3\n1\n1000',
+    },
+    {
+      type: 'task',
+      label: '✏️ ТАПСЫРМА',
+      heading: 'Өзіңіз жазып көріңіз!',
+      text: 'Өзіңіздің есіміңізді, жасыңызды және сүйікті санды айнымалыларға сақтаңыз. Содан кейін print() арқылы барлығын экранға шығарыңыз.',
+      hint: 'Мысалы: есім = "Нұрлан" · жас = 15 · сан = 7',
+      time: 120,
+    },
+    {
+      type: 'quiz',
+      question: '10 % 3 өрнегінің нәтижесі қанша?',
+      opts: ['3', '1', '0', '10'],
+      correct: 1,
+      points: 100,
+      time: 20,
+    },
+    {
+      type: 'end',
+      title: 'Керемет! Сабақ аяқталды 🎉',
+      points: [
+        'Python — ең танымал программалау тілі',
+        'Айнымалы — деректерді сақтайтын жады ұяшығы',
+        'Негізгі деректер түрлері: int, float, str, bool',
+        'Операторлар арқылы есептеулер жасауға болады',
+      ],
+    },
+  ],
+};
+
+// ══ STATE ═══════════════════════════════════════════════════
+let sessionId   = null;
+let sessionPin  = '';
+let currentIdx  = 0;
+let sessionStart = 0;
+let students    = {};   // uid → {name, score, color}
+let quizAnswers = {};   // uid → answerIdx for current quiz
+let quizRevealed = false;
+let quizTimerInt = null;
+let playerUnsub  = null;
+let answerUnsub  = null;
+
+const COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16'];
+
+// ══ SETUP ════════════════════════════════════════════════════
+const pin = String(Math.floor(100000 + Math.random() * 900000));
+sessionPin = pin;
+document.getElementById('setupPinDisplay').textContent = formatPin(pin);
+
+function formatPin(p) { return p.replace(/(\d{3})(\d{3})/, '$1 $2'); }
+
+window.beginSession = async function() {
+  const className = document.getElementById('classNameInput').value.trim() || 'Сынып';
+  sessionStart = Date.now();
   try {
-    const arrayBuffer = await file.arrayBuffer();
-    setParseText("Мәтін шығарылуда...");
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    const rawText = result.value;
-    setParseText("Жоспар структурасы анықталуда...");
-    const plan = parseLessonPlan(rawText, file.name);
-    lessonPlan = plan;
-    saveToRecent(plan, file.name);
-    setParseText("Дайын!");
-    setTimeout(() => showPlanPreview(plan), 500);
-  } catch(e) {
-    console.error(e);
-    toast("❌ Файлды оқу қатесі: " + e.message, "red");
-    showScreen("uploadScreen");
-  }
-}
-
-function setParseText(t) {
-  document.getElementById("parseText").textContent = t;
-}
-
-// ═══════════════════════════════════════════════════════════
-//  DOCX PARSER
-// ═══════════════════════════════════════════════════════════
-function parseLessonPlan(text, filename) {
-  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 2);
-  const plan = {
-    title: "",
-    teacher: "",
-    group: "",
-    date: "",
-    type: "",
-    goal: "",
-    outcomes: [],
-    duration: 45,
-    stages: [],
-    rawText: text,
-    filename: filename
-  };
-
-  // Extract key fields
-  const getAfter = (keyword, src) => {
-    const idx = src.toLowerCase().indexOf(keyword.toLowerCase());
-    if (idx === -1) return "";
-    const after = src.slice(idx + keyword.length, idx + keyword.length + 200).trim();
-    return after.split("\n")[0].replace(/^[:\s]+/, "").trim();
-  };
-
-  // Title — usually after "тақырыбы" or "Бөлім"
-  const titleLine = lines.find(l => /тақырыб[ыы]/i.test(l) && l.length > 10);
-  if (titleLine) {
-    plan.title = titleLine.replace(/^.*тақырыб[ыы][^:]*[:]/i, "").trim() || titleLine.slice(0, 80);
-  }
-  if (!plan.title) plan.title = lines[0]?.slice(0, 80) || filename.replace(".docx","");
-
-  // Teacher
-  const teacherLine = lines.find(l => /педагог|мұғалім|оқытушы|дайындаған/i.test(l));
-  if (teacherLine) {
-    plan.teacher = teacherLine.replace(/^.*[Дд]айындаған[^:]*[:]/,"").trim() || 
-                   teacherLine.replace(/педагог|мұғалім|оқытушы/gi,"").replace(/^[:\s]+/,"").trim();
-  }
-
-  // Group / class
-  const groupLine = lines.find(l => /^(Топ|Курс|Сынып|Тобы)/i.test(l) || /Топ/i.test(l));
-  if (groupLine) {
-    const m = groupLine.match(/[A-ZА-ЯЁа-яёa-z]{2,}\d{1,2}[-–]?\d{0,2}/);
-    plan.group = m ? m[0] : groupLine.replace(/Топ[ы]?|Курс|Сынып/gi,"").trim().slice(0,20);
-  }
-
-  // Duration
-  const durLine = text.match(/(\d+)\s*мин/i);
-  if (durLine) plan.duration = parseInt(durLine[1]) || 45;
-
-  // Goal
-  const goalLine = lines.find(l => /мақсат[ы]?/i.test(l) && l.length > 20);
-  if (goalLine) plan.goal = goalLine.replace(/^[^:]+:/,"").trim().slice(0,200);
-
-  // Type
-  const typeLine = lines.find(l => /сабақтың түрі|сабақ түрі/i.test(l));
-  if (typeLine) plan.type = typeLine.replace(/сабақтың түрі|сабақ түрі/gi,"").replace(/^[:\s]+/,"").trim();
-
-  // Outcomes
-  const outcomeStartIdx = lines.findIndex(l => /күтілетін нәтиже|күтілетін нәтижелер/i.test(l));
-  if (outcomeStartIdx >= 0) {
-    for (let i = outcomeStartIdx+1; i < Math.min(outcomeStartIdx+10, lines.length); i++) {
-      const l = lines[i];
-      if (/ресурс|қажет|сабақтың барысы/i.test(l)) break;
-      if (l.length > 5) plan.outcomes.push(l.replace(/^[•–\-\*]+/, "").trim());
-    }
-  }
-
-  // Parse stages from "Сабақтың барысы" section
-  plan.stages = parseStages(text, lines, plan.duration);
-
-  // Fill default title if empty
-  const subjectLine = lines.find(l => /параметрлі|for цикл|while|шарт|функци/i.test(l));
-  if (!plan.title || plan.title.length < 5) {
-    plan.title = subjectLine?.slice(0,80) || "Ашық сабақ";
-  }
-
-  return plan;
-}
-
-function parseStages(text, lines, totalDur) {
-  const stages = [];
-  // Look for numbered sections
-  const stagePatterns = [
-    { re: /1[.\)]\s*(Ұйымдастыру|Ұйым|Org)/i,          name: "Ұйымдастыру кезеңі",   emoji:"👋", defaultMin:5  },
-    { re: /2[.\)]\s*(Білімді өзект|Актуал|Review)/i,    name: "Білімді өзектендіру",  emoji:"🧠", defaultMin:15 },
-    { re: /3[.\)]\s*(Жаңа мате|Жаңа тақ|New|Негізгі)/i, name: "Жаңа материал",        emoji:"📖", defaultMin:15 },
-    { re: /4[.\)]\s*(Бекіт|Practic|Тапсырм)/i,          name: "Бекіту / Тапсырма",   emoji:"✏️", defaultMin:10 },
-    { re: /5[.\)]\s*(Рефлекс|Reflect|Қорыт)/i,          name: "Рефлексия",            emoji:"💬", defaultMin:5  },
-  ];
-
-  // Try to extract stage content blocks from text
-  const textLower = text.toLowerCase();
-  let usedLines = new Set();
-
-  stagePatterns.forEach((sp, idx) => {
-    const matchIdx = textLower.search(sp.re);
-    if (matchIdx === -1) return;
-
-    // Find the actual line
-    const linesBefore = text.slice(0, matchIdx).split("\n").length;
-    const stageLineIdx = linesBefore - 1;
-
-    // Extract time from line
-    const stageLine = lines[stageLineIdx] || "";
-    const timeMatch = stageLine.match(/(\d+)\s*мин/i);
-    const mins = timeMatch ? parseInt(timeMatch[1]) : sp.defaultMin;
-
-    // Collect content after this stage until next stage or end
-    const nextPatternIdx = textLower.slice(matchIdx+1).search(stagePatterns[idx+1]?.re || /NOMATCH/);
-    const endIdx = nextPatternIdx === -1 ? matchIdx + 1000 : matchIdx + nextPatternIdx;
-    const stageText = text.slice(matchIdx, endIdx);
-    const stageLines = stageText.split("\n").map(l => l.trim()).filter(l => l.length > 3);
-
-    // Build content blocks
-    const blocks = buildBlocks(stageLines.slice(1), sp);
-
-    stages.push({
-      id: `stage-${idx}`,
-      name: sp.name,
-      emoji: sp.emoji,
-      duration: mins,
-      blocks: blocks,
-      done: false
+    const ref = await addDoc(collection(db, 'openLessonSessions'), {
+      pin, lessonTitle: LESSON.title, className,
+      mode: 'presentation', status: 'active',
+      currentSlide: 0, currentQuizState: null,
+      startedAt: serverTimestamp(), players: {},
     });
+    sessionId = ref.id;
+    startListeners();
+  } catch(e) { console.error(e); }
+
+  document.getElementById('setupOverlay').style.display = 'none';
+  document.getElementById('sidePin').textContent = formatPin(pin);
+  document.getElementById('topPinDisplay').textContent = formatPin(pin);
+  document.getElementById('sideUrl').textContent = `student-view.html?pin=${pin}`;
+  buildThumbs();
+  renderSlide(0);
+  toast(`🚀 Сессия басталды! PIN: ${formatPin(pin)}`);
+};
+
+// ══ LISTENERS ════════════════════════════════════════════════
+function startListeners() {
+  // Watch players
+  playerUnsub = onSnapshot(doc(db, 'openLessonSessions', sessionId), snap => {
+    if (!snap.exists()) return;
+    const d = snap.data();
+    const raw = d.players || {};
+    Object.entries(raw).forEach(([uid, p], i) => {
+      if (!students[uid]) students[uid] = { ...p, color: COLORS[Object.keys(students).length % COLORS.length], score: 0 };
+      else Object.assign(students[uid], p);
+    });
+    renderStudents();
+    renderLB();
   });
-
-  // If no stages found, create default structure
-  if (stages.length === 0) {
-    const defs = [
-      { name:"Ұйымдастыру кезеңі", emoji:"👋", duration:5,  blocks:[{type:"task",text:"Оқушыларды амандастыру, тізімге алу, сабаққа дайындау."}] },
-      { name:"Білімді өзектендіру", emoji:"🧠", duration:15, blocks:[{type:"task",text:"Алдыңғы тақырыпты қайталау. Тапсырмалар мен сұрақтар арқылы бұрынғы білімді жандандыру."}] },
-      { name:"Жаңа материал",      emoji:"📖", duration:15, blocks:[{type:"theory",text:"Жаңа тақырып: " + (lessonPlan?.title||"")},{type:"task",text:"Мысалдар мен жаттығулар арқылы жаңа материалды меңгерту."}] },
-      { name:"Бекіту",             emoji:"✏️", duration:10, blocks:[{type:"task",text:"Тапсырмаларды орындату, нәтижелерін тексеру."}] },
-      { name:"Рефлексия",          emoji:"💬", duration:5,  blocks:[{type:"task",text:"Сабақты қорытындылау. Оқушылардың білімін бағалау."}] },
-    ];
-    defs.forEach((d,i) => stages.push({ id:`stage-${i}`, ...d, done:false }));
-  }
-
-  return stages;
 }
 
-function buildBlocks(lines, stageMeta) {
-  const blocks = [];
-  let current = [];
-  
-  lines.forEach(line => {
-    if (line.length < 4) return;
-    // Detect quiz questions (numbered)
-    if (/^\d+[.)]\./.test(line) || /A\.|B\.|C\.|D\./.test(line)) return; // skip raw quiz opts
-    if (/тапсырма_?\s*\d|тапсырма\s*:/i.test(line)) {
-      if (current.length) { blocks.push({type:"task",text:current.join("\n")}); current=[]; }
-      current.push(line.replace(/^тапсырма_?\s*\d[.):\s]*/i,"").trim() || line);
-    } else if (/https?:/i.test(line)) {
-      if (current.length) { blocks.push({type:"task",text:current.join("\n")}); current=[]; }
-      blocks.push({type:"link",text:line});
-    } else {
-      current.push(line);
+function listenAnswers() {
+  if (answerUnsub) answerUnsub();
+  quizAnswers = {};
+  const slide = LESSON.slides[currentIdx];
+  if (slide.type !== 'quiz') return;
+
+  answerUnsub = onSnapshot(
+    query(collection(db, 'liveAnswers'), where('sessionId','==',sessionId), where('slideIdx','==',currentIdx)),
+    snap => {
+      snap.docs.forEach(d => {
+        const v = d.data();
+        quizAnswers[v.uid] = { ans: v.answer, correct: v.answer === slide.correct };
+      });
+      updateQuizStats();
     }
-  });
-  if (current.length) blocks.push({type:"task",text:current.join(" ")});
-
-  // Ensure at least one block
-  if (blocks.length === 0) blocks.push({type:"info",text:stageMeta.name + " кезеңі"});
-  return blocks;
+  );
 }
 
-// ═══════════════════════════════════════════════════════════
-//  DEMO
-// ═══════════════════════════════════════════════════════════
-function loadDemo() {
-  lessonPlan = {
-    title: "Python: for циклі және range() функциясы",
-    teacher: "Бердибаева Салиха Диновна",
-    group: "ИС24-2",
-    date: "2026",
-    type: "Аралас сабақ",
-    goal: "for циклінің синтаксисін, range() функциясын және циклдің орындалу алгоритмін меңгерту",
-    outcomes: [
-      "for циклінің синтаксисін дұрыс жаза алады",
-      "range() функциясының параметрлерін қолданады",
-      "Қарапайым есептерді цикл арқылы шеше алады"
-    ],
-    duration: 45,
-    filename: "demo-lesson.docx",
-    stages: [
-      { id:"s0", emoji:"👋", name:"Ұйымдастыру кезеңі", duration:5, done:false,
-        blocks:[
-          {type:"task",text:"Оқушылармен амандасу, тізімге алу (2 мин). Сабақтың мақсаты мен бағалау шарттарын түсіндіру (3 мин)."}
-        ]
-      },
-      { id:"s1", emoji:"🧠", name:"Білімді өзектендіру", duration:15, done:false,
-        blocks:[
-          {type:"theory",text:"Алдыңғы тақырыпты қайталаймыз: if/elif/else шартты операторлар. Тернарлы операторды да еске түсіреміз."},
-          {type:"quiz",question:"Python-да if шартының синтаксисі:",
-           options:["if (x > 0):","if x > 0:","if x > 0","if: x > 0"],
-           answer:1, explain:"Python-да if шартынан кейін тырнақша керек емес, бірақ қос нүкте міндетті."},
-          {type:"quiz",question:"Тернарлы оператор қалай жазылады?",
-           options:["x if cond else y","cond ? x : y","if cond then x else y","x when cond otherwise y"],
-           answer:0, explain:"Python тернарлы операторы: мән_1 if шарт else мән_2"}
-        ]
-      },
-      { id:"s2", emoji:"📖", name:"Жаңа материал: for циклі", duration:15, done:false,
-        blocks:[
-          {type:"theory",text:"for циклі белгілі санда немесе тізім элементтері бойынша кодты қайталайды.\n\nСинтаксис:\nfor айнымалы in тізбек:\n    цикл денесі\n\nrange(n) → 0-ден n-1-ге дейін\nrange(a, b) → a-дан b-1-ге дейін\nrange(a, b, step) → a-дан b-1-ге дейін, қадам step"},
-          {type:"task",text:"Мысал 1: 1-ден 5-ке дейін шығару\nfor i in range(1, 6):\n    print(i)\n\nМысал 2: Тізім элементтерін шығару\nfruits = ['алма', 'алмұрт', 'шие']\nfor f in fruits:\n    print(f)"},
-          {type:"task",text:"Командалық тапсырма (5 мин): Топтарға бөлініңіз. Әр топ range() функциясының бір нұсқасын зерттейді:\n• 1-топ: range(n)\n• 2-топ: range(a, b)\n• 3-топ: range(a, b, step)\nНәтижені сыныпқа ұсыңыз."}
-        ]
-      },
-      { id:"s3", emoji:"✏️", name:"Бекіту / Тапсырмалар", duration:8, done:false,
-        blocks:[
-          {type:"quiz",question:"range(5) қандай мәндер береді?",
-           options:["1,2,3,4,5","0,1,2,3,4","0,1,2,3,4,5","1,2,3,4"],
-           answer:1, explain:"range(n) 0-ден n-1-ге дейін береді. range(5) → 0,1,2,3,4"},
-          {type:"quiz",question:"range(2, 8, 2) қандай мәндер береді?",
-           options:["2,4,6,8","2,4,6","0,2,4,6,8","2,3,4,5,6,7"],
-           answer:1, explain:"2-ден бастай, 8-ге дейін (8 кірмейді), 2-ден секіреді → 2,4,6"},
-          {type:"task",text:"Жеке тапсырма: for циклімен 5-тің кестесін 1-ден 10-ға дейін шығаратын код жазыңыз.\n\nfor i in range(1, 11):\n    print(5 * i)"}
-        ]
-      },
-      { id:"s4", emoji:"💬", name:"Рефлексия және қорытынды", duration:5, done:false,
-        blocks:[
-          {type:"quiz",question:"Бүгінгі сабақта не үйрендіңіз?",
-           options:["for циклінің синтаксисін","range() функциясын","Екеуін де","Ештеңе де"],
-           answer:2, explain:"Тамаша! Бүгін for циклі мен range() функциясын игердіңіз."},
-          {type:"task",text:"Үй тапсырмасы: for циклімен 1-ден 100-ге дейінгі жұп сандарды шығаратын бағдарлама жазыңыз.\n\nБағалау: Кері байланыс жинақталады, PDF есеп жасалады."}
-        ]
-      }
-    ]
-  };
-  showPlanPreview(lessonPlan);
-}
+// ══ RENDER SLIDE ═════════════════════════════════════════════
+function renderSlide(idx) {
+  currentIdx = idx;
+  quizRevealed = false;
+  clearInterval(quizTimerInt);
+  document.getElementById('quizRevealBar').classList.remove('show');
 
-// ═══════════════════════════════════════════════════════════
-//  PLAN PREVIEW
-// ═══════════════════════════════════════════════════════════
-function showPlanPreview(plan) {
-  showScreen("planPreview");
-  document.getElementById("planTitle").textContent = plan.title;
-  document.getElementById("tbTitle").textContent = plan.title;
-  document.getElementById("tbMeta").textContent = (plan.teacher||"") + (plan.group ? " · " + plan.group : "");
+  const slide = LESSON.slides[idx];
+  const inner = document.getElementById('slideInner');
+  const el    = document.getElementById('slideEl');
 
-  // Meta grid
-  const mg = document.getElementById("planMetaGrid");
-  const metas = [
-    plan.teacher && { l:"Мұғалім", v:plan.teacher },
-    plan.group && { l:"Топ / Сынып", v:plan.group },
-    plan.type && { l:"Сабақ түрі", v:plan.type },
-    { l:"Ұзақтығы", v:(plan.duration||45) + " мин" },
-  ].filter(Boolean);
-  mg.innerHTML = metas.map(m =>
-    `<div class="plan-meta-item"><div class="plan-meta-label">${m.l}</div><div class="plan-meta-val">${m.v}</div></div>`
-  ).join("");
+  // Remove old type classes
+  el.className = 'slide sl-' + slide.type;
 
-  // Goal
-  if (plan.goal) {
-    mg.innerHTML += `<div class="plan-meta-item" style="grid-column:1/-1"><div class="plan-meta-label">Мақсат</div><div class="plan-meta-val" style="font-size:13px;font-weight:400;color:var(--text2)">${plan.goal}</div></div>`;
+  inner.innerHTML = buildSlideHTML(slide);
+
+  // Update footer
+  document.getElementById('slideCounter').textContent = `${idx+1} / ${LESSON.slides.length}`;
+  document.getElementById('slideProgressFill').style.width = `${(idx+1)/LESSON.slides.length*100}%`;
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').textContent = idx === LESSON.slides.length-1 ? '🏁 Аяқтау' : 'Келесі →';
+  document.getElementById('currentSlideInfo').textContent = getSlideTitle(slide);
+
+  // Highlight thumb
+  document.querySelectorAll('.thumb-item').forEach((t,i) => t.classList.toggle('active', i===idx));
+
+  // Quiz setup
+  if (slide.type === 'quiz') {
+    document.getElementById('quizRevealBar').classList.add('show');
+    startQuizTimer(slide.time || 20);
+    listenAnswers();
+  } else if (answerUnsub) { answerUnsub(); answerUnsub = null; }
+
+  // Push to Firestore so students see it
+  if (sessionId) {
+    updateDoc(doc(db, 'openLessonSessions', sessionId), {
+      currentSlide: idx,
+      currentQuizState: slide.type === 'quiz' ? { revealed: false, correct: slide.correct } : null,
+    }).catch(()=>{});
   }
+}
 
-  // Stages
-  document.getElementById("stageCount").textContent = plan.stages.length + " кезең";
-  const sl = document.getElementById("planStageList");
-  sl.innerHTML = plan.stages.map((s,i) =>
-    `<div class="plan-stage-item">
-      <div class="plan-stage-num">${i+1}</div>
-      <div class="plan-stage-body">
-        <div class="plan-stage-name">${s.emoji} ${s.name}</div>
-        <div class="plan-stage-desc">${s.blocks.map(b=>b.text||b.question||"").join(" · ").slice(0,100)}...</div>
+function buildSlideHTML(s) {
+  switch(s.type) {
+    case 'cover': return `
+      <div class="sl-cover-tag">Tagybasqa · Ашық сабақ</div>
+      <div class="sl-cover-title">${s.title}</div>
+      <div class="sl-cover-sub">${s.sub}</div>
+      <div class="sl-cover-meta">${s.meta.map(m=>`<div class="sl-cover-chip">${m}</div>`).join('')}</div>`;
+
+    case 'section': return `
+      <div class="sl-section-num" style="color:${s.color}">${s.num} —</div>
+      <div class="sl-section-title">${s.title}</div>
+      <div class="sl-section-desc">${s.desc}</div>`;
+
+    case 'concept': return `
+      <span class="sl-label" style="background:${s.labelBg};color:${s.labelColor}">${s.label}</span>
+      <div class="sl-heading">${s.heading}</div>
+      <div class="sl-body">${s.body}</div>`;
+
+    case 'list': return `
+      <span class="sl-label" style="background:${s.labelBg||'#eff6ff'};color:${s.labelColor||'#1d4ed8'}">${s.label}</span>
+      <div class="sl-heading">${s.heading}</div>
+      <div class="sl-list-items">
+        ${s.items.map(it=>`
+          <div class="sl-list-item">
+            <div class="sl-list-item-icon" style="background:var(--paper2)">${it.icon}</div>
+            <div class="sl-list-item-text">${it.text}</div>
+          </div>`).join('')}
+      </div>`;
+
+    case 'code': return `
+      <span class="sl-label" style="background:${s.labelBg};color:${s.labelColor}">${s.label}</span>
+      <div class="sl-heading">${s.heading}</div>
+      <div class="code-block"><pre>${s.code}</pre></div>
+      ${s.output ? `<div><div class="code-output-label">Шығыс (Output)</div><div class="code-output">${s.output}</div></div>` : ''}`;
+
+    case 'two': return `
+      <div style="display:flex;gap:24px;width:100%;align-items:stretch;text-align:left">
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+          <span class="sl-label" style="background:${s.left.labelBg};color:${s.left.labelColor}">${s.left.label}</span>
+          ${s.left.items.map(it=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;
+              background:var(--paper);border-radius:var(--r);border:1px solid var(--paper3)">
+              <span style="font-size:20px">${it.icon}</span>
+              <div><b style="font-family:var(--mono);font-size:13px;color:var(--ink)">${it.name}</b>
+                <div style="font-size:12px;color:var(--ink3);margin-top:1px">${it.desc}</div></div>
+            </div>`).join('')}
+        </div>
+        <div style="width:1px;background:var(--paper3);flex-shrink:0"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+          <div class="code-block" style="flex:1"><pre>${s.right.code}</pre></div>
+          ${s.right.output ? `<div class="code-output" style="font-size:12px">${s.right.output}</div>` : ''}
+        </div>
+      </div>`;
+
+    case 'quiz': {
+      const colors = ['qo-a','qo-b','qo-c','qo-d'];
+      const keys   = ['A','B','C','D'];
+      return `
+        <span class="sl-label" style="background:#fff7ed;color:#c2410c">⚡ КВИЗ СҰРАҒЫ</span>
+        <div class="quiz-q">${s.question.replace(/\n/g,'<br>')}</div>
+        <div class="quiz-timer-bar"><div class="quiz-timer-fill" id="quizTimerBar" style="width:100%"></div></div>
+        <div class="quiz-opts" id="quizOpts">
+          ${s.opts.map((o,i)=>`
+            <button class="quiz-opt ${colors[i]}" disabled>
+              <div class="quiz-opt-key">${keys[i]}</div>
+              ${o}
+            </button>`).join('')}
+        </div>`;
+    }
+
+    case 'task': return `
+      <span class="sl-label" style="background:#eff6ff;color:#1d4ed8">${s.label}</span>
+      <div class="sl-heading">${s.heading}</div>
+      <div class="task-card">
+        <div class="task-label">Тапсырма</div>
+        <div class="task-text">${s.text}</div>
+        ${s.hint ? `<div class="task-hint">💡 ${s.hint}</div>` : ''}
       </div>
-      <div class="plan-stage-time">${s.duration} мин</div>
-    </div>`
-  ).join("");
+      ${s.time ? `<div style="font-family:var(--mono);font-size:12px;color:var(--ink3)">⏱ Уақыт: ${s.time} секунд</div>` : ''}`;
+
+    case 'end': return `
+      <div class="end-trophy">🏆</div>
+      <div style="font-size:clamp(22px,3.5vw,36px);font-weight:900;color:#fff;margin-bottom:16px">${s.title}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;text-align:left;max-width:520px;width:100%">
+        ${s.points.map(p=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;
+            background:rgba(18,183,106,.12);border:1px solid rgba(18,183,106,.2);border-radius:var(--r)">
+            <span style="color:var(--green);font-size:14px">✓</span>
+            <span style="color:rgba(255,255,255,.85);font-size:14px;font-weight:500">${p}</span>
+          </div>`).join('')}
+      </div>`;
+
+    default: return `<div style="font-size:18px;color:var(--ink3)">Слайд</div>`;
+  }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  START LESSON
-// ═══════════════════════════════════════════════════════════
-function startLesson() {
-  if (!lessonPlan) return;
-  currentStageIdx = 0;
-  lessonPlan.stages.forEach(s => s.done = false);
-  lessonStartTime = Date.now();
-  lessonTimer = setInterval(() => lessonElapsed = Math.floor((Date.now()-lessonStartTime)/1000), 1000);
-
-  document.getElementById("liveBadge").style.display = "flex";
-  document.getElementById("settingsBtn").style.display = "";
-  document.getElementById("endBtn").style.display = "";
-
-  // Build stages bar
-  buildStagesBar();
-  document.getElementById("stagesBar").classList.add("visible");
-
-  // Show sidebar
-  const sb = document.getElementById("runnersidebar");
-  sb.style.display = "flex";
-  buildSidebar(sb);
-
-  showScreen("lessonScreen");
-  renderStage(currentStageIdx);
+function getSlideTitle(s) {
+  return s.title || s.heading || s.question?.slice(0,40) || s.text?.slice(0,40) || s.type;
 }
 
-function buildStagesBar() {
-  const row = document.getElementById("stagesRow");
-  row.innerHTML = lessonPlan.stages.map((s,i) =>
-    `<div class="stg ${i===0?"active":""}" id="stg-${i}" onclick="jumpToStage(${i})">
-      <div class="stg-dot" id="stgdot-${i}">${i+1}</div>
-      <div class="stg-name">${s.name}</div>
-    </div>`
-  ).join("");
-}
+// ══ NAVIGATION ═══════════════════════════════════════════════
+window.nextSlide = function() {
+  if (currentIdx >= LESSON.slides.length - 1) { endSession(); return; }
+  renderSlide(currentIdx + 1);
+};
+window.prevSlide = function() {
+  if (currentIdx > 0) renderSlide(currentIdx - 1);
+};
+window.jumpToSlide = function(i) { renderSlide(i); };
 
-function updateStagesBar(idx) {
-  lessonPlan.stages.forEach((_,i) => {
-    const el = document.getElementById("stg-"+i);
-    const dot = document.getElementById("stgdot-"+i);
-    if (!el) return;
-    el.className = "stg";
-    if (i < idx) { el.classList.add("done"); dot.textContent = "✓"; }
-    else if (i === idx) { el.classList.add("active"); dot.textContent = i+1; }
-    else { dot.textContent = i+1; }
-  });
-}
-
-function buildSidebar(sb) {
-  sb.innerHTML = `
-  <div class="sb-section">
-    <div class="sb-label">Сабақ уақыты</div>
-    <div class="sb-stat"><span>Басталды</span><span class="sb-stat-val" id="sbElapsed">00:00</span></div>
-  </div>
-  <div class="divider"></div>
-  <div class="sb-section">
-    <div class="sb-label">Бақылаушылар</div>
-    ${[{av:"ДМ",col:"rgba(28,176,246,.2)",tc:"var(--blue)",n:"Диана М.",r:"Директордың орынбасары"},
-       {av:"АС",col:"rgba(87,204,2,.15)",tc:"var(--green)",n:"Асель С.",r:"Аудан әдіскері"}].map(o=>
-    `<div class="observer-item"><div class="obs-av" style="background:${o.col};color:${o.tc}">${o.av}</div><div><div class="obs-name">${o.n}</div><div class="obs-role">${o.r}</div></div></div>`
-    ).join("")}
-  </div>
-  <div class="divider"></div>
-  <div class="sb-section">
-    <div class="sb-label">Белсенді оқушылар</div>
-    ${["Айгерім К.","Нұрлан Б.","Сабина Т.","Дамир А.","Зере М."].map((n,i)=>
-    `<div class="student-row"><span class="student-name">${n}</span><span class="student-status ${i<2?"status-done":i<4?"status-work":"status-idle"}">${i<2?"✓ Дайын":i<4?"Жұмыста...":"—"}</span></div>`
-    ).join("")}
-  </div>`;
-
-  // Elapsed timer
-  setInterval(() => {
-    const s = Math.floor((Date.now()-lessonStartTime)/1000);
-    const m = String(Math.floor(s/60)).padStart(2,"0");
-    const sec = String(s%60).padStart(2,"0");
-    const el = document.getElementById("sbElapsed");
-    if (el) el.textContent = m+":"+sec;
+// ══ QUIZ ═════════════════════════════════════════════════════
+function startQuizTimer(sec) {
+  let rem = sec;
+  const bar = () => document.getElementById('quizTimerBar');
+  if(bar()) bar().style.transition = `width ${sec}s linear`;
+  setTimeout(() => { if(bar()) bar().style.width = '0%'; }, 50);
+  document.getElementById('timerDisplay').textContent = sec + 'с';
+  quizTimerInt = setInterval(() => {
+    rem--;
+    const el = document.getElementById('timerDisplay');
+    if(el) el.textContent = rem + 'с';
+    if(rem <= 0) { clearInterval(quizTimerInt); revealAnswer(); }
   }, 1000);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  RENDER STAGE
-// ═══════════════════════════════════════════════════════════
-function renderStage(idx) {
-  const stage = lessonPlan.stages[idx];
-  if (!stage) return;
-  updateStagesBar(idx);
-  document.getElementById("tbMeta").textContent = `Кезең ${idx+1}/${lessonPlan.stages.length} · ${stage.name}`;
-
-  const ls = document.getElementById("lessonScreen");
-  ls.innerHTML = "";
-  ls.style.display = "flex";
-
-  // Stage card
-  const card = document.createElement("div");
-  card.className = "stage-card";
-
-  // Header
-  card.innerHTML = `
-  <div class="stage-card-h">
-    <div class="stage-card-title">${stage.emoji} ${stage.name}</div>
-    <div class="stage-timer" id="stageTimer" title="Таймерді тоқтату/бастау үшін басыңыз">${fmt(stage.duration*60)}</div>
-  </div>
-  <div class="stage-card-body" id="stageCardBody"></div>`;
-
-  ls.appendChild(card);
-
-  // Build blocks
-  const body = card.querySelector("#stageCardBody");
-  stage.blocks.forEach((block, bi) => {
-    body.appendChild(buildBlock(block, bi));
+window.revealAnswer = function() {
+  if (quizRevealed) return;
+  quizRevealed = true;
+  clearInterval(quizTimerInt);
+  const slide = LESSON.slides[currentIdx];
+  const opts  = document.querySelectorAll('#quizOpts .quiz-opt');
+  opts.forEach((btn, i) => {
+    if (i === slide.correct) btn.classList.add('revealed-ok');
+    else btn.classList.add('revealed-err');
   });
+  document.getElementById('revealAnswerBtn').disabled = true;
 
-  // Stage nav
-  const nav = document.createElement("div");
-  nav.className = "stage-nav";
-  nav.innerHTML = `
-  <button class="stage-nav-prev" ${idx===0?"disabled":""} onclick="prevStage()">← Алдыңғы</button>
-  <span class="stage-progress">${idx+1} / ${lessonPlan.stages.length}</span>
-  <button class="stage-nav-next" onclick="nextStage()">
-    ${idx===lessonPlan.stages.length-1?"🏁 Аяқтау":"Келесі →"}
-  </button>`;
-  body.appendChild(nav);
+  // Award points
+  Object.entries(quizAnswers).forEach(([uid, info]) => {
+    if (info.correct && students[uid]) {
+      students[uid].score = (students[uid].score || 0) + (slide.points || 100);
+    }
+  });
+  renderLB();
 
-  // Start timer
-  startStageTimer(stage.duration * 60, "stageTimer");
-}
-
-function buildBlock(block, idx) {
-  const div = document.createElement("div");
-  div.className = "content-block";
-
-  if (block.type === "theory") {
-    div.innerHTML = `<div class="block-label">📖 Теория</div>
-    <div class="block-text">${block.text.replace(/\n/g,"<br>")}</div>`;
-  } else if (block.type === "task") {
-    div.innerHTML = `<div class="block-label">✏️ Тапсырма</div>
-    <div class="block-task">${block.text.replace(/\n/g,"<br>")}</div>`;
-  } else if (block.type === "quiz") {
-    let answered = false;
-    div.innerHTML = `<div class="block-label">❓ Сұрақ</div>
-    <div class="block-quiz">
-      <div class="quiz-q-text">${block.question}</div>
-      <div id="opts-${idx}">
-      ${(block.options||[]).map((o,i)=>`<button class="quiz-opt" data-i="${i}" onclick="answerQuiz(${idx},${i},${block.answer})">${o}</button>`).join("")}
-      </div>
-      <div class="quiz-explain" id="explain-${idx}"></div>
-      <button class="quiz-reveal-btn" onclick="revealAnswer(${idx},${block.answer},'${(block.explain||"").replace(/'/g,"\'")}')">Жауапты ашу</button>
-    </div>`;
-  } else if (block.type === "link") {
-    div.innerHTML = `<div class="block-label">🔗 Сілтеме</div>
-    <a href="${block.text}" target="_blank" style="color:var(--blue);font-size:13px;word-break:break-all">${block.text}</a>`;
-  } else {
-    div.innerHTML = `<div class="block-text">${block.text.replace(/\n/g,"<br>")}</div>`;
+  // Notify Firestore
+  if (sessionId) {
+    updateDoc(doc(db, 'openLessonSessions', sessionId), {
+      'currentQuizState.revealed': true,
+      'currentQuizState.correct': slide.correct,
+    }).catch(()=>{});
   }
-  return div;
-}
-
-window.answerQuiz = function(blockIdx, chosen, correct) {
-  const opts = document.querySelectorAll(`#opts-${blockIdx} .quiz-opt`);
-  opts.forEach(o => o.disabled = true);
-  opts[chosen].classList.add(chosen === correct ? "correct" : "wrong");
-  if (chosen !== correct) opts[correct].classList.add("correct");
+  spawnConfetti();
+  toast('✓ Жауап ашылды!');
 };
 
-window.revealAnswer = function(blockIdx, correct, explain) {
-  const opts = document.querySelectorAll(`#opts-${blockIdx} .quiz-opt`);
-  opts.forEach(o => o.disabled = true);
-  opts[correct].classList.add("correct");
-  if (explain) {
-    const ex = document.getElementById(`explain-${blockIdx}`);
-    ex.textContent = "💡 " + explain;
-    ex.className = "quiz-explain ok";
-    ex.style.display = "block";
+function updateQuizStats() {
+  const total   = Object.keys(students).length;
+  const answered = Object.keys(quizAnswers).length;
+  const correct  = Object.values(quizAnswers).filter(a => a.correct).length;
+  document.getElementById('answeredCount').textContent = `${answered}/${total}`;
+  document.getElementById('correctCount').textContent  = correct;
+}
+
+// ══ STUDENTS ═════════════════════════════════════════════════
+function renderStudents() {
+  const list  = document.getElementById('studentsList');
+  const count = document.getElementById('studentsCount');
+  const arr   = Object.values(students);
+  count.textContent = arr.length;
+  if (!arr.length) {
+    list.innerHTML = '<div class="empty-students">Әлі ешкім қосылған жоқ.<br>Студенттер PIN енгізгеннен кейін<br>осы жерде пайда болады.</div>';
+    return;
   }
-};
-
-// ═══════════════════════════════════════════════════════════
-//  TIMERS
-// ═══════════════════════════════════════════════════════════
-let activeTimer = null;
-let timerPaused = false;
-
-function startStageTimer(totalSec, elemId) {
-  if (activeTimer) clearInterval(activeTimer);
-  timerPaused = false;
-  let remaining = totalSec;
-  const el = () => document.getElementById(elemId);
-  if (el()) el().textContent = fmt(remaining);
-
-  activeTimer = setInterval(() => {
-    if (timerPaused) return;
-    remaining--;
-    const e = el();
-    if (!e) { clearInterval(activeTimer); return; }
-    e.textContent = fmt(remaining);
-    if (remaining <= 60) e.classList.add("red");
-    else e.classList.remove("red");
-    if (remaining <= 0) {
-      clearInterval(activeTimer);
-      e.textContent = "00:00";
-      toast("⏰ Кезең уақыты аяқталды!");
-    }
-  }, 1000);
-
-  // Toggle pause on click
-  setTimeout(() => {
-    const e = el();
-    if (e) {
-      e.onclick = () => {
-        timerPaused = !timerPaused;
-        e.classList.toggle("paused", timerPaused);
-        if (timerPaused) toast("⏸ Таймер тоқтатылды");
-        else toast("▶ Таймер жалғасты");
-      };
-    }
-  }, 100);
+  list.innerHTML = arr.map(s => `
+    <div class="student-row">
+      <div class="student-avatar" style="background:${s.color}22;color:${s.color}">${(s.name||'?').slice(0,2).toUpperCase()}</div>
+      <div class="student-name">${esc(s.name)}</div>
+      <div class="student-score">${s.score||0}</div>
+      <div class="student-status"></div>
+    </div>`).join('');
 }
 
-function fmt(s) {
-  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
-}
-
-// ═══════════════════════════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════════════════════════
-function nextStage() {
-  if (activeTimer) clearInterval(activeTimer);
-  lessonPlan.stages[currentStageIdx].done = true;
-  if (currentStageIdx < lessonPlan.stages.length - 1) {
-    currentStageIdx++;
-    renderStage(currentStageIdx);
-  } else {
-    endLesson();
-  }
-}
-
-function prevStage() {
-  if (activeTimer) clearInterval(activeTimer);
-  if (currentStageIdx > 0) {
-    currentStageIdx--;
-    renderStage(currentStageIdx);
-  }
-}
-
-function jumpToStage(idx) {
-  if (activeTimer) clearInterval(activeTimer);
-  for (let i = 0; i < idx; i++) lessonPlan.stages[i].done = true;
-  currentStageIdx = idx;
-  renderStage(idx);
-}
-
-// ═══════════════════════════════════════════════════════════
-//  END & RESULTS
-// ═══════════════════════════════════════════════════════════
-function endLesson() {
-  if (!confirm("Сабақты аяқтауды растайсыз ба?")) return;
-  if (activeTimer) clearInterval(activeTimer);
-  if (lessonTimer) clearInterval(lessonTimer);
-
-  const elapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
-  const m = String(Math.floor(elapsed/60)).padStart(2,"0");
-  const s = String(elapsed%60).padStart(2,"0");
-  const done = lessonPlan.stages.filter(s=>s.done).length;
-
-  document.getElementById("liveBadge").style.display = "none";
-  document.getElementById("stagesBar").classList.remove("visible");
-  document.getElementById("runnersidebar").style.display = "none";
-  document.getElementById("settingsBtn").style.display = "none";
-  document.getElementById("endBtn").style.display = "none";
-  document.getElementById("tbMeta").textContent = "Аяқталды";
-
-  document.getElementById("resSubtitle").textContent = `${lessonPlan.title} · ${lessonPlan.group||""}`;
-  document.getElementById("resTime").textContent = m+":"+s;
-  document.getElementById("resStages").textContent = done+"/"+lessonPlan.stages.length;
-  document.getElementById("resScore").textContent = "4.2";
-
-  showScreen("resultsScreen");
-}
-
-function downloadReport() {
-  const date = new Date().toLocaleDateString("kk-KZ");
-  const stages = lessonPlan.stages.map((s,i) => `${i+1}. ${s.emoji} ${s.name} (${s.done?"✓ Аяқталды":"Өтілмеді"}) — ${s.duration} мин`).join("\n");
-  const content = `АШЫҚ САБАҚ ЕСЕБІ\n${"=".repeat(40)}\n\nСабақ: ${lessonPlan.title}\nМұғалім: ${lessonPlan.teacher||"—"}\nТоп: ${lessonPlan.group||"—"}\nКүні: ${date}\nҰзақтығы: ${lessonPlan.duration} мин\n\nМАҚСАТ:\n${lessonPlan.goal||"—"}\n\nКЕЗЕҢДЕР:\n${stages}\n\nҚОРЫТЫНДЫ:\nСабақ сәтті өтті. Оқушылар мақсаттарға жетті.`;
-  const blob = new Blob([content], {type:"text/plain;charset=utf-8"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "sabak-esep-"+Date.now()+".txt";
-  a.click();
-  toast("📄 Есеп жүктелді");
-}
-
-// ═══════════════════════════════════════════════════════════
-//  EDIT OVERLAY
-// ═══════════════════════════════════════════════════════════
-function openEdit() {
-  if (!lessonPlan) return;
-  document.getElementById("editTitle").value = lessonPlan.title||"";
-  document.getElementById("editTeacher").value = lessonPlan.teacher||"";
-  document.getElementById("editClass").value = lessonPlan.group||"";
-  document.getElementById("editDuration").value = lessonPlan.duration||45;
-  document.getElementById("editGoal").value = lessonPlan.goal||"";
-  document.getElementById("editOutcomes").value = (lessonPlan.outcomes||[]).join("\n");
-
-  // Stages
-  const sl = document.getElementById("editStagesList");
-  sl.innerHTML = lessonPlan.stages.map((s,i) => `
-  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px">
-    <div style="display:flex;gap:8px;margin-bottom:8px">
-      <input class="edit-input" value="${s.emoji}" style="width:50px;text-align:center" onchange="lessonPlan.stages[${i}].emoji=this.value">
-      <input class="edit-input" value="${s.name}" style="flex:1" onchange="lessonPlan.stages[${i}].name=this.value">
-      <input class="edit-input" value="${s.duration}" type="number" style="width:70px" onchange="lessonPlan.stages[${i}].duration=+this.value">
-    </div>
-  </div>`).join("");
-
-  document.getElementById("editOverlay").classList.add("open");
-}
-
-function closeEdit() {
-  document.getElementById("editOverlay").classList.remove("open");
-}
-
-function saveEdit() {
-  lessonPlan.title    = document.getElementById("editTitle").value;
-  lessonPlan.teacher  = document.getElementById("editTeacher").value;
-  lessonPlan.group    = document.getElementById("editClass").value;
-  lessonPlan.duration = +document.getElementById("editDuration").value || 45;
-  lessonPlan.goal     = document.getElementById("editGoal").value;
-  lessonPlan.outcomes = document.getElementById("editOutcomes").value.split("\n").filter(Boolean);
-  document.getElementById("tbTitle").textContent = lessonPlan.title;
-  closeEdit();
-  toast("✅ Сақталды");
-  if (document.getElementById("planPreview").style.display !== "none") showPlanPreview(lessonPlan);
-}
-
-// ═══════════════════════════════════════════════════════════
-//  RECENT
-// ═══════════════════════════════════════════════════════════
-function saveToRecent(plan, filename) {
-  try {
-    const recent = JSON.parse(localStorage.getItem("tgb_recent_plans")||"[]");
-    const entry = { title:plan.title, filename, ts:Date.now(), stageCount:plan.stages.length };
-    const filtered = recent.filter(r=>r.filename!==filename);
-    localStorage.setItem("tgb_recent_plans", JSON.stringify([entry,...filtered].slice(0,5)));
-    renderRecent();
-  } catch(e){}
-}
-
-function renderRecent() {
-  try {
-    const recent = JSON.parse(localStorage.getItem("tgb_recent_plans")||"[]");
-    if (!recent.length) return;
-    const rp = document.getElementById("recentPlans");
-    const rl = document.getElementById("recentList");
-    rp.style.display = "block";
-    rl.innerHTML = recent.map((r,i)=>`
-    <div class="recent-item" onclick="loadRecentDemo()">
-      <div class="recent-item-icon">📄</div>
+function renderLB() {
+  const arr = Object.values(students).sort((a,b)=>(b.score||0)-(a.score||0));
+  const max = arr[0]?.score || 1;
+  const list = document.getElementById('lbList');
+  if (!arr.length) return;
+  const medals = ['🥇','🥈','🥉'];
+  list.innerHTML = arr.map((s,i)=>`
+    <div class="lb-row-side">
+      <div class="lb-rank-side">${medals[i]||i+1}</div>
       <div style="flex:1;min-width:0">
-        <div class="recent-item-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.title||r.filename}</div>
-        <div class="recent-item-meta">${r.stageCount} кезең · ${new Date(r.ts).toLocaleDateString("ru")}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}</div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${Math.round((s.score||0)/max*100)}%"></div></div>
       </div>
-    </div>`).join("");
-  } catch(e) {}
+      <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);margin-left:8px">${s.score||0}</div>
+    </div>`).join('');
 }
 
-function loadRecentDemo() {
-  toast("💡 Демо жоспар жүктелуде...");
-  setTimeout(() => loadDemo(), 500);
+// ══ THUMBS ═══════════════════════════════════════════════════
+function buildThumbs() {
+  const types = { cover:'🎯', section:'📌', concept:'💡', list:'📋', code:'🐍', two:'📊', quiz:'⚡', task:'✏️', end:'🏆' };
+  document.getElementById('thumbList').innerHTML = LESSON.slides.map((s,i)=>`
+    <div class="thumb-item${i===0?' active':''}" onclick="jumpToSlide(${i})">
+      <div class="thumb-num">${i+1}</div>
+      <div class="thumb-preview" style="background:${s.type==='cover'?'#0f1f40':s.type==='end'?'#0d2012':'var(--paper2)'}">
+        <span style="font-size:14px">${types[s.type]||'□'}</span>
+      </div>
+      <div class="thumb-title">${getSlideTitle(s)}</div>
+      <div class="thumb-type">${s.type}</div>
+    </div>`).join('');
 }
 
-function resetToUpload() {
-  lessonPlan = null;
-  currentStageIdx = 0;
-  if (activeTimer) clearInterval(activeTimer);
-  if (lessonTimer) clearInterval(lessonTimer);
-  document.getElementById("liveBadge").style.display = "none";
-  document.getElementById("settingsBtn").style.display = "none";
-  document.getElementById("endBtn").style.display = "none";
-  document.getElementById("stagesBar").classList.remove("visible");
-  document.getElementById("runnersidebar").style.display = "none";
-  document.getElementById("tbTitle").textContent = "Ашық сабақ";
-  document.getElementById("tbMeta").textContent = "Сабақ жоспарын жүктеңіз";
-  showScreen("uploadScreen");
-  renderRecent();
+// ══ END SESSION ══════════════════════════════════════════════
+window.endSession = async function() {
+  if (currentIdx < LESSON.slides.length - 1 && !confirm('Сабақты аяқтаусыз ба?')) return;
+  clearInterval(quizTimerInt);
+  if (playerUnsub) playerUnsub();
+  if (answerUnsub) answerUnsub();
+
+  const elapsed = Math.floor((Date.now()-sessionStart)/1000);
+  const em = `${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
+
+  if (sessionId) {
+    await updateDoc(doc(db,'openLessonSessions',sessionId), {
+      status:'finished', endedAt:serverTimestamp(), duration:em,
+    }).catch(()=>{});
+  }
+
+  const arr = Object.values(students).sort((a,b)=>(b.score||0)-(a.score||0));
+  const avg = arr.length ? Math.round(arr.reduce((s,p)=>s+(p.score||0),0)/arr.length) : 0;
+  document.getElementById('resultsSub').textContent = `${LESSON.title} · ${new Date().toLocaleDateString('kk-KZ')}`;
+  document.getElementById('resStudents').textContent = arr.length;
+  document.getElementById('resSlides').textContent   = LESSON.slides.length;
+  document.getElementById('resAvg').textContent      = avg;
+  document.getElementById('resultsTopList').innerHTML = arr.slice(0,3).map((s,i)=>`
+    <div class="res-lb-row">
+      <div class="res-lb-rank">${['🥇','🥈','🥉'][i]}</div>
+      <div class="res-lb-name">${esc(s.name)}</div>
+      <div class="res-lb-score">${s.score||0} ұп.</div>
+    </div>`).join('') || '<div style="color:var(--ink3);font-family:var(--mono);font-size:12px">Қатысушылар жоқ</div>';
+
+  document.getElementById('resultsOverlay').classList.add('show');
+  bigConfetti();
+};
+
+window.closeResults = () => document.getElementById('resultsOverlay').classList.remove('show');
+window.openReport   = () => {
+  window.open(`./lesson-report.html?session=${sessionId||''}`, '_blank');
+};
+
+// ══ UI HELPERS ═══════════════════════════════════════════════
+window.switchSideTab = function(tab, btn) {
+  document.querySelectorAll('.side-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.side-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+};
+window.showPinPanel = function() {
+  document.querySelectorAll('.side-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.querySelectorAll('.side-panel').forEach((p,i)=>p.classList.toggle('active',i===0));
+};
+window.copyJoinLink = function() {
+  navigator.clipboard.writeText(`${location.origin}/student-view.html?pin=${sessionPin}`)
+    .then(()=>toast('🔗 Сілтеме көшірілді!'));
+};
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  UTILS
-// ═══════════════════════════════════════════════════════════
-function showScreen(id) {
-  ["uploadScreen","parseScreen","planPreview","lessonScreen","resultsScreen"].forEach(s => {
-    const el = document.getElementById(s);
-    if (el) el.style.display = "none";
-  });
-  const target = document.getElementById(id);
-  if (target) target.style.display = "flex";
+function spawnConfetti() {
+  const colors=['#1a6ef5','#12b76a','#f59e0b','#8b5cf6','#ef4444'];
+  for(let i=0;i<40;i++){
+    const c=document.createElement('div');
+    c.style.cssText=`position:fixed;top:${20+Math.random()*30}%;left:${Math.random()*100}%;
+      width:${5+Math.random()*6}px;height:${5+Math.random()*6}px;
+      background:${colors[i%colors.length]};border-radius:${Math.random()>.5?'50%':'2px'};
+      pointer-events:none;z-index:9000;animation:cf .9s ease-out ${i*.02}s forwards`;
+    document.body.appendChild(c);setTimeout(()=>c.remove(),1400);
+  }
+  if(!document.getElementById('cfStyle')){
+    const s=document.createElement('style');s.id='cfStyle';
+    s.textContent='@keyframes cf{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100px) rotate(360deg)}}';
+    document.head.appendChild(s);
+  }
 }
 
-function toast(msg, type="") {
-  const w = document.getElementById("toastWrap");
-  const t = document.createElement("div");
-  t.className = "toast";
-  t.style.borderColor = type==="red" ? "rgba(255,75,75,.3)" : "var(--border2)";
-  if (type==="red") t.style.color = "var(--red)";
-  t.textContent = msg;
-  w.appendChild(t);
-  setTimeout(() => t.remove(), 3100);
+function bigConfetti(){
+  const cv=document.getElementById('confettiCanvas');
+  cv.width=innerWidth;cv.height=innerHeight;
+  const ctx=cv.getContext('2d');
+  const cl=['#1a6ef5','#12b76a','#f59e0b','#8b5cf6','#ef4444','#06b6d4'];
+  const ps=Array.from({length:100},()=>({x:Math.random()*cv.width,y:-10,
+    vx:(Math.random()-.5)*4,vy:Math.random()*4+2,c:cl[Math.floor(Math.random()*cl.length)],
+    r:Math.random()*6+2,rot:0,rv:(Math.random()-.5)*8}));
+  let fr; function draw(){ctx.clearRect(0,0,cv.width,cv.height);let alive=false;
+    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.07;p.rot+=p.rv;if(p.y<cv.height)alive=true;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.c;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);ctx.restore();});
+    if(alive)fr=requestAnimationFrame(draw);else ctx.clearRect(0,0,cv.width,cv.height);}
+  draw();setTimeout(()=>{cancelAnimationFrame(fr);ctx.clearRect(0,0,cv.width,cv.height);},5000);
 }
 
-// Init
-document.addEventListener("DOMContentLoaded", () => {
-  renderRecent();
+// ── keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) return;
+  if (e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); nextSlide(); }
+  if (e.key==='ArrowLeft')  { e.preventDefault(); prevSlide(); }
+  if (e.key==='r'||e.key==='R') revealAnswer();
 });
 </script>
 </body>

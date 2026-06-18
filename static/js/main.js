@@ -734,7 +734,7 @@ async function loadAllPublicCourses() {
         const snap = await getDocs(publicCoursesQuery);
 
         if (snap.empty) {
-            renderEmptyState(container, '🎓', 'Пока нет доступных курсов', 'Создать курс', () => {
+            renderEmptyState(container, '🎓', 'Әлі курстар жоқ', 'Курс құру', () => {
                 window.location.href = './create-course.html';
             });
             return;

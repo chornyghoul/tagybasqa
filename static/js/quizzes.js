@@ -1,3 +1,4 @@
+const _SVGIC = {"x": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/></svg>", "zap": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"none\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"/></svg>", "users": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M23 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg>", "cast": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M18 8a6 6 0 0 1 0 8\"/><path d=\"M6 8a6 6 0 0 0 0 8\"/><line x1=\"12\" y1=\"12\" x2=\"12.01\" y2=\"12\"/></svg>", "award": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"8\" r=\"7\"/><polyline points=\"8.21 13.89 7 23 12 20 17 23 15.79 13.88\"/></svg>", "layers": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"12 2 2 7 12 12 22 7 12 2\"/><polyline points=\"2 17 12 22 22 17\"/><polyline points=\"2 12 12 17 22 12\"/></svg>", "target": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/></svg>", "search": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/></svg>", "gamepad": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"6\" y1=\"12\" x2=\"10\" y2=\"12\"/><line x1=\"8\" y1=\"10\" x2=\"8\" y2=\"14\"/><line x1=\"15\" y1=\"13\" x2=\"15.01\" y2=\"13\"/><line x1=\"18\" y1=\"11\" x2=\"18.01\" y2=\"11\"/><rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"2\"/></svg>", "book": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"/><path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"/></svg>"};
 // ═══════════════════════════════════════════════════════════════════
 // quizzes.js — Тапсырмалар модулі · Tagybasqa Platform
 // Board Games · AI Quiz Generator · Session Manager · Analytics
@@ -24,10 +25,11 @@ const app  = !getApps().length ? initializeApp(FIREBASE_CONFIG) : getApp();
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// ─── Gemini config (ключ проксируется через переменную окружения) ──
-// В продакшене замените на fetch('/api/ai', {...}) с серверной функцией
+// ─── Gemini config ───────────────────────────────────────────────
+// Ключ берётся из config.js (не коммитится в Git, см. config.example.js).
+// Простой вариант без сервера — для одного класса/школы вполне достаточно.
 const GEMINI_ENDPOINT = (model) =>
-  `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${window.__GEMINI_KEY__ || 'AIzaSyC8cQujMxuqebmvvaArU23N3xdbzfGYZfU'}`;
+  `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${window.GEMINI_API_KEY || ''}`;
 
 // ─── State ────────────────────────────────────────────────────────
 const STATE = {
@@ -42,6 +44,8 @@ const STATE = {
   activeTab:     'qp-board-games',
   sessionsUnsub: null,     // Firestore realtime listener
   myCourses:     [],
+  courseLibrary: [],
+  coursesLoadedAt: 0,
 };
 
 // ─── Entry point ──────────────────────────────────────────────────
@@ -57,16 +61,30 @@ onAuthStateChanged(auth, user => {
 
 function initQuizzesModule() {
   injectStyles();
-  setupTabSwitching();
-  setupFilterTags();
-  setupSearch();
-  setupSortSelect();
-  loadBoardGamesTab();
-  loadMyCourses();
-  loadMyQuizzes();
-  loadLaunchTab();
-  loadAnalytics();
-  setupAIModal();
+  safeRun('setupTabSwitching', setupTabSwitching);
+  safeRun('setupFilterTags',   setupFilterTags);
+  safeRun('setupSearch',       setupSearch);
+  safeRun('setupSortSelect',   setupSortSelect);
+  safeRun('loadBoardGamesTab', loadBoardGamesTab);
+  safeRun('loadMyCourses',     loadMyCourses);
+  safeRun('loadMyQuizzes',     loadMyQuizzes);
+  safeRun('loadLaunchTab',     loadLaunchTab);
+  safeRun('loadAnalytics',     loadAnalytics);
+  safeRun('setupAIModal',      setupAIModal);
+}
+
+// Бір функция қатесі қалғандарын тоқтатпауы үшін қорғаныс орағышы.
+// (Бұрын loadMyCourses() анықталмаған күйде шақырылып, бүкіл initQuizzesModule()
+//  орындалуын тоқтатып тастайтын — сондықтан квиздер/лаунч/аналитика жүктелмей қалатын.)
+function safeRun(name, fn) {
+  try {
+    const r = fn();
+    if (r && typeof r.catch === 'function') {
+      r.catch(e => console.error(`[quizzes] ${name} сәтсіз аяқталды:`, e));
+    }
+  } catch (e) {
+    console.error(`[quizzes] ${name} сәтсіз аяқталды:`, e);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -138,6 +156,116 @@ function renderAuthRequired() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// КУРСТАР — менің курстарым + жалпы курстар кітапханасы
+// (Бұрын бұл функция тек шақырылып, ешқашан анықталмаған еді — сол
+//  ReferenceError бүкіл модульдің бастапқы жүктелуін бұзып тұрды.)
+// ═══════════════════════════════════════════════════════════════════
+
+async function loadMyCourses(force = false) {
+  if (!STATE.user) return;
+  if (!force && Date.now() - STATE.coursesLoadedAt < 15000) return; // 15с кэш
+
+  const mineGrid = el('myCoursesGrid');
+  const libGrid  = el('courseLibraryGrid');
+  if (mineGrid) mineGrid.innerHTML = `<div class="qz-loading" style="grid-column:1/-1">Курстар жүктелуде...</div>`;
+  if (libGrid)  libGrid.innerHTML  = `<div class="qz-loading" style="grid-column:1/-1">Кітапхана жүктелуде...</div>`;
+
+  try {
+    const [mineSnap, libSnap] = await Promise.all([
+      getDocs(query(collection(db, 'courses'), where('uid', '==', STATE.user.uid))),
+      getDocs(query(collection(db, 'courses'), where('visibility', '==', 'public'), limit(40))),
+    ]);
+
+    STATE.myCourses = mineSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    STATE.myCourses.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    STATE.courseLibrary = libSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    STATE.courseLibrary.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    STATE.coursesLoadedAt = Date.now();
+    renderMyCoursesGrid();
+    renderCourseLibraryGrid();
+  } catch (e) {
+    console.error('loadMyCourses error:', e);
+    const errHtml = `<div style="grid-column:1/-1;padding:24px;text-align:center;color:var(--text3)">Курстар жүктелмеді. Қайталап көр.</div>`;
+    if (mineGrid) mineGrid.innerHTML = errHtml;
+    if (libGrid)  libGrid.innerHTML  = errHtml;
+  }
+}
+
+function getCourseCover(course) {
+  if (course.cover?.startsWith('http'))
+    return `<img src="${course.cover}" style="width:100%;height:100%;object-fit:cover" loading="lazy">`;
+  const letter = (course.title || 'К').charAt(0).toUpperCase();
+  return `<div style="width:100%;height:100%;background:${getQuizGradient(course.title)};display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:900">${letter}</div>`;
+}
+
+function renderMyCoursesGrid() {
+  const grid = el('myCoursesGrid');
+  if (!grid) return;
+  const list = STATE.myCourses;
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1" class="empty-state-rich">
+        <div class="empty-icon">📚</div>
+        <div class="empty-title">Курстар жоқ</div>
+        <div class="empty-sub">Алғашқы курсыңызды жасаңыз</div>
+        <button class="empty-action-btn" onclick="window.location.href='./course-editor.html'">Курс жасау →</button>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(course => {
+    const lessons = course.lessons?.length || course.lessonCount || 0;
+    const isPub = course.visibility === 'public';
+    return `
+      <div class="course-card modern qz-card" data-course-id="${course.id}">
+        <div class="qz-card-top" onclick="window.location.href='./course-editor.html?edit=${course.id}'">
+          <div class="qz-card-cover">${getCourseCover(course)}</div>
+          <div class="qz-card-badges">
+            <span class="qz-badge ${isPub ? 'qz-badge-pub' : 'qz-badge-draft'}">${isPub ? '● Жалпыға' : '○ Жоба'}</span>
+          </div>
+        </div>
+        <div class="qz-card-body" onclick="window.location.href='./course-editor.html?edit=${course.id}'">
+          <div class="qz-card-title">${esc(course.title || 'Атаусыз курс')}</div>
+          <div class="qz-card-meta">${lessons} сабақ</div>
+        </div>
+        <div class="qz-card-actions">
+          <button class="qz-btn-edit" onclick="event.stopPropagation();window.location.href='./course-editor.html?edit=${course.id}'">✏️ Өңдеу</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderCourseLibraryGrid() {
+  const grid = el('courseLibraryGrid');
+  if (!grid) return;
+  const list = STATE.courseLibrary || [];
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1" class="empty-state-rich">
+        <div class="empty-icon">📖</div>
+        <div class="empty-title">Кітапханада курс жоқ әлі</div>
+        <div class="empty-sub">Жалпыға қолжетімді курстар осында пайда болады</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(course => `
+    <div class="course-card modern qz-card" data-course-id="${course.id}">
+      <div class="qz-card-top" onclick="window.location.href='./course-view.html?id=${course.id}'">
+        <div class="qz-card-cover">${getCourseCover(course)}</div>
+      </div>
+      <div class="qz-card-body" onclick="window.location.href='./course-view.html?id=${course.id}'">
+        <div class="qz-card-title">${esc(course.title || 'Атаусыз курс')}</div>
+        <div class="qz-card-meta">${course.lessons?.length || course.lessonCount || 0} сабақ${course.authorName ? ' · ' + esc(course.authorName) : ''}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // ТАБ НАВИГАЦИЯ
 // ═══════════════════════════════════════════════════════════════════
 
@@ -150,10 +278,11 @@ function setupTabSwitching() {
       btn.classList.add('active');
       el(panelId)?.classList.add('active');
       STATE.activeTab = panelId;
-      if (panelId === 'qp-analytics')    loadAnalytics();
-      if (panelId === 'qp-launch')        loadLaunchTab();
-      if (panelId === 'qp-board-games')   loadBoardGamesTab();
-  loadMyCourses();
+      if (panelId === 'qp-analytics')    safeRun('loadAnalytics', loadAnalytics);
+      if (panelId === 'qp-launch')       safeRun('loadLaunchTab', loadLaunchTab);
+      if (panelId === 'qp-board-games')  safeRun('loadBoardGamesTab', loadBoardGamesTab);
+      if (panelId === 'qp-courses' || panelId === 'qp-library')
+        safeRun('loadMyCourses', () => loadMyCourses());
     });
   });
 }
@@ -167,7 +296,7 @@ const BOARD_GAMES = [
   {
     id: 'bg-tictactoe',
     name: 'Ақылды Крестик-Нөлік',
-    emoji: '❌',
+    icon: 'x',
     category: '🎲 Тақтадағы ойындар',
     players: '2 команда',
     duration: '15–25 мин',
@@ -186,7 +315,7 @@ const BOARD_GAMES = [
   {
     id: 'bg-four-corners',
     name: 'Төрт Бұрыш (Рас/Жалған)',
-    emoji: '🏃',
+    icon: 'zap',
     category: '🎲 Тақтадағы ойындар',
     players: 'Бүкіл сынып',
     duration: '10–20 мин',
@@ -206,7 +335,7 @@ const BOARD_GAMES = [
   {
     id: 'bg-hot-potato',
     name: 'Ыстық Картоп (Сұрақ Добы)',
-    emoji: '🏐',
+    icon: 'users',
     category: '🎲 Тақтадағы ойындар',
     players: 'Бүкіл сынып',
     duration: '10–15 мин',
@@ -225,7 +354,7 @@ const BOARD_GAMES = [
   {
     id: 'bg-alias',
     name: 'Алиас (Сөзді Түсіндір)',
-    emoji: '🗣️',
+    icon: 'cast',
     category: '🧩 Үстел ойындары адаптациясы',
     players: '2+ топ',
     duration: '20–35 мин',
@@ -244,7 +373,7 @@ const BOARD_GAMES = [
   {
     id: 'bg-bingo',
     name: 'Терминологиялық Бинго',
-    emoji: '🎯',
+    icon: 'target',
     category: '🧩 Үстел ойындары адаптациясы',
     players: 'Бүкіл сынып',
     duration: '15–25 мин',
@@ -264,7 +393,7 @@ const BOARD_GAMES = [
   {
     id: 'bg-associations',
     name: 'Ассоциациялар (4 Сурет, 1 Ұғым)',
-    emoji: '🖼️',
+    icon: 'layers',
     category: '🧩 Үстел ойындары адаптациясы',
     players: 'Бүкіл сынып / командалар',
     duration: '15–30 мин',
@@ -311,7 +440,7 @@ function renderBoardGameCards() {
           ${games.map(game => `
             <div class="bg-card" role="article">
               <div class="bg-card-header" style="background:linear-gradient(135deg,${game.color[0]},${game.color[1]})">
-                <span class="bg-emoji">${game.emoji}</span>
+                <span class="bg-emoji">${_SVGIC[game.icon] || game.icon || ""}</span>
                 <div class="bg-badges">
                   <span class="bg-badge">👥 ${esc(game.players)}</span>
                   <span class="bg-badge">⏱ ${esc(game.duration)}</span>
@@ -345,7 +474,7 @@ window.openBoardGameModal = function(gameId) {
     <div class="bg-modal" role="dialog" aria-modal="true">
       <div class="bg-modal-header" style="background:linear-gradient(135deg,${game.color[0]},${game.color[1]})">
         <div style="display:flex;align-items:center;gap:14px">
-          <span style="font-size:36px">${game.emoji}</span>
+          <span style="font-size:36px">${_SVGIC[game.icon] || game.icon || ""}</span>
           <div>
             <div class="bg-modal-title">${esc(game.name)}</div>
             <div class="bg-modal-sub">${esc(game.category)} · ${esc(game.players)} · ${esc(game.duration)}</div>
@@ -370,7 +499,7 @@ window.openBoardGameModal = function(gameId) {
         </div>
         <div class="bg-modal-actions">
           <button class="bg-action-btn bg-action-primary" onclick="closeBoardGameModal();openBoardGameGenModal('${game.id}')">
-            ✨ Осы ойынға ЖИ сұрақтар жасау
+            ✨ Осы ойынға сұрақтар жасау
           </button>
           <button class="bg-action-btn bg-action-secondary" onclick="closeBoardGameModal()">
             Жабу
@@ -400,7 +529,7 @@ window.openBoardGameGenModal = function(gameId) {
     <div class="bg-modal" role="dialog" aria-modal="true">
       <div class="bg-modal-header" style="background:linear-gradient(135deg,${game.color[0]},${game.color[1]})">
         <div style="display:flex;align-items:center;gap:14px">
-          <span style="font-size:36px">${game.emoji}</span>
+          <span style="font-size:36px">${_SVGIC[game.icon] || game.icon || ""}</span>
           <div>
             <div class="bg-modal-title">✨ ${esc(game.name)} үшін сұрақтар</div>
             <div class="bg-modal-sub">ЖИ арқылы ойынға лайықталған сұрақтар жасаңыз</div>
@@ -427,7 +556,7 @@ window.openBoardGameGenModal = function(gameId) {
             <div class="bg-form-group" style="flex:1">
               <label class="bg-form-label">🔢 Сұрақ саны</label>
               <select id="bg-gen-count" class="bg-form-input">
-                <option value="6">6 сұрақ</option>
+                <option value="4">4 сұрақ</option>
                 <option value="10" selected>10 сұрақ</option>
                 <option value="15">15 сұрақ</option>
                 <option value="20">20 сұрақ</option>
@@ -715,7 +844,7 @@ function renderMyQuizzesGrid() {
     const isEmpty = !STATE.search && STATE.filterTag === 'all';
     grid.innerHTML = `
       <div style="grid-column:1/-1" class="empty-state-rich">
-        <div class="empty-icon">${isEmpty ? '🎯' : '🔍'}</div>
+        <div class="empty-icon">${isEmpty ? '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/><circle cx=\"12\" cy=\"12\" r=\"2\"></svg>' : '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"></svg>'}</div>
         <div class="empty-title">${isEmpty ? 'Квиздер жоқ' : 'Ештеңе табылмады'}</div>
         <div class="empty-sub">${isEmpty ? 'Бірінші квизді жасаңыз' : 'Іздеу параметрлерін өзгертіп көріңіз'}</div>
         ${isEmpty ? `<button class="empty-action-btn" onclick="window.location.href='./create-quiz.html'">Квиз жасау →</button>` : ''}
@@ -1226,6 +1355,256 @@ window.openInConstructor = function() {
 };
 
 // ═══════════════════════════════════════════════════════════════════
+// DOCX → КВИЗ (загрузка .docx, парсинг через mammoth.js, генерация ЖИ)
+// ═══════════════════════════════════════════════════════════════════
+let docxExtractedText = '';
+let docxFileName = '';
+
+window.openDocxQuizModal = function() {
+  const modal = el('docxQuizModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  modal.classList.add('active');
+  el('docxFormStep').style.display    = 'block';
+  el('docxLoadingStep').style.display = 'none';
+  el('docxPreviewStep').style.display = 'none';
+  updateDocxDailyLimit();
+  setupDocxDropZone();
+};
+
+window.closeDocxQuizModal = function() {
+  const m = el('docxQuizModal');
+  if (m) { m.style.display = 'none'; m.classList.remove('active'); }
+};
+
+window.backToDocxForm = function() {
+  el('docxFormStep').style.display    = 'block';
+  el('docxPreviewStep').style.display = 'none';
+};
+
+window.resetDocxUpload = function() {
+  docxExtractedText = '';
+  docxFileName = '';
+  el('docxFileInfo').style.display = 'none';
+  el('docxDropZone').style.display = 'block';
+  el('docxGenerateBtn').disabled = true;
+  const input = el('docxFileInput');
+  if (input) input.value = '';
+};
+
+function setupDocxDropZone() {
+  const zone  = el('docxDropZone');
+  const input = el('docxFileInput');
+  if (!zone || !input || zone._wired) return;
+  zone._wired = true;
+
+  zone.addEventListener('click', () => input.click());
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = '#8b5cf6'; });
+  zone.addEventListener('dragleave', () => { zone.style.borderColor = 'var(--border2)'; });
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.style.borderColor = 'var(--border2)';
+    const f = e.dataTransfer.files[0];
+    if (f) handleDocxFile(f);
+  });
+  input.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (f) handleDocxFile(f);
+  });
+}
+
+async function handleDocxFile(file) {
+  if (!file.name.toLowerCase().endsWith('.docx')) {
+    showToast('❌ Тек .docx форматы қабылданады', true);
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('❌ Файл тым үлкен (макс. 10MB)', true);
+    return;
+  }
+  if (typeof mammoth === 'undefined') {
+    showToast('❌ Құжат оқу кітапханасы жүктелмеді. Парақты қайта жүктеп көріңіз.', true);
+    return;
+  }
+
+  try {
+    el('docxDropZone').style.display = 'none';
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    docxExtractedText = (result.value || '').trim();
+    docxFileName = file.name;
+
+    if (!docxExtractedText || docxExtractedText.length < 30) {
+      showToast('❌ Құжатта мәтін табылмады', true);
+      resetDocxUpload();
+      return;
+    }
+
+    el('docxFileName').textContent = file.name;
+    el('docxFileInfo').style.display = 'flex';
+    el('docxGenerateBtn').disabled = false;
+    showToast('✓ Құжат оқылды (' + docxExtractedText.length + ' символ)');
+  } catch (e) {
+    console.error('docx parse error:', e);
+    showToast('❌ Файлды оқу қатесі', true);
+    resetDocxUpload();
+  }
+}
+
+async function updateDocxDailyLimit() {
+  const limitEl = el('docxLimitInfo');
+  if (!limitEl || !STATE.user) return;
+  try {
+    const snap  = await getDoc(doc(db, 'aiDailyLimits', STATE.user.uid));
+    const today = new Date().toISOString().split('T')[0];
+    const count = (snap.exists() && snap.data().date === today) ? (snap.data().count || 0) : 0;
+    const rem   = 10 - count;
+    limitEl.innerHTML = rem > 0
+      ? `Бүгін <strong>${rem}</strong> / 10 генерация қалды`
+      : `<span style="color:var(--duo-red,#ff4b4b)">Күндік лимит таусылды (10/10)</span>`;
+  } catch (_) { limitEl.textContent = 'Лимит: күніне 10 генерация'; }
+}
+
+window.generateQuizFromDocx = async function() {
+  if (!docxExtractedText) { showToast('Алдымен .docx файл жүктеңіз', true); return; }
+  if (!STATE.user) { showToast('Аккаунтқа кіріңіз', true); return; }
+
+  const limitRef = doc(db, 'aiDailyLimits', STATE.user.uid);
+  const snap      = await getDoc(limitRef);
+  const today     = new Date().toISOString().split('T')[0];
+  const count     = (snap.exists() && snap.data().date === today) ? (snap.data().count || 0) : 0;
+  if (count >= 10) { showToast('❌ Күндік лимит таусылды (10/10)', true); return; }
+
+  const countQ    = el('docxQuestionCount')?.value || '8';
+  const diff      = el('docxDifficulty')?.value || 'intermediate';
+  const diffLabel = { beginner: 'бастауыш', intermediate: 'орташа', advanced: 'жоғары' }[diff];
+
+  el('docxFormStep').style.display    = 'none';
+  el('docxLoadingStep').style.display = 'block';
+  el('docxLoadingText').textContent   = 'ЖИ мазмұнды талдап жатыр...';
+
+  // Ограничиваем длину текста, чтобы не превышать лимиты модели
+  const trimmedText = docxExtractedText.slice(0, 12000);
+
+  const prompt = `Берілген құжат мәтіні бойынша квиз жаса.
+Тіл: қазақша. Сұрақтар саны: ${countQ}. Деңгей: ${diffLabel}.
+Әр сұрақта 4 нұсқа, бір дұрыс жауап. Сұрақтар тек құжат мазмұнына негізделсін.
+ТЕК JSON қайтар (markdown жоқ, code block жоқ):
+{"title":"...","category":"...","questions":[{"question":"...","options":["A","B","C","D"],"correctIndex":0,"explanation":"..."}]}
+
+ҚҰЖАТ МӘТІНІ:
+"""
+${trimmedText}
+"""`;
+
+  try {
+    const resp = await fetch(GEMINI_ENDPOINT(STATE.selectedModel), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { response_mime_type: 'application/json', temperature: 0.6 },
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error?.message || 'Gemini error');
+    const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text
+      ?.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
+    if (!jsonText) throw new Error('Бос жауап');
+
+    const quiz = JSON.parse(jsonText);
+    if (!quiz.title) quiz.title = docxFileName.replace(/\.docx$/i, '');
+    STATE.currentDocxQuiz = quiz;
+    showDocxPreview(quiz);
+
+    if (!snap.exists() || snap.data().date !== today)
+      await setDoc(limitRef, { count: 1, date: today });
+    else
+      await updateDoc(limitRef, { count: increment(1) });
+
+  } catch (e) {
+    console.error('Docx quiz gen error:', e);
+    showToast('❌ Генерация қатесі. Қайталап көр.', true);
+    el('docxFormStep').style.display    = 'block';
+    el('docxLoadingStep').style.display = 'none';
+  }
+};
+
+function showDocxPreview(quiz) {
+  const content = `
+    <div style="margin-bottom:16px">
+      <h3 style="margin:0 0 8px;font-size:16px">${esc(quiz.title)}</h3>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="background:var(--bg3);color:var(--text3);padding:3px 10px;border-radius:99px;font-family:var(--mono);font-size:11px">${esc(quiz.category || 'Құжаттан')}</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">${quiz.questions?.length || 0} сұрақ</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">· ${esc(docxFileName)}</span>
+      </div>
+    </div>
+    <div style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px">
+      ${(quiz.questions || []).map((q, i) => `
+        <div style="padding:14px;background:var(--bg2);border:1px solid rgba(255,255,255,.08);border-radius:12px">
+          <div style="font-weight:700;margin-bottom:10px;font-size:13px;line-height:1.4">${i + 1}. ${esc(q.question)}</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            ${(q.options || []).map((opt, idx) => `
+              <div style="padding:8px 12px;border:1px solid ${idx === q.correctIndex ? '#57cc02' : 'rgba(255,255,255,.08)'};background:${idx === q.correctIndex ? 'rgba(87,204,2,.07)' : 'transparent'};border-radius:8px;font-size:12px;display:flex;gap:6px">
+                <span style="opacity:.5">${String.fromCharCode(65 + idx)}.</span>
+                <span>${esc(opt)}</span>
+                ${idx === q.correctIndex ? '<span style="color:#57cc02;margin-left:auto">✓</span>' : ''}
+              </div>`).join('')}
+          </div>
+          ${q.explanation ? `<div style="margin-top:8px;font-size:11px;color:var(--text3);padding:8px;background:var(--bg3);border-radius:6px;line-height:1.5">${esc(q.explanation)}</div>` : ''}
+        </div>`).join('')}
+    </div>`;
+
+  el('docxPreviewContent').innerHTML = content;
+  el('docxLoadingStep').style.display = 'none';
+  el('docxPreviewStep').style.display = 'block';
+}
+
+window.saveDocxQuizDirect = async function() {
+  if (!STATE.currentDocxQuiz || !STATE.user) return;
+  try {
+    await addDoc(collection(db, 'quizzes'), {
+      uid:      STATE.user.uid,
+      title:    STATE.currentDocxQuiz.title,
+      category: STATE.currentDocxQuiz.category || 'Құжаттан',
+      sourceFile: docxFileName,
+      questions: (STATE.currentDocxQuiz.questions || []).map(q => ({
+        type:         'multiple',
+        text:          q.question,
+        question:      q.question,
+        options:       (q.options || []).map((o, i) => ({ text: o, correct: i === q.correctIndex })),
+        correctIndex:  q.correctIndex,
+        explanation:   q.explanation || '',
+        timeLimit:     20,
+        points:        100,
+      })),
+      visibility:    'draft',
+      generatedByAI: true,
+      generatedFrom: 'docx',
+      aiModel:       STATE.selectedModel,
+      createdAt:     serverTimestamp(),
+    });
+    showToast(`✅ «${STATE.currentDocxQuiz.title}» сақталды!`);
+    closeDocxQuizModal();
+    STATE.currentDocxQuiz = null;
+    docxExtractedText = '';
+    docxFileName = '';
+    await loadMyQuizzes();
+  } catch (e) {
+    console.error(e);
+    showToast('❌ Сақтау қатесі', true);
+  }
+};
+
+window.openDocxQuizInConstructor = function() {
+  if (!STATE.currentDocxQuiz) return;
+  sessionStorage.setItem('aiQuizDraft', JSON.stringify(STATE.currentDocxQuiz));
+  closeDocxQuizModal();
+  window.location.href = './create-quiz.html';
+};
+
+// ═══════════════════════════════════════════════════════════════════
 // СТИЛИ
 // ═══════════════════════════════════════════════════════════════════
 
@@ -1387,6 +1766,60 @@ function injectStyles() {
 .quiz-stat-chip{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)}
 .quiz-stat-num{font-size:18px;font-weight:900;line-height:1}
 .quiz-stat-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase}
+
+/* ══════════════════════════════════════════════════════
+   АДАПТАЦИЯ — планшет және телефон
+   ══════════════════════════════════════════════════════ */
+@media(max-width:900px){
+  .bg-cards-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:0 12px}
+  .qz-stats-strip{gap:8px}
+  .qz-stat{min-width:72px;padding:10px 12px}
+}
+
+@media(max-width:680px){
+  .bg-cards-grid{grid-template-columns:1fr;padding:0 12px}
+  .bg-category-header{padding:0 12px 10px}
+  .bg-stats-row{flex-wrap:wrap}
+  .bg-stat{flex:1 1 33%;min-width:90px;padding:12px 8px}
+  .bg-stat-num{font-size:20px}
+
+  .bg-modal-overlay,.qz-auth-wall{padding:0}
+  .bg-modal{max-width:100%;width:100%;height:100%;max-height:100%;border-radius:0}
+  .bg-modal-header{padding:18px 16px 14px;flex-wrap:wrap}
+  .bg-modal-title{font-size:15px}
+  .bg-modal-body{padding:0 16px 18px}
+  .bg-modal-actions{flex-direction:column}
+  .bg-action-btn{width:100%;text-align:center}
+
+  .bg-form-row{flex-direction:column;gap:14px}
+  .bg-card-footer{flex-direction:column}
+
+  .qz-card-actions{flex-direction:column}
+  .qz-stats-strip{flex-direction:column}
+  .qz-stat{min-width:0}
+
+  .qz-pin-digit{width:36px;height:46px;font-size:18px}
+
+  .quiz-stats-row{padding:12px 14px}
+  .quiz-stat-chip{padding:8px 6px}
+  .quiz-stat-num{font-size:15px}
+
+  .empty-state-rich{padding:32px 16px}
+  .qz-auth-wall{padding:60px 18px}
+}
+
+@media(max-width:420px){
+  .bg-card-title{font-size:13px}
+  .bg-card-desc{font-size:11.5px}
+  .bg-section-text,.bg-rules-list li{font-size:12.5px}
+  .qz-recent-row,.qz-launch-row{gap:8px}
+  .qz-pin-digit{width:32px;height:42px;font-size:16px}
+}
+
+/* Сенсорлық/тач құрылғыларда hover-тек әрекеттер әрқашан көрінсін */
+@media(hover:none){
+  .qz-delete-btn{opacity:1}
+}
 `;
   document.head.appendChild(s);
 }
